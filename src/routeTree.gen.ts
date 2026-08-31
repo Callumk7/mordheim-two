@@ -11,6 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoRouteImport } from './routes/demo'
+import { Route as WarbandsRouteImport } from './routes/warbands'
+import { Route as WarbandsIndexRouteImport } from './routes/warbands.index'
+import { Route as WarbandsWarbandIdRouteImport } from './routes/warbands.$warbandId'
+import { Route as WarbandsNewRouteImport } from './routes/warbands.new'
+import { Route as WarbandsWarbandIdIndexRouteImport } from './routes/warbands.$warbandId.index'
+import { Route as WarbandsWarbandIdDeleteRouteImport } from './routes/warbands.$warbandId.delete'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +28,101 @@ const DemoRoute = DemoRouteImport.update({
   path: '/demo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WarbandsRoute = WarbandsRouteImport.update({
+  id: '/warbands',
+  path: '/warbands',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WarbandsIndexRoute = WarbandsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => WarbandsRoute,
+} as any)
+const WarbandsWarbandIdRoute = WarbandsWarbandIdRouteImport.update({
+  id: '/$warbandId',
+  path: '/$warbandId',
+  getParentRoute: () => WarbandsRoute,
+} as any)
+const WarbandsNewRoute = WarbandsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => WarbandsRoute,
+} as any)
+const WarbandsWarbandIdIndexRoute = WarbandsWarbandIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => WarbandsWarbandIdRoute,
+} as any)
+const WarbandsWarbandIdDeleteRoute = WarbandsWarbandIdDeleteRouteImport.update({
+  id: '/delete',
+  path: '/delete',
+  getParentRoute: () => WarbandsWarbandIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/demo': typeof DemoRoute
+  '/warbands': typeof WarbandsRouteWithChildren
+  '/warbands/$warbandId': typeof WarbandsWarbandIdRouteWithChildren
+  '/warbands/new': typeof WarbandsNewRoute
+  '/warbands/': typeof WarbandsIndexRoute
+  '/warbands/$warbandId/delete': typeof WarbandsWarbandIdDeleteRoute
+  '/warbands/$warbandId/': typeof WarbandsWarbandIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/demo': typeof DemoRoute
+  '/warbands/new': typeof WarbandsNewRoute
+  '/warbands': typeof WarbandsIndexRoute
+  '/warbands/$warbandId/delete': typeof WarbandsWarbandIdDeleteRoute
+  '/warbands/$warbandId': typeof WarbandsWarbandIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/demo': typeof DemoRoute
+  '/warbands': typeof WarbandsRouteWithChildren
+  '/warbands/$warbandId': typeof WarbandsWarbandIdRouteWithChildren
+  '/warbands/new': typeof WarbandsNewRoute
+  '/warbands/': typeof WarbandsIndexRoute
+  '/warbands/$warbandId/delete': typeof WarbandsWarbandIdDeleteRoute
+  '/warbands/$warbandId/': typeof WarbandsWarbandIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/demo'
+  fullPaths:
+    | '/'
+    | '/demo'
+    | '/warbands'
+    | '/warbands/$warbandId'
+    | '/warbands/new'
+    | '/warbands/'
+    | '/warbands/$warbandId/delete'
+    | '/warbands/$warbandId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/demo'
-  id: '__root__' | '/' | '/demo'
+  to:
+    | '/'
+    | '/demo'
+    | '/warbands/new'
+    | '/warbands'
+    | '/warbands/$warbandId/delete'
+    | '/warbands/$warbandId'
+  id:
+    | '__root__'
+    | '/'
+    | '/demo'
+    | '/warbands'
+    | '/warbands/$warbandId'
+    | '/warbands/new'
+    | '/warbands/'
+    | '/warbands/$warbandId/delete'
+    | '/warbands/$warbandId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DemoRoute: typeof DemoRoute
+  WarbandsRoute: typeof WarbandsRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +141,84 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/warbands': {
+      id: '/warbands'
+      path: '/warbands'
+      fullPath: '/warbands'
+      preLoaderRoute: typeof WarbandsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/warbands/': {
+      id: '/warbands/'
+      path: '/'
+      fullPath: '/warbands/'
+      preLoaderRoute: typeof WarbandsIndexRouteImport
+      parentRoute: typeof WarbandsRoute
+    }
+    '/warbands/$warbandId': {
+      id: '/warbands/$warbandId'
+      path: '/$warbandId'
+      fullPath: '/warbands/$warbandId'
+      preLoaderRoute: typeof WarbandsWarbandIdRouteImport
+      parentRoute: typeof WarbandsRoute
+    }
+    '/warbands/new': {
+      id: '/warbands/new'
+      path: '/new'
+      fullPath: '/warbands/new'
+      preLoaderRoute: typeof WarbandsNewRouteImport
+      parentRoute: typeof WarbandsRoute
+    }
+    '/warbands/$warbandId/': {
+      id: '/warbands/$warbandId/'
+      path: '/'
+      fullPath: '/warbands/$warbandId/'
+      preLoaderRoute: typeof WarbandsWarbandIdIndexRouteImport
+      parentRoute: typeof WarbandsWarbandIdRoute
+    }
+    '/warbands/$warbandId/delete': {
+      id: '/warbands/$warbandId/delete'
+      path: '/delete'
+      fullPath: '/warbands/$warbandId/delete'
+      preLoaderRoute: typeof WarbandsWarbandIdDeleteRouteImport
+      parentRoute: typeof WarbandsWarbandIdRoute
+    }
   }
 }
+
+interface WarbandsWarbandIdRouteChildren {
+  WarbandsWarbandIdDeleteRoute: typeof WarbandsWarbandIdDeleteRoute
+  WarbandsWarbandIdIndexRoute: typeof WarbandsWarbandIdIndexRoute
+}
+
+const WarbandsWarbandIdRouteChildren: WarbandsWarbandIdRouteChildren = {
+  WarbandsWarbandIdDeleteRoute: WarbandsWarbandIdDeleteRoute,
+  WarbandsWarbandIdIndexRoute: WarbandsWarbandIdIndexRoute,
+}
+
+const WarbandsWarbandIdRouteWithChildren =
+  WarbandsWarbandIdRoute._addFileChildren(WarbandsWarbandIdRouteChildren)
+
+interface WarbandsRouteChildren {
+  WarbandsWarbandIdRoute: typeof WarbandsWarbandIdRouteWithChildren
+  WarbandsNewRoute: typeof WarbandsNewRoute
+  WarbandsIndexRoute: typeof WarbandsIndexRoute
+}
+
+const WarbandsRouteChildren: WarbandsRouteChildren = {
+  WarbandsWarbandIdRoute: WarbandsWarbandIdRouteWithChildren,
+  WarbandsNewRoute: WarbandsNewRoute,
+  WarbandsIndexRoute: WarbandsIndexRoute,
+}
+
+const WarbandsRouteWithChildren = WarbandsRoute._addFileChildren(
+  WarbandsRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DemoRoute: DemoRoute,
+  WarbandsRoute: WarbandsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
