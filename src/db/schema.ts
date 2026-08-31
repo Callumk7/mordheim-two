@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { check, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { MATCH_STATUSES } from "./match";
 import { WARBAND_STATUSES } from "./warband";
 
@@ -44,3 +44,31 @@ export const warbandMatches = sqliteTable("warband_matches", {
 
 export type WarbandMatch = typeof warbandMatches.$inferSelect;
 export type NewWarbandMatch = typeof warbandMatches.$inferInsert;
+
+export const events = sqliteTable(
+	"events",
+	{
+		id: text("id").primaryKey(),
+		matchId: text("match_id")
+			.notNull()
+			.references(() => matches.id, { onDelete: "cascade" }),
+		attackerWarbandId: text("attacker_warband_id")
+			.notNull()
+			.references(() => warbands.id, { onDelete: "cascade" }),
+		defenderWarbandId: text("defender_warband_id")
+			.notNull()
+			.references(() => warbands.id, { onDelete: "cascade" }),
+		notes: text("notes"),
+		createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+		updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+	},
+	(table) => [
+		check(
+			"events_distinct_warbands",
+			sql`${table.attackerWarbandId} <> ${table.defenderWarbandId}`,
+		),
+	],
+);
+
+export type Event = typeof events.$inferSelect;
+export type NewEvent = typeof events.$inferInsert;

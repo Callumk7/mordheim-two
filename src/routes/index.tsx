@@ -13,8 +13,8 @@ function Home() {
 					Keep order in the City of the Damned.
 				</h1>
 				<p className="mt-6 max-w-2xl text-lg leading-8 text-stone-400">
-					Track warbands, captains, ratings, scenarios, and matches from one
-					durable campaign ledger.
+					Track warbands, matches, and the knock downs that shape each campaign
+					encounter.
 				</p>
 				<div className="mt-9 flex flex-wrap gap-3">
 					<Link
@@ -29,6 +29,12 @@ function Home() {
 					>
 						Browse matches
 					</Link>
+					<Link
+						className="rounded-lg border border-stone-700 px-5 py-3 font-semibold text-stone-300 transition hover:border-stone-500 hover:text-stone-100"
+						to="/events"
+					>
+						Browse events
+					</Link>
 				</div>
 			</section>
 
@@ -40,7 +46,7 @@ function Home() {
 					Fast local updates synchronized through TanStack DB.
 				</Feature>
 				<Feature title="Campaign-ready routes">
-					Create, inspect, edit, and retire warbands and matches.
+					Create, inspect, edit, and retire warbands, matches, and events.
 				</Feature>
 			</section>
 		</main>

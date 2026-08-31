@@ -11,14 +11,20 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoRouteImport } from './routes/demo'
+import { Route as EventsRouteImport } from './routes/events'
 import { Route as MatchesRouteImport } from './routes/matches'
 import { Route as WarbandsRouteImport } from './routes/warbands'
+import { Route as EventsIndexRouteImport } from './routes/events.index'
+import { Route as EventsEventIdRouteImport } from './routes/events.$eventId'
+import { Route as EventsNewRouteImport } from './routes/events.new'
 import { Route as MatchesIndexRouteImport } from './routes/matches.index'
 import { Route as MatchesMatchIdRouteImport } from './routes/matches.$matchId'
 import { Route as MatchesNewRouteImport } from './routes/matches.new'
 import { Route as WarbandsIndexRouteImport } from './routes/warbands.index'
 import { Route as WarbandsWarbandIdRouteImport } from './routes/warbands.$warbandId'
 import { Route as WarbandsNewRouteImport } from './routes/warbands.new'
+import { Route as EventsEventIdIndexRouteImport } from './routes/events.$eventId.index'
+import { Route as EventsEventIdDeleteRouteImport } from './routes/events.$eventId.delete'
 import { Route as MatchesMatchIdIndexRouteImport } from './routes/matches.$matchId.index'
 import { Route as MatchesMatchIdDeleteRouteImport } from './routes/matches.$matchId.delete'
 import { Route as WarbandsWarbandIdIndexRouteImport } from './routes/warbands.$warbandId.index'
@@ -34,6 +40,11 @@ const DemoRoute = DemoRouteImport.update({
   path: '/demo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MatchesRoute = MatchesRouteImport.update({
   id: '/matches',
   path: '/matches',
@@ -43,6 +54,21 @@ const WarbandsRoute = WarbandsRouteImport.update({
   id: '/warbands',
   path: '/warbands',
   getParentRoute: () => rootRouteImport,
+} as any)
+const EventsIndexRoute = EventsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsEventIdRoute = EventsEventIdRouteImport.update({
+  id: '/$eventId',
+  path: '/$eventId',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsNewRoute = EventsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => EventsRoute,
 } as any)
 const MatchesIndexRoute = MatchesIndexRouteImport.update({
   id: '/',
@@ -74,6 +100,16 @@ const WarbandsNewRoute = WarbandsNewRouteImport.update({
   path: '/new',
   getParentRoute: () => WarbandsRoute,
 } as any)
+const EventsEventIdIndexRoute = EventsEventIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EventsEventIdRoute,
+} as any)
+const EventsEventIdDeleteRoute = EventsEventIdDeleteRouteImport.update({
+  id: '/delete',
+  path: '/delete',
+  getParentRoute: () => EventsEventIdRoute,
+} as any)
 const MatchesMatchIdIndexRoute = MatchesMatchIdIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -98,28 +134,38 @@ const WarbandsWarbandIdDeleteRoute = WarbandsWarbandIdDeleteRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/demo': typeof DemoRoute
+  '/events': typeof EventsRouteWithChildren
   '/matches': typeof MatchesRouteWithChildren
   '/warbands': typeof WarbandsRouteWithChildren
+  '/events/$eventId': typeof EventsEventIdRouteWithChildren
+  '/events/new': typeof EventsNewRoute
   '/matches/$matchId': typeof MatchesMatchIdRouteWithChildren
   '/matches/new': typeof MatchesNewRoute
   '/warbands/$warbandId': typeof WarbandsWarbandIdRouteWithChildren
   '/warbands/new': typeof WarbandsNewRoute
+  '/events/': typeof EventsIndexRoute
   '/matches/': typeof MatchesIndexRoute
   '/warbands/': typeof WarbandsIndexRoute
+  '/events/$eventId/delete': typeof EventsEventIdDeleteRoute
   '/matches/$matchId/delete': typeof MatchesMatchIdDeleteRoute
   '/warbands/$warbandId/delete': typeof WarbandsWarbandIdDeleteRoute
+  '/events/$eventId/': typeof EventsEventIdIndexRoute
   '/matches/$matchId/': typeof MatchesMatchIdIndexRoute
   '/warbands/$warbandId/': typeof WarbandsWarbandIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/demo': typeof DemoRoute
+  '/events/new': typeof EventsNewRoute
   '/matches/new': typeof MatchesNewRoute
   '/warbands/new': typeof WarbandsNewRoute
+  '/events': typeof EventsIndexRoute
   '/matches': typeof MatchesIndexRoute
   '/warbands': typeof WarbandsIndexRoute
+  '/events/$eventId/delete': typeof EventsEventIdDeleteRoute
   '/matches/$matchId/delete': typeof MatchesMatchIdDeleteRoute
   '/warbands/$warbandId/delete': typeof WarbandsWarbandIdDeleteRoute
+  '/events/$eventId': typeof EventsEventIdIndexRoute
   '/matches/$matchId': typeof MatchesMatchIdIndexRoute
   '/warbands/$warbandId': typeof WarbandsWarbandIdIndexRoute
 }
@@ -127,16 +173,22 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/demo': typeof DemoRoute
+  '/events': typeof EventsRouteWithChildren
   '/matches': typeof MatchesRouteWithChildren
   '/warbands': typeof WarbandsRouteWithChildren
+  '/events/$eventId': typeof EventsEventIdRouteWithChildren
+  '/events/new': typeof EventsNewRoute
   '/matches/$matchId': typeof MatchesMatchIdRouteWithChildren
   '/matches/new': typeof MatchesNewRoute
   '/warbands/$warbandId': typeof WarbandsWarbandIdRouteWithChildren
   '/warbands/new': typeof WarbandsNewRoute
+  '/events/': typeof EventsIndexRoute
   '/matches/': typeof MatchesIndexRoute
   '/warbands/': typeof WarbandsIndexRoute
+  '/events/$eventId/delete': typeof EventsEventIdDeleteRoute
   '/matches/$matchId/delete': typeof MatchesMatchIdDeleteRoute
   '/warbands/$warbandId/delete': typeof WarbandsWarbandIdDeleteRoute
+  '/events/$eventId/': typeof EventsEventIdIndexRoute
   '/matches/$matchId/': typeof MatchesMatchIdIndexRoute
   '/warbands/$warbandId/': typeof WarbandsWarbandIdIndexRoute
 }
@@ -145,44 +197,60 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/demo'
+    | '/events'
     | '/matches'
     | '/warbands'
+    | '/events/$eventId'
+    | '/events/new'
     | '/matches/$matchId'
     | '/matches/new'
     | '/warbands/$warbandId'
     | '/warbands/new'
+    | '/events/'
     | '/matches/'
     | '/warbands/'
+    | '/events/$eventId/delete'
     | '/matches/$matchId/delete'
     | '/warbands/$warbandId/delete'
+    | '/events/$eventId/'
     | '/matches/$matchId/'
     | '/warbands/$warbandId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/demo'
+    | '/events/new'
     | '/matches/new'
     | '/warbands/new'
+    | '/events'
     | '/matches'
     | '/warbands'
+    | '/events/$eventId/delete'
     | '/matches/$matchId/delete'
     | '/warbands/$warbandId/delete'
+    | '/events/$eventId'
     | '/matches/$matchId'
     | '/warbands/$warbandId'
   id:
     | '__root__'
     | '/'
     | '/demo'
+    | '/events'
     | '/matches'
     | '/warbands'
+    | '/events/$eventId'
+    | '/events/new'
     | '/matches/$matchId'
     | '/matches/new'
     | '/warbands/$warbandId'
     | '/warbands/new'
+    | '/events/'
     | '/matches/'
     | '/warbands/'
+    | '/events/$eventId/delete'
     | '/matches/$matchId/delete'
     | '/warbands/$warbandId/delete'
+    | '/events/$eventId/'
     | '/matches/$matchId/'
     | '/warbands/$warbandId/'
   fileRoutesById: FileRoutesById
@@ -190,6 +258,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DemoRoute: typeof DemoRoute
+  EventsRoute: typeof EventsRouteWithChildren
   MatchesRoute: typeof MatchesRouteWithChildren
   WarbandsRoute: typeof WarbandsRouteWithChildren
 }
@@ -210,6 +279,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/matches': {
       id: '/matches'
       path: '/matches'
@@ -223,6 +299,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/warbands'
       preLoaderRoute: typeof WarbandsRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/events/': {
+      id: '/events/'
+      path: '/'
+      fullPath: '/events/'
+      preLoaderRoute: typeof EventsIndexRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/$eventId': {
+      id: '/events/$eventId'
+      path: '/$eventId'
+      fullPath: '/events/$eventId'
+      preLoaderRoute: typeof EventsEventIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/new': {
+      id: '/events/new'
+      path: '/new'
+      fullPath: '/events/new'
+      preLoaderRoute: typeof EventsNewRouteImport
+      parentRoute: typeof EventsRoute
     }
     '/matches/': {
       id: '/matches/'
@@ -266,6 +363,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WarbandsNewRouteImport
       parentRoute: typeof WarbandsRoute
     }
+    '/events/$eventId/': {
+      id: '/events/$eventId/'
+      path: '/'
+      fullPath: '/events/$eventId/'
+      preLoaderRoute: typeof EventsEventIdIndexRouteImport
+      parentRoute: typeof EventsEventIdRoute
+    }
+    '/events/$eventId/delete': {
+      id: '/events/$eventId/delete'
+      path: '/delete'
+      fullPath: '/events/$eventId/delete'
+      preLoaderRoute: typeof EventsEventIdDeleteRouteImport
+      parentRoute: typeof EventsEventIdRoute
+    }
     '/matches/$matchId/': {
       id: '/matches/$matchId/'
       path: '/'
@@ -296,6 +407,35 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface EventsEventIdRouteChildren {
+  EventsEventIdDeleteRoute: typeof EventsEventIdDeleteRoute
+  EventsEventIdIndexRoute: typeof EventsEventIdIndexRoute
+}
+
+const EventsEventIdRouteChildren: EventsEventIdRouteChildren = {
+  EventsEventIdDeleteRoute: EventsEventIdDeleteRoute,
+  EventsEventIdIndexRoute: EventsEventIdIndexRoute,
+}
+
+const EventsEventIdRouteWithChildren = EventsEventIdRoute._addFileChildren(
+  EventsEventIdRouteChildren,
+)
+
+interface EventsRouteChildren {
+  EventsEventIdRoute: typeof EventsEventIdRouteWithChildren
+  EventsNewRoute: typeof EventsNewRoute
+  EventsIndexRoute: typeof EventsIndexRoute
+}
+
+const EventsRouteChildren: EventsRouteChildren = {
+  EventsEventIdRoute: EventsEventIdRouteWithChildren,
+  EventsNewRoute: EventsNewRoute,
+  EventsIndexRoute: EventsIndexRoute,
+}
+
+const EventsRouteWithChildren =
+  EventsRoute._addFileChildren(EventsRouteChildren)
 
 interface MatchesMatchIdRouteChildren {
   MatchesMatchIdDeleteRoute: typeof MatchesMatchIdDeleteRoute
@@ -358,6 +498,7 @@ const WarbandsRouteWithChildren = WarbandsRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DemoRoute: DemoRoute,
+  EventsRoute: EventsRouteWithChildren,
   MatchesRoute: MatchesRouteWithChildren,
   WarbandsRoute: WarbandsRouteWithChildren,
 }

@@ -49,6 +49,7 @@ function createWarbandsCollection(queryClient: QueryClient) {
 						deleteWarband({ data: { id: mutation.original.id } }),
 					),
 				);
+				await queryClient.invalidateQueries({ queryKey: ["events"] });
 			},
 		}),
 	);

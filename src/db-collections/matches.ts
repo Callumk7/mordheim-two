@@ -43,6 +43,7 @@ function createMatchesCollection(queryClient: QueryClient) {
 						deleteMatch({ data: { id: mutation.original.id } }),
 					),
 				);
+				await queryClient.invalidateQueries({ queryKey: ["events"] });
 			},
 		}),
 	);
