@@ -13,6 +13,10 @@
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check",
+    "cf-typegen": "wrangler types",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply mordheim-two-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply mordheim-two-db --remote",
     "deploy": "pnpm run build && wrangler deploy"
   },
   "dependencies": {
@@ -29,6 +33,7 @@
     "@tanstack/react-router-ssr-query": "latest",
     "@tanstack/react-start": "latest",
     "@tanstack/react-table": "latest",
+    "drizzle-orm": "^0.45.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwindcss": "^4.1.18",
@@ -43,6 +48,7 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^6.0.1",
+    "drizzle-kit": "^0.31.10",
     "typescript": "^6.0.2",
     "vite": "^8.0.0",
     "wrangler": "^4.70.0"

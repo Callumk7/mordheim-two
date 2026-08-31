@@ -3,5 +3,13 @@
   "name": "tanstack-start-app",
   "compatibility_date": "2025-09-02",
   "compatibility_flags": ["nodejs_compat"],
-  "main": "@tanstack/react-start/server-entry"
+  "main": "@tanstack/react-start/server-entry",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "mordheim-two-db",
+      "database_id": "45d02283-1ed1-4ff0-ade4-83fe6c36d59c",
+      "migrations_dir": "drizzle"
+    }
+  ]
 }

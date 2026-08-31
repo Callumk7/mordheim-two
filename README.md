@@ -54,7 +54,38 @@ For production env vars, run `wrangler secret put MY_VAR` for each secret listed
 
 KV, D1, R2, and Durable Object bindings are configured in `wrangler.jsonc` — see https://developers.cloudflare.com/workers/wrangler/configuration/.
 
+## Database
 
+The app uses Drizzle ORM with the `DB` Cloudflare D1 binding. The schema is in
+`src/db/schema.ts`, and the server-only Drizzle client is exposed by
+`getDb()` in `src/db/index.server.ts`.
+
+After changing the schema, generate and apply a migration:
+
+```bash
+pnpm db:generate
+pnpm db:migrate:local
+pnpm db:migrate:remote
+```
+
+Regenerate Cloudflare binding types after changing `wrangler.jsonc`:
+
+```bash
+pnpm cf-typegen
+```
+
+Database access must stay in server functions or other server-only files. For
+example:
+
+```ts
+import { createServerFn } from "@tanstack/react-start";
+import { getDb } from "@/db/index.server";
+import { warbands } from "@/db/schema";
+
+export const listWarbands = createServerFn({ method: "GET" }).handler(
+  async () => getDb().select().from(warbands),
+);
+```
 
 ## Routing
 
