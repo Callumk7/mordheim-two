@@ -7,13 +7,17 @@ import {
 	tableFeatures,
 	useTable,
 } from "@tanstack/react-table";
-import { useEffect, useState } from "react";
-import { type Warband, warbandsCollection } from "../db-collections/warbands";
+import { useEffect, useMemo, useState } from "react";
+import {
+	getWarbandsCollection,
+	type Warband,
+	type WarbandsCollection,
+} from "../db-collections/warbands";
 
 export const Route = createFileRoute("/demo")({
 	ssr: false,
-	loader: async () => {
-		await warbandsCollection.preload();
+	loader: async ({ context }) => {
+		await getWarbandsCollection(context.queryClient).preload();
 		return null;
 	},
 	component: DemoPage,
@@ -26,126 +30,134 @@ const features = tableFeatures({
 
 const columnHelper = createColumnHelper<typeof features, Warband>();
 
-const columns = columnHelper.columns([
-	columnHelper.accessor("name", {
-		header: "Warband",
-		cell: ({ row }) => (
-			<div className="grid min-w-44 gap-1">
+function createColumns(warbandsCollection: WarbandsCollection) {
+	return columnHelper.columns([
+		columnHelper.accessor("name", {
+			header: "Warband",
+			cell: ({ row }) => (
+				<div className="grid min-w-44 gap-1">
+					<EditableText
+						ariaLabel="Warband name"
+						className="font-semibold text-stone-100"
+						onCommit={(name) =>
+							warbandsCollection.update(row.original.id, (draft) => {
+								draft.name = name;
+							})
+						}
+						value={row.original.name}
+					/>
+					<EditableText
+						ariaLabel="Faction"
+						className="text-xs text-stone-500"
+						onCommit={(faction) =>
+							warbandsCollection.update(row.original.id, (draft) => {
+								draft.faction = faction;
+							})
+						}
+						value={row.original.faction}
+					/>
+				</div>
+			),
+		}),
+		columnHelper.accessor("captain", {
+			header: "Captain",
+			cell: ({ row }) => (
 				<EditableText
-					ariaLabel="Warband name"
-					className="font-semibold text-stone-100"
-					onCommit={(name) =>
+					ariaLabel="Captain"
+					onCommit={(captain) =>
 						warbandsCollection.update(row.original.id, (draft) => {
-							draft.name = name;
+							draft.captain = captain;
 						})
 					}
-					value={row.original.name}
+					value={row.original.captain}
 				/>
-				<EditableText
-					ariaLabel="Faction"
-					className="text-xs text-stone-500"
-					onCommit={(faction) =>
+			),
+		}),
+		columnHelper.accessor("rating", {
+			header: "Rating",
+			cell: ({ row }) => (
+				<EditableNumber
+					ariaLabel="Rating"
+					onCommit={(rating) =>
 						warbandsCollection.update(row.original.id, (draft) => {
-							draft.faction = faction;
+							draft.rating = rating;
 						})
 					}
-					value={row.original.faction}
+					value={row.original.rating}
 				/>
-			</div>
-		),
-	}),
-	columnHelper.accessor("captain", {
-		header: "Captain",
-		cell: ({ row }) => (
-			<EditableText
-				ariaLabel="Captain"
-				onCommit={(captain) =>
-					warbandsCollection.update(row.original.id, (draft) => {
-						draft.captain = captain;
-					})
-				}
-				value={row.original.captain}
-			/>
-		),
-	}),
-	columnHelper.accessor("rating", {
-		header: "Rating",
-		cell: ({ row }) => (
-			<EditableNumber
-				ariaLabel="Rating"
-				onCommit={(rating) =>
-					warbandsCollection.update(row.original.id, (draft) => {
-						draft.rating = rating;
-					})
-				}
-				value={row.original.rating}
-			/>
-		),
-	}),
-	columnHelper.accessor("wins", {
-		header: "Wins",
-		cell: ({ row }) => (
-			<EditableNumber
-				ariaLabel="Wins"
-				onCommit={(wins) =>
-					warbandsCollection.update(row.original.id, (draft) => {
-						draft.wins = wins;
-					})
-				}
-				value={row.original.wins}
-			/>
-		),
-	}),
-	columnHelper.accessor("status", {
-		header: "Status",
-		cell: ({ row }) => (
-			<select
-				aria-label="Status"
-				className="rounded-md border border-transparent bg-transparent px-2 py-1 text-xs text-stone-300 outline-none transition hover:border-stone-700 focus:border-amber-500"
-				onChange={(event) =>
-					warbandsCollection.update(row.original.id, (draft) => {
-						draft.status = event.target.value as Warband["status"];
-					})
-				}
-				value={row.original.status}
-			>
-				<option value="Ready">Ready</option>
-				<option value="Recovering">Recovering</option>
-				<option value="Recruiting">Recruiting</option>
-			</select>
-		),
-	}),
-	columnHelper.display({
-		id: "actions",
-		header: "Actions",
-		cell: ({ row }) => (
-			<div className="flex justify-end gap-2">
-				<button
-					className="rounded-md border border-stone-700 px-2.5 py-1 text-xs text-stone-300 transition hover:border-amber-400/60 hover:text-amber-300"
-					onClick={() => {
+			),
+		}),
+		columnHelper.accessor("wins", {
+			header: "Wins",
+			cell: ({ row }) => (
+				<EditableNumber
+					ariaLabel="Wins"
+					onCommit={(wins) =>
 						warbandsCollection.update(row.original.id, (draft) => {
-							draft.wins += 1;
-							draft.rating += 5;
-						});
-					}}
-					type="button"
+							draft.wins = wins;
+						})
+					}
+					value={row.original.wins}
+				/>
+			),
+		}),
+		columnHelper.accessor("status", {
+			header: "Status",
+			cell: ({ row }) => (
+				<select
+					aria-label="Status"
+					className="rounded-md border border-transparent bg-transparent px-2 py-1 text-xs text-stone-300 outline-none transition hover:border-stone-700 focus:border-amber-500"
+					onChange={(event) =>
+						warbandsCollection.update(row.original.id, (draft) => {
+							draft.status = event.target.value as Warband["status"];
+						})
+					}
+					value={row.original.status}
 				>
-					+ win
-				</button>
-				<button
-					aria-label={`Delete ${row.original.name}`}
-					className="rounded-md border border-stone-700 px-2.5 py-1 text-xs text-stone-500 transition hover:border-rose-400/60 hover:text-rose-300"
-					onClick={() => warbandsCollection.delete(row.original.id)}
-					type="button"
-				>
-					Remove
-				</button>
-			</div>
-		),
-	}),
-]);
+					<option value="Ready">Ready</option>
+					<option value="Recovering">Recovering</option>
+					<option value="Recruiting">Recruiting</option>
+				</select>
+			),
+		}),
+		columnHelper.display({
+			id: "actions",
+			header: "Actions",
+			cell: ({ row }) => (
+				<div className="flex justify-end gap-2">
+					<button
+						className="rounded-md border border-stone-700 px-2.5 py-1 text-xs text-stone-300 transition hover:border-amber-400/60 hover:text-amber-300"
+						onClick={() => {
+							warbandsCollection.update(row.original.id, (draft) => {
+								draft.wins += 1;
+								draft.rating += 5;
+							});
+						}}
+						type="button"
+					>
+						+ win
+					</button>
+					<button
+						aria-label={`Delete ${row.original.name}`}
+						className="rounded-md border border-stone-700 px-2.5 py-1 text-xs text-stone-500 transition hover:border-rose-400/60 hover:text-rose-300"
+						onClick={() => warbandsCollection.delete(row.original.id)}
+						type="button"
+					>
+						Remove
+					</button>
+				</div>
+			),
+		}),
+	]);
+}
 
 function DemoPage() {
+	const { queryClient } = Route.useRouteContext();
+	const warbandsCollection = getWarbandsCollection(queryClient);
+	const columns = useMemo(
+		() => createColumns(warbandsCollection),
+		[warbandsCollection],
+	);
 	const [search, setSearch] = useState("");
 	const [name, setName] = useState("");
 

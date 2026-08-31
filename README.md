@@ -60,12 +60,24 @@ The app uses Drizzle ORM with the `DB` Cloudflare D1 binding. The schema is in
 `src/db/schema.ts`, and the server-only Drizzle client is exposed by
 `getDb()` in `src/db/index.server.ts`.
 
+The demo's TanStack DB collection uses a TanStack Query collection backed by
+server functions in `src/db/warbands.functions.ts`. Reads and optimistic
+insert/update/delete operations are persisted to D1 and automatically
+refetched after each mutation.
+
 After changing the schema, generate and apply a migration:
 
 ```bash
 pnpm db:generate
 pnpm db:migrate:local
 pnpm db:migrate:remote
+```
+
+Seed the example warbands when setting up a fresh database:
+
+```bash
+pnpm db:seed:local
+pnpm db:seed:remote
 ```
 
 Regenerate Cloudflare binding types after changing `wrangler.jsonc`:

@@ -17,6 +17,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply mordheim-two-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply mordheim-two-db --remote",
+    "db:seed:local": "wrangler d1 execute mordheim-two-db --local --file scripts/seed.sql",
+    "db:seed:remote": "wrangler d1 execute mordheim-two-db --remote --file scripts/seed.sql",
     "deploy": "pnpm run build && wrangler deploy"
   },
   "dependencies": {

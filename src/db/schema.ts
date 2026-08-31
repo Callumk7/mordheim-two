@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { WARBAND_STATUSES } from "./warband";
 
 export const warbands = sqliteTable("warbands", {
 	id: text("id").primaryKey(),
@@ -8,9 +9,7 @@ export const warbands = sqliteTable("warbands", {
 	captain: text("captain").notNull(),
 	rating: integer("rating").notNull().default(0),
 	wins: integer("wins").notNull().default(0),
-	status: text("status", {
-		enum: ["Ready", "Recovering", "Recruiting"],
-	})
+	status: text("status", { enum: WARBAND_STATUSES })
 		.notNull()
 		.default("Recruiting"),
 	createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
