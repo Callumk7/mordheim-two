@@ -24,6 +24,12 @@ function Home() {
 						Browse warbands
 					</Link>
 					<Link
+						className="rounded-lg bg-amber-400 px-5 py-3 font-semibold text-stone-950 transition hover:bg-amber-300"
+						to="/warriors"
+					>
+						Browse warriors
+					</Link>
+					<Link
 						className="rounded-lg border border-stone-700 px-5 py-3 font-semibold text-stone-300 transition hover:border-stone-500 hover:text-stone-100"
 						to="/matches"
 					>
@@ -37,33 +43,6 @@ function Home() {
 					</Link>
 				</div>
 			</section>
-
-			<section className="mt-16 grid gap-4 border-t border-stone-800 pt-8 sm:grid-cols-3">
-				<Feature title="Persistent records">
-					Drizzle-backed data stored in Cloudflare D1.
-				</Feature>
-				<Feature title="Optimistic commands">
-					Fast local updates synchronized through TanStack DB.
-				</Feature>
-				<Feature title="Campaign-ready routes">
-					Create, inspect, edit, and retire warbands, matches, and events.
-				</Feature>
-			</section>
 		</main>
-	);
-}
-
-function Feature({
-	children,
-	title,
-}: {
-	children: React.ReactNode;
-	title: string;
-}) {
-	return (
-		<article className="rounded-xl border border-stone-800 bg-stone-900/30 p-5">
-			<h2 className="font-semibold text-stone-100">{title}</h2>
-			<p className="mt-2 text-sm leading-6 text-stone-500">{children}</p>
-		</article>
 	);
 }

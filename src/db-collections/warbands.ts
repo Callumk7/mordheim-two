@@ -1,11 +1,7 @@
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
 import { createCollection } from "@tanstack/react-db";
 import type { QueryClient } from "@tanstack/react-query";
-import {
-	type Warband,
-	WarbandSchema,
-	WarbandUpdateSchema,
-} from "../db/warband";
+import { WarbandSchema, WarbandUpdateSchema } from "../db/warband";
 import {
 	createWarband,
 	deleteWarband,
@@ -67,5 +63,3 @@ export function getWarbandsCollection(queryClient: QueryClient) {
 	collections.set(queryClient, collection);
 	return collection;
 }
-
-export type { Warband };

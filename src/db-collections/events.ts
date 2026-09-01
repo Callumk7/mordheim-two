@@ -1,7 +1,7 @@
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
 import { createCollection } from "@tanstack/react-db";
 import type { QueryClient } from "@tanstack/react-query";
-import { type Event, EventSchema, EventUpdateSchema } from "../db/event";
+import { EventSchema, EventUpdateSchema } from "../db/event";
 import {
 	createEvent,
 	deleteEvent,
@@ -62,5 +62,3 @@ export function getEventsCollection(queryClient: QueryClient) {
 	collections.set(queryClient, collection);
 	return collection;
 }
-
-export type { Event };

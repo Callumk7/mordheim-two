@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import { check, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { MATCH_STATUSES } from "./match";
 import { WARBAND_STATUSES } from "./warband";
+import { WARRIOR_STATUSES } from "./warrior";
 
 export const warbands = sqliteTable("warbands", {
 	id: text("id").primaryKey(),
@@ -17,8 +18,20 @@ export const warbands = sqliteTable("warbands", {
 	updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
-export type Warband = typeof warbands.$inferSelect;
-export type NewWarband = typeof warbands.$inferInsert;
+export const warriors = sqliteTable("warriors", {
+	id: text("id").primaryKey(),
+	name: text("name").notNull(),
+	class: text("class").notNull(),
+	status: text("status", { enum: WARRIOR_STATUSES }).notNull().default("Alive"),
+	warbandId: text("warband_id")
+		.notNull()
+		.references(() => warbands.id, { onDelete: "cascade" }),
+	knocked: integer("knocked").notNull().default(0),
+	injuries: integer("injuries").notNull().default(0), // TODO: add an injury table
+	knockedDowns: integer("knocked_downs").notNull().default(0),
+	createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+	updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
 
 export const matches = sqliteTable("matches", {
 	id: text("id").primaryKey(),
@@ -31,9 +44,6 @@ export const matches = sqliteTable("matches", {
 	updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
-export type Match = typeof matches.$inferSelect;
-export type NewMatch = typeof matches.$inferInsert;
-
 export const warbandMatches = sqliteTable("warband_matches", {
 	id: text("id").primaryKey(),
 	warbandId: text("warband_id").notNull(),
@@ -41,9 +51,6 @@ export const warbandMatches = sqliteTable("warband_matches", {
 	createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 	updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
-
-export type WarbandMatch = typeof warbandMatches.$inferSelect;
-export type NewWarbandMatch = typeof warbandMatches.$inferInsert;
 
 export const events = sqliteTable(
 	"events",
@@ -69,6 +76,3 @@ export const events = sqliteTable(
 		),
 	],
 );
-
-export type Event = typeof events.$inferSelect;
-export type NewEvent = typeof events.$inferInsert;

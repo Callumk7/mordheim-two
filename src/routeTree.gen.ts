@@ -14,6 +14,7 @@ import { Route as DemoRouteImport } from './routes/demo'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as MatchesRouteImport } from './routes/matches'
 import { Route as WarbandsRouteImport } from './routes/warbands'
+import { Route as WarriorsRouteImport } from './routes/warriors'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as EventsEventIdRouteImport } from './routes/events.$eventId'
 import { Route as EventsNewRouteImport } from './routes/events.new'
@@ -23,12 +24,17 @@ import { Route as MatchesNewRouteImport } from './routes/matches.new'
 import { Route as WarbandsIndexRouteImport } from './routes/warbands.index'
 import { Route as WarbandsWarbandIdRouteImport } from './routes/warbands.$warbandId'
 import { Route as WarbandsNewRouteImport } from './routes/warbands.new'
+import { Route as WarriorsIndexRouteImport } from './routes/warriors.index'
+import { Route as WarriorsWarriorIdRouteImport } from './routes/warriors.$warriorId'
+import { Route as WarriorsNewRouteImport } from './routes/warriors.new'
 import { Route as EventsEventIdIndexRouteImport } from './routes/events.$eventId.index'
 import { Route as EventsEventIdDeleteRouteImport } from './routes/events.$eventId.delete'
 import { Route as MatchesMatchIdIndexRouteImport } from './routes/matches.$matchId.index'
 import { Route as MatchesMatchIdDeleteRouteImport } from './routes/matches.$matchId.delete'
 import { Route as WarbandsWarbandIdIndexRouteImport } from './routes/warbands.$warbandId.index'
 import { Route as WarbandsWarbandIdDeleteRouteImport } from './routes/warbands.$warbandId.delete'
+import { Route as WarriorsWarriorIdIndexRouteImport } from './routes/warriors.$warriorId.index'
+import { Route as WarriorsWarriorIdDeleteRouteImport } from './routes/warriors.$warriorId.delete'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -53,6 +59,11 @@ const MatchesRoute = MatchesRouteImport.update({
 const WarbandsRoute = WarbandsRouteImport.update({
   id: '/warbands',
   path: '/warbands',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WarriorsRoute = WarriorsRouteImport.update({
+  id: '/warriors',
+  path: '/warriors',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsIndexRoute = EventsIndexRouteImport.update({
@@ -100,6 +111,21 @@ const WarbandsNewRoute = WarbandsNewRouteImport.update({
   path: '/new',
   getParentRoute: () => WarbandsRoute,
 } as any)
+const WarriorsIndexRoute = WarriorsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => WarriorsRoute,
+} as any)
+const WarriorsWarriorIdRoute = WarriorsWarriorIdRouteImport.update({
+  id: '/$warriorId',
+  path: '/$warriorId',
+  getParentRoute: () => WarriorsRoute,
+} as any)
+const WarriorsNewRoute = WarriorsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => WarriorsRoute,
+} as any)
 const EventsEventIdIndexRoute = EventsEventIdIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -130,6 +156,16 @@ const WarbandsWarbandIdDeleteRoute = WarbandsWarbandIdDeleteRouteImport.update({
   path: '/delete',
   getParentRoute: () => WarbandsWarbandIdRoute,
 } as any)
+const WarriorsWarriorIdIndexRoute = WarriorsWarriorIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => WarriorsWarriorIdRoute,
+} as any)
+const WarriorsWarriorIdDeleteRoute = WarriorsWarriorIdDeleteRouteImport.update({
+  id: '/delete',
+  path: '/delete',
+  getParentRoute: () => WarriorsWarriorIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -137,21 +173,27 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRouteWithChildren
   '/matches': typeof MatchesRouteWithChildren
   '/warbands': typeof WarbandsRouteWithChildren
+  '/warriors': typeof WarriorsRouteWithChildren
   '/events/$eventId': typeof EventsEventIdRouteWithChildren
   '/events/new': typeof EventsNewRoute
   '/matches/$matchId': typeof MatchesMatchIdRouteWithChildren
   '/matches/new': typeof MatchesNewRoute
   '/warbands/$warbandId': typeof WarbandsWarbandIdRouteWithChildren
   '/warbands/new': typeof WarbandsNewRoute
+  '/warriors/$warriorId': typeof WarriorsWarriorIdRouteWithChildren
+  '/warriors/new': typeof WarriorsNewRoute
   '/events/': typeof EventsIndexRoute
   '/matches/': typeof MatchesIndexRoute
   '/warbands/': typeof WarbandsIndexRoute
+  '/warriors/': typeof WarriorsIndexRoute
   '/events/$eventId/delete': typeof EventsEventIdDeleteRoute
   '/matches/$matchId/delete': typeof MatchesMatchIdDeleteRoute
   '/warbands/$warbandId/delete': typeof WarbandsWarbandIdDeleteRoute
+  '/warriors/$warriorId/delete': typeof WarriorsWarriorIdDeleteRoute
   '/events/$eventId/': typeof EventsEventIdIndexRoute
   '/matches/$matchId/': typeof MatchesMatchIdIndexRoute
   '/warbands/$warbandId/': typeof WarbandsWarbandIdIndexRoute
+  '/warriors/$warriorId/': typeof WarriorsWarriorIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -159,15 +201,19 @@ export interface FileRoutesByTo {
   '/events/new': typeof EventsNewRoute
   '/matches/new': typeof MatchesNewRoute
   '/warbands/new': typeof WarbandsNewRoute
+  '/warriors/new': typeof WarriorsNewRoute
   '/events': typeof EventsIndexRoute
   '/matches': typeof MatchesIndexRoute
   '/warbands': typeof WarbandsIndexRoute
+  '/warriors': typeof WarriorsIndexRoute
   '/events/$eventId/delete': typeof EventsEventIdDeleteRoute
   '/matches/$matchId/delete': typeof MatchesMatchIdDeleteRoute
   '/warbands/$warbandId/delete': typeof WarbandsWarbandIdDeleteRoute
+  '/warriors/$warriorId/delete': typeof WarriorsWarriorIdDeleteRoute
   '/events/$eventId': typeof EventsEventIdIndexRoute
   '/matches/$matchId': typeof MatchesMatchIdIndexRoute
   '/warbands/$warbandId': typeof WarbandsWarbandIdIndexRoute
+  '/warriors/$warriorId': typeof WarriorsWarriorIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -176,21 +222,27 @@ export interface FileRoutesById {
   '/events': typeof EventsRouteWithChildren
   '/matches': typeof MatchesRouteWithChildren
   '/warbands': typeof WarbandsRouteWithChildren
+  '/warriors': typeof WarriorsRouteWithChildren
   '/events/$eventId': typeof EventsEventIdRouteWithChildren
   '/events/new': typeof EventsNewRoute
   '/matches/$matchId': typeof MatchesMatchIdRouteWithChildren
   '/matches/new': typeof MatchesNewRoute
   '/warbands/$warbandId': typeof WarbandsWarbandIdRouteWithChildren
   '/warbands/new': typeof WarbandsNewRoute
+  '/warriors/$warriorId': typeof WarriorsWarriorIdRouteWithChildren
+  '/warriors/new': typeof WarriorsNewRoute
   '/events/': typeof EventsIndexRoute
   '/matches/': typeof MatchesIndexRoute
   '/warbands/': typeof WarbandsIndexRoute
+  '/warriors/': typeof WarriorsIndexRoute
   '/events/$eventId/delete': typeof EventsEventIdDeleteRoute
   '/matches/$matchId/delete': typeof MatchesMatchIdDeleteRoute
   '/warbands/$warbandId/delete': typeof WarbandsWarbandIdDeleteRoute
+  '/warriors/$warriorId/delete': typeof WarriorsWarriorIdDeleteRoute
   '/events/$eventId/': typeof EventsEventIdIndexRoute
   '/matches/$matchId/': typeof MatchesMatchIdIndexRoute
   '/warbands/$warbandId/': typeof WarbandsWarbandIdIndexRoute
+  '/warriors/$warriorId/': typeof WarriorsWarriorIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -200,21 +252,27 @@ export interface FileRouteTypes {
     | '/events'
     | '/matches'
     | '/warbands'
+    | '/warriors'
     | '/events/$eventId'
     | '/events/new'
     | '/matches/$matchId'
     | '/matches/new'
     | '/warbands/$warbandId'
     | '/warbands/new'
+    | '/warriors/$warriorId'
+    | '/warriors/new'
     | '/events/'
     | '/matches/'
     | '/warbands/'
+    | '/warriors/'
     | '/events/$eventId/delete'
     | '/matches/$matchId/delete'
     | '/warbands/$warbandId/delete'
+    | '/warriors/$warriorId/delete'
     | '/events/$eventId/'
     | '/matches/$matchId/'
     | '/warbands/$warbandId/'
+    | '/warriors/$warriorId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -222,15 +280,19 @@ export interface FileRouteTypes {
     | '/events/new'
     | '/matches/new'
     | '/warbands/new'
+    | '/warriors/new'
     | '/events'
     | '/matches'
     | '/warbands'
+    | '/warriors'
     | '/events/$eventId/delete'
     | '/matches/$matchId/delete'
     | '/warbands/$warbandId/delete'
+    | '/warriors/$warriorId/delete'
     | '/events/$eventId'
     | '/matches/$matchId'
     | '/warbands/$warbandId'
+    | '/warriors/$warriorId'
   id:
     | '__root__'
     | '/'
@@ -238,21 +300,27 @@ export interface FileRouteTypes {
     | '/events'
     | '/matches'
     | '/warbands'
+    | '/warriors'
     | '/events/$eventId'
     | '/events/new'
     | '/matches/$matchId'
     | '/matches/new'
     | '/warbands/$warbandId'
     | '/warbands/new'
+    | '/warriors/$warriorId'
+    | '/warriors/new'
     | '/events/'
     | '/matches/'
     | '/warbands/'
+    | '/warriors/'
     | '/events/$eventId/delete'
     | '/matches/$matchId/delete'
     | '/warbands/$warbandId/delete'
+    | '/warriors/$warriorId/delete'
     | '/events/$eventId/'
     | '/matches/$matchId/'
     | '/warbands/$warbandId/'
+    | '/warriors/$warriorId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -261,6 +329,7 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRouteWithChildren
   MatchesRoute: typeof MatchesRouteWithChildren
   WarbandsRoute: typeof WarbandsRouteWithChildren
+  WarriorsRoute: typeof WarriorsRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -298,6 +367,13 @@ declare module '@tanstack/react-router' {
       path: '/warbands'
       fullPath: '/warbands'
       preLoaderRoute: typeof WarbandsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/warriors': {
+      id: '/warriors'
+      path: '/warriors'
+      fullPath: '/warriors'
+      preLoaderRoute: typeof WarriorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/events/': {
@@ -363,6 +439,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WarbandsNewRouteImport
       parentRoute: typeof WarbandsRoute
     }
+    '/warriors/': {
+      id: '/warriors/'
+      path: '/'
+      fullPath: '/warriors/'
+      preLoaderRoute: typeof WarriorsIndexRouteImport
+      parentRoute: typeof WarriorsRoute
+    }
+    '/warriors/$warriorId': {
+      id: '/warriors/$warriorId'
+      path: '/$warriorId'
+      fullPath: '/warriors/$warriorId'
+      preLoaderRoute: typeof WarriorsWarriorIdRouteImport
+      parentRoute: typeof WarriorsRoute
+    }
+    '/warriors/new': {
+      id: '/warriors/new'
+      path: '/new'
+      fullPath: '/warriors/new'
+      preLoaderRoute: typeof WarriorsNewRouteImport
+      parentRoute: typeof WarriorsRoute
+    }
     '/events/$eventId/': {
       id: '/events/$eventId/'
       path: '/'
@@ -404,6 +501,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/warbands/$warbandId/delete'
       preLoaderRoute: typeof WarbandsWarbandIdDeleteRouteImport
       parentRoute: typeof WarbandsWarbandIdRoute
+    }
+    '/warriors/$warriorId/': {
+      id: '/warriors/$warriorId/'
+      path: '/'
+      fullPath: '/warriors/$warriorId/'
+      preLoaderRoute: typeof WarriorsWarriorIdIndexRouteImport
+      parentRoute: typeof WarriorsWarriorIdRoute
+    }
+    '/warriors/$warriorId/delete': {
+      id: '/warriors/$warriorId/delete'
+      path: '/delete'
+      fullPath: '/warriors/$warriorId/delete'
+      preLoaderRoute: typeof WarriorsWarriorIdDeleteRouteImport
+      parentRoute: typeof WarriorsWarriorIdRoute
     }
   }
 }
@@ -495,12 +606,42 @@ const WarbandsRouteWithChildren = WarbandsRoute._addFileChildren(
   WarbandsRouteChildren,
 )
 
+interface WarriorsWarriorIdRouteChildren {
+  WarriorsWarriorIdDeleteRoute: typeof WarriorsWarriorIdDeleteRoute
+  WarriorsWarriorIdIndexRoute: typeof WarriorsWarriorIdIndexRoute
+}
+
+const WarriorsWarriorIdRouteChildren: WarriorsWarriorIdRouteChildren = {
+  WarriorsWarriorIdDeleteRoute: WarriorsWarriorIdDeleteRoute,
+  WarriorsWarriorIdIndexRoute: WarriorsWarriorIdIndexRoute,
+}
+
+const WarriorsWarriorIdRouteWithChildren =
+  WarriorsWarriorIdRoute._addFileChildren(WarriorsWarriorIdRouteChildren)
+
+interface WarriorsRouteChildren {
+  WarriorsWarriorIdRoute: typeof WarriorsWarriorIdRouteWithChildren
+  WarriorsNewRoute: typeof WarriorsNewRoute
+  WarriorsIndexRoute: typeof WarriorsIndexRoute
+}
+
+const WarriorsRouteChildren: WarriorsRouteChildren = {
+  WarriorsWarriorIdRoute: WarriorsWarriorIdRouteWithChildren,
+  WarriorsNewRoute: WarriorsNewRoute,
+  WarriorsIndexRoute: WarriorsIndexRoute,
+}
+
+const WarriorsRouteWithChildren = WarriorsRoute._addFileChildren(
+  WarriorsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DemoRoute: DemoRoute,
   EventsRoute: EventsRouteWithChildren,
   MatchesRoute: MatchesRouteWithChildren,
   WarbandsRoute: WarbandsRouteWithChildren,
+  WarriorsRoute: WarriorsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

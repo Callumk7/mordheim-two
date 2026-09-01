@@ -75,6 +75,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 							<Link
 								activeProps={{ className: "bg-stone-800 text-amber-300" }}
 								className="rounded-md px-3 py-2 text-stone-400 transition hover:bg-stone-900 hover:text-stone-100"
+								to="/warriors"
+							>
+								Warriors
+							</Link>
+							<Link
+								activeProps={{ className: "bg-stone-800 text-amber-300" }}
+								className="rounded-md px-3 py-2 text-stone-400 transition hover:bg-stone-900 hover:text-stone-100"
 								to="/matches"
 							>
 								Matches
