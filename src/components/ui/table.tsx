@@ -1,8 +1,8 @@
-import {
-	type ComponentPropsWithoutRef,
-	type CSSProperties,
-	forwardRef,
-	type ReactNode,
+import type {
+	ComponentPropsWithoutRef,
+	CSSProperties,
+	ReactNode,
+	Ref,
 } from "react";
 import {
 	Cell as AriaCell,
@@ -34,10 +34,17 @@ type TableRowElement = HTMLDivElement | HTMLTableRowElement;
 
 type StyledTableProps = TableProps & {
 	minWidth?: CSSProperties["minWidth"];
+	ref?: Ref<TableElement>;
 };
 
-export const Table = forwardRef<TableElement, StyledTableProps>(
-	({ className, minWidth, style, ...props }, ref) => (
+export function Table({
+	className,
+	minWidth,
+	ref,
+	style,
+	...props
+}: StyledTableProps) {
+	return (
 		<AriaTable
 			{...props}
 			ref={ref}
@@ -49,30 +56,34 @@ export const Table = forwardRef<TableElement, StyledTableProps>(
 			)}
 			style={composeRenderProps(style, (style) => ({ minWidth, ...style }))}
 		/>
-	),
-);
-Table.displayName = "Table";
+	);
+}
 
-const TableHeaderBase = forwardRef<
-	TableSectionElement,
-	TableHeaderProps<unknown>
->(({ className, ...props }, ref) => (
-	<AriaTableHeader
-		{...props}
-		ref={ref}
-		className={composeRenderProps(className, (className) =>
-			withDefaultClassName(
-				className,
-				"border-b border-stone-800 bg-stone-900/70 text-xs uppercase tracking-wider text-stone-500",
-			),
-		)}
-	/>
-));
-TableHeaderBase.displayName = "TableHeader";
-export const TableHeader = TableHeaderBase as typeof AriaTableHeader;
+export function TableHeader<T>({
+	className,
+	ref,
+	...props
+}: TableHeaderProps<T> & { ref?: Ref<TableSectionElement> }) {
+	return (
+		<AriaTableHeader
+			{...props}
+			ref={ref}
+			className={composeRenderProps(className, (className) =>
+				withDefaultClassName(
+					className,
+					"border-b border-stone-800 bg-stone-900/70 text-xs uppercase tracking-wider text-stone-500",
+				),
+			)}
+		/>
+	);
+}
 
-const TableBodyBase = forwardRef<TableSectionElement, TableBodyProps<unknown>>(
-	({ className, ...props }, ref) => (
+export function TableBody<T>({
+	className,
+	ref,
+	...props
+}: TableBodyProps<T> & { ref?: Ref<TableSectionElement> }) {
+	return (
 		<AriaTableBody
 			{...props}
 			ref={ref}
@@ -80,13 +91,15 @@ const TableBodyBase = forwardRef<TableSectionElement, TableBodyProps<unknown>>(
 				withDefaultClassName(className, "divide-y divide-stone-800/80"),
 			)}
 		/>
-	),
-);
-TableBodyBase.displayName = "TableBody";
-export const TableBody = TableBodyBase as typeof AriaTableBody;
+	);
+}
 
-export const Column = forwardRef<TableCellElement, ColumnProps>(
-	({ className, ...props }, ref) => (
+export function Column({
+	className,
+	ref,
+	...props
+}: ColumnProps & { ref?: Ref<TableCellElement> }) {
+	return (
 		<AriaColumn
 			{...props}
 			ref={ref}
@@ -94,12 +107,15 @@ export const Column = forwardRef<TableCellElement, ColumnProps>(
 				withDefaultClassName(className, "px-5 py-3.5 font-medium"),
 			)}
 		/>
-	),
-);
-Column.displayName = "Column";
+	);
+}
 
-const RowBase = forwardRef<TableRowElement, RowProps<unknown>>(
-	({ className, ...props }, ref) => (
+export function Row<T>({
+	className,
+	ref,
+	...props
+}: RowProps<T> & { ref?: Ref<TableRowElement> }) {
+	return (
 		<AriaRow
 			{...props}
 			ref={ref}
@@ -107,13 +123,15 @@ const RowBase = forwardRef<TableRowElement, RowProps<unknown>>(
 				withDefaultClassName(className, "transition hover:bg-stone-900/60"),
 			)}
 		/>
-	),
-);
-RowBase.displayName = "Row";
-export const Row = RowBase as typeof AriaRow;
+	);
+}
 
-export const Cell = forwardRef<TableCellElement, CellProps>(
-	({ className, ...props }, ref) => (
+export function Cell({
+	className,
+	ref,
+	...props
+}: CellProps & { ref?: Ref<TableCellElement> }) {
+	return (
 		<AriaCell
 			{...props}
 			ref={ref}
@@ -121,9 +139,8 @@ export const Cell = forwardRef<TableCellElement, CellProps>(
 				withDefaultClassName(className, "px-5 py-4 text-stone-300"),
 			)}
 		/>
-	),
-);
-Cell.displayName = "Cell";
+	);
+}
 
 export function TableContainer({
 	children,
