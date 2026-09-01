@@ -4,14 +4,18 @@ import {
 	IndexEmptyState,
 	IndexPage,
 	IndexPageHeader,
-	IndexTable,
-	IndexTableActions,
-	IndexTableBody,
-	IndexTableCell,
-	IndexTableHead,
-	IndexTableHeader,
-	IndexTableRow,
 } from "../components/index-page";
+import {
+	Cell,
+	Column,
+	Row,
+	Table,
+	TableActions,
+	TableBody,
+	TableContainer,
+	TableHeader,
+	TablePrimaryCell,
+} from "../components/ui/table";
 import { getWarbandsCollection } from "../db-collections/warbands";
 
 export const Route = createFileRoute("/warbands/")({
@@ -38,50 +42,54 @@ function WarbandsIndexPage() {
 			/>
 
 			{warbands.length ? (
-				<IndexTable minWidth={720}>
-					<IndexTableHead>
-						<IndexTableHeader>Warband</IndexTableHeader>
-						<IndexTableHeader>Captain</IndexTableHeader>
-						<IndexTableHeader>Status</IndexTableHeader>
-						<IndexTableHeader>Rating</IndexTableHeader>
-						<IndexTableHeader align="right">Actions</IndexTableHeader>
-					</IndexTableHead>
-					<IndexTableBody>
-						{warbands.map((warband) => (
-							<IndexTableRow key={warband.id}>
-								<IndexTableCell primary>
-									<Link
-										params={{ warbandId: warband.id }}
-										to="/warbands/$warbandId"
-									>
-										{warband.name}
-									</Link>
-									<div className="mt-1 text-xs text-stone-500">
-										{warband.faction}
-									</div>
-								</IndexTableCell>
-								<IndexTableCell>{warband.captain}</IndexTableCell>
-								<IndexTableCell>{warband.status}</IndexTableCell>
-								<IndexTableCell tone="accent">{warband.rating}</IndexTableCell>
-								<IndexTableActions>
-									<Link
-										params={{ warbandId: warband.id }}
-										to="/warbands/$warbandId"
-									>
-										View
-									</Link>
-									<Link
-										data-danger
-										params={{ warbandId: warband.id }}
-										to="/warbands/$warbandId/delete"
-									>
-										Delete
-									</Link>
-								</IndexTableActions>
-							</IndexTableRow>
-						))}
-					</IndexTableBody>
-				</IndexTable>
+				<TableContainer>
+					<Table aria-label="Warbands" minWidth={720}>
+						<TableHeader>
+							<Column isRowHeader>Warband</Column>
+							<Column>Captain</Column>
+							<Column>Status</Column>
+							<Column>Rating</Column>
+							<Column className="text-right">Actions</Column>
+						</TableHeader>
+						<TableBody>
+							{warbands.map((warband) => (
+								<Row key={warband.id}>
+									<TablePrimaryCell>
+										<Link
+											params={{ warbandId: warband.id }}
+											to="/warbands/$warbandId"
+										>
+											{warband.name}
+										</Link>
+										<div className="mt-1 text-xs text-stone-500">
+											{warband.faction}
+										</div>
+									</TablePrimaryCell>
+									<Cell>{warband.captain}</Cell>
+									<Cell>{warband.status}</Cell>
+									<Cell className="font-mono text-amber-300">
+										{warband.rating}
+									</Cell>
+									<TableActions>
+										<Link
+											params={{ warbandId: warband.id }}
+											to="/warbands/$warbandId"
+										>
+											View
+										</Link>
+										<Link
+											data-danger
+											params={{ warbandId: warband.id }}
+											to="/warbands/$warbandId/delete"
+										>
+											Delete
+										</Link>
+									</TableActions>
+								</Row>
+							))}
+						</TableBody>
+					</Table>
+				</TableContainer>
 			) : (
 				<IndexEmptyState
 					action={<Link to="/warbands/new">Create a warband →</Link>}

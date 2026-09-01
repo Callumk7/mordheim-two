@@ -4,14 +4,18 @@ import {
 	IndexEmptyState,
 	IndexPage,
 	IndexPageHeader,
-	IndexTable,
-	IndexTableActions,
-	IndexTableBody,
-	IndexTableCell,
-	IndexTableHead,
-	IndexTableHeader,
-	IndexTableRow,
 } from "../components/index-page";
+import {
+	Cell,
+	Column,
+	Row,
+	Table,
+	TableActions,
+	TableBody,
+	TableContainer,
+	TableHeader,
+	TablePrimaryCell,
+} from "../components/ui/table";
 import { getWarbandsCollection } from "../db-collections/warbands";
 import { getWarriorsCollection } from "../db-collections/warriors";
 
@@ -46,58 +50,60 @@ function WarriorsIndexPage() {
 			/>
 
 			{warriors.length ? (
-				<IndexTable minWidth={760}>
-					<IndexTableHead>
-						<IndexTableHeader>Warrior</IndexTableHeader>
-						<IndexTableHeader>Warband</IndexTableHeader>
-						<IndexTableHeader>Status</IndexTableHeader>
-						<IndexTableHeader>Injuries</IndexTableHeader>
-						<IndexTableHeader>Knock downs</IndexTableHeader>
-						<IndexTableHeader align="right">Actions</IndexTableHeader>
-					</IndexTableHead>
-					<IndexTableBody>
-						{warriors.map((warrior) => (
-							<IndexTableRow key={warrior.id}>
-								<IndexTableCell primary>
-									<Link
-										params={{ warriorId: warrior.id }}
-										to="/warriors/$warriorId"
-									>
-										{warrior.name}
-									</Link>
-									<div className="mt-1 text-xs text-stone-500">
-										{warrior.class}
-									</div>
-								</IndexTableCell>
-								<IndexTableCell>
-									{warbandNames.get(warrior.warbandId) ?? "Unknown warband"}
-								</IndexTableCell>
-								<IndexTableCell>{warrior.status}</IndexTableCell>
-								<IndexTableCell tone="accent">
-									{warrior.injuries}
-								</IndexTableCell>
-								<IndexTableCell tone="accent">
-									{warrior.knockedDowns}
-								</IndexTableCell>
-								<IndexTableActions>
-									<Link
-										params={{ warriorId: warrior.id }}
-										to="/warriors/$warriorId"
-									>
-										View
-									</Link>
-									<Link
-										data-danger
-										params={{ warriorId: warrior.id }}
-										to="/warriors/$warriorId/delete"
-									>
-										Delete
-									</Link>
-								</IndexTableActions>
-							</IndexTableRow>
-						))}
-					</IndexTableBody>
-				</IndexTable>
+				<TableContainer>
+					<Table aria-label="Warriors" minWidth={760}>
+						<TableHeader>
+							<Column isRowHeader>Warrior</Column>
+							<Column>Warband</Column>
+							<Column>Status</Column>
+							<Column>Injuries</Column>
+							<Column>Knock downs</Column>
+							<Column className="text-right">Actions</Column>
+						</TableHeader>
+						<TableBody>
+							{warriors.map((warrior) => (
+								<Row key={warrior.id}>
+									<TablePrimaryCell>
+										<Link
+											params={{ warriorId: warrior.id }}
+											to="/warriors/$warriorId"
+										>
+											{warrior.name}
+										</Link>
+										<div className="mt-1 text-xs text-stone-500">
+											{warrior.class}
+										</div>
+									</TablePrimaryCell>
+									<Cell>
+										{warbandNames.get(warrior.warbandId) ?? "Unknown warband"}
+									</Cell>
+									<Cell>{warrior.status}</Cell>
+									<Cell className="font-mono text-amber-300">
+										{warrior.injuries}
+									</Cell>
+									<Cell className="font-mono text-amber-300">
+										{warrior.knockedDowns}
+									</Cell>
+									<TableActions>
+										<Link
+											params={{ warriorId: warrior.id }}
+											to="/warriors/$warriorId"
+										>
+											View
+										</Link>
+										<Link
+											data-danger
+											params={{ warriorId: warrior.id }}
+											to="/warriors/$warriorId/delete"
+										>
+											Delete
+										</Link>
+									</TableActions>
+								</Row>
+							))}
+						</TableBody>
+					</Table>
+				</TableContainer>
 			) : (
 				<IndexEmptyState
 					action={<Link to="/warriors/new">Create a warrior →</Link>}

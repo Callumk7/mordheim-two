@@ -4,14 +4,18 @@ import {
 	IndexEmptyState,
 	IndexPage,
 	IndexPageHeader,
-	IndexTable,
-	IndexTableActions,
-	IndexTableBody,
-	IndexTableCell,
-	IndexTableHead,
-	IndexTableHeader,
-	IndexTableRow,
 } from "../components/index-page";
+import {
+	Cell,
+	Column,
+	Row,
+	Table,
+	TableActions,
+	TableBody,
+	TableContainer,
+	TableHeader,
+	TablePrimaryCell,
+} from "../components/ui/table";
 import { getEventsCollection } from "../db-collections/events";
 import { getMatchesCollection } from "../db-collections/matches";
 import { getWarbandsCollection } from "../db-collections/warbands";
@@ -52,49 +56,51 @@ function EventsIndexPage() {
 			/>
 
 			{events.length ? (
-				<IndexTable minWidth={760}>
-					<IndexTableHead>
-						<IndexTableHeader>Match</IndexTableHeader>
-						<IndexTableHeader>Attacker</IndexTableHeader>
-						<IndexTableHeader>Defender</IndexTableHeader>
-						<IndexTableHeader>Notes</IndexTableHeader>
-						<IndexTableHeader align="right">Actions</IndexTableHeader>
-					</IndexTableHead>
-					<IndexTableBody>
-						{events.map((event) => (
-							<IndexTableRow key={event.id}>
-								<IndexTableCell primary>
-									<Link params={{ eventId: event.id }} to="/events/$eventId">
-										{matchNames.get(event.matchId) ?? "Unknown match"}
-									</Link>
-								</IndexTableCell>
-								<IndexTableCell>
-									{warbandNames.get(event.attackerWarbandId) ??
-										"Unknown warband"}
-								</IndexTableCell>
-								<IndexTableCell>
-									{warbandNames.get(event.defenderWarbandId) ??
-										"Unknown warband"}
-								</IndexTableCell>
-								<IndexTableCell className="max-w-64 truncate" tone="muted">
-									{event.notes || "—"}
-								</IndexTableCell>
-								<IndexTableActions>
-									<Link params={{ eventId: event.id }} to="/events/$eventId">
-										View
-									</Link>
-									<Link
-										data-danger
-										params={{ eventId: event.id }}
-										to="/events/$eventId/delete"
-									>
-										Delete
-									</Link>
-								</IndexTableActions>
-							</IndexTableRow>
-						))}
-					</IndexTableBody>
-				</IndexTable>
+				<TableContainer>
+					<Table aria-label="Events" minWidth={760}>
+						<TableHeader>
+							<Column isRowHeader>Match</Column>
+							<Column>Attacker</Column>
+							<Column>Defender</Column>
+							<Column>Notes</Column>
+							<Column className="text-right">Actions</Column>
+						</TableHeader>
+						<TableBody>
+							{events.map((event) => (
+								<Row key={event.id}>
+									<TablePrimaryCell>
+										<Link params={{ eventId: event.id }} to="/events/$eventId">
+											{matchNames.get(event.matchId) ?? "Unknown match"}
+										</Link>
+									</TablePrimaryCell>
+									<Cell>
+										{warbandNames.get(event.attackerWarbandId) ??
+											"Unknown warband"}
+									</Cell>
+									<Cell>
+										{warbandNames.get(event.defenderWarbandId) ??
+											"Unknown warband"}
+									</Cell>
+									<Cell className="text-stone-400 max-w-64 truncate">
+										{event.notes || "—"}
+									</Cell>
+									<TableActions>
+										<Link params={{ eventId: event.id }} to="/events/$eventId">
+											View
+										</Link>
+										<Link
+											data-danger
+											params={{ eventId: event.id }}
+											to="/events/$eventId/delete"
+										>
+											Delete
+										</Link>
+									</TableActions>
+								</Row>
+							))}
+						</TableBody>
+					</Table>
+				</TableContainer>
 			) : (
 				<IndexEmptyState
 					action={<Link to="/events/new">Create an event →</Link>}

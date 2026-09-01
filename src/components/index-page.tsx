@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 type ChildrenProps = {
 	children: ReactNode;
@@ -34,91 +34,6 @@ export function IndexPageHeader({
 				{action}
 			</div>
 		</header>
-	);
-}
-
-export function IndexTable({
-	children,
-	minWidth,
-}: ChildrenProps & { minWidth: number }) {
-	return (
-		<div className="overflow-hidden rounded-xl border border-stone-800 bg-stone-950/60">
-			<div className="overflow-x-auto">
-				<table
-					className="w-full border-collapse text-left text-sm"
-					style={{ minWidth } satisfies CSSProperties}
-				>
-					{children}
-				</table>
-			</div>
-		</div>
-	);
-}
-
-export function IndexTableHead({ children }: ChildrenProps) {
-	return (
-		<thead className="border-b border-stone-800 bg-stone-900/70 text-xs uppercase tracking-wider text-stone-500">
-			<tr>{children}</tr>
-		</thead>
-	);
-}
-
-export function IndexTableHeader({
-	align = "left",
-	children,
-}: ChildrenProps & { align?: "left" | "right" }) {
-	return (
-		<th
-			className={`px-5 py-3.5 font-medium ${align === "right" ? "text-right" : ""}`}
-		>
-			{children}
-		</th>
-	);
-}
-
-export function IndexTableBody({ children }: ChildrenProps) {
-	return <tbody className="divide-y divide-stone-800/80">{children}</tbody>;
-}
-
-export function IndexTableRow({ children }: ChildrenProps) {
-	return <tr className="transition hover:bg-stone-900/60">{children}</tr>;
-}
-
-export function IndexTableCell({
-	children,
-	className = "",
-	primary = false,
-	tone = "default",
-}: ChildrenProps & {
-	className?: string;
-	primary?: boolean;
-	tone?: "default" | "muted" | "accent";
-}) {
-	const toneClassName = {
-		accent: "font-mono text-amber-300",
-		default: "text-stone-300",
-		muted: "text-stone-400",
-	}[tone];
-	const primaryClassName = primary
-		? "[&_a]:font-semibold [&_a]:text-stone-100 [&_a:hover]:text-amber-300"
-		: "";
-
-	return (
-		<td
-			className={`px-5 py-4 ${toneClassName} ${primaryClassName} ${className}`}
-		>
-			{children}
-		</td>
-	);
-}
-
-export function IndexTableActions({ children }: ChildrenProps) {
-	return (
-		<IndexTableCell>
-			<div className="flex justify-end gap-3 [&_a]:text-stone-400 [&_a:hover]:text-stone-100 [&_a[data-danger]]:text-rose-400/80 [&_a[data-danger]:hover]:text-rose-300">
-				{children}
-			</div>
-		</IndexTableCell>
 	);
 }
 
