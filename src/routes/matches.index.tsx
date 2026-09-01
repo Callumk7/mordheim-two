@@ -1,16 +1,17 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
+	Cell,
+	Column,
+	Row,
+	TableBody,
+	TableHeader,
+} from "react-aria-components";
+import {
 	IndexEmptyState,
 	IndexPage,
 	IndexPageHeader,
 	IndexTable,
-	IndexTableActions,
-	IndexTableBody,
-	IndexTableCell,
-	IndexTableHead,
-	IndexTableHeader,
-	IndexTableRow,
 } from "../components/index-page";
 import { formatStatus } from "../components/match-form";
 import { getMatchesCollection } from "../db-collections/matches";
@@ -39,38 +40,42 @@ function MatchesIndexPage() {
 			/>
 
 			{matches.length ? (
-				<IndexTable minWidth={640}>
-					<IndexTableHead>
-						<IndexTableHeader>Match</IndexTableHeader>
-						<IndexTableHeader>Scenario</IndexTableHeader>
-						<IndexTableHeader>Status</IndexTableHeader>
-						<IndexTableHeader align="right">Actions</IndexTableHeader>
-					</IndexTableHead>
-					<IndexTableBody>
+				<IndexTable aria-label="Matches" minWidth={640}>
+					<TableHeader>
+						<Column isRowHeader>Match</Column>
+						<Column>Scenario</Column>
+						<Column>Status</Column>
+						<Column className="text-right">Actions</Column>
+					</TableHeader>
+					<TableBody>
 						{matches.map((match) => (
-							<IndexTableRow key={match.id}>
-								<IndexTableCell primary>
+							<Row key={match.id}>
+								<Cell className="text-stone-300 [&_a]:font-semibold [&_a]:text-stone-100 [&_a:hover]:text-amber-300">
 									<Link params={{ matchId: match.id }} to="/matches/$matchId">
 										{match.name}
 									</Link>
-								</IndexTableCell>
-								<IndexTableCell>{match.scenario}</IndexTableCell>
-								<IndexTableCell>{formatStatus(match.status)}</IndexTableCell>
-								<IndexTableActions>
-									<Link params={{ matchId: match.id }} to="/matches/$matchId">
-										View
-									</Link>
-									<Link
-										data-danger
-										params={{ matchId: match.id }}
-										to="/matches/$matchId/delete"
-									>
-										Delete
-									</Link>
-								</IndexTableActions>
-							</IndexTableRow>
+								</Cell>
+								<Cell className="text-stone-300">{match.scenario}</Cell>
+								<Cell className="text-stone-300">
+									{formatStatus(match.status)}
+								</Cell>
+								<Cell className="text-stone-300">
+									<div className="flex justify-end gap-3 [&_a]:text-stone-400 [&_a:hover]:text-stone-100 [&_a[data-danger]]:text-rose-400/80 [&_a[data-danger]:hover]:text-rose-300">
+										<Link params={{ matchId: match.id }} to="/matches/$matchId">
+											View
+										</Link>
+										<Link
+											data-danger
+											params={{ matchId: match.id }}
+											to="/matches/$matchId/delete"
+										>
+											Delete
+										</Link>
+									</div>
+								</Cell>
+							</Row>
 						))}
-					</IndexTableBody>
+					</TableBody>
 				</IndexTable>
 			) : (
 				<IndexEmptyState

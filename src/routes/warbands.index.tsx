@@ -1,16 +1,17 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
+	Cell,
+	Column,
+	Row,
+	TableBody,
+	TableHeader,
+} from "react-aria-components";
+import {
 	IndexEmptyState,
 	IndexPage,
 	IndexPageHeader,
 	IndexTable,
-	IndexTableActions,
-	IndexTableBody,
-	IndexTableCell,
-	IndexTableHead,
-	IndexTableHeader,
-	IndexTableRow,
 } from "../components/index-page";
 import { getWarbandsCollection } from "../db-collections/warbands";
 
@@ -38,18 +39,18 @@ function WarbandsIndexPage() {
 			/>
 
 			{warbands.length ? (
-				<IndexTable minWidth={720}>
-					<IndexTableHead>
-						<IndexTableHeader>Warband</IndexTableHeader>
-						<IndexTableHeader>Captain</IndexTableHeader>
-						<IndexTableHeader>Status</IndexTableHeader>
-						<IndexTableHeader>Rating</IndexTableHeader>
-						<IndexTableHeader align="right">Actions</IndexTableHeader>
-					</IndexTableHead>
-					<IndexTableBody>
+				<IndexTable aria-label="Warbands" minWidth={720}>
+					<TableHeader>
+						<Column isRowHeader>Warband</Column>
+						<Column>Captain</Column>
+						<Column>Status</Column>
+						<Column>Rating</Column>
+						<Column className="text-right">Actions</Column>
+					</TableHeader>
+					<TableBody>
 						{warbands.map((warband) => (
-							<IndexTableRow key={warband.id}>
-								<IndexTableCell primary>
+							<Row key={warband.id}>
+								<Cell className="text-stone-300 [&_a]:font-semibold [&_a]:text-stone-100 [&_a:hover]:text-amber-300">
 									<Link
 										params={{ warbandId: warband.id }}
 										to="/warbands/$warbandId"
@@ -59,28 +60,32 @@ function WarbandsIndexPage() {
 									<div className="mt-1 text-xs text-stone-500">
 										{warband.faction}
 									</div>
-								</IndexTableCell>
-								<IndexTableCell>{warband.captain}</IndexTableCell>
-								<IndexTableCell>{warband.status}</IndexTableCell>
-								<IndexTableCell tone="accent">{warband.rating}</IndexTableCell>
-								<IndexTableActions>
-									<Link
-										params={{ warbandId: warband.id }}
-										to="/warbands/$warbandId"
-									>
-										View
-									</Link>
-									<Link
-										data-danger
-										params={{ warbandId: warband.id }}
-										to="/warbands/$warbandId/delete"
-									>
-										Delete
-									</Link>
-								</IndexTableActions>
-							</IndexTableRow>
+								</Cell>
+								<Cell className="text-stone-300">{warband.captain}</Cell>
+								<Cell className="text-stone-300">{warband.status}</Cell>
+								<Cell className="font-mono text-amber-300">
+									{warband.rating}
+								</Cell>
+								<Cell className="text-stone-300">
+									<div className="flex justify-end gap-3 [&_a]:text-stone-400 [&_a:hover]:text-stone-100 [&_a[data-danger]]:text-rose-400/80 [&_a[data-danger]:hover]:text-rose-300">
+										<Link
+											params={{ warbandId: warband.id }}
+											to="/warbands/$warbandId"
+										>
+											View
+										</Link>
+										<Link
+											data-danger
+											params={{ warbandId: warband.id }}
+											to="/warbands/$warbandId/delete"
+										>
+											Delete
+										</Link>
+									</div>
+								</Cell>
+							</Row>
 						))}
-					</IndexTableBody>
+					</TableBody>
 				</IndexTable>
 			) : (
 				<IndexEmptyState

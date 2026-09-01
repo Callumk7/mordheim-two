@@ -1,16 +1,17 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
+	Cell,
+	Column,
+	Row,
+	TableBody,
+	TableHeader,
+} from "react-aria-components";
+import {
 	IndexEmptyState,
 	IndexPage,
 	IndexPageHeader,
 	IndexTable,
-	IndexTableActions,
-	IndexTableBody,
-	IndexTableCell,
-	IndexTableHead,
-	IndexTableHeader,
-	IndexTableRow,
 } from "../components/index-page";
 import { getEventsCollection } from "../db-collections/events";
 import { getMatchesCollection } from "../db-collections/matches";
@@ -52,48 +53,50 @@ function EventsIndexPage() {
 			/>
 
 			{events.length ? (
-				<IndexTable minWidth={760}>
-					<IndexTableHead>
-						<IndexTableHeader>Match</IndexTableHeader>
-						<IndexTableHeader>Attacker</IndexTableHeader>
-						<IndexTableHeader>Defender</IndexTableHeader>
-						<IndexTableHeader>Notes</IndexTableHeader>
-						<IndexTableHeader align="right">Actions</IndexTableHeader>
-					</IndexTableHead>
-					<IndexTableBody>
+				<IndexTable aria-label="Events" minWidth={760}>
+					<TableHeader>
+						<Column isRowHeader>Match</Column>
+						<Column>Attacker</Column>
+						<Column>Defender</Column>
+						<Column>Notes</Column>
+						<Column className="text-right">Actions</Column>
+					</TableHeader>
+					<TableBody>
 						{events.map((event) => (
-							<IndexTableRow key={event.id}>
-								<IndexTableCell primary>
+							<Row key={event.id}>
+								<Cell className="text-stone-300 [&_a]:font-semibold [&_a]:text-stone-100 [&_a:hover]:text-amber-300">
 									<Link params={{ eventId: event.id }} to="/events/$eventId">
 										{matchNames.get(event.matchId) ?? "Unknown match"}
 									</Link>
-								</IndexTableCell>
-								<IndexTableCell>
+								</Cell>
+								<Cell className="text-stone-300">
 									{warbandNames.get(event.attackerWarbandId) ??
 										"Unknown warband"}
-								</IndexTableCell>
-								<IndexTableCell>
+								</Cell>
+								<Cell className="text-stone-300">
 									{warbandNames.get(event.defenderWarbandId) ??
 										"Unknown warband"}
-								</IndexTableCell>
-								<IndexTableCell className="max-w-64 truncate" tone="muted">
+								</Cell>
+								<Cell className="text-stone-400 max-w-64 truncate">
 									{event.notes || "—"}
-								</IndexTableCell>
-								<IndexTableActions>
-									<Link params={{ eventId: event.id }} to="/events/$eventId">
-										View
-									</Link>
-									<Link
-										data-danger
-										params={{ eventId: event.id }}
-										to="/events/$eventId/delete"
-									>
-										Delete
-									</Link>
-								</IndexTableActions>
-							</IndexTableRow>
+								</Cell>
+								<Cell className="text-stone-300">
+									<div className="flex justify-end gap-3 [&_a]:text-stone-400 [&_a:hover]:text-stone-100 [&_a[data-danger]]:text-rose-400/80 [&_a[data-danger]:hover]:text-rose-300">
+										<Link params={{ eventId: event.id }} to="/events/$eventId">
+											View
+										</Link>
+										<Link
+											data-danger
+											params={{ eventId: event.id }}
+											to="/events/$eventId/delete"
+										>
+											Delete
+										</Link>
+									</div>
+								</Cell>
+							</Row>
 						))}
-					</IndexTableBody>
+					</TableBody>
 				</IndexTable>
 			) : (
 				<IndexEmptyState
