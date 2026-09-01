@@ -21,18 +21,18 @@ function MissingWarband() {
 	const { warbandId } = Route.useParams();
 
 	return (
-		<section className="rounded-xl border border-stone-800 bg-stone-900/40 px-6 py-14 text-center">
-			<p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-400">
+		<section className="rounded-xl border border-border bg-card px-6 py-14 text-center">
+			<p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
 				Not found
 			</p>
-			<h1 className="mt-3 font-serif text-3xl text-stone-100">
+			<h1 className="mt-3 font-serif text-3xl text-foreground">
 				Unknown warband
 			</h1>
-			<p className="mt-2 text-stone-500">
+			<p className="mt-2 text-muted-foreground">
 				No warband exists with the identifier “{warbandId}”.
 			</p>
 			<Link
-				className="mt-6 inline-flex text-amber-300 hover:text-amber-200"
+				className="mt-6 inline-flex text-primary hover:text-primary/80"
 				to="/warbands"
 			>
 				Return to warbands →

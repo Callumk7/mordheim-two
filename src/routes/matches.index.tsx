@@ -7,15 +7,12 @@ import {
 } from "../components/index-page";
 import { formatStatus } from "../components/match-form";
 import {
-	Cell,
-	Column,
-	Row,
 	Table,
-	TableActions,
 	TableBody,
-	TableContainer,
+	TableCell,
+	TableHead,
 	TableHeader,
-	TablePrimaryCell,
+	TableRow,
 } from "../components/ui/table";
 import { getMatchesCollection } from "../db-collections/matches";
 
@@ -43,41 +40,46 @@ function MatchesIndexPage() {
 			/>
 
 			{matches.length ? (
-				<TableContainer>
-					<Table aria-label="Matches" minWidth={640}>
+				<div className="overflow-hidden rounded-xl border border-border bg-card">
+					<Table aria-label="Matches" className="min-w-[640px]">
 						<TableHeader>
-							<Column isRowHeader>Match</Column>
-							<Column>Scenario</Column>
-							<Column>Status</Column>
-							<Column className="text-right">Actions</Column>
+							<TableHead isRowHeader>Match</TableHead>
+							<TableHead>Scenario</TableHead>
+							<TableHead>Status</TableHead>
+							<TableHead className="text-right">Actions</TableHead>
 						</TableHeader>
 						<TableBody>
 							{matches.map((match) => (
-								<Row key={match.id}>
-									<TablePrimaryCell>
+								<TableRow key={match.id}>
+									<TableCell className="[&_a]:font-semibold [&_a]:text-foreground [&_a:hover]:text-primary">
 										<Link params={{ matchId: match.id }} to="/matches/$matchId">
 											{match.name}
 										</Link>
-									</TablePrimaryCell>
-									<Cell>{match.scenario}</Cell>
-									<Cell>{formatStatus(match.status)}</Cell>
-									<TableActions>
-										<Link params={{ matchId: match.id }} to="/matches/$matchId">
-											View
-										</Link>
-										<Link
-											data-danger
-											params={{ matchId: match.id }}
-											to="/matches/$matchId/delete"
-										>
-											Delete
-										</Link>
-									</TableActions>
-								</Row>
+									</TableCell>
+									<TableCell>{match.scenario}</TableCell>
+									<TableCell>{formatStatus(match.status)}</TableCell>
+									<TableCell>
+										<div className="flex justify-end gap-3 [&_a]:text-muted-foreground [&_a:hover]:text-foreground [&_a[data-danger]]:text-destructive/80 [&_a[data-danger]:hover]:text-destructive">
+											<Link
+												params={{ matchId: match.id }}
+												to="/matches/$matchId"
+											>
+												View
+											</Link>
+											<Link
+												data-danger
+												params={{ matchId: match.id }}
+												to="/matches/$matchId/delete"
+											>
+												Delete
+											</Link>
+										</div>
+									</TableCell>
+								</TableRow>
 							))}
 						</TableBody>
 					</Table>
-				</TableContainer>
+				</div>
 			) : (
 				<IndexEmptyState
 					action={<Link to="/matches/new">Create a match →</Link>}

@@ -93,10 +93,11 @@ export function EventForm({
 				/>
 			</div>
 
-			<label className="grid gap-2 text-sm font-medium text-stone-300">
-				Notes <span className="font-normal text-stone-500">(optional)</span>
+			<label className="grid gap-2 text-sm font-medium text-foreground">
+				Notes{" "}
+				<span className="font-normal text-muted-foreground">(optional)</span>
 				<textarea
-					className="min-h-28 resize-y rounded-lg border border-stone-700 bg-stone-950 px-3 py-2.5 text-stone-100 outline-none focus:border-amber-500"
+					className="min-h-28 resize-y rounded-lg border border-input bg-background px-3 py-2.5 text-foreground outline-none focus:border-ring"
 					onChange={(event) =>
 						setValues((current) => ({
 							...current,
@@ -109,20 +110,20 @@ export function EventForm({
 			</label>
 
 			{!hasDistinctWarbands ? (
-				<p className="rounded-lg border border-amber-900/70 bg-amber-950/40 px-4 py-3 text-sm text-amber-300">
+				<p className="rounded-lg border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-primary">
 					Attacker and defender must be different warbands.
 				</p>
 			) : null}
 
 			{error ? (
-				<p className="rounded-lg border border-rose-900/70 bg-rose-950/50 px-4 py-3 text-sm text-rose-300">
+				<p className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
 					{error}
 				</p>
 			) : null}
 
 			<div>
 				<button
-					className="rounded-lg bg-amber-400 px-5 py-2.5 font-semibold text-stone-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-50"
+					className="rounded-lg bg-primary px-5 py-2.5 font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
 					disabled={isSubmitting || !canSubmit}
 					type="submit"
 				>
@@ -147,10 +148,10 @@ function SelectField({
 	value: string;
 }) {
 	return (
-		<label className="grid gap-2 text-sm font-medium text-stone-300">
+		<label className="grid gap-2 text-sm font-medium text-foreground">
 			{label}
 			<select
-				className="rounded-lg border border-stone-700 bg-stone-950 px-3 py-2.5 text-stone-100 outline-none focus:border-amber-500"
+				className="rounded-lg border border-input bg-background px-3 py-2.5 text-foreground outline-none focus:border-ring"
 				onChange={(event) => onChange(event.target.value)}
 				required
 				value={value}

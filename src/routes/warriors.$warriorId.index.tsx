@@ -36,13 +36,13 @@ function WarriorDetailPage() {
 		<div className="mx-auto max-w-3xl">
 			<div className="flex items-center justify-between gap-4">
 				<Link
-					className="text-sm text-stone-500 hover:text-amber-300"
+					className="text-sm text-muted-foreground hover:text-primary/80"
 					to="/warriors"
 				>
 					← Warriors
 				</Link>
 				<Link
-					className="text-sm text-rose-400/80 hover:text-rose-300"
+					className="text-sm text-destructive/80 hover:text-destructive"
 					params={{ warriorId }}
 					to="/warriors/$warriorId/delete"
 				>
@@ -50,19 +50,19 @@ function WarriorDetailPage() {
 				</Link>
 			</div>
 
-			<header className="mt-7 border-b border-stone-800 pb-6">
-				<p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-400">
+			<header className="mt-7 border-b border-border pb-6">
+				<p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
 					{warband?.name ?? "Unknown warband"} · {warrior.class}
 				</p>
-				<h1 className="mt-2 font-serif text-4xl font-semibold text-stone-100">
+				<h1 className="mt-2 font-serif text-4xl font-semibold text-foreground">
 					{warrior.name}
 				</h1>
-				<p className="mt-2 text-stone-400">
+				<p className="mt-2 text-muted-foreground">
 					Edit this warrior’s campaign record.
 				</p>
 			</header>
 
-			<section className="mt-7 rounded-xl border border-stone-800 bg-stone-900/40 p-6">
+			<section className="mt-7 rounded-xl border border-border bg-card p-6">
 				<WarriorForm
 					initialValues={warrior}
 					key={warrior.id}

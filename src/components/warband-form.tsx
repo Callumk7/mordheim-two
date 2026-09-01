@@ -57,10 +57,10 @@ export function WarbandForm({
 					}
 					value={values.captain}
 				/>
-				<label className="grid gap-2 text-sm font-medium text-stone-300">
+				<label className="grid gap-2 text-sm font-medium text-foreground">
 					Status
 					<select
-						className="rounded-lg border border-stone-700 bg-stone-950 px-3 py-2.5 text-stone-100 outline-none focus:border-amber-500"
+						className="rounded-lg border border-input bg-background px-3 py-2.5 text-foreground outline-none focus:border-ring"
 						onChange={(event) =>
 							setValues((current) => ({
 								...current,
@@ -91,14 +91,14 @@ export function WarbandForm({
 			</div>
 
 			{error ? (
-				<p className="rounded-lg border border-rose-900/70 bg-rose-950/50 px-4 py-3 text-sm text-rose-300">
+				<p className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
 					{error}
 				</p>
 			) : null}
 
 			<div>
 				<button
-					className="rounded-lg bg-amber-400 px-5 py-2.5 font-semibold text-stone-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-50"
+					className="rounded-lg bg-primary px-5 py-2.5 font-semibold text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
 					disabled={
 						isSubmitting ||
 						!values.name.trim() ||
@@ -124,10 +124,10 @@ function TextField({
 	value: string;
 }) {
 	return (
-		<label className="grid gap-2 text-sm font-medium text-stone-300">
+		<label className="grid gap-2 text-sm font-medium text-foreground">
 			{label}
 			<input
-				className="rounded-lg border border-stone-700 bg-stone-950 px-3 py-2.5 text-stone-100 outline-none focus:border-amber-500"
+				className="rounded-lg border border-input bg-background px-3 py-2.5 text-foreground outline-none focus:border-ring"
 				onChange={(event) => onChange(event.target.value)}
 				required
 				value={value}
@@ -146,10 +146,10 @@ function NumberField({
 	value: number;
 }) {
 	return (
-		<label className="grid gap-2 text-sm font-medium text-stone-300">
+		<label className="grid gap-2 text-sm font-medium text-foreground">
 			{label}
 			<input
-				className="rounded-lg border border-stone-700 bg-stone-950 px-3 py-2.5 text-stone-100 outline-none focus:border-amber-500"
+				className="rounded-lg border border-input bg-background px-3 py-2.5 text-foreground outline-none focus:border-ring"
 				min="0"
 				onChange={(event) => onChange(Number(event.target.value))}
 				required

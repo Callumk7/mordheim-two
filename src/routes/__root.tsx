@@ -44,11 +44,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<head>
 				<HeadContent />
 			</head>
-			<body className="min-h-screen bg-[#0c0b09] text-stone-300">
-				<header className="border-b border-stone-800 bg-stone-950/80 backdrop-blur">
+			<body className="dark min-h-screen">
+				<header className="border-b border-border backdrop-blur">
 					<div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-4 sm:px-8">
 						<Link
-							className="font-serif text-xl font-semibold text-stone-100"
+							className="font-serif text-xl font-semibold text-foreground"
 							to="/"
 						>
 							Mordheim Ledger
@@ -59,36 +59,36 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 						>
 							<Link
 								activeOptions={{ exact: true }}
-								activeProps={{ className: "bg-stone-800 text-amber-300" }}
-								className="rounded-md px-3 py-2 text-stone-400 transition hover:bg-stone-900 hover:text-stone-100"
+								activeProps={{ className: "bg-accent text-primary" }}
+								className="rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
 								to="/"
 							>
 								Home
 							</Link>
 							<Link
-								activeProps={{ className: "bg-stone-800 text-amber-300" }}
-								className="rounded-md px-3 py-2 text-stone-400 transition hover:bg-stone-900 hover:text-stone-100"
+								activeProps={{ className: "bg-accent text-primary" }}
+								className="rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
 								to="/warbands"
 							>
 								Warbands
 							</Link>
 							<Link
-								activeProps={{ className: "bg-stone-800 text-amber-300" }}
-								className="rounded-md px-3 py-2 text-stone-400 transition hover:bg-stone-900 hover:text-stone-100"
+								activeProps={{ className: "bg-accent text-primary" }}
+								className="rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
 								to="/warriors"
 							>
 								Warriors
 							</Link>
 							<Link
-								activeProps={{ className: "bg-stone-800 text-amber-300" }}
-								className="rounded-md px-3 py-2 text-stone-400 transition hover:bg-stone-900 hover:text-stone-100"
+								activeProps={{ className: "bg-accent text-primary" }}
+								className="rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
 								to="/matches"
 							>
 								Matches
 							</Link>
 							<Link
-								activeProps={{ className: "bg-stone-800 text-amber-300" }}
-								className="rounded-md px-3 py-2 text-stone-400 transition hover:bg-stone-900 hover:text-stone-100"
+								activeProps={{ className: "bg-accent text-primary" }}
+								className="rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
 								to="/events"
 							>
 								Events

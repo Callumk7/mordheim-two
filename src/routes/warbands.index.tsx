@@ -6,15 +6,12 @@ import {
 	IndexPageHeader,
 } from "../components/index-page";
 import {
-	Cell,
-	Column,
-	Row,
 	Table,
-	TableActions,
 	TableBody,
-	TableContainer,
+	TableCell,
+	TableHead,
 	TableHeader,
-	TablePrimaryCell,
+	TableRow,
 } from "../components/ui/table";
 import { getWarbandsCollection } from "../db-collections/warbands";
 
@@ -42,54 +39,56 @@ function WarbandsIndexPage() {
 			/>
 
 			{warbands.length ? (
-				<TableContainer>
-					<Table aria-label="Warbands" minWidth={720}>
+				<div className="overflow-hidden rounded-xl border border-border bg-card">
+					<Table aria-label="Warbands" className="min-w-[720px]">
 						<TableHeader>
-							<Column isRowHeader>Warband</Column>
-							<Column>Captain</Column>
-							<Column>Status</Column>
-							<Column>Rating</Column>
-							<Column className="text-right">Actions</Column>
+							<TableHead isRowHeader>Warband</TableHead>
+							<TableHead>Captain</TableHead>
+							<TableHead>Status</TableHead>
+							<TableHead>Rating</TableHead>
+							<TableHead className="text-right">Actions</TableHead>
 						</TableHeader>
 						<TableBody>
 							{warbands.map((warband) => (
-								<Row key={warband.id}>
-									<TablePrimaryCell>
+								<TableRow key={warband.id}>
+									<TableCell className="[&_a]:font-semibold [&_a]:text-foreground [&_a:hover]:text-primary">
 										<Link
 											params={{ warbandId: warband.id }}
 											to="/warbands/$warbandId"
 										>
 											{warband.name}
 										</Link>
-										<div className="mt-1 text-xs text-stone-500">
+										<div className="mt-1 text-xs text-muted-foreground">
 											{warband.faction}
 										</div>
-									</TablePrimaryCell>
-									<Cell>{warband.captain}</Cell>
-									<Cell>{warband.status}</Cell>
-									<Cell className="font-mono text-amber-300">
+									</TableCell>
+									<TableCell>{warband.captain}</TableCell>
+									<TableCell>{warband.status}</TableCell>
+									<TableCell className="font-mono text-primary">
 										{warband.rating}
-									</Cell>
-									<TableActions>
-										<Link
-											params={{ warbandId: warband.id }}
-											to="/warbands/$warbandId"
-										>
-											View
-										</Link>
-										<Link
-											data-danger
-											params={{ warbandId: warband.id }}
-											to="/warbands/$warbandId/delete"
-										>
-											Delete
-										</Link>
-									</TableActions>
-								</Row>
+									</TableCell>
+									<TableCell>
+										<div className="flex justify-end gap-3 [&_a]:text-muted-foreground [&_a:hover]:text-foreground [&_a[data-danger]]:text-destructive/80 [&_a[data-danger]:hover]:text-destructive">
+											<Link
+												params={{ warbandId: warband.id }}
+												to="/warbands/$warbandId"
+											>
+												View
+											</Link>
+											<Link
+												data-danger
+												params={{ warbandId: warband.id }}
+												to="/warbands/$warbandId/delete"
+											>
+												Delete
+											</Link>
+										</div>
+									</TableCell>
+								</TableRow>
 							))}
 						</TableBody>
 					</Table>
-				</TableContainer>
+				</div>
 			) : (
 				<IndexEmptyState
 					action={<Link to="/warbands/new">Create a warband →</Link>}

@@ -6,15 +6,12 @@ import {
 	IndexPageHeader,
 } from "../components/index-page";
 import {
-	Cell,
-	Column,
-	Row,
 	Table,
-	TableActions,
 	TableBody,
-	TableContainer,
+	TableCell,
+	TableHead,
 	TableHeader,
-	TablePrimaryCell,
+	TableRow,
 } from "../components/ui/table";
 import { getWarbandsCollection } from "../db-collections/warbands";
 import { getWarriorsCollection } from "../db-collections/warriors";
@@ -50,60 +47,62 @@ function WarriorsIndexPage() {
 			/>
 
 			{warriors.length ? (
-				<TableContainer>
-					<Table aria-label="Warriors" minWidth={760}>
+				<div className="overflow-hidden rounded-xl border border-border bg-card">
+					<Table aria-label="Warriors" className="min-w-[760px]">
 						<TableHeader>
-							<Column isRowHeader>Warrior</Column>
-							<Column>Warband</Column>
-							<Column>Status</Column>
-							<Column>Injuries</Column>
-							<Column>Knock downs</Column>
-							<Column className="text-right">Actions</Column>
+							<TableHead isRowHeader>Warrior</TableHead>
+							<TableHead>Warband</TableHead>
+							<TableHead>Status</TableHead>
+							<TableHead>Injuries</TableHead>
+							<TableHead>Knock downs</TableHead>
+							<TableHead className="text-right">Actions</TableHead>
 						</TableHeader>
 						<TableBody>
 							{warriors.map((warrior) => (
-								<Row key={warrior.id}>
-									<TablePrimaryCell>
+								<TableRow key={warrior.id}>
+									<TableCell className="[&_a]:font-semibold [&_a]:text-foreground [&_a:hover]:text-primary">
 										<Link
 											params={{ warriorId: warrior.id }}
 											to="/warriors/$warriorId"
 										>
 											{warrior.name}
 										</Link>
-										<div className="mt-1 text-xs text-stone-500">
+										<div className="mt-1 text-xs text-muted-foreground">
 											{warrior.class}
 										</div>
-									</TablePrimaryCell>
-									<Cell>
+									</TableCell>
+									<TableCell>
 										{warbandNames.get(warrior.warbandId) ?? "Unknown warband"}
-									</Cell>
-									<Cell>{warrior.status}</Cell>
-									<Cell className="font-mono text-amber-300">
+									</TableCell>
+									<TableCell>{warrior.status}</TableCell>
+									<TableCell className="font-mono text-primary">
 										{warrior.injuries}
-									</Cell>
-									<Cell className="font-mono text-amber-300">
+									</TableCell>
+									<TableCell className="font-mono text-primary">
 										{warrior.knockedDowns}
-									</Cell>
-									<TableActions>
-										<Link
-											params={{ warriorId: warrior.id }}
-											to="/warriors/$warriorId"
-										>
-											View
-										</Link>
-										<Link
-											data-danger
-											params={{ warriorId: warrior.id }}
-											to="/warriors/$warriorId/delete"
-										>
-											Delete
-										</Link>
-									</TableActions>
-								</Row>
+									</TableCell>
+									<TableCell>
+										<div className="flex justify-end gap-3 [&_a]:text-muted-foreground [&_a:hover]:text-foreground [&_a[data-danger]]:text-destructive/80 [&_a[data-danger]:hover]:text-destructive">
+											<Link
+												params={{ warriorId: warrior.id }}
+												to="/warriors/$warriorId"
+											>
+												View
+											</Link>
+											<Link
+												data-danger
+												params={{ warriorId: warrior.id }}
+												to="/warriors/$warriorId/delete"
+											>
+												Delete
+											</Link>
+										</div>
+									</TableCell>
+								</TableRow>
 							))}
 						</TableBody>
 					</Table>
-				</TableContainer>
+				</div>
 			) : (
 				<IndexEmptyState
 					action={<Link to="/warriors/new">Create a warrior →</Link>}
