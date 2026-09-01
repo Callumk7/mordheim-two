@@ -12,6 +12,7 @@ import {
 	IndexPage,
 	IndexPageHeader,
 	IndexTable,
+	IndexTableActions,
 } from "../components/index-page";
 import { getEventsCollection } from "../db-collections/events";
 import { getMatchesCollection } from "../db-collections/matches";
@@ -80,20 +81,18 @@ function EventsIndexPage() {
 								<Cell className="text-stone-400 max-w-64 truncate">
 									{event.notes || "—"}
 								</Cell>
-								<Cell className="text-stone-300">
-									<div className="flex justify-end gap-3 [&_a]:text-stone-400 [&_a:hover]:text-stone-100 [&_a[data-danger]]:text-rose-400/80 [&_a[data-danger]:hover]:text-rose-300">
-										<Link params={{ eventId: event.id }} to="/events/$eventId">
-											View
-										</Link>
-										<Link
-											data-danger
-											params={{ eventId: event.id }}
-											to="/events/$eventId/delete"
-										>
-											Delete
-										</Link>
-									</div>
-								</Cell>
+								<IndexTableActions>
+									<Link params={{ eventId: event.id }} to="/events/$eventId">
+										View
+									</Link>
+									<Link
+										data-danger
+										params={{ eventId: event.id }}
+										to="/events/$eventId/delete"
+									>
+										Delete
+									</Link>
+								</IndexTableActions>
 							</Row>
 						))}
 					</TableBody>

@@ -12,6 +12,7 @@ import {
 	IndexPage,
 	IndexPageHeader,
 	IndexTable,
+	IndexTableActions,
 } from "../components/index-page";
 import { formatStatus } from "../components/match-form";
 import { getMatchesCollection } from "../db-collections/matches";
@@ -59,20 +60,18 @@ function MatchesIndexPage() {
 								<Cell className="text-stone-300">
 									{formatStatus(match.status)}
 								</Cell>
-								<Cell className="text-stone-300">
-									<div className="flex justify-end gap-3 [&_a]:text-stone-400 [&_a:hover]:text-stone-100 [&_a[data-danger]]:text-rose-400/80 [&_a[data-danger]:hover]:text-rose-300">
-										<Link params={{ matchId: match.id }} to="/matches/$matchId">
-											View
-										</Link>
-										<Link
-											data-danger
-											params={{ matchId: match.id }}
-											to="/matches/$matchId/delete"
-										>
-											Delete
-										</Link>
-									</div>
-								</Cell>
+								<IndexTableActions>
+									<Link params={{ matchId: match.id }} to="/matches/$matchId">
+										View
+									</Link>
+									<Link
+										data-danger
+										params={{ matchId: match.id }}
+										to="/matches/$matchId/delete"
+									>
+										Delete
+									</Link>
+								</IndexTableActions>
 							</Row>
 						))}
 					</TableBody>

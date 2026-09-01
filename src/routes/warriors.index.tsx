@@ -12,6 +12,7 @@ import {
 	IndexPage,
 	IndexPageHeader,
 	IndexTable,
+	IndexTableActions,
 } from "../components/index-page";
 import { getWarbandsCollection } from "../db-collections/warbands";
 import { getWarriorsCollection } from "../db-collections/warriors";
@@ -80,23 +81,21 @@ function WarriorsIndexPage() {
 								<Cell className="font-mono text-amber-300">
 									{warrior.knockedDowns}
 								</Cell>
-								<Cell className="text-stone-300">
-									<div className="flex justify-end gap-3 [&_a]:text-stone-400 [&_a:hover]:text-stone-100 [&_a[data-danger]]:text-rose-400/80 [&_a[data-danger]:hover]:text-rose-300">
-										<Link
-											params={{ warriorId: warrior.id }}
-											to="/warriors/$warriorId"
-										>
-											View
-										</Link>
-										<Link
-											data-danger
-											params={{ warriorId: warrior.id }}
-											to="/warriors/$warriorId/delete"
-										>
-											Delete
-										</Link>
-									</div>
-								</Cell>
+								<IndexTableActions>
+									<Link
+										params={{ warriorId: warrior.id }}
+										to="/warriors/$warriorId"
+									>
+										View
+									</Link>
+									<Link
+										data-danger
+										params={{ warriorId: warrior.id }}
+										to="/warriors/$warriorId/delete"
+									>
+										Delete
+									</Link>
+								</IndexTableActions>
 							</Row>
 						))}
 					</TableBody>
