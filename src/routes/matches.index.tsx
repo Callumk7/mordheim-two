@@ -1,20 +1,22 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-	Cell,
-	Column,
-	Row,
-	TableBody,
-	TableHeader,
-} from "react-aria-components";
-import {
 	IndexEmptyState,
 	IndexPage,
 	IndexPageHeader,
-	IndexTable,
-	IndexTableActions,
 } from "../components/index-page";
 import { formatStatus } from "../components/match-form";
+import {
+	Cell,
+	Column,
+	Row,
+	Table,
+	TableActions,
+	TableBody,
+	TableContainer,
+	TableHeader,
+	TablePrimaryCell,
+} from "../components/ui/table";
 import { getMatchesCollection } from "../db-collections/matches";
 
 export const Route = createFileRoute("/matches/")({
@@ -41,41 +43,41 @@ function MatchesIndexPage() {
 			/>
 
 			{matches.length ? (
-				<IndexTable aria-label="Matches" minWidth={640}>
-					<TableHeader>
-						<Column isRowHeader>Match</Column>
-						<Column>Scenario</Column>
-						<Column>Status</Column>
-						<Column className="text-right">Actions</Column>
-					</TableHeader>
-					<TableBody>
-						{matches.map((match) => (
-							<Row key={match.id}>
-								<Cell className="text-stone-300 [&_a]:font-semibold [&_a]:text-stone-100 [&_a:hover]:text-amber-300">
-									<Link params={{ matchId: match.id }} to="/matches/$matchId">
-										{match.name}
-									</Link>
-								</Cell>
-								<Cell className="text-stone-300">{match.scenario}</Cell>
-								<Cell className="text-stone-300">
-									{formatStatus(match.status)}
-								</Cell>
-								<IndexTableActions>
-									<Link params={{ matchId: match.id }} to="/matches/$matchId">
-										View
-									</Link>
-									<Link
-										data-danger
-										params={{ matchId: match.id }}
-										to="/matches/$matchId/delete"
-									>
-										Delete
-									</Link>
-								</IndexTableActions>
-							</Row>
-						))}
-					</TableBody>
-				</IndexTable>
+				<TableContainer>
+					<Table aria-label="Matches" minWidth={640}>
+						<TableHeader>
+							<Column isRowHeader>Match</Column>
+							<Column>Scenario</Column>
+							<Column>Status</Column>
+							<Column className="text-right">Actions</Column>
+						</TableHeader>
+						<TableBody>
+							{matches.map((match) => (
+								<Row key={match.id}>
+									<TablePrimaryCell>
+										<Link params={{ matchId: match.id }} to="/matches/$matchId">
+											{match.name}
+										</Link>
+									</TablePrimaryCell>
+									<Cell>{match.scenario}</Cell>
+									<Cell>{formatStatus(match.status)}</Cell>
+									<TableActions>
+										<Link params={{ matchId: match.id }} to="/matches/$matchId">
+											View
+										</Link>
+										<Link
+											data-danger
+											params={{ matchId: match.id }}
+											to="/matches/$matchId/delete"
+										>
+											Delete
+										</Link>
+									</TableActions>
+								</Row>
+							))}
+						</TableBody>
+					</Table>
+				</TableContainer>
 			) : (
 				<IndexEmptyState
 					action={<Link to="/matches/new">Create a match →</Link>}

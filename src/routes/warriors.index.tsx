@@ -1,19 +1,21 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-	Cell,
-	Column,
-	Row,
-	TableBody,
-	TableHeader,
-} from "react-aria-components";
-import {
 	IndexEmptyState,
 	IndexPage,
 	IndexPageHeader,
-	IndexTable,
-	IndexTableActions,
 } from "../components/index-page";
+import {
+	Cell,
+	Column,
+	Row,
+	Table,
+	TableActions,
+	TableBody,
+	TableContainer,
+	TableHeader,
+	TablePrimaryCell,
+} from "../components/ui/table";
 import { getWarbandsCollection } from "../db-collections/warbands";
 import { getWarriorsCollection } from "../db-collections/warriors";
 
@@ -48,58 +50,60 @@ function WarriorsIndexPage() {
 			/>
 
 			{warriors.length ? (
-				<IndexTable aria-label="Warriors" minWidth={760}>
-					<TableHeader>
-						<Column isRowHeader>Warrior</Column>
-						<Column>Warband</Column>
-						<Column>Status</Column>
-						<Column>Injuries</Column>
-						<Column>Knock downs</Column>
-						<Column className="text-right">Actions</Column>
-					</TableHeader>
-					<TableBody>
-						{warriors.map((warrior) => (
-							<Row key={warrior.id}>
-								<Cell className="text-stone-300 [&_a]:font-semibold [&_a]:text-stone-100 [&_a:hover]:text-amber-300">
-									<Link
-										params={{ warriorId: warrior.id }}
-										to="/warriors/$warriorId"
-									>
-										{warrior.name}
-									</Link>
-									<div className="mt-1 text-xs text-stone-500">
-										{warrior.class}
-									</div>
-								</Cell>
-								<Cell className="text-stone-300">
-									{warbandNames.get(warrior.warbandId) ?? "Unknown warband"}
-								</Cell>
-								<Cell className="text-stone-300">{warrior.status}</Cell>
-								<Cell className="font-mono text-amber-300">
-									{warrior.injuries}
-								</Cell>
-								<Cell className="font-mono text-amber-300">
-									{warrior.knockedDowns}
-								</Cell>
-								<IndexTableActions>
-									<Link
-										params={{ warriorId: warrior.id }}
-										to="/warriors/$warriorId"
-									>
-										View
-									</Link>
-									<Link
-										data-danger
-										params={{ warriorId: warrior.id }}
-										to="/warriors/$warriorId/delete"
-									>
-										Delete
-									</Link>
-								</IndexTableActions>
-							</Row>
-						))}
-					</TableBody>
-				</IndexTable>
+				<TableContainer>
+					<Table aria-label="Warriors" minWidth={760}>
+						<TableHeader>
+							<Column isRowHeader>Warrior</Column>
+							<Column>Warband</Column>
+							<Column>Status</Column>
+							<Column>Injuries</Column>
+							<Column>Knock downs</Column>
+							<Column className="text-right">Actions</Column>
+						</TableHeader>
+						<TableBody>
+							{warriors.map((warrior) => (
+								<Row key={warrior.id}>
+									<TablePrimaryCell>
+										<Link
+											params={{ warriorId: warrior.id }}
+											to="/warriors/$warriorId"
+										>
+											{warrior.name}
+										</Link>
+										<div className="mt-1 text-xs text-stone-500">
+											{warrior.class}
+										</div>
+									</TablePrimaryCell>
+									<Cell>
+										{warbandNames.get(warrior.warbandId) ?? "Unknown warband"}
+									</Cell>
+									<Cell>{warrior.status}</Cell>
+									<Cell className="font-mono text-amber-300">
+										{warrior.injuries}
+									</Cell>
+									<Cell className="font-mono text-amber-300">
+										{warrior.knockedDowns}
+									</Cell>
+									<TableActions>
+										<Link
+											params={{ warriorId: warrior.id }}
+											to="/warriors/$warriorId"
+										>
+											View
+										</Link>
+										<Link
+											data-danger
+											params={{ warriorId: warrior.id }}
+											to="/warriors/$warriorId/delete"
+										>
+											Delete
+										</Link>
+									</TableActions>
+								</Row>
+							))}
+						</TableBody>
+					</Table>
+				</TableContainer>
 			) : (
 				<IndexEmptyState
 					action={<Link to="/warriors/new">Create a warrior →</Link>}

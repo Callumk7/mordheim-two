@@ -1,19 +1,21 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-	Cell,
-	Column,
-	Row,
-	TableBody,
-	TableHeader,
-} from "react-aria-components";
-import {
 	IndexEmptyState,
 	IndexPage,
 	IndexPageHeader,
-	IndexTable,
-	IndexTableActions,
 } from "../components/index-page";
+import {
+	Cell,
+	Column,
+	Row,
+	Table,
+	TableActions,
+	TableBody,
+	TableContainer,
+	TableHeader,
+	TablePrimaryCell,
+} from "../components/ui/table";
 import { getEventsCollection } from "../db-collections/events";
 import { getMatchesCollection } from "../db-collections/matches";
 import { getWarbandsCollection } from "../db-collections/warbands";
@@ -54,49 +56,51 @@ function EventsIndexPage() {
 			/>
 
 			{events.length ? (
-				<IndexTable aria-label="Events" minWidth={760}>
-					<TableHeader>
-						<Column isRowHeader>Match</Column>
-						<Column>Attacker</Column>
-						<Column>Defender</Column>
-						<Column>Notes</Column>
-						<Column className="text-right">Actions</Column>
-					</TableHeader>
-					<TableBody>
-						{events.map((event) => (
-							<Row key={event.id}>
-								<Cell className="text-stone-300 [&_a]:font-semibold [&_a]:text-stone-100 [&_a:hover]:text-amber-300">
-									<Link params={{ eventId: event.id }} to="/events/$eventId">
-										{matchNames.get(event.matchId) ?? "Unknown match"}
-									</Link>
-								</Cell>
-								<Cell className="text-stone-300">
-									{warbandNames.get(event.attackerWarbandId) ??
-										"Unknown warband"}
-								</Cell>
-								<Cell className="text-stone-300">
-									{warbandNames.get(event.defenderWarbandId) ??
-										"Unknown warband"}
-								</Cell>
-								<Cell className="text-stone-400 max-w-64 truncate">
-									{event.notes || "—"}
-								</Cell>
-								<IndexTableActions>
-									<Link params={{ eventId: event.id }} to="/events/$eventId">
-										View
-									</Link>
-									<Link
-										data-danger
-										params={{ eventId: event.id }}
-										to="/events/$eventId/delete"
-									>
-										Delete
-									</Link>
-								</IndexTableActions>
-							</Row>
-						))}
-					</TableBody>
-				</IndexTable>
+				<TableContainer>
+					<Table aria-label="Events" minWidth={760}>
+						<TableHeader>
+							<Column isRowHeader>Match</Column>
+							<Column>Attacker</Column>
+							<Column>Defender</Column>
+							<Column>Notes</Column>
+							<Column className="text-right">Actions</Column>
+						</TableHeader>
+						<TableBody>
+							{events.map((event) => (
+								<Row key={event.id}>
+									<TablePrimaryCell>
+										<Link params={{ eventId: event.id }} to="/events/$eventId">
+											{matchNames.get(event.matchId) ?? "Unknown match"}
+										</Link>
+									</TablePrimaryCell>
+									<Cell>
+										{warbandNames.get(event.attackerWarbandId) ??
+											"Unknown warband"}
+									</Cell>
+									<Cell>
+										{warbandNames.get(event.defenderWarbandId) ??
+											"Unknown warband"}
+									</Cell>
+									<Cell className="text-stone-400 max-w-64 truncate">
+										{event.notes || "—"}
+									</Cell>
+									<TableActions>
+										<Link params={{ eventId: event.id }} to="/events/$eventId">
+											View
+										</Link>
+										<Link
+											data-danger
+											params={{ eventId: event.id }}
+											to="/events/$eventId/delete"
+										>
+											Delete
+										</Link>
+									</TableActions>
+								</Row>
+							))}
+						</TableBody>
+					</Table>
+				</TableContainer>
 			) : (
 				<IndexEmptyState
 					action={<Link to="/events/new">Create an event →</Link>}
