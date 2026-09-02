@@ -20,7 +20,11 @@ export function MatchForm({
 	onSubmit: (values: MatchFormValues) => Promise<void>;
 	submitLabel: string;
 }) {
-	const [values, setValues] = useState(initialValues);
+	const [values, setValues] = useState<MatchFormValues>(() => ({
+		name: initialValues.name,
+		scenario: initialValues.scenario,
+		status: initialValues.status,
+	}));
 	const [error, setError] = useState<string>();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const statusId = useId();
