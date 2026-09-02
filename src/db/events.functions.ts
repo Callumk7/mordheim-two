@@ -5,8 +5,15 @@ import { EventFieldsSchema, EventSchema, EventUpdateSchema } from "./event";
 import { getDb } from "./index.server";
 import { events } from "./schema";
 
-export const listEvents = createServerFn({ method: "GET" }).handler(async () =>
-	getDb().select().from(events).orderBy(events.createdAt),
+export const listEvents = createServerFn({ method: "GET" }).handler(() =>
+	getDb().query.events.findMany({
+		orderBy: (events, { asc }) => [asc(events.createdAt)],
+		with: {
+			match: true,
+			attackerWarband: true,
+			defenderWarband: true,
+		},
+	}),
 );
 
 export const createEvent = createServerFn({ method: "POST" })

@@ -1,6 +1,7 @@
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
 import { createCollection } from "@tanstack/react-db";
 import type { QueryClient } from "@tanstack/react-query";
+import { WarbandWithRelationsSchema } from "../db/relations";
 import { WarbandSchema, WarbandUpdateSchema } from "../db/warband";
 import {
 	createWarband,
@@ -17,7 +18,7 @@ function createWarbandsCollection(queryClient: QueryClient) {
 			queryClient,
 			queryFn: () => listWarbands(),
 			getKey: (warband) => warband.id,
-			schema: WarbandSchema,
+			schema: WarbandWithRelationsSchema,
 			onInsert: async ({ transaction }) => {
 				await Promise.all(
 					transaction.mutations.map((mutation) =>

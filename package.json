@@ -19,7 +19,8 @@
     "db:migrate:remote": "wrangler d1 migrations apply mordheim-two-db --remote",
     "db:seed:local": "wrangler d1 execute mordheim-two-db --local --file scripts/seed.sql",
     "db:seed:remote": "wrangler d1 execute mordheim-two-db --remote --file scripts/seed.sql",
-    "deploy": "pnpm run build && wrangler deploy"
+    "deploy": "pnpm run build && wrangler deploy",
+    "test": "tsx --test src/db/relations.test.ts"
   },
   "dependencies": {
     "@faker-js/faker": "^10.3.0",
@@ -59,6 +60,7 @@
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^6.0.1",
     "drizzle-kit": "^0.31.10",
+    "tsx": "^4.23.13",
     "typescript": "^6.0.2",
     "vite": "^8.0.0",
     "wrangler": "^4.70.0"
