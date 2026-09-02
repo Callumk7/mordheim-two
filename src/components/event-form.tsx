@@ -29,7 +29,12 @@ export function EventForm({
 	onSubmit: (values: EventFormValues) => Promise<void>;
 	submitLabel: string;
 }) {
-	const [values, setValues] = useState(initialValues);
+	const [values, setValues] = useState<EventFormValues>(() => ({
+		matchId: initialValues.matchId,
+		attackerWarbandId: initialValues.attackerWarbandId,
+		defenderWarbandId: initialValues.defenderWarbandId,
+		notes: initialValues.notes,
+	}));
 	const [error, setError] = useState<string>();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const notesId = useId();

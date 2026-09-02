@@ -23,7 +23,14 @@ export function WarbandForm({
 	onSubmit: (values: WarbandFormValues) => Promise<void>;
 	submitLabel: string;
 }) {
-	const [values, setValues] = useState(initialValues);
+	const [values, setValues] = useState<WarbandFormValues>(() => ({
+		name: initialValues.name,
+		faction: initialValues.faction,
+		captain: initialValues.captain,
+		rating: initialValues.rating,
+		wins: initialValues.wins,
+		status: initialValues.status,
+	}));
 	const [error, setError] = useState<string>();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const statusId = useId();

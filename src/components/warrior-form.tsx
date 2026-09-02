@@ -32,7 +32,15 @@ export function WarriorForm({
 	submitLabel: string;
 	warbands: Warband[];
 }) {
-	const [values, setValues] = useState(initialValues);
+	const [values, setValues] = useState<WarriorFormValues>(() => ({
+		name: initialValues.name,
+		class: initialValues.class,
+		status: initialValues.status,
+		warbandId: initialValues.warbandId,
+		knocked: initialValues.knocked,
+		injuries: initialValues.injuries,
+		knockedDowns: initialValues.knockedDowns,
+	}));
 	const [error, setError] = useState<string>();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const warbandId = useId();
