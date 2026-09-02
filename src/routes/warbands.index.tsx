@@ -1,6 +1,6 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { LinkButton } from "#/components/ui/button";
+import { LinkButton } from "@/components/ui/button";
 import {
 	IndexEmptyState,
 	IndexPage,

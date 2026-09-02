@@ -1,5 +1,6 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { LinkButton } from "@/components/ui/button";
 import {
 	IndexEmptyState,
 	IndexPage,
@@ -40,7 +41,7 @@ function WarriorsIndexPage() {
 	return (
 		<IndexPage>
 			<IndexPageHeader
-				action={<Link to="/warriors/new">New warrior</Link>}
+				action={<LinkButton to="/warriors/new">New warrior</LinkButton>}
 				description="Manage every fighter serving in the campaign’s warbands."
 				eyebrow="Campaign roster"
 				title="Warriors"

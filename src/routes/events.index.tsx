@@ -1,5 +1,6 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { LinkButton } from "@/components/ui/button";
 import {
 	IndexEmptyState,
 	IndexPage,
@@ -46,7 +47,7 @@ function EventsIndexPage() {
 	return (
 		<IndexPage>
 			<IndexPageHeader
-				action={<Link to="/events/new">New event</Link>}
+				action={<LinkButton to="/events/new">New event</LinkButton>}
 				description="Record knock downs as they happen during each match."
 				eyebrow="Campaign action"
 				title="Events"
