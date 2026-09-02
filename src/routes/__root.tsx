@@ -7,9 +7,9 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { LinkButton } from "#/components/ui/button";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
-import { LinkButton } from "#/components/ui/button";
 
 interface MyRouterContext {
 	queryClient: QueryClient;

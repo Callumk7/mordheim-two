@@ -1,7 +1,15 @@
-import { useLiveQuery } from "@tanstack/react-db";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { safeRandomUUID, useLiveQuery } from "@tanstack/react-db";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { WarriorsTable } from "#/components/table/warriors-table";
-import { LinkButton } from "@/components/ui/button";
+import { WarriorForm, type WarriorFormValues } from "#/components/warrior-form";
+import { Button } from "@/components/ui/button";
+import {
+	Dialog,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 import {
 	IndexEmptyState,
 	IndexPage,
@@ -15,6 +23,7 @@ export const Route = createFileRoute("/warriors/")({
 });
 
 function WarriorsIndexPage() {
+	const [isNewWarriorOpen, setIsNewWarriorOpen] = useState(false);
 	const { queryClient } = Route.useRouteContext();
 	const warriorsCollection = getWarriorsCollection(queryClient);
 	const warbandsCollection = getWarbandsCollection(queryClient);
@@ -25,16 +34,30 @@ function WarriorsIndexPage() {
 				.orderBy(({ warrior }) => warrior.name, "asc"),
 	});
 	const { data: warbands } = useLiveQuery({
-		query: (q) => q.from({ warband: warbandsCollection }),
+		query: (q) =>
+			q
+				.from({ warband: warbandsCollection })
+				.orderBy(({ warband }) => warband.name),
 	});
 	const warbandNames = new Map(
 		warbands.map((warband) => [warband.id, warband.name]),
 	);
+	const initialValues: WarriorFormValues = {
+		name: "",
+		class: "",
+		status: "Alive",
+		warbandId: warbands[0]?.id ?? "",
+		knocked: 0,
+		injuries: 0,
+		knockedDowns: 0,
+	};
 
 	return (
 		<IndexPage>
 			<IndexPageHeader
-				action={<LinkButton to="/warriors/new">New warrior</LinkButton>}
+				action={
+					<Button onPress={() => setIsNewWarriorOpen(true)}>New warrior</Button>
+				}
 				description="Manage every fighter serving in the campaign’s warbands."
 				eyebrow="Campaign roster"
 				title="Warriors"
@@ -44,11 +67,50 @@ function WarriorsIndexPage() {
 				<WarriorsTable warbandNames={warbandNames} warriors={warriors} />
 			) : (
 				<IndexEmptyState
-					action={<Link to="/warriors/new">Create a warrior →</Link>}
+					action={
+						<Button variant="link" onPress={() => setIsNewWarriorOpen(true)}>
+							Create a warrior →
+						</Button>
+					}
 					description="Add the first fighter to a campaign warband."
 					title="No warriors yet"
 				/>
 			)}
+
+			<Dialog
+				className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl"
+				isOpen={isNewWarriorOpen}
+				onOpenChange={setIsNewWarriorOpen}
+			>
+				<DialogHeader>
+					<DialogTitle>New warrior</DialogTitle>
+					<DialogDescription>
+						Add a new fighter to a campaign warband.
+					</DialogDescription>
+				</DialogHeader>
+				{warbands.length ? (
+					<WarriorForm
+						initialValues={initialValues}
+						onSubmit={async (values) => {
+							const id = safeRandomUUID();
+							const transaction = warriorsCollection.insert({ id, ...values });
+							await transaction.isPersisted.promise;
+							setIsNewWarriorOpen(false);
+						}}
+						submitLabel="Create warrior"
+						warbands={warbands}
+					/>
+				) : (
+					<section className="rounded-xl border border-dashed border-input px-6 py-10 text-center">
+						<h2 className="font-serif text-2xl text-foreground">
+							A warband is required
+						</h2>
+						<p className="mt-2 text-muted-foreground">
+							Create a warband before recruiting a warrior.
+						</p>
+					</section>
+				)}
+			</Dialog>
 		</IndexPage>
 	);
 }
