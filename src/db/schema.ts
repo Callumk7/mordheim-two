@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { check, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { MATCH_STATUSES } from "./match";
 import { WARBAND_STATUSES } from "./warband";
@@ -46,8 +46,12 @@ export const matches = sqliteTable("matches", {
 
 export const warbandMatches = sqliteTable("warband_matches", {
 	id: text("id").primaryKey(),
-	warbandId: text("warband_id").notNull(),
-	matchId: text("match_id").notNull(),
+	warbandId: text("warband_id")
+		.notNull()
+		.references(() => warbands.id, { onDelete: "cascade" }),
+	matchId: text("match_id")
+		.notNull()
+		.references(() => matches.id, { onDelete: "cascade" }),
 	createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 	updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
@@ -76,3 +80,51 @@ export const events = sqliteTable(
 		),
 	],
 );
+
+export const warbandsRelations = relations(warbands, ({ many }) => ({
+	warriors: many(warriors),
+	warbandMatches: many(warbandMatches),
+	attackingEvents: many(events, { relationName: "attackerWarband" }),
+	defendingEvents: many(events, { relationName: "defenderWarband" }),
+}));
+
+export const warriorsRelations = relations(warriors, ({ one }) => ({
+	warband: one(warbands, {
+		fields: [warriors.warbandId],
+		references: [warbands.id],
+	}),
+}));
+
+export const matchesRelations = relations(matches, ({ many }) => ({
+	warbandMatches: many(warbandMatches),
+	events: many(events),
+}));
+
+export const warbandMatchesRelations = relations(warbandMatches, ({ one }) => ({
+	warband: one(warbands, {
+		fields: [warbandMatches.warbandId],
+		references: [warbands.id],
+	}),
+	match: one(matches, {
+		fields: [warbandMatches.matchId],
+		references: [matches.id],
+	}),
+}));
+
+export const eventsRelations = relations(events, ({ one }) => ({
+	match: one(matches, {
+		fields: [events.matchId],
+		references: [matches.id],
+	}),
+	attackerWarband: one(warbands, {
+		fields: [events.attackerWarbandId],
+		references: [warbands.id],
+		relationName: "attackerWarband",
+	}),
+	defenderWarband: one(warbands, {
+		fields: [events.defenderWarbandId],
+		references: [warbands.id],
+		relationName: "defenderWarband",
+	}),
+	// Warrior relations can be added here when events gain warrior foreign keys.
+}));

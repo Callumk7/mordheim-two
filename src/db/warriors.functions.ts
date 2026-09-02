@@ -5,8 +5,11 @@ import { getDb } from "./index.server";
 import { warriors } from "./schema";
 import { WarriorSchema, WarriorUpdateSchema } from "./warrior";
 
-export const listWarriors = createServerFn({ method: "GET" }).handler(
-	async () => getDb().select().from(warriors).orderBy(warriors.name),
+export const listWarriors = createServerFn({ method: "GET" }).handler(() =>
+	getDb().query.warriors.findMany({
+		orderBy: (warriors, { asc }) => [asc(warriors.name)],
+		with: { warband: true },
+	}),
 );
 
 export const createWarrior = createServerFn({ method: "POST" })

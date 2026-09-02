@@ -5,8 +5,14 @@ import { getDb } from "./index.server";
 import { MatchSchema, MatchUpdateSchema } from "./match";
 import { matches, warbandMatches } from "./schema";
 
-export const listMatches = createServerFn({ method: "GET" }).handler(async () =>
-	getDb().select().from(matches).orderBy(matches.createdAt),
+export const listMatches = createServerFn({ method: "GET" }).handler(() =>
+	getDb().query.matches.findMany({
+		orderBy: (matches, { asc }) => [asc(matches.createdAt)],
+		with: {
+			warbandMatches: { with: { warband: true } },
+			events: true,
+		},
+	}),
 );
 
 export const createMatch = createServerFn({ method: "POST" })

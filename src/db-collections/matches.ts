@@ -8,6 +8,7 @@ import {
 	listMatches,
 	updateMatch,
 } from "../db/matches.functions";
+import { MatchWithRelationsSchema } from "../db/relations";
 
 function createMatchesCollection(queryClient: QueryClient) {
 	return createCollection(
@@ -17,7 +18,7 @@ function createMatchesCollection(queryClient: QueryClient) {
 			queryClient,
 			queryFn: () => listMatches(),
 			getKey: (match) => match.id,
-			schema: MatchSchema,
+			schema: MatchWithRelationsSchema,
 			onInsert: async ({ transaction }) => {
 				await Promise.all(
 					transaction.mutations.map((mutation) =>

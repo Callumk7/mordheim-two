@@ -8,6 +8,7 @@ import {
 	listEvents,
 	updateEvent,
 } from "../db/events.functions";
+import { EventWithRelationsSchema } from "../db/relations";
 
 function createEventsCollection(queryClient: QueryClient) {
 	return createCollection(
@@ -17,7 +18,7 @@ function createEventsCollection(queryClient: QueryClient) {
 			queryClient,
 			queryFn: () => listEvents(),
 			getKey: (event) => event.id,
-			schema: EventSchema,
+			schema: EventWithRelationsSchema,
 			onInsert: async ({ transaction }) => {
 				await Promise.all(
 					transaction.mutations.map((mutation) =>
