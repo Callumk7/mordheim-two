@@ -30,9 +30,7 @@ export function IndexPageHeader({
 				</h1>
 				<p className="mt-2 text-muted-foreground">{description}</p>
 			</div>
-			<div className="[&>a]:inline-flex [&>a]:w-fit [&>a]:rounded-lg [&>a]:bg-primary [&>a]:px-4 [&>a]:py-2.5 [&>a]:font-semibold [&>a]:text-primary-foreground [&>a]:transition [&>a:hover]:bg-primary/90">
-				{action}
-			</div>
+			{action}
 		</header>
 	);
 }

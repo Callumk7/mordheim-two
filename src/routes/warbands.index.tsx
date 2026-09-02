@@ -1,5 +1,6 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { LinkButton } from "#/components/ui/button";
 import {
 	IndexEmptyState,
 	IndexPage,
@@ -32,7 +33,7 @@ function WarbandsIndexPage() {
 	return (
 		<IndexPage>
 			<IndexPageHeader
-				action={<Link to="/warbands/new">New warband</Link>}
+				action={<LinkButton to="/warbands/new">New warband</LinkButton>}
 				description="Manage every company fighting through the City of the Damned."
 				eyebrow="Campaign records"
 				title="Warbands"
@@ -40,7 +41,7 @@ function WarbandsIndexPage() {
 
 			{warbands.length ? (
 				<div className="overflow-hidden rounded-xl border border-border bg-card">
-					<Table aria-label="Warbands" className="min-w-[720px]">
+					<Table aria-label="Warbands" className="min-w-180">
 						<TableHeader>
 							<TableHead isRowHeader>Warband</TableHead>
 							<TableHead>Captain</TableHead>

@@ -1,5 +1,6 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Card, CardContent } from "../components/ui/card";
 import { WarriorForm } from "../components/warrior-form";
 import { getWarbandsCollection } from "../db-collections/warbands";
 import { getWarriorsCollection } from "../db-collections/warriors";
@@ -62,23 +63,25 @@ function WarriorDetailPage() {
 				</p>
 			</header>
 
-			<section className="mt-7 rounded-xl border border-border bg-card p-6">
-				<WarriorForm
-					initialValues={warrior}
-					key={warrior.id}
-					onSubmit={async (values) => {
-						const transaction = warriorsCollection.update(
-							warrior.id,
-							(draft) => {
-								Object.assign(draft, values);
-							},
-						);
-						await transaction.isPersisted.promise;
-					}}
-					submitLabel="Save changes"
-					warbands={warbands}
-				/>
-			</section>
+			<Card className="mt-7">
+				<CardContent>
+					<WarriorForm
+						initialValues={warrior}
+						key={warrior.id}
+						onSubmit={async (values) => {
+							const transaction = warriorsCollection.update(
+								warrior.id,
+								(draft) => {
+									Object.assign(draft, values);
+								},
+							);
+							await transaction.isPersisted.promise;
+						}}
+						submitLabel="Save changes"
+						warbands={warbands}
+					/>
+				</CardContent>
+			</Card>
 		</div>
 	);
 }

@@ -1,6 +1,7 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { EventForm } from "../components/event-form";
+import { Card, CardContent } from "../components/ui/card";
 import { getEventsCollection } from "../db-collections/events";
 import { getMatchesCollection } from "../db-collections/matches";
 import { getWarbandsCollection } from "../db-collections/warbands";
@@ -66,21 +67,23 @@ function EventDetailPage() {
 				</p>
 			</header>
 
-			<section className="mt-7 rounded-xl border border-border bg-card p-6">
-				<EventForm
-					initialValues={event}
-					key={event.id}
-					matches={matches}
-					onSubmit={async (values) => {
-						const transaction = eventsCollection.update(event.id, (draft) => {
-							Object.assign(draft, values);
-						});
-						await transaction.isPersisted.promise;
-					}}
-					submitLabel="Save changes"
-					warbands={warbands}
-				/>
-			</section>
+			<Card className="mt-7">
+				<CardContent>
+					<EventForm
+						initialValues={event}
+						key={event.id}
+						matches={matches}
+						onSubmit={async (values) => {
+							const transaction = eventsCollection.update(event.id, (draft) => {
+								Object.assign(draft, values);
+							});
+							await transaction.isPersisted.promise;
+						}}
+						submitLabel="Save changes"
+						warbands={warbands}
+					/>
+				</CardContent>
+			</Card>
 		</div>
 	);
 }

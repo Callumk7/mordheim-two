@@ -1,6 +1,7 @@
 import { safeRandomUUID, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { EventForm } from "../components/event-form";
+import { Card, CardContent } from "../components/ui/card";
 import { getEventsCollection } from "../db-collections/events";
 import { getMatchesCollection } from "../db-collections/matches";
 import { getWarbandsCollection } from "../db-collections/warbands";
@@ -47,28 +48,30 @@ function NewEventPage() {
 			</header>
 
 			{matches.length && warbands.length >= 2 ? (
-				<section className="mt-7 rounded-xl border border-border bg-card p-6">
-					<EventForm
-						initialValues={{
-							matchId: matches[0]?.id ?? "",
-							attackerWarbandId: warbands[0]?.id ?? "",
-							defenderWarbandId: warbands[1]?.id ?? warbands[0]?.id ?? "",
-							notes: null,
-						}}
-						matches={matches}
-						onSubmit={async (values) => {
-							const id = safeRandomUUID();
-							const transaction = eventsCollection.insert({ id, ...values });
-							await transaction.isPersisted.promise;
-							await navigate({
-								to: "/events/$eventId",
-								params: { eventId: id },
-							});
-						}}
-						submitLabel="Create event"
-						warbands={warbands}
-					/>
-				</section>
+				<Card className="mt-7">
+					<CardContent>
+						<EventForm
+							initialValues={{
+								matchId: matches[0]?.id ?? "",
+								attackerWarbandId: warbands[0]?.id ?? "",
+								defenderWarbandId: warbands[1]?.id ?? warbands[0]?.id ?? "",
+								notes: null,
+							}}
+							matches={matches}
+							onSubmit={async (values) => {
+								const id = safeRandomUUID();
+								const transaction = eventsCollection.insert({ id, ...values });
+								await transaction.isPersisted.promise;
+								await navigate({
+									to: "/events/$eventId",
+									params: { eventId: id },
+								});
+							}}
+							submitLabel="Create event"
+							warbands={warbands}
+						/>
+					</CardContent>
+				</Card>
 			) : (
 				<section className="mt-7 rounded-xl border border-dashed border-input px-6 py-12 text-center">
 					<h2 className="font-serif text-2xl text-foreground">

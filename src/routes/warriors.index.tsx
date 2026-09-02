@@ -48,7 +48,7 @@ function WarriorsIndexPage() {
 
 			{warriors.length ? (
 				<div className="overflow-hidden rounded-xl border border-border bg-card">
-					<Table aria-label="Warriors" className="min-w-[760px]">
+					<Table aria-label="Warriors" className="min-w-190">
 						<TableHeader>
 							<TableHead isRowHeader>Warrior</TableHead>
 							<TableHead>Warband</TableHead>

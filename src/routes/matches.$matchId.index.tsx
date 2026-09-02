@@ -1,6 +1,7 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { MatchForm } from "../components/match-form";
+import { Card, CardContent } from "../components/ui/card";
 import { getMatchesCollection } from "../db-collections/matches";
 
 export const Route = createFileRoute("/matches/$matchId/")({
@@ -51,19 +52,24 @@ function MatchDetailPage() {
 				</p>
 			</header>
 
-			<section className="mt-7 rounded-xl border border-border bg-card p-6">
-				<MatchForm
-					initialValues={match}
-					key={match.id}
-					onSubmit={async (values) => {
-						const transaction = matchesCollection.update(match.id, (draft) => {
-							Object.assign(draft, values);
-						});
-						await transaction.isPersisted.promise;
-					}}
-					submitLabel="Save changes"
-				/>
-			</section>
+			<Card className="mt-7">
+				<CardContent>
+					<MatchForm
+						initialValues={match}
+						key={match.id}
+						onSubmit={async (values) => {
+							const transaction = matchesCollection.update(
+								match.id,
+								(draft) => {
+									Object.assign(draft, values);
+								},
+							);
+							await transaction.isPersisted.promise;
+						}}
+						submitLabel="Save changes"
+					/>
+				</CardContent>
+			</Card>
 		</div>
 	);
 }

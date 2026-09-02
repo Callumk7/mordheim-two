@@ -1,6 +1,7 @@
 import { safeRandomUUID } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { MatchForm, type MatchFormValues } from "../components/match-form";
+import { Card, CardContent } from "../components/ui/card";
 import { getMatchesCollection } from "../db-collections/matches";
 
 export const Route = createFileRoute("/matches/new")({
@@ -38,21 +39,23 @@ function NewMatchPage() {
 				</p>
 			</header>
 
-			<section className="mt-7 rounded-xl border border-border bg-card p-6">
-				<MatchForm
-					initialValues={initialValues}
-					onSubmit={async (values) => {
-						const id = safeRandomUUID();
-						const transaction = matchesCollection.insert({ id, ...values });
-						await transaction.isPersisted.promise;
-						await navigate({
-							to: "/matches/$matchId",
-							params: { matchId: id },
-						});
-					}}
-					submitLabel="Create match"
-				/>
-			</section>
+			<Card className="mt-7">
+				<CardContent>
+					<MatchForm
+						initialValues={initialValues}
+						onSubmit={async (values) => {
+							const id = safeRandomUUID();
+							const transaction = matchesCollection.insert({ id, ...values });
+							await transaction.isPersisted.promise;
+							await navigate({
+								to: "/matches/$matchId",
+								params: { matchId: id },
+							});
+						}}
+						submitLabel="Create match"
+					/>
+				</CardContent>
+			</Card>
 		</div>
 	);
 }

@@ -1,5 +1,6 @@
 import { safeRandomUUID } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Card, CardContent } from "../components/ui/card";
 import {
 	WarbandForm,
 	type WarbandFormValues,
@@ -44,21 +45,23 @@ function NewWarbandPage() {
 				</p>
 			</header>
 
-			<section className="mt-7 rounded-xl border border-border bg-card p-6">
-				<WarbandForm
-					initialValues={initialValues}
-					onSubmit={async (values) => {
-						const id = safeRandomUUID();
-						const transaction = warbandsCollection.insert({ id, ...values });
-						await transaction.isPersisted.promise;
-						await navigate({
-							to: "/warbands/$warbandId",
-							params: { warbandId: id },
-						});
-					}}
-					submitLabel="Create warband"
-				/>
-			</section>
+			<Card className="mt-7">
+				<CardContent>
+					<WarbandForm
+						initialValues={initialValues}
+						onSubmit={async (values) => {
+							const id = safeRandomUUID();
+							const transaction = warbandsCollection.insert({ id, ...values });
+							await transaction.isPersisted.promise;
+							await navigate({
+								to: "/warbands/$warbandId",
+								params: { warbandId: id },
+							});
+						}}
+						submitLabel="Create warband"
+					/>
+				</CardContent>
+			</Card>
 		</div>
 	);
 }

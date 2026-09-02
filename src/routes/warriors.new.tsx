@@ -1,5 +1,6 @@
 import { safeRandomUUID, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Card, CardContent } from "../components/ui/card";
 import {
 	WarriorForm,
 	type WarriorFormValues,
@@ -53,22 +54,27 @@ function NewWarriorPage() {
 			</header>
 
 			{warbands.length ? (
-				<section className="mt-7 rounded-xl border border-border bg-card p-6">
-					<WarriorForm
-						initialValues={initialValues}
-						onSubmit={async (values) => {
-							const id = safeRandomUUID();
-							const transaction = warriorsCollection.insert({ id, ...values });
-							await transaction.isPersisted.promise;
-							await navigate({
-								to: "/warriors/$warriorId",
-								params: { warriorId: id },
-							});
-						}}
-						submitLabel="Create warrior"
-						warbands={warbands}
-					/>
-				</section>
+				<Card className="mt-7">
+					<CardContent>
+						<WarriorForm
+							initialValues={initialValues}
+							onSubmit={async (values) => {
+								const id = safeRandomUUID();
+								const transaction = warriorsCollection.insert({
+									id,
+									...values,
+								});
+								await transaction.isPersisted.promise;
+								await navigate({
+									to: "/warriors/$warriorId",
+									params: { warriorId: id },
+								});
+							}}
+							submitLabel="Create warrior"
+							warbands={warbands}
+						/>
+					</CardContent>
+				</Card>
 			) : (
 				<section className="mt-7 rounded-xl border border-dashed border-input px-6 py-12 text-center">
 					<h2 className="font-serif text-2xl text-foreground">
