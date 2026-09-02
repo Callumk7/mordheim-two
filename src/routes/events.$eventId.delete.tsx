@@ -27,34 +27,34 @@ function DeleteEventPage() {
 	return (
 		<div className="mx-auto max-w-2xl">
 			<Link
-				className="text-sm text-stone-500 hover:text-amber-300"
+				className="text-sm text-muted-foreground hover:text-primary/80"
 				params={{ eventId }}
 				to="/events/$eventId"
 			>
 				← Cancel
 			</Link>
 
-			<section className="mt-7 rounded-xl border border-rose-900/60 bg-rose-950/20 p-7">
-				<p className="text-xs font-semibold uppercase tracking-[0.28em] text-rose-400">
+			<section className="mt-7 rounded-xl border border-destructive/50 bg-destructive/10 p-7">
+				<p className="text-xs font-semibold uppercase tracking-[0.28em] text-destructive">
 					Destructive action
 				</p>
-				<h1 className="mt-3 font-serif text-4xl font-semibold text-stone-100">
+				<h1 className="mt-3 font-serif text-4xl font-semibold text-foreground">
 					Delete this event?
 				</h1>
-				<p className="mt-3 max-w-xl text-stone-400">
+				<p className="mt-3 max-w-xl text-muted-foreground">
 					This permanently removes the knock down from the match record. This
 					action cannot be undone.
 				</p>
 
 				{error ? (
-					<p className="mt-5 rounded-lg border border-rose-900 bg-rose-950/60 px-4 py-3 text-sm text-rose-300">
+					<p className="mt-5 rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
 						{error}
 					</p>
 				) : null}
 
 				<div className="mt-7 flex flex-wrap gap-3">
 					<button
-						className="rounded-lg bg-rose-500 px-5 py-2.5 font-semibold text-white transition hover:bg-rose-400 disabled:cursor-not-allowed disabled:opacity-50"
+						className="rounded-lg bg-destructive px-5 py-2.5 font-semibold text-destructive-foreground transition hover:bg-destructive/90 disabled:cursor-not-allowed disabled:opacity-50"
 						disabled={isDeleting || !event}
 						onClick={async () => {
 							setError(undefined);
@@ -77,7 +77,7 @@ function DeleteEventPage() {
 						{isDeleting ? "Deleting…" : "Delete event"}
 					</button>
 					<Link
-						className="rounded-lg border border-stone-700 px-5 py-2.5 font-semibold text-stone-300 hover:border-stone-500 hover:text-stone-100"
+						className="rounded-lg border border-input px-5 py-2.5 font-semibold text-foreground hover:border-ring hover:text-foreground"
 						params={{ eventId }}
 						to="/events/$eventId"
 					>

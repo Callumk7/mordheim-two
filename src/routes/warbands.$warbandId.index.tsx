@@ -1,5 +1,6 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Card, CardContent } from "../components/ui/card";
 import { WarbandForm } from "../components/warband-form";
 import { getWarbandsCollection } from "../db-collections/warbands";
 
@@ -25,13 +26,13 @@ function WarbandDetailPage() {
 		<div className="mx-auto max-w-3xl">
 			<div className="flex items-center justify-between gap-4">
 				<Link
-					className="text-sm text-stone-500 hover:text-amber-300"
+					className="text-sm text-muted-foreground hover:text-primary/80"
 					to="/warbands"
 				>
 					← Warbands
 				</Link>
 				<Link
-					className="text-sm text-rose-400/80 hover:text-rose-300"
+					className="text-sm text-destructive/80 hover:text-destructive"
 					params={{ warbandId }}
 					to="/warbands/$warbandId/delete"
 				>
@@ -39,34 +40,36 @@ function WarbandDetailPage() {
 				</Link>
 			</div>
 
-			<header className="mt-7 border-b border-stone-800 pb-6">
-				<p className="text-xs font-semibold uppercase tracking-[0.28em] text-amber-400">
+			<header className="mt-7 border-b border-border pb-6">
+				<p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
 					{warband.faction}
 				</p>
-				<h1 className="mt-2 font-serif text-4xl font-semibold text-stone-100">
+				<h1 className="mt-2 font-serif text-4xl font-semibold text-foreground">
 					{warband.name}
 				</h1>
-				<p className="mt-2 text-stone-400">
+				<p className="mt-2 text-muted-foreground">
 					Edit this warband’s campaign record.
 				</p>
 			</header>
 
-			<section className="mt-7 rounded-xl border border-stone-800 bg-stone-900/40 p-6">
-				<WarbandForm
-					initialValues={warband}
-					key={warband.id}
-					onSubmit={async (values) => {
-						const transaction = warbandsCollection.update(
-							warband.id,
-							(draft) => {
-								Object.assign(draft, values);
-							},
-						);
-						await transaction.isPersisted.promise;
-					}}
-					submitLabel="Save changes"
-				/>
-			</section>
+			<Card className="mt-7">
+				<CardContent>
+					<WarbandForm
+						initialValues={warband}
+						key={warband.id}
+						onSubmit={async (values) => {
+							const transaction = warbandsCollection.update(
+								warband.id,
+								(draft) => {
+									Object.assign(draft, values);
+								},
+							);
+							await transaction.isPersisted.promise;
+						}}
+						submitLabel="Save changes"
+					/>
+				</CardContent>
+			</Card>
 		</div>
 	);
 }

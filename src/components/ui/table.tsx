@@ -1,179 +1,136 @@
-import type {
-	ComponentPropsWithoutRef,
-	CSSProperties,
-	ReactNode,
-	Ref,
-} from "react";
+import type * as React from "react";
 import {
-	Cell as AriaCell,
-	Column as AriaColumn,
-	Row as AriaRow,
-	Table as AriaTable,
-	TableBody as AriaTableBody,
-	TableHeader as AriaTableHeader,
+	Cell as CellPrimitive,
 	type CellProps,
+	Column as ColumnPrimitive,
 	type ColumnProps,
-	composeRenderProps,
+	Row as RowPrimitive,
 	type RowProps,
+	TableBody as TableBodyPrimitive,
 	type TableBodyProps,
+	TableFooter as TableFooterPrimitive,
+	type TableFooterProps,
+	TableHeader as TableHeaderPrimitive,
 	type TableHeaderProps,
+	Table as TablePrimitive,
 	type TableProps,
 } from "react-aria-components";
 
-function withDefaultClassName(
-	className: string | undefined,
-	defaultClassName: string,
-) {
-	return [defaultClassName, className].filter(Boolean).join(" ");
-}
+import { cn } from "@/lib/utils";
 
-type TableElement = HTMLDivElement | HTMLTableElement;
-type TableSectionElement = HTMLDivElement | HTMLTableSectionElement;
-type TableCellElement = HTMLDivElement | HTMLTableCellElement;
-type TableRowElement = HTMLDivElement | HTMLTableRowElement;
-
-type StyledTableProps = TableProps & {
-	minWidth?: CSSProperties["minWidth"];
-	ref?: Ref<TableElement>;
-};
-
-export function Table({
-	className,
-	minWidth,
-	ref,
-	style,
-	...props
-}: StyledTableProps) {
-	return (
-		<AriaTable
-			{...props}
-			ref={ref}
-			className={composeRenderProps(className, (className) =>
-				withDefaultClassName(
-					className,
-					"w-full border-collapse text-left text-sm",
-				),
-			)}
-			style={composeRenderProps(style, (style) => ({ minWidth, ...style }))}
-		/>
-	);
-}
-
-export function TableHeader<T>({
-	className,
-	ref,
-	...props
-}: TableHeaderProps<T> & { ref?: Ref<TableSectionElement> }) {
-	return (
-		<AriaTableHeader
-			{...props}
-			ref={ref}
-			className={composeRenderProps(className, (className) =>
-				withDefaultClassName(
-					className,
-					"border-b border-stone-800 bg-stone-900/70 text-xs uppercase tracking-wider text-stone-500",
-				),
-			)}
-		/>
-	);
-}
-
-export function TableBody<T>({
-	className,
-	ref,
-	...props
-}: TableBodyProps<T> & { ref?: Ref<TableSectionElement> }) {
-	return (
-		<AriaTableBody
-			{...props}
-			ref={ref}
-			className={composeRenderProps(className, (className) =>
-				withDefaultClassName(className, "divide-y divide-stone-800/80"),
-			)}
-		/>
-	);
-}
-
-export function Column({
-	className,
-	ref,
-	...props
-}: ColumnProps & { ref?: Ref<TableCellElement> }) {
-	return (
-		<AriaColumn
-			{...props}
-			ref={ref}
-			className={composeRenderProps(className, (className) =>
-				withDefaultClassName(className, "px-5 py-3.5 font-medium"),
-			)}
-		/>
-	);
-}
-
-export function Row<T>({
-	className,
-	ref,
-	...props
-}: RowProps<T> & { ref?: Ref<TableRowElement> }) {
-	return (
-		<AriaRow
-			{...props}
-			ref={ref}
-			className={composeRenderProps(className, (className) =>
-				withDefaultClassName(className, "transition hover:bg-stone-900/60"),
-			)}
-		/>
-	);
-}
-
-export function Cell({
-	className,
-	ref,
-	...props
-}: CellProps & { ref?: Ref<TableCellElement> }) {
-	return (
-		<AriaCell
-			{...props}
-			ref={ref}
-			className={composeRenderProps(className, (className) =>
-				withDefaultClassName(className, "px-5 py-4 text-stone-300"),
-			)}
-		/>
-	);
-}
-
-export function TableContainer({
-	children,
-	className,
-	...props
-}: ComponentPropsWithoutRef<"div">) {
+function Table({ className, ...props }: TableProps) {
 	return (
 		<div
-			{...props}
-			className={withDefaultClassName(
-				className,
-				"overflow-hidden rounded-xl border border-stone-800 bg-stone-950/60",
-			)}
+			data-slot="table-container"
+			className="relative w-full overflow-x-auto"
 		>
-			<div className="overflow-x-auto">{children}</div>
+			<TablePrimitive
+				data-slot="table"
+				className={cn("w-full caption-bottom text-sm", className)}
+				{...props}
+			/>
 		</div>
 	);
 }
 
-export function TablePrimaryCell({ children }: { children: ReactNode }) {
+function TableHeader<T>({ className, ...props }: TableHeaderProps<T>) {
 	return (
-		<Cell className="[&_a]:font-semibold [&_a]:text-stone-100 [&_a:hover]:text-amber-300">
-			{children}
-		</Cell>
+		<TableHeaderPrimitive
+			data-slot="table-header"
+			className={cn("[&_tr]:border-b", className)}
+			{...props}
+		/>
 	);
 }
 
-export function TableActions({ children }: { children: ReactNode }) {
+function TableBody<T>({ className, ...props }: TableBodyProps<T>) {
 	return (
-		<Cell>
-			<div className="flex justify-end gap-3 [&_a]:text-stone-400 [&_a:hover]:text-stone-100 [&_a[data-danger]]:text-rose-400/80 [&_a[data-danger]:hover]:text-rose-300">
-				{children}
-			</div>
-		</Cell>
+		<TableBodyPrimitive
+			data-slot="table-body"
+			className={cn(
+				"data-empty:h-24 data-empty:text-center [&_tr:last-child]:border-0",
+				className,
+			)}
+			{...props}
+		/>
 	);
 }
+
+function TableFooter<T>({ className, ...props }: TableFooterProps<T>) {
+	return (
+		<TableFooterPrimitive
+			data-slot="table-footer"
+			className={cn(
+				"border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
+				className,
+			)}
+			{...props}
+		/>
+	);
+}
+
+function TableRow<T>({ className, ...props }: RowProps<T>) {
+	return (
+		<RowPrimitive
+			data-slot="table-row"
+			className={cn(
+				"border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted data-selected:bg-muted",
+				className,
+			)}
+			{...props}
+		/>
+	);
+}
+
+function TableHead({ className, ...props }: ColumnProps) {
+	return (
+		<ColumnPrimitive
+			data-slot="table-head"
+			className={cn(
+				"h-12 px-3 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([data-slot=checkbox])]:pr-0 [&:has([role=checkbox])]:pr-0",
+				className,
+			)}
+			{...props}
+		/>
+	);
+}
+
+function TableCell({ className, ...props }: CellProps) {
+	return (
+		<CellPrimitive
+			data-slot="table-cell"
+			className={cn(
+				"p-3 align-middle whitespace-nowrap [&:has([data-slot=checkbox])]:pr-0 [&:has([role=checkbox])]:pr-0",
+				className,
+			)}
+			{...props}
+		/>
+	);
+}
+
+function TableCaption({
+	className,
+	...props
+}: React.ComponentProps<"figcaption">) {
+	return (
+		<figcaption
+			data-slot="table-caption"
+			className={cn(
+				"mt-4 text-center text-sm text-muted-foreground",
+				className,
+			)}
+			{...props}
+		/>
+	);
+}
+
+export {
+	Table,
+	TableHeader,
+	TableBody,
+	TableFooter,
+	TableHead,
+	TableRow,
+	TableCell,
+	TableCaption,
+};
