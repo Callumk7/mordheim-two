@@ -1,35 +1,35 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { getMatchesCollection } from "../db-collections/matches";
+import { getWarbandsCollection } from "../../../db-collections/warbands";
 
-export const Route = createFileRoute("/matches/$matchId/delete")({
-	component: DeleteMatchPage,
+export const Route = createFileRoute("/warbands/$warbandId/delete")({
+	component: DeleteWarbandPage,
 });
 
-function DeleteMatchPage() {
-	const { matchId } = Route.useParams();
+function DeleteWarbandPage() {
+	const { warbandId } = Route.useParams();
 	const { queryClient } = Route.useRouteContext();
-	const matchesCollection = getMatchesCollection(queryClient);
+	const warbandsCollection = getWarbandsCollection(queryClient);
 	const navigate = useNavigate({ from: Route.fullPath });
 	const [error, setError] = useState<string>();
 	const [isDeleting, setIsDeleting] = useState(false);
 	const { data } = useLiveQuery({
 		query: (q) =>
 			q
-				.from({ match: matchesCollection })
-				.where(({ match }) => eq(match.id, matchId)),
+				.from({ warband: warbandsCollection })
+				.where(({ warband }) => eq(warband.id, warbandId)),
 	});
-	const match = data[0];
+	const warband = data[0];
 
-	if (!match && !isDeleting) return null;
+	if (!warband && !isDeleting) return null;
 
 	return (
 		<div className="mx-auto max-w-2xl">
 			<Link
 				className="text-sm text-muted-foreground hover:text-primary/80"
-				params={{ matchId }}
-				to="/matches/$matchId"
+				params={{ warbandId }}
+				to="/warbands/$warbandId"
 			>
 				← Cancel
 			</Link>
@@ -39,10 +39,10 @@ function DeleteMatchPage() {
 					Destructive action
 				</p>
 				<h1 className="mt-3 font-serif text-4xl font-semibold text-foreground">
-					Delete {match?.name ?? "match"}?
+					Delete {warband?.name ?? "warband"}?
 				</h1>
 				<p className="mt-3 max-w-xl text-muted-foreground">
-					This permanently removes the match and its campaign record. This
+					This permanently removes the warband and its campaign record. This
 					action cannot be undone.
 				</p>
 
@@ -55,33 +55,33 @@ function DeleteMatchPage() {
 				<div className="mt-7 flex flex-wrap gap-3">
 					<button
 						className="rounded-lg bg-destructive px-5 py-2.5 font-semibold text-destructive-foreground transition hover:bg-destructive/90 disabled:cursor-not-allowed disabled:opacity-50"
-						disabled={isDeleting || !match}
+						disabled={isDeleting || !warband}
 						onClick={async () => {
 							setError(undefined);
 							setIsDeleting(true);
 							try {
-								const transaction = matchesCollection.delete(matchId);
+								const transaction = warbandsCollection.delete(warbandId);
 								await transaction.isPersisted.promise;
-								await navigate({ to: "/matches" });
+								await navigate({ to: "/warbands" });
 							} catch (cause) {
 								setError(
 									cause instanceof Error
 										? cause.message
-										: "Unable to delete match.",
+										: "Unable to delete warband.",
 								);
 								setIsDeleting(false);
 							}
 						}}
 						type="button"
 					>
-						{isDeleting ? "Deleting…" : "Delete match"}
+						{isDeleting ? "Deleting…" : "Delete warband"}
 					</button>
 					<Link
 						className="rounded-lg border border-input px-5 py-2.5 font-semibold text-foreground hover:border-ring hover:text-foreground"
-						params={{ matchId }}
-						to="/matches/$matchId"
+						params={{ warbandId }}
+						to="/warbands/$warbandId"
 					>
-						Keep match
+						Keep warband
 					</Link>
 				</div>
 			</section>

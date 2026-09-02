@@ -1,11 +1,11 @@
 import { safeRandomUUID } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Card, CardContent } from "../components/ui/card";
+import { Card, CardContent } from "../../components/ui/card";
 import {
 	WarbandForm,
 	type WarbandFormValues,
-} from "../components/warband-form";
-import { getWarbandsCollection } from "../db-collections/warbands";
+} from "../../components/warband-form";
+import { getWarbandsCollection } from "../../db-collections/warbands";
 
 export const Route = createFileRoute("/warbands/new")({
 	component: NewWarbandPage,

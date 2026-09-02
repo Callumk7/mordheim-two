@@ -1,9 +1,9 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Card, CardContent } from "../components/ui/card";
-import { WarriorForm } from "../components/warrior-form";
-import { getWarbandsCollection } from "../db-collections/warbands";
-import { getWarriorsCollection } from "../db-collections/warriors";
+import { Card, CardContent } from "../../../components/ui/card";
+import { WarriorForm } from "../../../components/warrior-form";
+import { getWarbandsCollection } from "../../../db-collections/warbands";
+import { getWarriorsCollection } from "../../../db-collections/warriors";
 
 export const Route = createFileRoute("/warriors/$warriorId/")({
 	component: WarriorDetailPage,

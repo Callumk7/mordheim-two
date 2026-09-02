@@ -1,35 +1,35 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { getEventsCollection } from "../db-collections/events";
+import { getMatchesCollection } from "../../../db-collections/matches";
 
-export const Route = createFileRoute("/events/$eventId/delete")({
-	component: DeleteEventPage,
+export const Route = createFileRoute("/matches/$matchId/delete")({
+	component: DeleteMatchPage,
 });
 
-function DeleteEventPage() {
-	const { eventId } = Route.useParams();
+function DeleteMatchPage() {
+	const { matchId } = Route.useParams();
 	const { queryClient } = Route.useRouteContext();
-	const eventsCollection = getEventsCollection(queryClient);
+	const matchesCollection = getMatchesCollection(queryClient);
 	const navigate = useNavigate({ from: Route.fullPath });
 	const [error, setError] = useState<string>();
 	const [isDeleting, setIsDeleting] = useState(false);
 	const { data } = useLiveQuery({
 		query: (q) =>
 			q
-				.from({ event: eventsCollection })
-				.where(({ event }) => eq(event.id, eventId)),
+				.from({ match: matchesCollection })
+				.where(({ match }) => eq(match.id, matchId)),
 	});
-	const event = data[0];
+	const match = data[0];
 
-	if (!event && !isDeleting) return null;
+	if (!match && !isDeleting) return null;
 
 	return (
 		<div className="mx-auto max-w-2xl">
 			<Link
 				className="text-sm text-muted-foreground hover:text-primary/80"
-				params={{ eventId }}
-				to="/events/$eventId"
+				params={{ matchId }}
+				to="/matches/$matchId"
 			>
 				← Cancel
 			</Link>
@@ -39,10 +39,10 @@ function DeleteEventPage() {
 					Destructive action
 				</p>
 				<h1 className="mt-3 font-serif text-4xl font-semibold text-foreground">
-					Delete this event?
+					Delete {match?.name ?? "match"}?
 				</h1>
 				<p className="mt-3 max-w-xl text-muted-foreground">
-					This permanently removes the knock down from the match record. This
+					This permanently removes the match and its campaign record. This
 					action cannot be undone.
 				</p>
 
@@ -55,33 +55,33 @@ function DeleteEventPage() {
 				<div className="mt-7 flex flex-wrap gap-3">
 					<button
 						className="rounded-lg bg-destructive px-5 py-2.5 font-semibold text-destructive-foreground transition hover:bg-destructive/90 disabled:cursor-not-allowed disabled:opacity-50"
-						disabled={isDeleting || !event}
+						disabled={isDeleting || !match}
 						onClick={async () => {
 							setError(undefined);
 							setIsDeleting(true);
 							try {
-								const transaction = eventsCollection.delete(eventId);
+								const transaction = matchesCollection.delete(matchId);
 								await transaction.isPersisted.promise;
-								await navigate({ to: "/events" });
+								await navigate({ to: "/matches" });
 							} catch (cause) {
 								setError(
 									cause instanceof Error
 										? cause.message
-										: "Unable to delete event.",
+										: "Unable to delete match.",
 								);
 								setIsDeleting(false);
 							}
 						}}
 						type="button"
 					>
-						{isDeleting ? "Deleting…" : "Delete event"}
+						{isDeleting ? "Deleting…" : "Delete match"}
 					</button>
 					<Link
 						className="rounded-lg border border-input px-5 py-2.5 font-semibold text-foreground hover:border-ring hover:text-foreground"
-						params={{ eventId }}
-						to="/events/$eventId"
+						params={{ matchId }}
+						to="/matches/$matchId"
 					>
-						Keep event
+						Keep match
 					</Link>
 				</div>
 			</section>

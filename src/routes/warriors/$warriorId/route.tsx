@@ -4,7 +4,7 @@ import {
 	notFound,
 	Outlet,
 } from "@tanstack/react-router";
-import { getWarriorsCollection } from "../db-collections/warriors";
+import { getWarriorsCollection } from "../../../db-collections/warriors";
 
 export const Route = createFileRoute("/warriors/$warriorId")({
 	loader: async ({ context, params }) => {

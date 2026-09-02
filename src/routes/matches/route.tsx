@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { getMatchesCollection } from "../db-collections/matches";
+import { getMatchesCollection } from "../../db-collections/matches";
 
 export const Route = createFileRoute("/matches")({
 	ssr: false,

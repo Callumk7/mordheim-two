@@ -5,7 +5,7 @@ import {
 	IndexEmptyState,
 	IndexPage,
 	IndexPageHeader,
-} from "../components/index-page";
+} from "../../components/index-page";
 import {
 	Table,
 	TableBody,
@@ -13,9 +13,9 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from "../components/ui/table";
-import { getWarbandsCollection } from "../db-collections/warbands";
-import { getWarriorsCollection } from "../db-collections/warriors";
+} from "../../components/ui/table";
+import { getWarbandsCollection } from "../../db-collections/warbands";
+import { getWarriorsCollection } from "../../db-collections/warriors";
 
 export const Route = createFileRoute("/warriors/")({
 	component: WarriorsIndexPage,

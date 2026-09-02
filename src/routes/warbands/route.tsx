@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { getWarbandsCollection } from "../db-collections/warbands";
+import { getWarbandsCollection } from "../../db-collections/warbands";
 
 export const Route = createFileRoute("/warbands")({
 	ssr: false,

@@ -1,8 +1,8 @@
 import { safeRandomUUID } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { MatchForm, type MatchFormValues } from "../components/match-form";
-import { Card, CardContent } from "../components/ui/card";
-import { getMatchesCollection } from "../db-collections/matches";
+import { MatchForm, type MatchFormValues } from "../../components/match-form";
+import { Card, CardContent } from "../../components/ui/card";
+import { getMatchesCollection } from "../../db-collections/matches";
 
 export const Route = createFileRoute("/matches/new")({
 	component: NewMatchPage,
