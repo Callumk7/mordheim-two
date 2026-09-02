@@ -1,9 +1,14 @@
+import { createLink } from "@tanstack/react-router";
+import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
 import type * as React from "react";
 import {
+	Button as ButtonPrimitive,
 	Cell as CellPrimitive,
 	type CellProps,
 	Column as ColumnPrimitive,
 	type ColumnProps,
+	Link as LinkPrimitive,
+	type LinkProps as LinkPrimitiveProps,
 	Row as RowPrimitive,
 	type RowProps,
 	TableBody as TableBodyPrimitive,
@@ -108,6 +113,105 @@ function TableCell({ className, ...props }: CellProps) {
 	);
 }
 
+type TableSortDirection = false | "asc" | "desc";
+
+interface TableSortableHeadProps
+	extends Omit<ColumnProps, "children" | "className"> {
+	align?: "start" | "end";
+	children: React.ReactNode;
+	className?: string;
+	direction: TableSortDirection;
+	onSort: () => void;
+}
+
+function TableSortableHead({
+	align = "start",
+	children,
+	className,
+	direction,
+	onSort,
+	...props
+}: TableSortableHeadProps) {
+	const SortIcon =
+		direction === "asc"
+			? ArrowUp
+			: direction === "desc"
+				? ArrowDown
+				: ChevronsUpDown;
+
+	return (
+		<TableHead
+			aria-sort={
+				direction === "asc"
+					? "ascending"
+					: direction === "desc"
+						? "descending"
+						: "none"
+			}
+			className={cn("h-11", align === "end" && "text-right", className)}
+			{...props}
+		>
+			<ButtonPrimitive
+				className={cn(
+					"inline-flex w-full cursor-pointer items-center gap-1.5 rounded-sm text-sm font-medium outline-none hover:text-primary focus-visible:ring-2 focus-visible:ring-ring",
+					align === "end" ? "justify-end" : "justify-start",
+				)}
+				onPress={onSort}
+			>
+				{children}
+				<SortIcon
+					aria-hidden="true"
+					className={cn(
+						"size-3.5",
+						direction === false && "text-muted-foreground/60",
+					)}
+				/>
+				<span className="sr-only">
+					{direction === "asc"
+						? "Sorted ascending"
+						: direction === "desc"
+							? "Sorted descending"
+							: "Not sorted"}
+				</span>
+			</ButtonPrimitive>
+		</TableHead>
+	);
+}
+
+function TableActions({ className, ...props }: React.ComponentProps<"div">) {
+	return (
+		<div
+			className={cn("flex justify-end gap-3", className)}
+			data-slot="table-actions"
+			{...props}
+		/>
+	);
+}
+
+function TableActionLinkPrimitive({
+	className,
+	variant = "default",
+	...props
+}: Omit<LinkPrimitiveProps, "className"> & {
+	className?: string;
+	variant?: "default" | "destructive";
+}) {
+	return (
+		<LinkPrimitive
+			className={cn(
+				variant === "default"
+					? "text-muted-foreground hover:text-foreground"
+					: "text-destructive/80 hover:text-destructive",
+				className,
+			)}
+			data-slot="table-action-link"
+			{...props}
+		/>
+	);
+}
+
+const TableActionLink = createLink(TableActionLinkPrimitive);
+
 function TableCaption({
 	className,
 	...props
@@ -126,10 +230,13 @@ function TableCaption({
 
 export {
 	Table,
+	TableActionLink,
+	TableActions,
 	TableHeader,
 	TableBody,
 	TableFooter,
 	TableHead,
+	TableSortableHead,
 	TableRow,
 	TableCell,
 	TableCaption,

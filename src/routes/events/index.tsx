@@ -1,19 +1,12 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { EventsTable } from "#/components/table/events-table";
 import { LinkButton } from "@/components/ui/button";
 import {
 	IndexEmptyState,
 	IndexPage,
 	IndexPageHeader,
 } from "../../components/index-page";
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "../../components/ui/table";
 import { getEventsCollection } from "../../db-collections/events";
 import { getMatchesCollection } from "../../db-collections/matches";
 import { getWarbandsCollection } from "../../db-collections/warbands";
@@ -54,56 +47,11 @@ function EventsIndexPage() {
 			/>
 
 			{events.length ? (
-				<div className="overflow-hidden rounded-xl border border-border bg-card">
-					<Table aria-label="Events" className="min-w-[760px]">
-						<TableHeader>
-							<TableHead isRowHeader>Match</TableHead>
-							<TableHead>Attacker</TableHead>
-							<TableHead>Defender</TableHead>
-							<TableHead>Notes</TableHead>
-							<TableHead className="text-right">Actions</TableHead>
-						</TableHeader>
-						<TableBody>
-							{events.map((event) => (
-								<TableRow key={event.id}>
-									<TableCell className="[&_a]:font-semibold [&_a]:text-foreground [&_a:hover]:text-primary">
-										<Link params={{ eventId: event.id }} to="/events/$eventId">
-											{matchNames.get(event.matchId) ?? "Unknown match"}
-										</Link>
-									</TableCell>
-									<TableCell>
-										{warbandNames.get(event.attackerWarbandId) ??
-											"Unknown warband"}
-									</TableCell>
-									<TableCell>
-										{warbandNames.get(event.defenderWarbandId) ??
-											"Unknown warband"}
-									</TableCell>
-									<TableCell className="max-w-64 truncate text-muted-foreground">
-										{event.notes || "—"}
-									</TableCell>
-									<TableCell>
-										<div className="flex justify-end gap-3 [&_a]:text-muted-foreground [&_a:hover]:text-foreground [&_a[data-danger]]:text-destructive/80 [&_a[data-danger]:hover]:text-destructive">
-											<Link
-												params={{ eventId: event.id }}
-												to="/events/$eventId"
-											>
-												View
-											</Link>
-											<Link
-												data-danger
-												params={{ eventId: event.id }}
-												to="/events/$eventId/delete"
-											>
-												Delete
-											</Link>
-										</div>
-									</TableCell>
-								</TableRow>
-							))}
-						</TableBody>
-					</Table>
-				</div>
+				<EventsTable
+					events={events}
+					matchNames={matchNames}
+					warbandNames={warbandNames}
+				/>
 			) : (
 				<IndexEmptyState
 					action={<Link to="/events/new">Create an event →</Link>}
