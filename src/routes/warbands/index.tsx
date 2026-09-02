@@ -5,7 +5,7 @@ import {
 	IndexEmptyState,
 	IndexPage,
 	IndexPageHeader,
-} from "../components/index-page";
+} from "../../components/index-page";
 import {
 	Table,
 	TableBody,
@@ -13,8 +13,8 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from "../components/ui/table";
-import { getWarbandsCollection } from "../db-collections/warbands";
+} from "../../components/ui/table";
+import { getWarbandsCollection } from "../../db-collections/warbands";
 
 export const Route = createFileRoute("/warbands/")({
 	component: WarbandsIndexPage,

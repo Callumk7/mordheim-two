@@ -5,8 +5,8 @@ import {
 	IndexEmptyState,
 	IndexPage,
 	IndexPageHeader,
-} from "../components/index-page";
-import { formatStatus } from "../components/match-form";
+} from "../../components/index-page";
+import { formatStatus } from "../../components/match-form";
 import {
 	Table,
 	TableBody,
@@ -14,8 +14,8 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from "../components/ui/table";
-import { getMatchesCollection } from "../db-collections/matches";
+} from "../../components/ui/table";
+import { getMatchesCollection } from "../../db-collections/matches";
 
 export const Route = createFileRoute("/matches/")({
 	component: MatchesIndexPage,

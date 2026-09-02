@@ -5,7 +5,7 @@ import {
 	IndexEmptyState,
 	IndexPage,
 	IndexPageHeader,
-} from "../components/index-page";
+} from "../../components/index-page";
 import {
 	Table,
 	TableBody,
@@ -13,10 +13,10 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from "../components/ui/table";
-import { getEventsCollection } from "../db-collections/events";
-import { getMatchesCollection } from "../db-collections/matches";
-import { getWarbandsCollection } from "../db-collections/warbands";
+} from "../../components/ui/table";
+import { getEventsCollection } from "../../db-collections/events";
+import { getMatchesCollection } from "../../db-collections/matches";
+import { getWarbandsCollection } from "../../db-collections/warbands";
 
 export const Route = createFileRoute("/events/")({
 	component: EventsIndexPage,

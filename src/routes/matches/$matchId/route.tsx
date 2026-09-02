@@ -4,21 +4,21 @@ import {
 	notFound,
 	Outlet,
 } from "@tanstack/react-router";
-import { getWarbandsCollection } from "../db-collections/warbands";
+import { getMatchesCollection } from "../../../db-collections/matches";
 
-export const Route = createFileRoute("/warbands/$warbandId")({
+export const Route = createFileRoute("/matches/$matchId")({
 	loader: async ({ context, params }) => {
-		const collection = getWarbandsCollection(context.queryClient);
+		const collection = getMatchesCollection(context.queryClient);
 		await collection.preload();
-		if (!collection.get(params.warbandId)) throw notFound();
+		if (!collection.get(params.matchId)) throw notFound();
 		return null;
 	},
 	component: () => <Outlet />,
-	notFoundComponent: MissingWarband,
+	notFoundComponent: MissingMatch,
 });
 
-function MissingWarband() {
-	const { warbandId } = Route.useParams();
+function MissingMatch() {
+	const { matchId } = Route.useParams();
 
 	return (
 		<section className="rounded-xl border border-border bg-card px-6 py-14 text-center">
@@ -26,16 +26,16 @@ function MissingWarband() {
 				Not found
 			</p>
 			<h1 className="mt-3 font-serif text-3xl text-foreground">
-				Unknown warband
+				Unknown match
 			</h1>
 			<p className="mt-2 text-muted-foreground">
-				No warband exists with the identifier “{warbandId}”.
+				No match exists with the identifier “{matchId}”.
 			</p>
 			<Link
 				className="mt-6 inline-flex text-primary hover:text-primary/80"
-				to="/warbands"
+				to="/matches"
 			>
-				Return to warbands →
+				Return to matches →
 			</Link>
 		</section>
 	);

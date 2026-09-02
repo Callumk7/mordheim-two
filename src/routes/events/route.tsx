@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { getEventsCollection } from "../db-collections/events";
-import { getMatchesCollection } from "../db-collections/matches";
-import { getWarbandsCollection } from "../db-collections/warbands";
+import { getEventsCollection } from "../../db-collections/events";
+import { getMatchesCollection } from "../../db-collections/matches";
+import { getWarbandsCollection } from "../../db-collections/warbands";
 
 export const Route = createFileRoute("/events")({
 	ssr: false,

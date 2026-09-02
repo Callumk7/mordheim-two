@@ -1,10 +1,10 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { EventForm } from "../components/event-form";
-import { Card, CardContent } from "../components/ui/card";
-import { getEventsCollection } from "../db-collections/events";
-import { getMatchesCollection } from "../db-collections/matches";
-import { getWarbandsCollection } from "../db-collections/warbands";
+import { EventForm } from "../../../components/event-form";
+import { Card, CardContent } from "../../../components/ui/card";
+import { getEventsCollection } from "../../../db-collections/events";
+import { getMatchesCollection } from "../../../db-collections/matches";
+import { getWarbandsCollection } from "../../../db-collections/warbands";
 
 export const Route = createFileRoute("/events/$eventId/")({
 	component: EventDetailPage,

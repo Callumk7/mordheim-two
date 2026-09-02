@@ -9,6 +9,7 @@ import {
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
+import { LinkButton } from "#/components/ui/button";
 
 interface MyRouterContext {
 	queryClient: QueryClient;
@@ -47,12 +48,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<body className="dark min-h-screen">
 				<header className="border-b border-border backdrop-blur">
 					<div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-4 sm:px-8">
-						<Link
-							className="font-serif text-xl font-semibold text-foreground"
-							to="/"
-						>
+						<LinkButton variant="link" to="/">
 							Mordheim Ledger
-						</Link>
+						</LinkButton>
 						<nav
 							aria-label="Primary navigation"
 							className="flex items-center gap-2 text-sm"
