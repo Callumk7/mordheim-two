@@ -1,5 +1,4 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import { expect, test } from "vitest";
 import {
 	EventWithRelationsSchema,
 	MatchWithRelationsSchema,
@@ -53,8 +52,8 @@ test("warband relation data retains its warriors and linked matches", () => {
 		defendingEvents: [],
 	});
 
-	assert.equal(result.warriors?.[0]?.warbandId, warband.id);
-	assert.equal(result.warbandMatches?.[0]?.match.name, match.name);
+	expect(result.warriors?.[0]?.warbandId).toBe(warband.id);
+	expect(result.warbandMatches?.[0]?.match.name).toBe(match.name);
 });
 
 test("match, warrior, and event relation data retain their parent records", () => {
@@ -94,9 +93,9 @@ test("match, warrior, and event relation data retain their parent records", () =
 		defenderWarband: { ...warband, id: "sisters", name: "Silver Hammers" },
 	});
 
-	assert.equal(linkedMatch.warbandMatches?.[0]?.warband.id, warband.id);
-	assert.equal(warrior.warband?.name, warband.name);
-	assert.equal(event.match?.id, match.id);
-	assert.equal(event.attackerWarband?.id, event.attackerWarbandId);
-	assert.equal(event.defenderWarband?.id, event.defenderWarbandId);
+	expect(linkedMatch.warbandMatches?.[0]?.warband.id).toBe(warband.id);
+	expect(warrior.warband?.name).toBe(warband.name);
+	expect(event.match?.id).toBe(match.id);
+	expect(event.attackerWarband?.id).toBe(event.attackerWarbandId);
+	expect(event.defenderWarband?.id).toBe(event.defenderWarbandId);
 });
