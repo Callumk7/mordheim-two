@@ -2,6 +2,7 @@ import type { ComponentProps } from "react";
 import { useEffect, useId, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "./input";
+import { NumberField } from "./number-field";
 import {
 	Select,
 	SelectContent,
@@ -119,6 +120,86 @@ function TableCellInput({
 	);
 }
 
+type TableCellNumberFieldProps = Omit<
+	ComponentProps<typeof NumberField>,
+	| "className"
+	| "defaultValue"
+	| "description"
+	| "errorMessage"
+	| "isInvalid"
+	| "label"
+	| "onChange"
+	| "value"
+> & {
+	className?: string;
+	onCommit: (value: number) => Promise<void> | void;
+	value: number;
+};
+
+function TableCellNumberField({
+	className,
+	maxValue,
+	minValue,
+	onCommit,
+	step = 1,
+	value,
+	...props
+}: TableCellNumberFieldProps) {
+	const [draft, setDraft] = useState(value);
+	const [error, setError] = useState<string>();
+	const [isSaving, setIsSaving] = useState(false);
+
+	useEffect(() => setDraft(value), [value]);
+
+	return (
+		<NumberField
+			aria-busy={isSaving || undefined}
+			className="gap-0"
+			commitBehavior="validate"
+			errorClassName="sr-only"
+			errorMessage={error}
+			groupClassName={cn(tableCellControlClassName, "px-0", className)}
+			inputClassName="px-1 text-right"
+			isInvalid={error ? true : undefined}
+			maxValue={maxValue}
+			minValue={minValue}
+			onChange={async (nextValue) => {
+				setDraft(nextValue);
+				setError(undefined);
+
+				const stepBase = minValue ?? 0;
+				const stepRemainder = Math.abs((nextValue - stepBase) / step);
+				const isOnStep =
+					Math.abs(stepRemainder - Math.round(stepRemainder)) < 1e-9;
+				if (
+					!Number.isFinite(nextValue) ||
+					(minValue != null && nextValue < minValue) ||
+					(maxValue != null && nextValue > maxValue) ||
+					!isOnStep ||
+					nextValue === value
+				) {
+					return;
+				}
+
+				setIsSaving(true);
+				try {
+					await onCommit(nextValue);
+				} catch (cause) {
+					setDraft(value);
+					setError(
+						cause instanceof Error ? cause.message : "Unable to save change.",
+					);
+				} finally {
+					setIsSaving(false);
+				}
+			}}
+			step={step}
+			value={draft}
+			{...props}
+		/>
+	);
+}
+
 interface TableCellSelectProps {
 	"aria-label": string;
 	className?: string;
@@ -193,4 +274,4 @@ function TableCellSelect({
 	);
 }
 
-export { TableCellInput, TableCellSelect };
+export { TableCellInput, TableCellNumberField, TableCellSelect };

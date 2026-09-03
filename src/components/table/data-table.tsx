@@ -1,5 +1,6 @@
 import {
 	columnFilteringFeature,
+	createExpandedRowModel,
 	createFilteredRowModel,
 	createSortedRowModel,
 	createTableHook,
@@ -7,12 +8,15 @@ import {
 	globalFilteringFeature,
 	metaHelper,
 	type RowData,
+	rowExpandingFeature,
 	rowSortingFeature,
 	type SortingState,
 	type TableOptions,
 	tableFeatures,
 } from "@tanstack/react-table";
 import { Search, X } from "lucide-react";
+import type { ReactNode } from "react";
+import { Fragment } from "react";
 import { cn } from "#/lib/utils";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -37,6 +41,8 @@ const features = tableFeatures({
 	globalFilteringFeature,
 	filteredRowModel: createFilteredRowModel(),
 	filterFns: { includesString: filterFn_includesString },
+	rowExpandingFeature,
+	expandedRowModel: createExpandedRowModel(),
 	rowSortingFeature,
 	sortedRowModel: createSortedRowModel(),
 });
@@ -68,6 +74,7 @@ interface DataTableProps<TData extends RowData & { id: string }> {
 	initialSorting?: SortingState;
 	itemLabel: DataTableItemLabel;
 	searchPlaceholder: string;
+	renderExpandedRow?: (row: TData) => ReactNode;
 	tableClassName?: string;
 }
 
@@ -136,11 +143,13 @@ export function DataTable<TData extends RowData & { id: string }>({
 	initialSorting = [],
 	itemLabel,
 	searchPlaceholder,
+	renderExpandedRow,
 	tableClassName,
 }: DataTableProps<TData>) {
 	const table = useAppTable({
 		columns,
 		data,
+		getRowCanExpand: () => Boolean(renderExpandedRow),
 		initialState: { sorting: initialSorting },
 	});
 	const rows = table.getRowModel().rows;
@@ -194,19 +203,31 @@ export function DataTable<TData extends RowData & { id: string }>({
 						)}
 					>
 						{rows.map((row) => (
-							<TableRow key={row.id}>
-								{row.getAllCells().map((cell) => (
-									<TableCell
-										className={cn(
-											cell.column.columnDef.meta?.align === "end" &&
-												"text-right",
-										)}
-										key={cell.id}
-									>
-										<table.FlexRender cell={cell} />
-									</TableCell>
-								))}
-							</TableRow>
+							<Fragment key={row.id}>
+								<TableRow>
+									{row.getAllCells().map((cell) => (
+										<TableCell
+											className={cn(
+												cell.column.columnDef.meta?.align === "end" &&
+													"text-right",
+											)}
+											key={cell.id}
+										>
+											<table.FlexRender cell={cell} />
+										</TableCell>
+									))}
+								</TableRow>
+								{row.getIsExpanded() && renderExpandedRow ? (
+									<TableRow className="bg-muted/20 hover:bg-muted/20">
+										<TableCell
+											className="p-0 whitespace-normal"
+											colSpan={row.getAllCells().length}
+										>
+											{renderExpandedRow(row.original)}
+										</TableCell>
+									</TableRow>
+								) : null}
+							</Fragment>
 						))}
 					</TableBody>
 				</Table>
