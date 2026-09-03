@@ -7,6 +7,13 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { MATCH_STATUSES, type Match } from "../db/match";
 
 export type MatchFormValues = Pick<Match, "name" | "scenario" | "status">;
@@ -64,24 +71,28 @@ export function MatchForm({
 				/>
 				<Field>
 					<FieldLabel htmlFor={statusId}>Status</FieldLabel>
-					<select
-						id={statusId}
+					<Select
+						className="w-full"
 						name="status"
-						className="h-9 w-full rounded-4xl border border-input bg-input/30 px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-						onChange={(event) =>
+						onSelectionChange={(key) =>
 							setValues((current) => ({
 								...current,
-								status: event.target.value as Match["status"],
+								status: String(key) as Match["status"],
 							}))
 						}
-						value={values.status}
+						selectedKey={values.status}
 					>
-						{MATCH_STATUSES.map((status) => (
-							<option key={status} value={status}>
-								{formatStatus(status)}
-							</option>
-						))}
-					</select>
+						<SelectTrigger id={statusId}>
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							{MATCH_STATUSES.map((status) => (
+								<SelectItem id={status} key={status}>
+									{formatStatus(status)}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
 				</Field>
 			</FieldGroup>
 

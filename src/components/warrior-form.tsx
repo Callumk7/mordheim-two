@@ -7,6 +7,13 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import type { Warband } from "../db/warband";
 import { WARRIOR_STATUSES, type Warrior } from "../db/warrior";
 
@@ -81,47 +88,55 @@ export function WarriorForm({
 				/>
 				<Field>
 					<FieldLabel htmlFor={warbandId}>Warband</FieldLabel>
-					<select
-						id={warbandId}
+					<Select
+						className="w-full"
+						isRequired
 						name="warbandId"
-						className="h-9 w-full rounded-4xl border border-input bg-input/30 px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-						onChange={(event) =>
+						onSelectionChange={(key) =>
 							setValues((current) => ({
 								...current,
-								warbandId: event.target.value,
+								warbandId: String(key),
 							}))
 						}
-						required
-						value={values.warbandId}
+						placeholder="Select a warband"
+						selectedKey={values.warbandId || null}
 					>
-						<option value="">Select a warband</option>
-						{warbands.map((warband) => (
-							<option key={warband.id} value={warband.id}>
-								{warband.name}
-							</option>
-						))}
-					</select>
+						<SelectTrigger id={warbandId}>
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							{warbands.map((warband) => (
+								<SelectItem id={warband.id} key={warband.id}>
+									{warband.name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
 				</Field>
 				<Field>
 					<FieldLabel htmlFor={statusId}>Status</FieldLabel>
-					<select
-						id={statusId}
+					<Select
+						className="w-full"
 						name="status"
-						className="h-9 w-full rounded-4xl border border-input bg-input/30 px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-						onChange={(event) =>
+						onSelectionChange={(key) =>
 							setValues((current) => ({
 								...current,
-								status: event.target.value as Warrior["status"],
+								status: String(key) as Warrior["status"],
 							}))
 						}
-						value={values.status}
+						selectedKey={values.status}
 					>
-						{WARRIOR_STATUSES.map((status) => (
-							<option key={status} value={status}>
-								{status}
-							</option>
-						))}
-					</select>
+						<SelectTrigger id={statusId}>
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							{WARRIOR_STATUSES.map((status) => (
+								<SelectItem id={status} key={status}>
+									{status}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
 				</Field>
 				<NumberField
 					label="Knocked"

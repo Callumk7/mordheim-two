@@ -7,6 +7,13 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { WARBAND_STATUSES, type Warband } from "../db/warband";
 
 export type WarbandFormValues = Pick<
@@ -78,24 +85,28 @@ export function WarbandForm({
 				/>
 				<Field>
 					<FieldLabel htmlFor={statusId}>Status</FieldLabel>
-					<select
-						id={statusId}
+					<Select
+						className="w-full"
 						name="status"
-						className="h-9 w-full rounded-4xl border border-input bg-input/30 px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-						onChange={(event) =>
+						onSelectionChange={(key) =>
 							setValues((current) => ({
 								...current,
-								status: event.target.value as Warband["status"],
+								status: String(key) as Warband["status"],
 							}))
 						}
-						value={values.status}
+						selectedKey={values.status}
 					>
-						{WARBAND_STATUSES.map((status) => (
-							<option key={status} value={status}>
-								{status}
-							</option>
-						))}
-					</select>
+						<SelectTrigger id={statusId}>
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							{WARBAND_STATUSES.map((status) => (
+								<SelectItem id={status} key={status}>
+									{status}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
 				</Field>
 				<NumberField
 					label="Rating"
