@@ -229,23 +229,27 @@ function TableCellSelect({
 				aria-label={ariaLabel}
 				className="w-full"
 				isInvalid={Boolean(error)}
-				onSelectionChange={async (key) => {
-					const nextValue = String(key);
-					setSelectedValue(nextValue);
-					setError(undefined);
-					setIsSaving(true);
-					try {
-						await onCommit(nextValue);
-					} catch (cause) {
-						setSelectedValue(value);
-						setError(
-							cause instanceof Error ? cause.message : "Unable to save change.",
-						);
-					} finally {
-						setIsSaving(false);
+				onChange={async (key) => {
+					if (key !== null) {
+						const nextValue = String(key);
+						setSelectedValue(nextValue);
+						setError(undefined);
+						setIsSaving(true);
+						try {
+							await onCommit(nextValue);
+						} catch (cause) {
+							setSelectedValue(value);
+							setError(
+								cause instanceof Error
+									? cause.message
+									: "Unable to save change.",
+							);
+						} finally {
+							setIsSaving(false);
+						}
 					}
 				}}
-				selectedKey={selectedValue}
+				value={selectedValue}
 			>
 				<SelectTrigger
 					aria-describedby={error ? errorId : undefined}

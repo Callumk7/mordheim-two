@@ -93,14 +93,16 @@ export function WarriorForm({
 						className="w-full"
 						isRequired
 						name="warbandId"
-						onSelectionChange={(key) =>
-							setValues((current) => ({
-								...current,
-								warbandId: String(key),
-							}))
-						}
+						onChange={(key) => {
+							if (key !== null) {
+								setValues((current) => ({
+									...current,
+									warbandId: String(key),
+								}));
+							}
+						}}
 						placeholder="Select a warband"
-						selectedKey={values.warbandId || null}
+						value={values.warbandId || null}
 					>
 						<SelectTrigger id={warbandId}>
 							<SelectValue />
@@ -119,13 +121,15 @@ export function WarriorForm({
 					<Select
 						className="w-full"
 						name="status"
-						onSelectionChange={(key) =>
-							setValues((current) => ({
-								...current,
-								status: String(key) as Warrior["status"],
-							}))
-						}
-						selectedKey={values.status}
+						onChange={(key) => {
+							if (key !== null) {
+								setValues((current) => ({
+									...current,
+									status: String(key) as Warrior["status"],
+								}));
+							}
+						}}
+						value={values.status}
 					>
 						<SelectTrigger id={statusId}>
 							<SelectValue />
