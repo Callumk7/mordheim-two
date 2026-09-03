@@ -20,7 +20,7 @@
     "db:seed:local": "wrangler d1 execute mordheim-two-db --local --file scripts/seed.sql",
     "db:seed:remote": "wrangler d1 execute mordheim-two-db --remote --file scripts/seed.sql",
     "deploy": "pnpm run build && wrangler deploy",
-    "test": "tsx --test src/db/relations.test.ts"
+    "test": "vitest run"
   },
   "dependencies": {
     "@faker-js/faker": "^10.3.0",
@@ -63,6 +63,7 @@
     "tsx": "^4.23.13",
     "typescript": "^6.0.2",
     "vite": "^8.0.0",
+    "vitest": "^5.0.0",
     "wrangler": "^4.70.0"
   },
   "packageManager": "pnpm@10.34.4",
