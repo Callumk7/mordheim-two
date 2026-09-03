@@ -7,6 +7,7 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { NumberField } from "@/components/ui/number-field";
 import {
 	Select,
 	SelectContent,
@@ -139,7 +140,9 @@ export function WarriorForm({
 					</Select>
 				</Field>
 				<NumberField
+					isRequired
 					label="Knocked"
+					minValue={0}
 					name="knocked"
 					onChange={(knocked) =>
 						setValues((current) => ({ ...current, knocked }))
@@ -147,7 +150,9 @@ export function WarriorForm({
 					value={values.knocked}
 				/>
 				<NumberField
+					isRequired
 					label="Injuries"
+					minValue={0}
 					name="injuries"
 					onChange={(injuries) =>
 						setValues((current) => ({ ...current, injuries }))
@@ -155,7 +160,9 @@ export function WarriorForm({
 					value={values.injuries}
 				/>
 				<NumberField
+					isRequired
 					label="Knock downs"
+					minValue={0}
 					name="knockedDowns"
 					onChange={(knockedDowns) =>
 						setValues((current) => ({ ...current, knockedDowns }))
@@ -204,35 +211,6 @@ function TextField({
 				name={name}
 				onChange={(event) => onChange(event.target.value)}
 				required
-				value={value}
-			/>
-		</Field>
-	);
-}
-
-function NumberField({
-	label,
-	name,
-	onChange,
-	value,
-}: {
-	label: string;
-	name: string;
-	onChange: (value: number) => void;
-	value: number;
-}) {
-	const id = useId();
-
-	return (
-		<Field>
-			<FieldLabel htmlFor={id}>{label}</FieldLabel>
-			<Input
-				id={id}
-				min="0"
-				name={name}
-				onChange={(event) => onChange(Number(event.target.value))}
-				required
-				type="number"
 				value={value}
 			/>
 		</Field>

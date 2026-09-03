@@ -1,11 +1,18 @@
+import { ChevronRight, Users } from "lucide-react";
 import { useMemo } from "react";
+import type { WarbandWithRelations } from "#/db/relations";
 import type { Warband } from "#/db/warband";
 import { WARBAND_STATUSES } from "#/db/warband";
+import { Button } from "../ui/button";
 import { TableActionLink, TableActions } from "../ui/table";
-import { TableCellInput, TableCellSelect } from "../ui/table-cell-field";
+import {
+	TableCellInput,
+	TableCellNumberField,
+	TableCellSelect,
+} from "../ui/table-cell-field";
 import { createDataTableColumnHelper, DataTable } from "./data-table";
 
-const columnHelper = createDataTableColumnHelper<Warband>();
+const columnHelper = createDataTableColumnHelper<WarbandWithRelations>();
 
 export type WarbandInlineUpdate = Partial<
 	Pick<Warband, "captain" | "faction" | "name" | "rating" | "status">
@@ -13,13 +20,81 @@ export type WarbandInlineUpdate = Partial<
 
 interface WarbandsTableProps {
 	onUpdate: (id: string, changes: WarbandInlineUpdate) => Promise<void>;
-	warbands: Warband[];
+	warbands: WarbandWithRelations[];
+}
+
+function WarbandWarriors({ warband }: { warband: WarbandWithRelations }) {
+	const warriors = warband.warriors ?? [];
+
+	return (
+		<div className="px-4 py-4 sm:px-12">
+			<div className="mb-3 flex items-center gap-2 text-sm font-medium text-foreground">
+				<Users aria-hidden="true" className="size-4 text-primary" />
+				{warriors.length} {warriors.length === 1 ? "warrior" : "warriors"}
+			</div>
+			{warriors.length ? (
+				<div className="grid gap-2">
+					{warriors.map((warrior) => (
+						<div
+							className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 rounded-lg border border-border bg-background px-3 py-2 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto]"
+							key={warrior.id}
+						>
+							<div className="min-w-0">
+								<p className="truncate font-medium text-foreground">
+									{warrior.name}
+								</p>
+								<p className="truncate text-xs text-muted-foreground">
+									{warrior.class} · {warrior.status}
+								</p>
+							</div>
+							<span className="hidden text-xs text-muted-foreground sm:block">
+								{warrior.injuries} injuries
+							</span>
+							<span className="hidden text-xs text-muted-foreground sm:block">
+								{warrior.knockedDowns} knock downs
+							</span>
+							<TableActionLink
+								params={{ warriorId: warrior.id }}
+								to="/warriors/$warriorId"
+							>
+								View
+							</TableActionLink>
+						</div>
+					))}
+				</div>
+			) : (
+				<p className="text-sm text-muted-foreground">
+					No warriors have joined this warband yet.
+				</p>
+			)}
+		</div>
+	);
 }
 
 export function WarbandsTable({ onUpdate, warbands }: WarbandsTableProps) {
 	const columns = useMemo(
 		() =>
 			columnHelper.columns([
+				columnHelper.display({
+					id: "expand",
+					header: "",
+					enableGlobalFilter: false,
+					enableSorting: false,
+					cell: ({ row }) => (
+						<Button
+							aria-label={`${row.getIsExpanded() ? "Collapse" : "Expand"} warriors for ${row.original.name}`}
+							aria-expanded={row.getIsExpanded()}
+							onPress={row.getToggleExpandedHandler()}
+							size="icon-xs"
+							variant="ghost"
+						>
+							<ChevronRight
+								aria-hidden="true"
+								className={`transition-transform ${row.getIsExpanded() ? "rotate-90" : ""}`}
+							/>
+						</Button>
+					),
+				}),
 				columnHelper.accessor(
 					(warband) => `${warband.name} ${warband.faction}`,
 					{
@@ -90,20 +165,13 @@ export function WarbandsTable({ onUpdate, warbands }: WarbandsTableProps) {
 					header: "Rating",
 					meta: { align: "end" },
 					cell: ({ row }) => (
-						<TableCellInput
+						<TableCellNumberField
 							aria-label={`Rating for ${row.original.name}`}
-							className="min-w-20 text-right font-mono text-primary"
-							min="0"
-							onCommit={(rating) =>
-								onUpdate(row.original.id, { rating: Number(rating) })
-							}
-							step="1"
-							type="number"
-							validate={(rating) =>
-								/^\d+$/.test(rating)
-									? undefined
-									: "Rating must be a non-negative whole number."
-							}
+							className="min-w-20 font-mono text-primary"
+							isRequired
+							minValue={0}
+							onCommit={(rating) => onUpdate(row.original.id, { rating })}
+							step={1}
 							value={row.original.rating}
 						/>
 					),
@@ -144,6 +212,7 @@ export function WarbandsTable({ onUpdate, warbands }: WarbandsTableProps) {
 			emptyMessage="No warbands match your search."
 			initialSorting={[{ id: "name", desc: false }]}
 			itemLabel={{ singular: "warband", plural: "warbands" }}
+			renderExpandedRow={(warband) => <WarbandWarriors warband={warband} />}
 			searchPlaceholder="Search warbands…"
 			tableClassName="min-w-180"
 		/>

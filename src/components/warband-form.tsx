@@ -7,6 +7,7 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { NumberField } from "@/components/ui/number-field";
 import {
 	Select,
 	SelectContent,
@@ -109,7 +110,9 @@ export function WarbandForm({
 					</Select>
 				</Field>
 				<NumberField
+					isRequired
 					label="Rating"
+					minValue={0}
 					name="rating"
 					onChange={(rating) =>
 						setValues((current) => ({ ...current, rating }))
@@ -117,7 +120,9 @@ export function WarbandForm({
 					value={values.rating}
 				/>
 				<NumberField
+					isRequired
 					label="Wins"
+					minValue={0}
 					name="wins"
 					onChange={(wins) => setValues((current) => ({ ...current, wins }))}
 					value={values.wins}
@@ -164,35 +169,6 @@ function TextField({
 				name={name}
 				onChange={(event) => onChange(event.target.value)}
 				required
-				value={value}
-			/>
-		</Field>
-	);
-}
-
-function NumberField({
-	label,
-	name,
-	onChange,
-	value,
-}: {
-	label: string;
-	name: string;
-	onChange: (value: number) => void;
-	value: number;
-}) {
-	const id = useId();
-
-	return (
-		<Field>
-			<FieldLabel htmlFor={id}>{label}</FieldLabel>
-			<Input
-				id={id}
-				min="0"
-				name={name}
-				onChange={(event) => onChange(Number(event.target.value))}
-				required
-				type="number"
 				value={value}
 			/>
 		</Field>
