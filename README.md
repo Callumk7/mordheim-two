@@ -1,250 +1,82 @@
-Welcome to your new TanStack Start app!
+# Mordheim Campaign Ledger
 
-# Getting Started
+Mordheim Campaign Ledger is a web application for recording and managing Mordheim campaign warbands, warriors, matches, and events. It is built with TanStack Start and file-based TanStack Router routes, with campaign data stored in Cloudflare D1 through Drizzle ORM and exposed to the client through TanStack DB collections.
 
-To run this application:
+## Prerequisites and setup
+
+- Node.js and pnpm (the repository declares `pnpm@10.34.4`)
+- A Cloudflare account and Wrangler authentication for remote D1 operations or deployment
 
 ```bash
 pnpm install
+pnpm db:migrate:local
+pnpm db:seed:local
 pnpm dev
 ```
 
-# Building For Production
+The development server runs on port 3000. Local database commands use Wrangler's local D1 database; remote commands target the D1 database configured in `wrangler.jsonc`.
 
-To build this application for production:
+## Commands
 
 ```bash
+pnpm dev
 pnpm build
-```
-
-## Styling
-
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
-
-### Removing Tailwind CSS
-
-If you prefer not to use Tailwind CSS:
-
-1. Remove the demo pages in `src/routes/demo/`
-2. Replace the Tailwind import in `src/styles.css` with your own styles
-3. Remove `tailwindcss()` from the plugins array in `vite.config.ts`
-4. Remove `@tailwindcss/vite` and `tailwindcss` from `package.json`
-
-## Linting & Formatting
-
-This project uses [Biome](https://biomejs.dev/) for linting and formatting. The following scripts are available:
-
-
-```bash
+pnpm check
 pnpm lint
 pnpm format
-pnpm check
+pnpm test
+pnpm db:generate
+pnpm db:migrate:local
+pnpm db:migrate:remote
+pnpm db:seed:local
+pnpm db:seed:remote
+pnpm cf-typegen
+pnpm deploy
 ```
 
+- `pnpm dev` starts the Vite development server.
+- `pnpm build` creates a production build.
+- `pnpm check`, `pnpm lint`, and `pnpm format` run Biome's combined checks, linter, and formatter.
+- `pnpm test` runs the database relations test.
+- `pnpm cf-typegen` regenerates Cloudflare binding types after changes to `wrangler.jsonc`.
+- `pnpm deploy` builds the application and deploys it with Wrangler.
 
-## Deploy to Cloudflare Workers
+## Database workflow
 
-This project uses the Cloudflare Vite plugin (configured in `vite.config.ts`) and `wrangler.jsonc`:
+The Drizzle schema is `src/db/schema.ts`; Drizzle Kit writes migrations to `drizzle/`, which is also the D1 migrations directory configured in `wrangler.jsonc`. Seed data lives in `scripts/seed.sql`.
 
-1. Install Wrangler: `npm install -g wrangler`
-2. Authenticate: `wrangler login`
-3. Deploy: `npx wrangler deploy`
-
-For production env vars, run `wrangler secret put MY_VAR` for each secret listed in `.env.example`. Public (non-secret) vars go in `wrangler.jsonc` under `vars`.
-
-KV, D1, R2, and Durable Object bindings are configured in `wrangler.jsonc` — see https://developers.cloudflare.com/workers/wrangler/configuration/.
-
-## Database
-
-The app uses Drizzle ORM with the `DB` Cloudflare D1 binding. The schema is in
-`src/db/schema.ts`, and the server-only Drizzle client is exposed by
-`getDb()` in `src/db/index.server.ts`.
-
-The demo's TanStack DB collection uses a TanStack Query collection backed by
-server functions in `src/db/warbands.functions.ts`. Reads and optimistic
-insert/update/delete operations are persisted to D1 and automatically
-refetched after each mutation.
-
-After changing the schema, generate and apply a migration:
+After changing the schema, generate a migration and apply it to the environment you need:
 
 ```bash
 pnpm db:generate
 pnpm db:migrate:local
+# When ready to update the configured Cloudflare D1 database:
 pnpm db:migrate:remote
 ```
 
-Seed the example warbands when setting up a fresh database:
+To populate a fresh database with the project's seed data, run `pnpm db:seed:local` for local D1 or `pnpm db:seed:remote` for the configured remote D1 database. Keep database access in server-only code; client-side collections in `src/db-collections/` use the application's server functions.
+
+## Deployment
+
+Ensure remote migrations have been applied, authenticate Wrangler with your Cloudflare account, then run:
 
 ```bash
-pnpm db:seed:local
-pnpm db:seed:remote
+pnpm deploy
 ```
 
-Regenerate Cloudflare binding types after changing `wrangler.jsonc`:
+The deployment command builds the TanStack Start application and invokes Wrangler using `wrangler.jsonc`, including its configured Worker entry point and D1 binding.
 
-```bash
-pnpm cf-typegen
-```
+## Directory overview
 
-Database access must stay in server functions or other server-only files. For
-example:
+- `src/components/ui/` — design-system primitives
+- `src/components/table/` — application table components
+- `src/db/` — Drizzle schema, database access, domain modules, and server functions
+- `src/db-collections/` — TanStack DB collections
+- `src/routes/` — file-based TanStack Router routes
+- `src/lib/` — shared utilities
+- `drizzle/` — generated Drizzle/D1 migrations
+- `scripts/` — SQL and other operational scripts
 
-```ts
-import { createServerFn } from "@tanstack/react-start";
-import { getDb } from "@/db/index.server";
-import { warbands } from "@/db/schema";
+## Contributing
 
-export const listWarbands = createServerFn({ method: "GET" }).handler(
-  async () => getDb().select().from(warbands),
-);
-```
-
-## Routing
-
-This project uses [TanStack Router](https://tanstack.com/router) with file-based routing. Routes are managed as files in `src/routes`.
-
-### Adding A Route
-
-To add a new route to your application just add a new file in the `./src/routes` directory.
-
-TanStack will automatically generate the content of the route file for you.
-
-Now that you have two routes you can use a `Link` component to navigate between them.
-
-### Adding Links
-
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
-
-```tsx
-import { Link } from "@tanstack/react-router";
-```
-
-Then anywhere in your JSX you can use it like so:
-
-```tsx
-<Link to="/about">About</Link>
-```
-
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you render `{children}` in the `shellComponent`.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'My App' },
-    ],
-  }),
-  shellComponent: ({ children }) => (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <header>
-          <nav>
-            <Link to="/">Home</Link>
-            <Link to="/about">About</Link>
-          </nav>
-        </header>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  ),
-})
-```
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-## Server Functions
-
-TanStack Start provides server functions that allow you to write server-side code that seamlessly integrates with your client components.
-
-```tsx
-import { createServerFn } from '@tanstack/react-start'
-
-const getServerTime = createServerFn({
-  method: 'GET',
-}).handler(async () => {
-  return new Date().toISOString()
-})
-
-// Use in a component
-function MyComponent() {
-  const [time, setTime] = useState('')
-  
-  useEffect(() => {
-    getServerTime().then(setTime)
-  }, [])
-  
-  return <div>Server time: {time}</div>
-}
-```
-
-## API Routes
-
-You can create API routes by using the `server` property in your route definitions:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { json } from '@tanstack/react-start'
-
-export const Route = createFileRoute('/api/hello')({
-  server: {
-    handlers: {
-      GET: () => json({ message: 'Hello, World!' }),
-    },
-  },
-})
-```
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-
-export const Route = createFileRoute('/people')({
-  loader: async () => {
-    const response = await fetch('https://swapi.dev/api/people')
-    return response.json()
-  },
-  component: PeopleComponent,
-})
-
-function PeopleComponent() {
-  const data = Route.useLoaderData()
-  return (
-    <ul>
-      {data.results.map((person) => (
-        <li key={person.name}>{person.name}</li>
-      ))}
-    </ul>
-  )
-}
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
-
-For TanStack Start specific documentation, visit [TanStack Start](https://tanstack.com/start).
+Read [`AGENTS.md`](./AGENTS.md) before contributing or working as an agent. It documents the project's UI, styling, import, and quality conventions.

@@ -212,3 +212,27 @@ tanstackIntent:
     run: "pnpm dlx @tanstack/intent@latest load @tanstack/virtual-file-routes#virtual-file-routes"
     for: "Programmatic route tree building as an alternative to filesystem conventions: rootRoute, index, route, layout, physical, defineVirtualSubtreeConfig. Use with TanStack Router plugin's virtualRouteConfig option."
 <!-- intent-skills:end -->
+
+# Project guide
+
+## Stack
+
+Mordheim Campaign Ledger is a TanStack Start application using file-based TanStack Router routes, TanStack DB with `@tanstack/query-db-collection`, and Cloudflare D1 through Drizzle ORM. The UI is React 19 with React Aria Components and shadcn's `aria-maia` style, Tailwind CSS v4, Lucide React icons, and Biome.
+
+## UI and styling
+
+- Inspect and reuse the design-system primitives in `src/components/ui/` before introducing a base control. Existing primitives include `Button`, `Input`, `Field`, `Dialog`, `Table`, and the table-cell field/input primitives.
+- Keep `src/components/ui/` for primitives. When an application-specific composite pattern is repeated, extract it to `src/components/shared/` rather than duplicating it locally; create that directory only when it is needed.
+- Use Tailwind v4 and the semantic theme tokens in `src/styles.css`, including `bg-background`, `text-foreground`, `bg-card`, `border-border`, and `text-primary`, instead of hard-coded theme colors. Headings use the Schoensperger serif treatment; body copy uses Inter Variable.
+- Use `cn()` from `@/lib/utils` to compose conditional class names.
+
+## Layout and imports
+
+- `src/components/ui/` contains design-system primitives; `src/components/table/` contains table UI.
+- `src/db/` contains the Drizzle schema, server access, domain modules, and server functions; `src/db-collections/` contains TanStack DB collections.
+- `src/routes/` contains file-based routes, `src/lib/` contains shared utilities, `drizzle/` contains D1 migrations, and `scripts/` contains database scripts such as the seed SQL.
+- Prefer the `@/*` import alias for new imports. `#/*` also resolves to `src/*`, but do not use it for new imports.
+
+## Code quality
+
+Biome is configured for tabs and double quotes. Run the package scripts—`pnpm format`, `pnpm lint`, and `pnpm check`—to format, lint, and check changes.
