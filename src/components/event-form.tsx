@@ -7,6 +7,13 @@ import {
 	FieldGroup,
 	FieldLabel,
 } from "@/components/ui/field";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import type { Event } from "../db/event";
 import type { Match } from "../db/match";
 import type { Warband } from "../db/warband";
@@ -168,22 +175,26 @@ function SelectField({
 	return (
 		<Field data-invalid={invalid}>
 			<FieldLabel htmlFor={id}>{label}</FieldLabel>
-			<select
-				id={id}
+			<Select
+				className="w-full"
+				isInvalid={invalid}
+				isRequired
 				name={name}
-				aria-invalid={invalid}
-				className="h-9 w-full rounded-4xl border border-input bg-input/30 px-3 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-[3px] aria-invalid:ring-destructive/20"
-				onChange={(event) => onChange(event.target.value)}
-				required
-				value={value}
+				onSelectionChange={(key) => onChange(String(key))}
+				placeholder={placeholder}
+				selectedKey={value || null}
 			>
-				<option value="">{placeholder}</option>
-				{options.map((option) => (
-					<option key={option.value} value={option.value}>
-						{option.label}
-					</option>
-				))}
-			</select>
+				<SelectTrigger id={id}>
+					<SelectValue />
+				</SelectTrigger>
+				<SelectContent>
+					{options.map((option) => (
+						<SelectItem id={option.value} key={option.value}>
+							{option.label}
+						</SelectItem>
+					))}
+				</SelectContent>
+			</Select>
 		</Field>
 	);
 }

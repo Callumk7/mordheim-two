@@ -2,6 +2,13 @@ import type { ComponentProps } from "react";
 import { useEffect, useId, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "./input";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "./select";
 
 const tableCellControlClassName =
 	"-mx-1 h-8 w-[calc(100%+0.5rem)] rounded-sm border-transparent bg-transparent px-1 py-0 text-sm shadow-none hover:border-input hover:bg-input/20 focus-visible:border-ring focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-ring/50 disabled:bg-transparent";
@@ -112,19 +119,20 @@ function TableCellInput({
 	);
 }
 
-interface TableCellSelectProps
-	extends Omit<ComponentProps<"select">, "onChange" | "value"> {
+interface TableCellSelectProps {
+	"aria-label": string;
+	className?: string;
 	onCommit: (value: string) => Promise<void> | void;
 	options: readonly string[];
 	value: string;
 }
 
 function TableCellSelect({
+	"aria-label": ariaLabel,
 	className,
 	onCommit,
 	options,
 	value,
-	...props
 }: TableCellSelectProps) {
 	const [selectedValue, setSelectedValue] = useState(value);
 	const [error, setError] = useState<string>();
@@ -135,17 +143,13 @@ function TableCellSelect({
 
 	return (
 		<>
-			<select
+			<Select
 				aria-busy={isSaving || undefined}
-				aria-describedby={error ? errorId : undefined}
-				aria-invalid={Boolean(error)}
-				className={cn(
-					tableCellControlClassName,
-					"appearance-none text-foreground",
-					className,
-				)}
-				onChange={async (event) => {
-					const nextValue = event.target.value;
+				aria-label={ariaLabel}
+				className="w-full"
+				isInvalid={Boolean(error)}
+				onSelectionChange={async (key) => {
+					const nextValue = String(key);
 					setSelectedValue(nextValue);
 					setError(undefined);
 					setIsSaving(true);
@@ -160,15 +164,26 @@ function TableCellSelect({
 						setIsSaving(false);
 					}
 				}}
-				value={selectedValue}
-				{...props}
+				selectedKey={selectedValue}
 			>
-				{options.map((option) => (
-					<option key={option} value={option}>
-						{option}
-					</option>
-				))}
-			</select>
+				<SelectTrigger
+					aria-describedby={error ? errorId : undefined}
+					className={cn(
+						tableCellControlClassName,
+						"text-foreground",
+						className,
+					)}
+				>
+					<SelectValue />
+				</SelectTrigger>
+				<SelectContent>
+					{options.map((option) => (
+						<SelectItem id={option} key={option}>
+							{option}
+						</SelectItem>
+					))}
+				</SelectContent>
+			</Select>
 			{error ? (
 				<span className="sr-only" id={errorId} role="alert">
 					{error}
