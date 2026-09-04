@@ -19,13 +19,17 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { MATCH_STATUSES, type Match } from "@/db/match";
+import type { Warband } from "@/db/warband";
+import {
+	canSubmitMatch,
+	changeMatchParticipantSelection,
+	isMatchParticipantLocked,
+	type MatchFormValues,
+} from "@/lib/match-form";
 import { cn } from "@/lib/utils";
-import { MATCH_STATUSES, type Match } from "../db/match";
-import type { Warband } from "../db/warband";
 
-export type MatchFormValues = Pick<Match, "name" | "scenario" | "status"> & {
-	participantWarbandIds: string[];
-};
+export type { MatchFormValues } from "@/lib/match-form";
 
 export function MatchForm({
 	initialValues,
@@ -49,7 +53,7 @@ export function MatchForm({
 	const [error, setError] = useState<string>();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const statusId = useId();
-	const lockedParticipantIds = new Set(lockedParticipantWarbandIds);
+	const canSubmit = canSubmitMatch(values);
 
 	return (
 		<form
@@ -124,7 +128,11 @@ export function MatchForm({
 				<FieldGroup className="grid gap-2 sm:grid-cols-2">
 					{warbands.map((warband) => {
 						const isChecked = values.participantWarbandIds.includes(warband.id);
-						const isLocked = isChecked && lockedParticipantIds.has(warband.id);
+						const isLocked = isMatchParticipantLocked(
+							warband.id,
+							values.participantWarbandIds,
+							lockedParticipantWarbandIds,
+						);
 						const checkboxId = `participant-${warband.id}`;
 						return (
 							<Field
@@ -143,11 +151,12 @@ export function MatchForm({
 									onChange={(isSelected) =>
 										setValues((current) => ({
 											...current,
-											participantWarbandIds: isSelected
-												? [...current.participantWarbandIds, warband.id]
-												: current.participantWarbandIds.filter(
-														(id) => id !== warband.id,
-													),
+											participantWarbandIds: changeMatchParticipantSelection(
+												current.participantWarbandIds,
+												warband.id,
+												isSelected,
+												lockedParticipantWarbandIds,
+											),
 										}))
 									}
 								/>
@@ -168,12 +177,7 @@ export function MatchForm({
 			<FieldError>{error}</FieldError>
 
 			<div>
-				<Button
-					isDisabled={
-						isSubmitting || !values.name.trim() || !values.scenario.trim()
-					}
-					type="submit"
-				>
+				<Button isDisabled={isSubmitting || !canSubmit} type="submit">
 					{isSubmitting ? "Saving…" : submitLabel}
 				</Button>
 			</div>
