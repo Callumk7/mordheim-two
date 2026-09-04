@@ -74,13 +74,15 @@ export function MatchForm({
 					<Select
 						className="w-full"
 						name="status"
-						onSelectionChange={(key) =>
-							setValues((current) => ({
-								...current,
-								status: String(key) as Match["status"],
-							}))
-						}
-						selectedKey={values.status}
+						onChange={(key) => {
+							if (key !== null) {
+								setValues((current) => ({
+									...current,
+									status: String(key) as Match["status"],
+								}));
+							}
+						}}
+						value={values.status}
 					>
 						<SelectTrigger id={statusId}>
 							<SelectValue />

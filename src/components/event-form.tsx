@@ -180,9 +180,13 @@ function SelectField({
 				isInvalid={invalid}
 				isRequired
 				name={name}
-				onSelectionChange={(key) => onChange(String(key))}
+				onChange={(key) => {
+					if (key !== null) {
+						onChange(String(key));
+					}
+				}}
 				placeholder={placeholder}
-				selectedKey={value || null}
+				value={value || null}
 			>
 				<SelectTrigger id={id}>
 					<SelectValue />
