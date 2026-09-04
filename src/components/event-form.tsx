@@ -40,14 +40,16 @@ export function EventForm({
 	participants,
 	warbands,
 	warriors,
+	isMatchLocked = false,
 	onSubmit,
 	submitLabel,
 }: {
 	initialValues: EventFormValues;
-	matches: Match[];
-	participants: WarbandMatch[];
-	warbands: Warband[];
-	warriors: Warrior[];
+	matches: readonly Match[];
+	participants: readonly WarbandMatch[];
+	warbands: readonly Warband[];
+	warriors: readonly Warrior[];
+	isMatchLocked?: boolean;
 	onSubmit: (values: EventFormValues) => Promise<void>;
 	submitLabel: string;
 }) {
@@ -109,37 +111,43 @@ export function EventForm({
 			}}
 		>
 			<FieldGroup className="grid gap-5 md:grid-cols-2">
-				<SelectField
-					label="Match"
-					name="matchId"
-					onChange={(matchId) => {
-						const nextWarbandIds = getParticipantWarbandIds(
-							matchId,
-							participants,
-						).filter((warbandId) =>
-							warriors.some((warrior) => warrior.warbandId === warbandId),
-						);
-						const attackerWarbandId = nextWarbandIds[0] ?? "";
-						const defenderWarbandId = nextWarbandIds[1] ?? "";
-						setValues((current) => ({
-							...current,
-							matchId,
-							attackerWarbandId,
-							attackerWarriorId:
-								getWarriorsForWarband(attackerWarbandId, warriors)[0]?.id ?? "",
-							defenderWarbandId,
-							defenderWarriorId:
-								getWarriorsForWarband(defenderWarbandId, warriors)[0]?.id ?? "",
-						}));
-					}}
-					options={matches.map((match) => ({
-						label: `${match.name} — ${match.scenario}`,
-						value: match.id,
-					}))}
-					placeholder="Select a match"
-					value={values.matchId}
-				/>
-				<div className="hidden md:block" />
+				{isMatchLocked ? null : (
+					<>
+						<SelectField
+							label="Match"
+							name="matchId"
+							onChange={(matchId) => {
+								const nextWarbandIds = getParticipantWarbandIds(
+									matchId,
+									participants,
+								).filter((warbandId) =>
+									warriors.some((warrior) => warrior.warbandId === warbandId),
+								);
+								const attackerWarbandId = nextWarbandIds[0] ?? "";
+								const defenderWarbandId = nextWarbandIds[1] ?? "";
+								setValues((current) => ({
+									...current,
+									matchId,
+									attackerWarbandId,
+									attackerWarriorId:
+										getWarriorsForWarband(attackerWarbandId, warriors)[0]?.id ??
+										"",
+									defenderWarbandId,
+									defenderWarriorId:
+										getWarriorsForWarband(defenderWarbandId, warriors)[0]?.id ??
+										"",
+								}));
+							}}
+							options={matches.map((match) => ({
+								label: `${match.name} — ${match.scenario}`,
+								value: match.id,
+							}))}
+							placeholder="Select a match"
+							value={values.matchId}
+						/>
+						<div className="hidden md:block" />
+					</>
+				)}
 				<SelectField
 					label="Attacking warband"
 					name="attackerWarbandId"
@@ -223,7 +231,7 @@ export function EventForm({
 							notes: event.target.value,
 						}))
 					}
-					placeholder="Add any details about the knock down"
+					placeholder="Add any details about the event"
 					value={values.notes ?? ""}
 				/>
 			</Field>
