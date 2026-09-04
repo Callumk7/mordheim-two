@@ -8,9 +8,13 @@ import { getCollections } from "@/db-collections";
 
 export const Route = createFileRoute("/warbands/$warbandId")({
 	loader: async ({ context, params }) => {
-		const { warbands: collection } = getCollections(context.dbClient);
-		await collection.preload();
-		if (!collection.get(params.warbandId)) throw notFound();
+		const { warbands: warbandsCollection, warriors: warriorsCollection } =
+			getCollections(context.dbClient);
+		await Promise.all([
+			warbandsCollection.preload(),
+			warriorsCollection.preload(),
+		]);
+		if (!warbandsCollection.get(params.warbandId)) throw notFound();
 		return null;
 	},
 	component: () => <Outlet />,
