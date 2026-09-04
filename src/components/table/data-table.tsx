@@ -73,6 +73,7 @@ interface DataTableProps<TData extends RowData & { id: string }> {
 	emptyMessage: string;
 	initialSorting?: SortingState;
 	itemLabel: DataTableItemLabel;
+	onRowAction?: (row: TData) => void;
 	searchPlaceholder: string;
 	renderExpandedRow?: (row: TData) => ReactNode;
 	tableClassName?: string;
@@ -142,6 +143,7 @@ export function DataTable<TData extends RowData & { id: string }>({
 	emptyMessage,
 	initialSorting = [],
 	itemLabel,
+	onRowAction,
 	searchPlaceholder,
 	renderExpandedRow,
 	tableClassName,
@@ -205,7 +207,12 @@ export function DataTable<TData extends RowData & { id: string }>({
 					>
 						{rows.map((row) => (
 							<Fragment key={row.id}>
-								<TableRow>
+								<TableRow
+									className={cn(onRowAction && "cursor-pointer")}
+									onAction={
+										onRowAction ? () => onRowAction(row.original) : undefined
+									}
+								>
 									{row.getAllCells().map((cell) => (
 										<TableCell
 											className={cn(
