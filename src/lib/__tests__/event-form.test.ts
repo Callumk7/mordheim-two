@@ -11,7 +11,7 @@ import {
 	type EventFormValues,
 	hasDuplicateEventWarbands,
 	normalizeEventFormValues,
-} from "./event-form";
+} from "../event-form";
 
 const now = "2026-01-01T00:00:00.000Z";
 

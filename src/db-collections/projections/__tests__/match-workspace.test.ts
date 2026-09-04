@@ -4,7 +4,7 @@ import type { Match } from "@/db/match";
 import type { Warband } from "@/db/warband";
 import type { WarbandMatch } from "@/db/warband-match";
 import type { Warrior } from "@/db/warrior";
-import { type MatchEventRow, projectMatchWorkspace } from "./match-workspace";
+import { type MatchEventRow, projectMatchWorkspace } from "../match-workspace";
 
 const match: Match = {
 	id: "match-1",

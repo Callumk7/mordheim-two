@@ -3,10 +3,10 @@ import { describe, expect, it } from "vitest";
 import {
 	getParticipantWarbandIds,
 	getWarriorsForWarband,
-} from "../lib/event-options";
-import { EventSchema, validateEventMembership } from "./event";
-import { events, warbandMatches, warriors } from "./schema";
-import { WarbandMatchSchema } from "./warband-match";
+} from "../../lib/event-options";
+import { EventSchema, validateEventMembership } from "../event";
+import { events, warbandMatches, warriors } from "../schema";
+import { WarbandMatchSchema } from "../warband-match";
 
 const validEvent = {
 	id: "event-1",
