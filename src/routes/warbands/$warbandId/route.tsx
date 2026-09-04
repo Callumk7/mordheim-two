@@ -4,11 +4,11 @@ import {
 	notFound,
 	Outlet,
 } from "@tanstack/react-router";
-import { getWarbandsCollection } from "../../../db-collections/warbands";
+import { getCollections } from "@/db-collections";
 
 export const Route = createFileRoute("/warbands/$warbandId")({
 	loader: async ({ context, params }) => {
-		const collection = getWarbandsCollection(context.queryClient);
+		const { warbands: collection } = getCollections(context.dbClient);
 		await collection.preload();
 		if (!collection.get(params.warbandId)) throw notFound();
 		return null;

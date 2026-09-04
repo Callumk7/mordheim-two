@@ -1,7 +1,7 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { getEventsCollection } from "../../../db-collections/events";
+import { getCollections } from "@/db-collections";
 
 export const Route = createFileRoute("/events/$eventId/delete")({
 	component: DeleteEventPage,
@@ -9,8 +9,8 @@ export const Route = createFileRoute("/events/$eventId/delete")({
 
 function DeleteEventPage() {
 	const { eventId } = Route.useParams();
-	const { queryClient } = Route.useRouteContext();
-	const eventsCollection = getEventsCollection(queryClient);
+	const { dbClient } = Route.useRouteContext();
+	const { events: eventsCollection } = getCollections(dbClient);
 	const navigate = useNavigate({ from: Route.fullPath });
 	const [error, setError] = useState<string>();
 	const [isDeleting, setIsDeleting] = useState(false);

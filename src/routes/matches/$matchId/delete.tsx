@@ -1,7 +1,8 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { getMatchesCollection } from "../../../db-collections/matches";
+import { getCollections } from "@/db-collections";
+import { deleteMatchTransaction } from "@/db-collections/actions";
 
 export const Route = createFileRoute("/matches/$matchId/delete")({
 	component: DeleteMatchPage,
@@ -9,8 +10,13 @@ export const Route = createFileRoute("/matches/$matchId/delete")({
 
 function DeleteMatchPage() {
 	const { matchId } = Route.useParams();
-	const { queryClient } = Route.useRouteContext();
-	const matchesCollection = getMatchesCollection(queryClient);
+	const { dbClient } = Route.useRouteContext();
+	const collections = getCollections(dbClient);
+	const {
+		events: eventsCollection,
+		matches: matchesCollection,
+		warbandMatches,
+	} = collections;
 	const navigate = useNavigate({ from: Route.fullPath });
 	const [error, setError] = useState<string>();
 	const [isDeleting, setIsDeleting] = useState(false);
@@ -19,6 +25,18 @@ function DeleteMatchPage() {
 			q
 				.from({ match: matchesCollection })
 				.where(({ match }) => eq(match.id, matchId)),
+	});
+	const { data: participantRows } = useLiveQuery({
+		query: (q) =>
+			q
+				.from({ participant: warbandMatches })
+				.where(({ participant }) => eq(participant.matchId, matchId)),
+	});
+	const { data: eventRows } = useLiveQuery({
+		query: (q) =>
+			q
+				.from({ event: eventsCollection })
+				.where(({ event }) => eq(event.matchId, matchId)),
 	});
 	const match = data[0];
 
@@ -42,8 +60,12 @@ function DeleteMatchPage() {
 					Delete {match?.name ?? "match"}?
 				</h1>
 				<p className="mt-3 max-w-xl text-muted-foreground">
-					This permanently removes the match and its campaign record. This
-					action cannot be undone.
+					This permanently removes the match, {participantRows.length}{" "}
+					participant
+					{participantRows.length === 1 ? " link" : " links"}, and{" "}
+					{eventRows.length}
+					event{eventRows.length === 1 ? "" : "s"}. Warbands and warriors are
+					kept.
 				</p>
 
 				{error ? (
@@ -60,7 +82,13 @@ function DeleteMatchPage() {
 							setError(undefined);
 							setIsDeleting(true);
 							try {
-								const transaction = matchesCollection.delete(matchId);
+								const transaction = deleteMatchTransaction(
+									dbClient,
+									collections,
+									matchId,
+									participantRows.map((participant) => participant.id),
+									eventRows.map((event) => event.id),
+								);
 								await transaction.isPersisted.promise;
 								await navigate({ to: "/matches" });
 							} catch (cause) {

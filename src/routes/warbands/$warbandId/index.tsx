@@ -1,8 +1,8 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { getCollections } from "@/db-collections";
 import { Card, CardContent } from "../../../components/ui/card";
 import { WarbandForm } from "../../../components/warband-form";
-import { getWarbandsCollection } from "../../../db-collections/warbands";
 
 export const Route = createFileRoute("/warbands/$warbandId/")({
 	component: WarbandDetailPage,
@@ -10,8 +10,8 @@ export const Route = createFileRoute("/warbands/$warbandId/")({
 
 function WarbandDetailPage() {
 	const { warbandId } = Route.useParams();
-	const { queryClient } = Route.useRouteContext();
-	const warbandsCollection = getWarbandsCollection(queryClient);
+	const { dbClient } = Route.useRouteContext();
+	const { warbands: warbandsCollection } = getCollections(dbClient);
 	const { data } = useLiveQuery({
 		query: (q) =>
 			q

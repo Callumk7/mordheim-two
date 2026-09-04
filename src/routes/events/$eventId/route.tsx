@@ -4,11 +4,11 @@ import {
 	notFound,
 	Outlet,
 } from "@tanstack/react-router";
-import { getEventsCollection } from "../../../db-collections/events";
+import { getCollections } from "@/db-collections";
 
 export const Route = createFileRoute("/events/$eventId")({
 	loader: async ({ context, params }) => {
-		const collection = getEventsCollection(context.queryClient);
+		const { events: collection } = getCollections(context.dbClient);
 		await collection.preload();
 		if (!collection.get(params.eventId)) throw notFound();
 		return null;

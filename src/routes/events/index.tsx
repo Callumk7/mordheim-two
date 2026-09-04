@@ -1,8 +1,13 @@
-import { safeRandomUUID, useLiveQuery } from "@tanstack/react-db";
+import { eq, safeRandomUUID, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { EventForm } from "#/components/event-form";
-import { EventsTable } from "#/components/table/events-table";
+import { EventForm } from "@/components/event-form";
+import {
+	IndexEmptyState,
+	IndexPage,
+	IndexPageHeader,
+} from "@/components/index-page";
+import { EventsTable } from "@/components/table/events-table";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -10,14 +15,8 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import {
-	IndexEmptyState,
-	IndexPage,
-	IndexPageHeader,
-} from "../../components/index-page";
-import { getEventsCollection } from "../../db-collections/events";
-import { getMatchesCollection } from "../../db-collections/matches";
-import { getWarbandsCollection } from "../../db-collections/warbands";
+import { getCollections } from "@/db-collections";
+import { getParticipantWarbandIds } from "@/lib/event-options";
 
 export const Route = createFileRoute("/events/")({
 	component: EventsIndexPage,
@@ -25,31 +24,90 @@ export const Route = createFileRoute("/events/")({
 
 function EventsIndexPage() {
 	const [isNewEventOpen, setIsNewEventOpen] = useState(false);
-	const { queryClient } = Route.useRouteContext();
-	const eventsCollection = getEventsCollection(queryClient);
-	const matchesCollection = getMatchesCollection(queryClient);
-	const warbandsCollection = getWarbandsCollection(queryClient);
-	const { data: events } = useLiveQuery({
+	const { dbClient } = Route.useRouteContext();
+	const collections = getCollections(dbClient);
+	const { events, matches, warbandMatches, warbands, warriors } = collections;
+	const { data: eventRows } = useLiveQuery({
 		query: (q) =>
 			q
-				.from({ event: eventsCollection })
+				.from({ event: events })
+				.innerJoin({ match: matches }, ({ event, match }) =>
+					eq(event.matchId, match.id),
+				)
+				.innerJoin({ attacker: warbands }, ({ event, attacker }) =>
+					eq(event.attackerWarbandId, attacker.id),
+				)
+				.innerJoin({ defender: warbands }, ({ event, defender }) =>
+					eq(event.defenderWarbandId, defender.id),
+				)
+				.innerJoin(
+					{ attackerWarrior: warriors },
+					({ event, attackerWarrior }) =>
+						eq(event.attackerWarriorId, attackerWarrior.id),
+				)
+				.innerJoin(
+					{ defenderWarrior: warriors },
+					({ event, defenderWarrior }) =>
+						eq(event.defenderWarriorId, defenderWarrior.id),
+				)
+				.select(
+					({
+						event,
+						match,
+						attacker,
+						defender,
+						attackerWarrior,
+						defenderWarrior,
+					}) => ({
+						id: event.id,
+						matchId: event.matchId,
+						attackerWarbandId: event.attackerWarbandId,
+						attackerWarriorId: event.attackerWarriorId,
+						defenderWarbandId: event.defenderWarbandId,
+						defenderWarriorId: event.defenderWarriorId,
+						notes: event.notes,
+						createdAt: event.createdAt,
+						updatedAt: event.updatedAt,
+						matchName: match.name,
+						attackerName: attacker.name,
+						attackerWarriorName: attackerWarrior.name,
+						defenderName: defender.name,
+						defenderWarriorName: defenderWarrior.name,
+					}),
+				)
 				.orderBy(({ event }) => event.createdAt, "desc"),
 	});
-	const { data: matches } = useLiveQuery({
-		query: (q) =>
-			q.from({ match: matchesCollection }).orderBy(({ match }) => match.name),
+	const { data: matchRows } = useLiveQuery({
+		query: (q) => q.from({ match: matches }).orderBy(({ match }) => match.name),
 	});
-	const { data: warbands } = useLiveQuery({
-		query: (q) =>
-			q
-				.from({ warband: warbandsCollection })
-				.orderBy(({ warband }) => warband.name),
+	const { data: participantRows } = useLiveQuery({
+		query: (q) => q.from({ participant: warbandMatches }),
 	});
-	const matchNames = new Map(matches.map((match) => [match.id, match.name]));
-	const warbandNames = new Map(
-		warbands.map((warband) => [warband.id, warband.name]),
-	);
-	const canCreateEvent = matches.length > 0 && warbands.length >= 2;
+	const { data: warbandRows } = useLiveQuery({
+		query: (q) =>
+			q.from({ warband: warbands }).orderBy(({ warband }) => warband.name),
+	});
+	const { data: warriorRows } = useLiveQuery({
+		query: (q) =>
+			q.from({ warrior: warriors }).orderBy(({ warrior }) => warrior.name),
+	});
+	const eligibleMatches = matchRows.filter((match) => {
+		const participantIds = getParticipantWarbandIds(match.id, participantRows);
+		return (
+			participantIds.filter((warbandId) =>
+				warriorRows.some((warrior) => warrior.warbandId === warbandId),
+			).length >= 2
+		);
+	});
+	const initialMatch = eligibleMatches[0];
+	const initialWarbandIds = initialMatch
+		? getParticipantWarbandIds(initialMatch.id, participantRows).filter(
+				(warbandId) =>
+					warriorRows.some((warrior) => warrior.warbandId === warbandId),
+			)
+		: [];
+	const attackerWarbandId = initialWarbandIds[0] ?? "";
+	const defenderWarbandId = initialWarbandIds[1] ?? "";
 
 	return (
 		<IndexPage>
@@ -62,12 +120,8 @@ function EventsIndexPage() {
 				title="Events"
 			/>
 
-			{events.length ? (
-				<EventsTable
-					events={events}
-					matchNames={matchNames}
-					warbandNames={warbandNames}
-				/>
+			{eventRows.length ? (
+				<EventsTable events={eventRows} />
 			) : (
 				<IndexEmptyState
 					action={
@@ -91,31 +145,43 @@ function EventsIndexPage() {
 						Record a knock down from a campaign match.
 					</DialogDescription>
 				</DialogHeader>
-				{canCreateEvent ? (
+				{initialMatch ? (
 					<EventForm
 						initialValues={{
-							matchId: matches[0]?.id ?? "",
-							attackerWarbandId: warbands[0]?.id ?? "",
-							defenderWarbandId: warbands[1]?.id ?? warbands[0]?.id ?? "",
+							matchId: initialMatch.id,
+							attackerWarbandId,
+							attackerWarriorId:
+								warriorRows.find(
+									(warrior) => warrior.warbandId === attackerWarbandId,
+								)?.id ?? "",
+							defenderWarbandId,
+							defenderWarriorId:
+								warriorRows.find(
+									(warrior) => warrior.warbandId === defenderWarbandId,
+								)?.id ?? "",
 							notes: null,
 						}}
-						matches={matches}
+						matches={eligibleMatches}
 						onSubmit={async (values) => {
-							const id = safeRandomUUID();
-							const transaction = eventsCollection.insert({ id, ...values });
+							const transaction = events.insert({
+								id: safeRandomUUID(),
+								...values,
+							});
 							await transaction.isPersisted.promise;
 							setIsNewEventOpen(false);
 						}}
+						participants={participantRows}
 						submitLabel="Create event"
-						warbands={warbands}
+						warbands={warbandRows}
+						warriors={warriorRows}
 					/>
 				) : (
 					<section className="rounded-xl border border-dashed border-input px-6 py-10 text-center">
 						<h2 className="font-serif text-2xl text-foreground">
-							A match and two warbands are required
+							A match with two staffed warbands is required
 						</h2>
 						<p className="mt-2 text-muted-foreground">
-							Create the campaign participants before recording an event.
+							Add participating warbands and warriors before recording an event.
 						</p>
 					</section>
 				)}

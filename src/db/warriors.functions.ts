@@ -1,15 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import z from "zod";
 import { getDb } from "./index.server";
-import { warriors } from "./schema";
+import { events, warriors } from "./schema";
 import { WarriorSchema, WarriorUpdateSchema } from "./warrior";
 
 export const listWarriors = createServerFn({ method: "GET" }).handler(() =>
-	getDb().query.warriors.findMany({
-		orderBy: (warriors, { asc }) => [asc(warriors.name)],
-		with: { warband: true },
-	}),
+	getDb().select().from(warriors).orderBy(warriors.name),
 );
 
 export const createWarrior = createServerFn({ method: "POST" })
@@ -41,5 +38,15 @@ export const deleteWarrior = createServerFn({ method: "POST" })
 	.validator(z.object({ id: z.string().min(1) }))
 	.handler(async ({ data }) => {
 		const db = getDb();
-		await db.batch([db.delete(warriors).where(eq(warriors.id, data.id))]);
+		await db.batch([
+			db
+				.delete(events)
+				.where(
+					or(
+						eq(events.attackerWarriorId, data.id),
+						eq(events.defenderWarriorId, data.id),
+					),
+				),
+			db.delete(warriors).where(eq(warriors.id, data.id)),
+		]);
 	});

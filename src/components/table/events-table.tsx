@@ -1,12 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import type { Event } from "#/db/event";
+import type { Event } from "@/db/event";
 import { TableActionLink, TableActions } from "../ui/table";
 import { createDataTableColumnHelper, DataTable } from "./data-table";
 
-type EventTableRow = Event & {
+export type EventTableRow = Event & {
 	attackerName: string;
+	attackerWarriorName: string;
 	defenderName: string;
+	defenderWarriorName: string;
 	matchName: string;
 };
 
@@ -26,8 +28,36 @@ const columns = columnHelper.columns([
 			</Link>
 		),
 	}),
-	columnHelper.accessor("attackerName", { header: "Attacker" }),
-	columnHelper.accessor("defenderName", { header: "Defender" }),
+	columnHelper.accessor(
+		(event) => `${event.attackerName} ${event.attackerWarriorName}`,
+		{
+			id: "attacker",
+			header: "Attacker",
+			cell: ({ row }) => (
+				<span>
+					{row.original.attackerWarriorName}
+					<span className="block text-xs text-muted-foreground">
+						{row.original.attackerName}
+					</span>
+				</span>
+			),
+		},
+	),
+	columnHelper.accessor(
+		(event) => `${event.defenderName} ${event.defenderWarriorName}`,
+		{
+			id: "defender",
+			header: "Defender",
+			cell: ({ row }) => (
+				<span>
+					{row.original.defenderWarriorName}
+					<span className="block text-xs text-muted-foreground">
+						{row.original.defenderName}
+					</span>
+				</span>
+			),
+		},
+	),
 	columnHelper.accessor((event) => event.notes ?? "", {
 		id: "notes",
 		header: "Notes",
@@ -63,30 +93,8 @@ const columns = columnHelper.columns([
 	}),
 ]);
 
-interface EventsTableProps {
-	events: Event[];
-	matchNames: Map<string, string>;
-	warbandNames: Map<string, string>;
-}
-
-export function EventsTable({
-	events,
-	matchNames,
-	warbandNames,
-}: EventsTableProps) {
-	const rows = useMemo<EventTableRow[]>(
-		() =>
-			events.map((event) => ({
-				...event,
-				attackerName:
-					warbandNames.get(event.attackerWarbandId) ?? "Unknown warband",
-				defenderName:
-					warbandNames.get(event.defenderWarbandId) ?? "Unknown warband",
-				matchName: matchNames.get(event.matchId) ?? "Unknown match",
-			})),
-		[events, matchNames, warbandNames],
-	);
-
+export function EventsTable({ events }: { events: EventTableRow[] }) {
+	const rows = useMemo(() => events, [events]);
 	return (
 		<DataTable
 			ariaLabel="Events"

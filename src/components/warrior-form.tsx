@@ -2,6 +2,7 @@ import { useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Field,
+	FieldDescription,
 	FieldError,
 	FieldGroup,
 	FieldLabel,
@@ -31,11 +32,13 @@ export type WarriorFormValues = Pick<
 
 export function WarriorForm({
 	initialValues,
+	isWarbandLocked = false,
 	onSubmit,
 	submitLabel,
 	warbands,
 }: {
 	initialValues: WarriorFormValues;
+	isWarbandLocked?: boolean;
 	onSubmit: (values: WarriorFormValues) => Promise<void>;
 	submitLabel: string;
 	warbands: Warband[];
@@ -52,6 +55,7 @@ export function WarriorForm({
 	const [error, setError] = useState<string>();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const warbandId = useId();
+	const warbandDescriptionId = useId();
 	const statusId = useId();
 
 	return (
@@ -87,10 +91,14 @@ export function WarriorForm({
 					}
 					value={values.class}
 				/>
-				<Field>
+				<Field data-disabled={isWarbandLocked}>
 					<FieldLabel htmlFor={warbandId}>Warband</FieldLabel>
 					<Select
+						aria-describedby={
+							isWarbandLocked ? warbandDescriptionId : undefined
+						}
 						className="w-full"
+						isDisabled={isWarbandLocked}
 						isRequired
 						name="warbandId"
 						onChange={(key) => {
@@ -115,6 +123,12 @@ export function WarriorForm({
 							))}
 						</SelectContent>
 					</Select>
+					{isWarbandLocked ? (
+						<FieldDescription id={warbandDescriptionId}>
+							This warrior’s warband cannot change because they are used in an
+							event.
+						</FieldDescription>
+					) : null}
 				</Field>
 				<Field>
 					<FieldLabel htmlFor={statusId}>Status</FieldLabel>

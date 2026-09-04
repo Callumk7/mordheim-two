@@ -10,13 +10,12 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { getCollections } from "@/db-collections";
 import {
 	IndexEmptyState,
 	IndexPage,
 	IndexPageHeader,
 } from "../../components/index-page";
-import { getWarbandsCollection } from "../../db-collections/warbands";
-import { getWarriorsCollection } from "../../db-collections/warriors";
 
 export const Route = createFileRoute("/warriors/")({
 	component: WarriorsIndexPage,
@@ -24,9 +23,9 @@ export const Route = createFileRoute("/warriors/")({
 
 function WarriorsIndexPage() {
 	const [isNewWarriorOpen, setIsNewWarriorOpen] = useState(false);
-	const { queryClient } = Route.useRouteContext();
-	const warriorsCollection = getWarriorsCollection(queryClient);
-	const warbandsCollection = getWarbandsCollection(queryClient);
+	const { dbClient } = Route.useRouteContext();
+	const { warbands: warbandsCollection, warriors: warriorsCollection } =
+		getCollections(dbClient);
 	const { data: warriors } = useLiveQuery({
 		query: (q) =>
 			q

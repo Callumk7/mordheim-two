@@ -1,10 +1,9 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { EventForm } from "../../../components/event-form";
-import { Card, CardContent } from "../../../components/ui/card";
-import { getEventsCollection } from "../../../db-collections/events";
-import { getMatchesCollection } from "../../../db-collections/matches";
-import { getWarbandsCollection } from "../../../db-collections/warbands";
+import { EventForm } from "@/components/event-form";
+import { Card, CardContent } from "@/components/ui/card";
+import { getCollections } from "@/db-collections";
+import { getParticipantWarbandIds } from "@/lib/event-options";
 
 export const Route = createFileRoute("/events/$eventId/")({
 	component: EventDetailPage,
@@ -12,28 +11,40 @@ export const Route = createFileRoute("/events/$eventId/")({
 
 function EventDetailPage() {
 	const { eventId } = Route.useParams();
-	const { queryClient } = Route.useRouteContext();
-	const eventsCollection = getEventsCollection(queryClient);
-	const matchesCollection = getMatchesCollection(queryClient);
-	const warbandsCollection = getWarbandsCollection(queryClient);
-	const { data: events } = useLiveQuery({
+	const { dbClient } = Route.useRouteContext();
+	const { events, matches, warbandMatches, warbands, warriors } =
+		getCollections(dbClient);
+	const { data: eventRows } = useLiveQuery({
 		query: (q) =>
-			q
-				.from({ event: eventsCollection })
-				.where(({ event }) => eq(event.id, eventId)),
+			q.from({ event: events }).where(({ event }) => eq(event.id, eventId)),
 	});
-	const { data: matches } = useLiveQuery({
+	const { data: matchRows } = useLiveQuery({
+		query: (q) => q.from({ match: matches }).orderBy(({ match }) => match.name),
+	});
+	const { data: participantRows } = useLiveQuery({
+		query: (q) => q.from({ participant: warbandMatches }),
+	});
+	const { data: warbandRows } = useLiveQuery({
 		query: (q) =>
-			q.from({ match: matchesCollection }).orderBy(({ match }) => match.name),
+			q.from({ warband: warbands }).orderBy(({ warband }) => warband.name),
 	});
-	const { data: warbands } = useLiveQuery({
+	const { data: warriorRows } = useLiveQuery({
 		query: (q) =>
-			q
-				.from({ warband: warbandsCollection })
-				.orderBy(({ warband }) => warband.name),
+			q.from({ warrior: warriors }).orderBy(({ warrior }) => warrior.name),
 	});
-	const event = events[0];
-	const match = matches.find((candidate) => candidate.id === event?.matchId);
+	const event = eventRows[0];
+	const match = matchRows.find((candidate) => candidate.id === event?.matchId);
+	const eligibleMatches = matchRows.filter((candidate) => {
+		const participantIds = getParticipantWarbandIds(
+			candidate.id,
+			participantRows,
+		);
+		return (
+			participantIds.filter((warbandId) =>
+				warriorRows.some((warrior) => warrior.warbandId === warbandId),
+			).length >= 2
+		);
+	});
 
 	if (!event) return null;
 
@@ -72,15 +83,17 @@ function EventDetailPage() {
 					<EventForm
 						initialValues={event}
 						key={event.id}
-						matches={matches}
+						matches={eligibleMatches}
 						onSubmit={async (values) => {
-							const transaction = eventsCollection.update(event.id, (draft) => {
+							const transaction = events.update(event.id, (draft) => {
 								Object.assign(draft, values);
 							});
 							await transaction.isPersisted.promise;
 						}}
+						participants={participantRows}
 						submitLabel="Save changes"
-						warbands={warbands}
+						warbands={warbandRows}
+						warriors={warriorRows}
 					/>
 				</CardContent>
 			</Card>

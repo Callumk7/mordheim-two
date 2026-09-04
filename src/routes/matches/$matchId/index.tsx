@@ -1,8 +1,9 @@
-import { eq, useLiveQuery } from "@tanstack/react-db";
+import { eq, safeRandomUUID, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { MatchForm } from "../../../components/match-form";
-import { Card, CardContent } from "../../../components/ui/card";
-import { getMatchesCollection } from "../../../db-collections/matches";
+import { MatchForm } from "@/components/match-form";
+import { Card, CardContent } from "@/components/ui/card";
+import { getCollections } from "@/db-collections";
+import { updateMatchTransaction } from "@/db-collections/actions";
 
 export const Route = createFileRoute("/matches/$matchId/")({
 	component: MatchDetailPage,
@@ -10,15 +11,38 @@ export const Route = createFileRoute("/matches/$matchId/")({
 
 function MatchDetailPage() {
 	const { matchId } = Route.useParams();
-	const { queryClient } = Route.useRouteContext();
-	const matchesCollection = getMatchesCollection(queryClient);
-	const { data } = useLiveQuery({
+	const { dbClient } = Route.useRouteContext();
+	const collections = getCollections(dbClient);
+	const { events, matches, warbandMatches, warbands } = collections;
+	const { data: matchRows } = useLiveQuery({
+		query: (q) =>
+			q.from({ match: matches }).where(({ match }) => eq(match.id, matchId)),
+	});
+	const { data: participantRows } = useLiveQuery({
 		query: (q) =>
 			q
-				.from({ match: matchesCollection })
-				.where(({ match }) => eq(match.id, matchId)),
+				.from({ participant: warbandMatches })
+				.where(({ participant }) => eq(participant.matchId, matchId)),
 	});
-	const match = data[0];
+	const { data: eventRows } = useLiveQuery({
+		query: (q) =>
+			q
+				.from({ event: events })
+				.where(({ event }) => eq(event.matchId, matchId)),
+	});
+	const { data: warbandRows } = useLiveQuery({
+		query: (q) =>
+			q.from({ warband: warbands }).orderBy(({ warband }) => warband.name),
+	});
+	const lockedParticipantWarbandIds = [
+		...new Set(
+			eventRows.flatMap((event) => [
+				event.attackerWarbandId,
+				event.defenderWarbandId,
+			]),
+		),
+	];
+	const match = matchRows[0];
 
 	if (!match) return null;
 
@@ -48,25 +72,48 @@ function MatchDetailPage() {
 					{match.name}
 				</h1>
 				<p className="mt-2 text-muted-foreground">
-					Edit this match’s campaign record.
+					Edit this match and its participating warbands.
 				</p>
 			</header>
 
 			<Card className="mt-7">
 				<CardContent>
 					<MatchForm
-						initialValues={match}
-						key={match.id}
-						onSubmit={async (values) => {
-							const transaction = matchesCollection.update(
-								match.id,
-								(draft) => {
-									Object.assign(draft, values);
-								},
+						initialValues={{
+							...match,
+							participantWarbandIds: participantRows.map(
+								(participant) => participant.warbandId,
+							),
+						}}
+						key={`${match.id}:${participantRows.map((row) => row.id).join(",")}`}
+						lockedParticipantWarbandIds={lockedParticipantWarbandIds}
+						onSubmit={async ({ participantWarbandIds, ...changes }) => {
+							const selectedIds = new Set(participantWarbandIds);
+							const existingIds = new Set(
+								participantRows.map((participant) => participant.warbandId),
+							);
+							const now = new Date().toISOString();
+							const additions = participantWarbandIds
+								.filter((warbandId) => !existingIds.has(warbandId))
+								.map((warbandId) => ({
+									id: safeRandomUUID(),
+									matchId,
+									warbandId,
+									createdAt: now,
+									updatedAt: now,
+								}));
+							const removals = participantRows.filter(
+								(participant) => !selectedIds.has(participant.warbandId),
+							);
+							const transaction = updateMatchTransaction(
+								dbClient,
+								collections,
+								{ id: matchId, changes, additions, removals },
 							);
 							await transaction.isPersisted.promise;
 						}}
 						submitLabel="Save changes"
+						warbands={warbandRows}
 					/>
 				</CardContent>
 			</Card>

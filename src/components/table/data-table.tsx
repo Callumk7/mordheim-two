@@ -149,6 +149,7 @@ export function DataTable<TData extends RowData & { id: string }>({
 	const table = useAppTable({
 		columns,
 		data,
+		autoResetExpanded: false,
 		getRowCanExpand: () => Boolean(renderExpandedRow),
 		initialState: { sorting: initialSorting },
 	});

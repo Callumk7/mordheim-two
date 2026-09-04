@@ -1,13 +1,14 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { getWarbandsCollection } from "../../db-collections/warbands";
-import { getWarriorsCollection } from "../../db-collections/warriors";
+import { getCollections } from "@/db-collections";
 
 export const Route = createFileRoute("/warriors")({
 	ssr: false,
 	loader: async ({ context }) => {
+		const { events, warbands, warriors } = getCollections(context.dbClient);
 		await Promise.all([
-			getWarriorsCollection(context.queryClient).preload(),
-			getWarbandsCollection(context.queryClient).preload(),
+			events.preload(),
+			warbands.preload(),
+			warriors.preload(),
 		]);
 		return null;
 	},

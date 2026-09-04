@@ -1,8 +1,8 @@
 import { ChevronRight, Users } from "lucide-react";
 import { useMemo } from "react";
-import type { WarbandWithRelations } from "#/db/relations";
 import type { Warband } from "#/db/warband";
 import { WARBAND_STATUSES } from "#/db/warband";
+import type { Warrior } from "@/db/warrior";
 import { Button } from "../ui/button";
 import { TableActionLink, TableActions } from "../ui/table";
 import {
@@ -12,7 +12,9 @@ import {
 } from "../ui/table-cell-field";
 import { createDataTableColumnHelper, DataTable } from "./data-table";
 
-const columnHelper = createDataTableColumnHelper<WarbandWithRelations>();
+type WarbandWithWarriors = Warband & { warriors: Warrior[] };
+
+const columnHelper = createDataTableColumnHelper<WarbandWithWarriors>();
 
 export type WarbandInlineUpdate = Partial<
 	Pick<Warband, "captain" | "faction" | "name" | "rating" | "status">
@@ -20,11 +22,11 @@ export type WarbandInlineUpdate = Partial<
 
 interface WarbandsTableProps {
 	onUpdate: (id: string, changes: WarbandInlineUpdate) => Promise<void>;
-	warbands: WarbandWithRelations[];
+	warbands: WarbandWithWarriors[];
 }
 
-function WarbandWarriors({ warband }: { warband: WarbandWithRelations }) {
-	const warriors = warband.warriors ?? [];
+function WarbandWarriors({ warband }: { warband: WarbandWithWarriors }) {
+	const warriors = warband.warriors;
 
 	return (
 		<div className="px-4 py-4 sm:px-12">
