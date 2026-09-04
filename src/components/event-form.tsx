@@ -14,25 +14,22 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import type { Event } from "@/db/event";
 import type { Match } from "@/db/match";
 import type { Warband } from "@/db/warband";
 import type { WarbandMatch } from "@/db/warband-match";
 import type { Warrior } from "@/db/warrior";
 import {
-	getParticipantWarbandIds,
-	getWarriorsForWarband,
-} from "@/lib/event-options";
+	canSubmitEvent,
+	changeEventAttackerWarband,
+	changeEventDefenderWarband,
+	changeEventMatch,
+	deriveEventFormOptions,
+	type EventFormValues,
+	hasDuplicateEventWarbands,
+	normalizeEventFormValues,
+} from "@/lib/event-form";
 
-export type EventFormValues = Pick<
-	Event,
-	| "matchId"
-	| "attackerWarbandId"
-	| "attackerWarriorId"
-	| "defenderWarbandId"
-	| "defenderWarriorId"
-	| "notes"
->;
+export type { EventFormValues } from "@/lib/event-form";
 
 export function EventForm({
 	initialValues,
@@ -57,37 +54,10 @@ export function EventForm({
 	const [error, setError] = useState<string>();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const notesId = useId();
-	const participantWarbandIds = getParticipantWarbandIds(
-		values.matchId,
-		participants,
-	);
-	const participantWarbands = warbands.filter(
-		(warband) =>
-			participantWarbandIds.includes(warband.id) &&
-			warriors.some((warrior) => warrior.warbandId === warband.id),
-	);
-	const attackerWarriors = getWarriorsForWarband(
-		values.attackerWarbandId,
-		warriors,
-	);
-	const defenderWarriors = getWarriorsForWarband(
-		values.defenderWarbandId,
-		warriors,
-	);
-	const hasDistinctWarbands =
-		values.attackerWarbandId !== values.defenderWarbandId;
-	const hasDuplicateWarbands =
-		Boolean(values.attackerWarbandId) &&
-		Boolean(values.defenderWarbandId) &&
-		!hasDistinctWarbands;
-	const canSubmit =
-		participantWarbandIds.includes(values.attackerWarbandId) &&
-		participantWarbandIds.includes(values.defenderWarbandId) &&
-		hasDistinctWarbands &&
-		attackerWarriors.some(
-			(warrior) => warrior.id === values.attackerWarriorId,
-		) &&
-		defenderWarriors.some((warrior) => warrior.id === values.defenderWarriorId);
+	const { participantWarbands, attackerWarriors, defenderWarriors } =
+		deriveEventFormOptions(values, participants, warbands, warriors);
+	const hasDuplicateWarbands = hasDuplicateEventWarbands(values);
+	const canSubmit = canSubmitEvent(values, participants, warriors);
 
 	return (
 		<form
@@ -97,10 +67,7 @@ export function EventForm({
 				setError(undefined);
 				setIsSubmitting(true);
 				try {
-					await onSubmit({
-						...values,
-						notes: values.notes?.trim() || null,
-					});
+					await onSubmit(normalizeEventFormValues(values));
 				} catch (cause) {
 					setError(
 						cause instanceof Error ? cause.message : "Unable to save event.",
@@ -116,28 +83,11 @@ export function EventForm({
 						<SelectField
 							label="Match"
 							name="matchId"
-							onChange={(matchId) => {
-								const nextWarbandIds = getParticipantWarbandIds(
-									matchId,
-									participants,
-								).filter((warbandId) =>
-									warriors.some((warrior) => warrior.warbandId === warbandId),
-								);
-								const attackerWarbandId = nextWarbandIds[0] ?? "";
-								const defenderWarbandId = nextWarbandIds[1] ?? "";
-								setValues((current) => ({
-									...current,
-									matchId,
-									attackerWarbandId,
-									attackerWarriorId:
-										getWarriorsForWarband(attackerWarbandId, warriors)[0]?.id ??
-										"",
-									defenderWarbandId,
-									defenderWarriorId:
-										getWarriorsForWarband(defenderWarbandId, warriors)[0]?.id ??
-										"",
-								}));
-							}}
+							onChange={(matchId) =>
+								setValues((current) =>
+									changeEventMatch(current, matchId, participants, warriors),
+								)
+							}
 							options={matches.map((match) => ({
 								label: `${match.name} — ${match.scenario}`,
 								value: match.id,
@@ -152,12 +102,9 @@ export function EventForm({
 					label="Attacking warband"
 					name="attackerWarbandId"
 					onChange={(attackerWarbandId) =>
-						setValues((current) => ({
-							...current,
-							attackerWarbandId,
-							attackerWarriorId:
-								getWarriorsForWarband(attackerWarbandId, warriors)[0]?.id ?? "",
-						}))
+						setValues((current) =>
+							changeEventAttackerWarband(current, attackerWarbandId, warriors),
+						)
 					}
 					options={participantWarbands.map((warband) => ({
 						label: warband.name,
@@ -189,12 +136,9 @@ export function EventForm({
 					label="Defending warband"
 					name="defenderWarbandId"
 					onChange={(defenderWarbandId) =>
-						setValues((current) => ({
-							...current,
-							defenderWarbandId,
-							defenderWarriorId:
-								getWarriorsForWarband(defenderWarbandId, warriors)[0]?.id ?? "",
-						}))
+						setValues((current) =>
+							changeEventDefenderWarband(current, defenderWarbandId, warriors),
+						)
 					}
 					options={participantWarbands.map((warband) => ({
 						label: warband.name,
