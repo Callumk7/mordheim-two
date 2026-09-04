@@ -38,7 +38,7 @@ export function MatchForm({
 	lockedParticipantWarbandIds?: string[];
 	onSubmit: (values: MatchFormValues) => Promise<void>;
 	submitLabel: string;
-	warbands: Warband[];
+	warbands: readonly Warband[];
 }) {
 	const [values, setValues] = useState<MatchFormValues>(() => ({
 		name: initialValues.name,

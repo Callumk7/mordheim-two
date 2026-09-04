@@ -4,14 +4,14 @@ import { getCollections } from "@/db-collections";
 export const Route = createFileRoute("/matches")({
 	ssr: false,
 	loader: async ({ context }) => {
-		const { events, matches, warbandMatches, warbands } = getCollections(
-			context.dbClient,
-		);
+		const { events, matches, warbandMatches, warbands, warriors } =
+			getCollections(context.dbClient);
 		await Promise.all([
 			events.preload(),
 			matches.preload(),
 			warbandMatches.preload(),
 			warbands.preload(),
+			warriors.preload(),
 		]);
 		return null;
 	},
