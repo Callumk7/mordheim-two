@@ -1,10 +1,18 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { getMatchesCollection } from "../../db-collections/matches";
+import { getCollections } from "@/db-collections";
 
 export const Route = createFileRoute("/matches")({
 	ssr: false,
 	loader: async ({ context }) => {
-		await getMatchesCollection(context.queryClient).preload();
+		const { events, matches, warbandMatches, warbands } = getCollections(
+			context.dbClient,
+		);
+		await Promise.all([
+			events.preload(),
+			matches.preload(),
+			warbandMatches.preload(),
+			warbands.preload(),
+		]);
 		return null;
 	},
 	component: MatchesLayout,

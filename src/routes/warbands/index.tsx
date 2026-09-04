@@ -1,4 +1,4 @@
-import { safeRandomUUID, useLiveQuery } from "@tanstack/react-db";
+import { eq, safeRandomUUID, toArray, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useState } from "react";
 import {
@@ -13,12 +13,12 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { getCollections } from "@/db-collections";
 import {
 	IndexEmptyState,
 	IndexPage,
 	IndexPageHeader,
 } from "../../components/index-page";
-import { getWarbandsCollection } from "../../db-collections/warbands";
 
 export const Route = createFileRoute("/warbands/")({
 	component: WarbandsIndexPage,
@@ -35,12 +35,42 @@ const initialValues: WarbandFormValues = {
 
 function WarbandsIndexPage() {
 	const [isNewWarbandOpen, setIsNewWarbandOpen] = useState(false);
-	const { queryClient } = Route.useRouteContext();
-	const warbandsCollection = getWarbandsCollection(queryClient);
+	const { dbClient } = Route.useRouteContext();
+	const { warbands: warbandsCollection, warriors: warriorsCollection } =
+		getCollections(dbClient);
 	const { data: warbands } = useLiveQuery({
 		query: (q) =>
 			q
 				.from({ warband: warbandsCollection })
+				.select(({ warband }) => ({
+					id: warband.id,
+					name: warband.name,
+					faction: warband.faction,
+					captain: warband.captain,
+					rating: warband.rating,
+					wins: warband.wins,
+					status: warband.status,
+					createdAt: warband.createdAt,
+					updatedAt: warband.updatedAt,
+					warriors: toArray(
+						q
+							.from({ warrior: warriorsCollection })
+							.where(({ warrior }) => eq(warrior.warbandId, warband.id))
+							.orderBy(({ warrior }) => warrior.name)
+							.select(({ warrior }) => ({
+								id: warrior.id,
+								name: warrior.name,
+								class: warrior.class,
+								status: warrior.status,
+								warbandId: warrior.warbandId,
+								knocked: warrior.knocked,
+								injuries: warrior.injuries,
+								knockedDowns: warrior.knockedDowns,
+								createdAt: warrior.createdAt,
+								updatedAt: warrior.updatedAt,
+							})),
+					),
+				}))
 				.orderBy(({ warband }) => warband.name, "asc"),
 	});
 	const updateWarband = useCallback(

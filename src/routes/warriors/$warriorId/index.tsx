@@ -1,9 +1,8 @@
-import { eq, useLiveQuery } from "@tanstack/react-db";
+import { eq, or, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { getCollections } from "@/db-collections";
 import { Card, CardContent } from "../../../components/ui/card";
 import { WarriorForm } from "../../../components/warrior-form";
-import { getWarbandsCollection } from "../../../db-collections/warbands";
-import { getWarriorsCollection } from "../../../db-collections/warriors";
 
 export const Route = createFileRoute("/warriors/$warriorId/")({
 	component: WarriorDetailPage,
@@ -11,14 +10,28 @@ export const Route = createFileRoute("/warriors/$warriorId/")({
 
 function WarriorDetailPage() {
 	const { warriorId } = Route.useParams();
-	const { queryClient } = Route.useRouteContext();
-	const warriorsCollection = getWarriorsCollection(queryClient);
-	const warbandsCollection = getWarbandsCollection(queryClient);
+	const { dbClient } = Route.useRouteContext();
+	const {
+		events: eventsCollection,
+		warbands: warbandsCollection,
+		warriors: warriorsCollection,
+	} = getCollections(dbClient);
 	const { data: warriors } = useLiveQuery({
 		query: (q) =>
 			q
 				.from({ warrior: warriorsCollection })
 				.where(({ warrior }) => eq(warrior.id, warriorId)),
+	});
+	const { data: eventReferences } = useLiveQuery({
+		query: (q) =>
+			q
+				.from({ event: eventsCollection })
+				.where(({ event }) =>
+					or(
+						eq(event.attackerWarriorId, warriorId),
+						eq(event.defenderWarriorId, warriorId),
+					),
+				),
 	});
 	const { data: warbands } = useLiveQuery({
 		query: (q) =>
@@ -67,6 +80,7 @@ function WarriorDetailPage() {
 				<CardContent>
 					<WarriorForm
 						initialValues={warrior}
+						isWarbandLocked={eventReferences.length > 0}
 						key={warrior.id}
 						onSubmit={async (values) => {
 							const transaction = warriorsCollection.update(

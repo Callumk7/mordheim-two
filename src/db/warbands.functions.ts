@@ -1,20 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "./index.server";
-import { warbandMatches, warbands } from "./schema";
+import { events, warbandMatches, warbands, warriors } from "./schema";
 import { WarbandSchema, WarbandUpdateSchema } from "./warband";
 
 export const listWarbands = createServerFn({ method: "GET" }).handler(() =>
-	getDb().query.warbands.findMany({
-		orderBy: (warbands, { asc }) => [asc(warbands.name)],
-		with: {
-			warriors: true,
-			warbandMatches: { with: { match: true } },
-			attackingEvents: true,
-			defendingEvents: true,
-		},
-	}),
+	getDb().select().from(warbands).orderBy(warbands.name),
 );
 
 export const createWarband = createServerFn({ method: "POST" })
@@ -47,7 +39,16 @@ export const deleteWarband = createServerFn({ method: "POST" })
 	.handler(async ({ data }) => {
 		const db = getDb();
 		await db.batch([
+			db
+				.delete(events)
+				.where(
+					or(
+						eq(events.attackerWarbandId, data.id),
+						eq(events.defenderWarbandId, data.id),
+					),
+				),
 			db.delete(warbandMatches).where(eq(warbandMatches.warbandId, data.id)),
+			db.delete(warriors).where(eq(warriors.warbandId, data.id)),
 			db.delete(warbands).where(eq(warbands.id, data.id)),
 		]);
 	});

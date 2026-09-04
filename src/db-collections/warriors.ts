@@ -1,24 +1,24 @@
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
-import { createCollection } from "@tanstack/react-db";
+import { collectionOptions } from "@tanstack/react-db";
 import type { QueryClient } from "@tanstack/react-query";
-import { WarriorWithRelationsSchema } from "#/db/relations";
-import { WarriorSchema, WarriorUpdateSchema } from "#/db/warrior";
+import { WarriorSchema, WarriorUpdateSchema } from "@/db/warrior";
 import {
 	createWarrior,
 	deleteWarrior,
 	listWarriors,
 	updateWarrior,
-} from "#/db/warriors.functions";
+} from "@/db/warriors.functions";
 
-function createWarriorsCollection(queryClient: QueryClient) {
-	return createCollection(
+export const warriorsCollectionOptions = collectionOptions(
+	"warriors",
+	(client) =>
 		queryCollectionOptions({
 			id: "warriors",
 			queryKey: ["warriors"],
-			queryClient,
+			queryClient: client.requireDependency<QueryClient>("queryClient"),
 			queryFn: () => listWarriors(),
 			getKey: (warrior) => warrior.id,
-			schema: WarriorWithRelationsSchema,
+			schema: WarriorSchema,
 			onInsert: async ({ transaction }) => {
 				await Promise.all(
 					transaction.mutations.map((mutation) =>
@@ -46,18 +46,4 @@ function createWarriorsCollection(queryClient: QueryClient) {
 				);
 			},
 		}),
-	);
-}
-
-export type WarrriorsCollection = ReturnType<typeof createWarriorsCollection>;
-
-const collections = new WeakMap<QueryClient, WarrriorsCollection>();
-
-export function getWarriorsCollection(queryClient: QueryClient) {
-	const existingCollection = collections.get(queryClient);
-	if (existingCollection) return existingCollection;
-
-	const collection = createWarriorsCollection(queryClient);
-	collections.set(queryClient, collection);
-	return collection;
-}
+);

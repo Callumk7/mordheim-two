@@ -1,7 +1,8 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { getWarbandsCollection } from "../../../db-collections/warbands";
+import { getCollections } from "@/db-collections";
+import { deleteWarbandTransaction } from "@/db-collections/actions";
 
 export const Route = createFileRoute("/warbands/$warbandId/delete")({
 	component: DeleteWarbandPage,
@@ -9,8 +10,14 @@ export const Route = createFileRoute("/warbands/$warbandId/delete")({
 
 function DeleteWarbandPage() {
 	const { warbandId } = Route.useParams();
-	const { queryClient } = Route.useRouteContext();
-	const warbandsCollection = getWarbandsCollection(queryClient);
+	const { dbClient } = Route.useRouteContext();
+	const collections = getCollections(dbClient);
+	const {
+		events,
+		warbandMatches,
+		warbands: warbandsCollection,
+		warriors,
+	} = collections;
 	const navigate = useNavigate({ from: Route.fullPath });
 	const [error, setError] = useState<string>();
 	const [isDeleting, setIsDeleting] = useState(false);
@@ -20,6 +27,35 @@ function DeleteWarbandPage() {
 				.from({ warband: warbandsCollection })
 				.where(({ warband }) => eq(warband.id, warbandId)),
 	});
+	const { data: participantRows } = useLiveQuery({
+		query: (q) =>
+			q
+				.from({ participant: warbandMatches })
+				.where(({ participant }) => eq(participant.warbandId, warbandId)),
+	});
+	const { data: warriorRows } = useLiveQuery({
+		query: (q) =>
+			q
+				.from({ warrior: warriors })
+				.where(({ warrior }) => eq(warrior.warbandId, warbandId)),
+	});
+	const { data: attackingEvents } = useLiveQuery({
+		query: (q) =>
+			q
+				.from({ event: events })
+				.where(({ event }) => eq(event.attackerWarbandId, warbandId)),
+	});
+	const { data: defendingEvents } = useLiveQuery({
+		query: (q) =>
+			q
+				.from({ event: events })
+				.where(({ event }) => eq(event.defenderWarbandId, warbandId)),
+	});
+	const eventIds = [
+		...new Set(
+			[...attackingEvents, ...defendingEvents].map((event) => event.id),
+		),
+	];
 	const warband = data[0];
 
 	if (!warband && !isDeleting) return null;
@@ -42,8 +78,11 @@ function DeleteWarbandPage() {
 					Delete {warband?.name ?? "warband"}?
 				</h1>
 				<p className="mt-3 max-w-xl text-muted-foreground">
-					This permanently removes the warband and its campaign record. This
-					action cannot be undone.
+					This permanently removes the warband, {warriorRows.length} warrior
+					{warriorRows.length === 1 ? "" : "s"}, {participantRows.length} match
+					link{participantRows.length === 1 ? "" : "s"}, and {eventIds.length}{" "}
+					event
+					{eventIds.length === 1 ? "" : "s"}. Matches are kept.
 				</p>
 
 				{error ? (
@@ -60,7 +99,16 @@ function DeleteWarbandPage() {
 							setError(undefined);
 							setIsDeleting(true);
 							try {
-								const transaction = warbandsCollection.delete(warbandId);
+								const transaction = deleteWarbandTransaction(
+									dbClient,
+									collections,
+									warbandId,
+									{
+										participantIds: participantRows.map((row) => row.id),
+										warriorIds: warriorRows.map((row) => row.id),
+										eventIds,
+									},
+								);
 								await transaction.isPersisted.promise;
 								await navigate({ to: "/warbands" });
 							} catch (cause) {

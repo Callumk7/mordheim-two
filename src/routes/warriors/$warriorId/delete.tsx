@@ -1,7 +1,8 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { getWarriorsCollection } from "../../../db-collections/warriors";
+import { getCollections } from "@/db-collections";
+import { deleteWarriorTransaction } from "@/db-collections/actions";
 
 export const Route = createFileRoute("/warriors/$warriorId/delete")({
 	component: DeleteWarriorPage,
@@ -9,8 +10,9 @@ export const Route = createFileRoute("/warriors/$warriorId/delete")({
 
 function DeleteWarriorPage() {
 	const { warriorId } = Route.useParams();
-	const { queryClient } = Route.useRouteContext();
-	const warriorsCollection = getWarriorsCollection(queryClient);
+	const { dbClient } = Route.useRouteContext();
+	const collections = getCollections(dbClient);
+	const { events, warriors: warriorsCollection } = collections;
 	const navigate = useNavigate({ from: Route.fullPath });
 	const [error, setError] = useState<string>();
 	const [isDeleting, setIsDeleting] = useState(false);
@@ -20,6 +22,23 @@ function DeleteWarriorPage() {
 				.from({ warrior: warriorsCollection })
 				.where(({ warrior }) => eq(warrior.id, warriorId)),
 	});
+	const { data: attackingEvents } = useLiveQuery({
+		query: (q) =>
+			q
+				.from({ event: events })
+				.where(({ event }) => eq(event.attackerWarriorId, warriorId)),
+	});
+	const { data: defendingEvents } = useLiveQuery({
+		query: (q) =>
+			q
+				.from({ event: events })
+				.where(({ event }) => eq(event.defenderWarriorId, warriorId)),
+	});
+	const eventIds = [
+		...new Set(
+			[...attackingEvents, ...defendingEvents].map((event) => event.id),
+		),
+	];
 	const warrior = data[0];
 
 	if (!warrior && !isDeleting) return null;
@@ -42,8 +61,9 @@ function DeleteWarriorPage() {
 					Delete {warrior?.name ?? "warrior"}?
 				</h1>
 				<p className="mt-3 max-w-xl text-muted-foreground">
-					This permanently removes the warrior and their campaign record. This
-					action cannot be undone.
+					This permanently removes the warrior and {eventIds.length} event
+					{eventIds.length === 1 ? "" : "s"} that reference them. This action
+					cannot be undone.
 				</p>
 
 				{error ? (
@@ -60,7 +80,12 @@ function DeleteWarriorPage() {
 							setError(undefined);
 							setIsDeleting(true);
 							try {
-								const transaction = warriorsCollection.delete(warriorId);
+								const transaction = deleteWarriorTransaction(
+									dbClient,
+									collections,
+									warriorId,
+									eventIds,
+								);
 								await transaction.isPersisted.promise;
 								await navigate({ to: "/warriors" });
 							} catch (cause) {

@@ -1,30 +1,28 @@
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
-import { createCollection } from "@tanstack/react-db";
+import { collectionOptions } from "@tanstack/react-db";
 import type { QueryClient } from "@tanstack/react-query";
-import { WarbandWithRelationsSchema } from "../db/relations";
-import { WarbandSchema, WarbandUpdateSchema } from "../db/warband";
+import { WarbandSchema, WarbandUpdateSchema } from "@/db/warband";
 import {
 	createWarband,
 	deleteWarband,
 	listWarbands,
 	updateWarband,
-} from "../db/warbands.functions";
+} from "@/db/warbands.functions";
 
-function createWarbandsCollection(queryClient: QueryClient) {
-	return createCollection(
+export const warbandsCollectionOptions = collectionOptions(
+	"warbands",
+	(client) =>
 		queryCollectionOptions({
 			id: "warbands",
 			queryKey: ["warbands"],
-			queryClient,
+			queryClient: client.requireDependency<QueryClient>("queryClient"),
 			queryFn: () => listWarbands(),
 			getKey: (warband) => warband.id,
-			schema: WarbandWithRelationsSchema,
+			schema: WarbandSchema,
 			onInsert: async ({ transaction }) => {
 				await Promise.all(
 					transaction.mutations.map((mutation) =>
-						createWarband({
-							data: WarbandSchema.parse(mutation.modified),
-						}),
+						createWarband({ data: WarbandSchema.parse(mutation.modified) }),
 					),
 				);
 			},
@@ -46,21 +44,6 @@ function createWarbandsCollection(queryClient: QueryClient) {
 						deleteWarband({ data: { id: mutation.original.id } }),
 					),
 				);
-				await queryClient.invalidateQueries({ queryKey: ["events"] });
 			},
 		}),
-	);
-}
-
-export type WarbandsCollection = ReturnType<typeof createWarbandsCollection>;
-
-const collections = new WeakMap<QueryClient, WarbandsCollection>();
-
-export function getWarbandsCollection(queryClient: QueryClient) {
-	const existingCollection = collections.get(queryClient);
-	if (existingCollection) return existingCollection;
-
-	const collection = createWarbandsCollection(queryClient);
-	collections.set(queryClient, collection);
-	return collection;
-}
+);

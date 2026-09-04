@@ -1,8 +1,13 @@
 import { safeRandomUUID, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { MatchForm, type MatchFormValues } from "#/components/match-form";
-import { MatchesTable } from "#/components/table/matches-table";
+import {
+	IndexEmptyState,
+	IndexPage,
+	IndexPageHeader,
+} from "@/components/index-page";
+import { MatchForm, type MatchFormValues } from "@/components/match-form";
+import { MatchesTable } from "@/components/table/matches-table";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -10,12 +15,8 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import {
-	IndexEmptyState,
-	IndexPage,
-	IndexPageHeader,
-} from "../../components/index-page";
-import { getMatchesCollection } from "../../db-collections/matches";
+import { getCollections } from "@/db-collections";
+import { createMatchTransaction } from "@/db-collections/actions";
 
 export const Route = createFileRoute("/matches/")({
 	component: MatchesIndexPage,
@@ -25,17 +26,23 @@ const initialValues: MatchFormValues = {
 	name: "",
 	scenario: "",
 	status: "Scheduled",
+	participantWarbandIds: [],
 };
 
 function MatchesIndexPage() {
 	const [isNewMatchOpen, setIsNewMatchOpen] = useState(false);
-	const { queryClient } = Route.useRouteContext();
-	const matchesCollection = getMatchesCollection(queryClient);
-	const { data: matches } = useLiveQuery({
+	const { dbClient } = Route.useRouteContext();
+	const collections = getCollections(dbClient);
+	const { matches, warbands } = collections;
+	const { data: matchRows } = useLiveQuery({
 		query: (q) =>
 			q
-				.from({ match: matchesCollection })
+				.from({ match: matches })
 				.orderBy(({ match }) => match.createdAt, "desc"),
+	});
+	const { data: warbandRows } = useLiveQuery({
+		query: (q) =>
+			q.from({ warband: warbands }).orderBy(({ warband }) => warband.name),
 	});
 
 	return (
@@ -49,8 +56,8 @@ function MatchesIndexPage() {
 				title="Matches"
 			/>
 
-			{matches.length ? (
-				<MatchesTable matches={matches} />
+			{matchRows.length ? (
+				<MatchesTable matches={matchRows} />
 			) : (
 				<IndexEmptyState
 					action={
@@ -76,13 +83,32 @@ function MatchesIndexPage() {
 				</DialogHeader>
 				<MatchForm
 					initialValues={initialValues}
-					onSubmit={async (values) => {
-						const id = safeRandomUUID();
-						const transaction = matchesCollection.insert({ id, ...values });
+					onSubmit={async ({ participantWarbandIds, ...values }) => {
+						const now = new Date().toISOString();
+						const match = {
+							id: safeRandomUUID(),
+							...values,
+							createdAt: now,
+							updatedAt: now,
+						};
+						const participants = participantWarbandIds.map((warbandId) => ({
+							id: safeRandomUUID(),
+							matchId: match.id,
+							warbandId,
+							createdAt: now,
+							updatedAt: now,
+						}));
+						const transaction = createMatchTransaction(
+							dbClient,
+							collections,
+							match,
+							participants,
+						);
 						await transaction.isPersisted.promise;
 						setIsNewMatchOpen(false);
 					}}
 					submitLabel="Create match"
+					warbands={warbandRows}
 				/>
 			</Dialog>
 		</IndexPage>

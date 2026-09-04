@@ -14,27 +14,37 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 import { MATCH_STATUSES, type Match } from "../db/match";
+import type { Warband } from "../db/warband";
 
-export type MatchFormValues = Pick<Match, "name" | "scenario" | "status">;
+export type MatchFormValues = Pick<Match, "name" | "scenario" | "status"> & {
+	participantWarbandIds: string[];
+};
 
 export function MatchForm({
 	initialValues,
+	lockedParticipantWarbandIds = [],
 	onSubmit,
 	submitLabel,
+	warbands,
 }: {
 	initialValues: MatchFormValues;
+	lockedParticipantWarbandIds?: string[];
 	onSubmit: (values: MatchFormValues) => Promise<void>;
 	submitLabel: string;
+	warbands: Warband[];
 }) {
 	const [values, setValues] = useState<MatchFormValues>(() => ({
 		name: initialValues.name,
 		scenario: initialValues.scenario,
 		status: initialValues.status,
+		participantWarbandIds: initialValues.participantWarbandIds,
 	}));
 	const [error, setError] = useState<string>();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const statusId = useId();
+	const lockedParticipantIds = new Set(lockedParticipantWarbandIds);
 
 	return (
 		<form
@@ -97,6 +107,56 @@ export function MatchForm({
 					</Select>
 				</Field>
 			</FieldGroup>
+
+			<fieldset className="grid gap-3">
+				<legend className="text-sm font-medium text-foreground">
+					Participating warbands
+				</legend>
+				<p className="text-sm text-muted-foreground">
+					Select the warbands taking part. At least two are needed before an
+					event can be recorded.
+				</p>
+				<div className="grid gap-2 sm:grid-cols-2">
+					{warbands.map((warband) => {
+						const isChecked = values.participantWarbandIds.includes(warband.id);
+						const isLocked = isChecked && lockedParticipantIds.has(warband.id);
+						return (
+							<label
+								className={cn(
+									"flex cursor-pointer items-center gap-3 rounded-xl border border-input bg-input/30 px-3 py-2.5 text-sm text-foreground",
+									isLocked && "cursor-not-allowed opacity-70",
+								)}
+								key={warband.id}
+							>
+								<input
+									checked={isChecked}
+									className="size-4 accent-primary"
+									disabled={isLocked}
+									onChange={() =>
+										setValues((current) => ({
+											...current,
+											participantWarbandIds: isChecked
+												? current.participantWarbandIds.filter(
+														(id) => id !== warband.id,
+													)
+												: [...current.participantWarbandIds, warband.id],
+										}))
+									}
+									type="checkbox"
+								/>
+								<span className="grid gap-0.5">
+									<span>{warband.name}</span>
+									{isLocked ? (
+										<span className="text-xs text-muted-foreground">
+											Used by an event in this match
+										</span>
+									) : null}
+								</span>
+							</label>
+						);
+					})}
+				</div>
+			</fieldset>
 
 			<FieldError>{error}</FieldError>
 

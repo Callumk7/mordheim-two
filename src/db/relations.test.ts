@@ -1,101 +1,148 @@
-import { expect, test } from "vitest";
+import { getTableConfig } from "drizzle-orm/sqlite-core";
+import { describe, expect, it } from "vitest";
 import {
-	EventWithRelationsSchema,
-	MatchWithRelationsSchema,
-	WarbandWithRelationsSchema,
-	WarriorWithRelationsSchema,
-} from "./relations";
+	getParticipantWarbandIds,
+	getWarriorsForWarband,
+} from "../lib/event-options";
+import { EventSchema, validateEventMembership } from "./event";
+import { events, warbandMatches, warriors } from "./schema";
+import { WarbandMatchSchema } from "./warband-match";
 
-const warband = {
-	id: "reavers",
-	name: "Reikland Reavers",
-	faction: "Mercenaries",
-	captain: "Otto Falk",
-	rating: 186,
-	wins: 7,
-	status: "Ready" as const,
+const validEvent = {
+	id: "event-1",
+	matchId: "match-1",
+	attackerWarbandId: "warband-a",
+	attackerWarriorId: "warrior-a",
+	defenderWarbandId: "warband-b",
+	defenderWarriorId: "warrior-b",
+	notes: null,
 };
 
-const match = {
-	id: "skirmish",
-	name: "Street skirmish",
-	scenario: "Skirmish",
-	status: "Scheduled" as const,
-};
+describe("event relations", () => {
+	it("requires distinct warbands and both warriors", () => {
+		expect(EventSchema.safeParse(validEvent).success).toBe(true);
+		expect(
+			EventSchema.safeParse({
+				...validEvent,
+				defenderWarbandId: validEvent.attackerWarbandId,
+			}).success,
+		).toBe(false);
+		expect(
+			EventSchema.safeParse({ ...validEvent, attackerWarriorId: "" }).success,
+		).toBe(false);
+	});
 
-test("warband relation data retains its warriors and linked matches", () => {
-	const result = WarbandWithRelationsSchema.parse({
-		...warband,
-		warriors: [
+	it("rejects non-participants and warriors in the wrong warband", () => {
+		const participantIds = new Set(["warband-a", "warband-b"]);
+		const warriorWarbands = new Map([
+			["warrior-a", "warband-a"],
+			["warrior-b", "warband-b"],
+		]);
+
+		expect(() =>
+			validateEventMembership(validEvent, participantIds, warriorWarbands),
+		).not.toThrow();
+		expect(() =>
+			validateEventMembership(
+				validEvent,
+				new Set(["warband-a"]),
+				warriorWarbands,
+			),
+		).toThrow(/must participate/);
+		expect(() =>
+			validateEventMembership(
+				validEvent,
+				participantIds,
+				new Map([
+					["warrior-a", "warband-b"],
+					["warrior-b", "warband-b"],
+				]),
+			),
+		).toThrow(/attacking warrior/);
+	});
+
+	it("enforces unique participation and composite event membership", () => {
+		const participantConfig = getTableConfig(warbandMatches);
+		const warriorConfig = getTableConfig(warriors);
+		const eventConfig = getTableConfig(events);
+
+		expect(
+			participantConfig.indexes.some(
+				(index) =>
+					index.config.name === "warband_matches_match_warband_unique" &&
+					index.config.unique,
+			),
+		).toBe(true);
+		expect(
+			warriorConfig.indexes.some(
+				(index) =>
+					index.config.name === "warriors_warband_id_unique" &&
+					index.config.unique,
+			),
+		).toBe(true);
+		expect(
+			eventConfig.foreignKeys
+				.map((key) => key.getName())
+				.filter(
+					(name) => name.includes("membership") || name.includes("participant"),
+				)
+				.sort(),
+		).toEqual([
+			"events_attacker_participant_fk",
+			"events_attacker_warrior_membership_fk",
+			"events_defender_participant_fk",
+			"events_defender_warrior_membership_fk",
+		]);
+	});
+
+	it("filters event choices through match and warband membership", () => {
+		const participants = [
 			{
-				id: "otto",
-				name: "Otto",
-				class: "Captain",
-				status: "Alive",
-				warbandId: warband.id,
-				knocked: 0,
-				injuries: 0,
-				knockedDowns: 0,
+				id: "p1",
+				matchId: "match-1",
+				warbandId: "warband-a",
+				createdAt: "now",
+				updatedAt: "now",
 			},
-		],
-		warbandMatches: [
 			{
-				id: "reavers-skirmish",
-				warbandId: warband.id,
-				matchId: match.id,
-				createdAt: "2026-01-01T00:00:00.000Z",
-				updatedAt: "2026-01-01T00:00:00.000Z",
-				match,
+				id: "p2",
+				matchId: "match-2",
+				warbandId: "warband-b",
+				createdAt: "now",
+				updatedAt: "now",
 			},
-		],
-		attackingEvents: [],
-		defendingEvents: [],
+		];
+		const warrior = {
+			id: "warrior-a",
+			name: "A",
+			class: "Hero",
+			status: "Alive" as const,
+			warbandId: "warband-a",
+			knocked: 0,
+			injuries: 0,
+			knockedDowns: 0,
+			createdAt: "now",
+			updatedAt: "now",
+		};
+
+		expect(getParticipantWarbandIds("match-1", participants)).toEqual([
+			"warband-a",
+		]);
+		expect(getWarriorsForWarband("warband-a", [warrior])).toEqual([warrior]);
+		expect(getWarriorsForWarband("warband-b", [warrior])).toEqual([]);
 	});
 
-	expect(result.warriors?.[0]?.warbandId).toBe(warband.id);
-	expect(result.warbandMatches?.[0]?.match.name).toBe(match.name);
-});
-
-test("match, warrior, and event relation data retain their parent records", () => {
-	const linkedMatch = MatchWithRelationsSchema.parse({
-		...match,
-		warbandMatches: [
-			{
-				id: "reavers-skirmish",
-				warbandId: warband.id,
-				matchId: match.id,
-				createdAt: "2026-01-01T00:00:00.000Z",
-				updatedAt: "2026-01-01T00:00:00.000Z",
-				warband,
-			},
-		],
-		events: [],
+	it("rejects incomplete participation rows", () => {
+		expect(
+			WarbandMatchSchema.safeParse({
+				id: "participant-1",
+				matchId: "match-1",
+				warbandId: "warband-a",
+			}).success,
+		).toBe(true);
+		expect(
+			WarbandMatchSchema.safeParse({ id: "participant-1", matchId: "match-1" })
+				.success,
+		).toBe(false);
 	});
-	const warrior = WarriorWithRelationsSchema.parse({
-		id: "otto",
-		name: "Otto",
-		class: "Captain",
-		status: "Alive",
-		warbandId: warband.id,
-		knocked: 0,
-		injuries: 0,
-		knockedDowns: 0,
-		warband,
-	});
-	const event = EventWithRelationsSchema.parse({
-		id: "knockdown",
-		matchId: match.id,
-		attackerWarbandId: warband.id,
-		defenderWarbandId: "sisters",
-		notes: null,
-		match,
-		attackerWarband: warband,
-		defenderWarband: { ...warband, id: "sisters", name: "Silver Hammers" },
-	});
-
-	expect(linkedMatch.warbandMatches?.[0]?.warband.id).toBe(warband.id);
-	expect(warrior.warband?.name).toBe(warband.name);
-	expect(event.match?.id).toBe(match.id);
-	expect(event.attackerWarband?.id).toBe(event.attackerWarbandId);
-	expect(event.defenderWarband?.id).toBe(event.defenderWarbandId);
 });
