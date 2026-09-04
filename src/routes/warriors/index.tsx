@@ -1,4 +1,4 @@
-import { safeRandomUUID, useLiveQuery } from "@tanstack/react-db";
+import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { WarriorsTable } from "#/components/table/warriors-table";
@@ -11,6 +11,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { getCollections } from "@/db-collections";
+import { createWarriorTransaction } from "@/db-collections/mutations/warriors";
 import {
 	IndexEmptyState,
 	IndexPage,
@@ -24,8 +25,9 @@ export const Route = createFileRoute("/warriors/")({
 function WarriorsIndexPage() {
 	const [isNewWarriorOpen, setIsNewWarriorOpen] = useState(false);
 	const { dbClient } = Route.useRouteContext();
+	const collections = getCollections(dbClient);
 	const { warbands: warbandsCollection, warriors: warriorsCollection } =
-		getCollections(dbClient);
+		collections;
 	const { data: warriors } = useLiveQuery({
 		query: (q) =>
 			q
@@ -58,7 +60,6 @@ function WarriorsIndexPage() {
 					<Button onPress={() => setIsNewWarriorOpen(true)}>New warrior</Button>
 				}
 				description="Manage every fighter serving in the campaign’s warbands."
-				eyebrow="Campaign roster"
 				title="Warriors"
 			/>
 
@@ -91,8 +92,7 @@ function WarriorsIndexPage() {
 					<WarriorForm
 						initialValues={initialValues}
 						onSubmit={async (values) => {
-							const id = safeRandomUUID();
-							const transaction = warriorsCollection.insert({ id, ...values });
+							const transaction = createWarriorTransaction(collections, values);
 							await transaction.isPersisted.promise;
 							setIsNewWarriorOpen(false);
 						}}

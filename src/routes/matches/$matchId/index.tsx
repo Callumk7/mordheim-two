@@ -21,7 +21,8 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { getCollections } from "@/db-collections";
-import { updateMatchTransaction } from "@/db-collections/actions";
+import { createEventTransaction } from "@/db-collections/mutations/events";
+import { updateMatchTransaction } from "@/db-collections/mutations/matches";
 import type { MatchParticipantWarband } from "@/db-collections/projections";
 import { useMatchWorkspace } from "@/db-collections/queries";
 
@@ -35,7 +36,6 @@ function MatchDetailPage() {
 	const { matchId } = Route.useParams();
 	const { dbClient } = Route.useRouteContext();
 	const collections = getCollections(dbClient);
-	const { events } = collections;
 	const {
 		allWarbands: warbandRows,
 		canAddEvent,
@@ -81,7 +81,7 @@ function MatchDetailPage() {
 							{formatStatus(match.status)}
 						</span>
 					</div>
-					<h1 className="mt-2 font-serif text-4xl font-semibold text-foreground sm:text-5xl">
+					<h1 className="mt-2 font-mordheim text-4xl text-foreground sm:text-5xl">
 						{match.name}
 					</h1>
 					<p className="mt-2 text-muted-foreground">
@@ -104,11 +104,40 @@ function MatchDetailPage() {
 				</div>
 			</header>
 
+			<section aria-labelledby="events-heading" className="grid gap-4">
+				<div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+					<div>
+						<h2
+							className="mt-1 font-serif text-3xl text-foreground"
+							id="events-heading"
+						>
+							Match events
+						</h2>
+						{canAddEvent ? (
+							<p className="mt-1 text-sm text-muted-foreground">
+								Newest events appear first.
+							</p>
+						) : (
+							<p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+								Add warriors to at least two participating warbands before
+								recording an event.
+							</p>
+						)}
+					</div>
+					<Button
+						isDisabled={!canAddEvent}
+						onPress={() => setIsNewEventOpen(true)}
+						variant="outline"
+					>
+						<Plus aria-hidden="true" data-icon="inline-start" />
+						Add event
+					</Button>
+				</div>
+				<MatchEventsTable events={eventRows} />
+			</section>
+
 			<section aria-labelledby="participants-heading" className="grid gap-4">
 				<div>
-					<p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-						Participants
-					</p>
 					<h2
 						className="mt-1 font-serif text-3xl text-foreground"
 						id="participants-heading"
@@ -142,41 +171,6 @@ function MatchDetailPage() {
 				)}
 			</section>
 
-			<section aria-labelledby="events-heading" className="grid gap-4">
-				<div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-					<div>
-						<p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-							Activity
-						</p>
-						<h2
-							className="mt-1 font-serif text-3xl text-foreground"
-							id="events-heading"
-						>
-							Match events
-						</h2>
-						{canAddEvent ? (
-							<p className="mt-1 text-sm text-muted-foreground">
-								Newest events appear first.
-							</p>
-						) : (
-							<p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-								Add warriors to at least two participating warbands before
-								recording an event.
-							</p>
-						)}
-					</div>
-					<Button
-						isDisabled={!canAddEvent}
-						onPress={() => setIsNewEventOpen(true)}
-						variant="outline"
-					>
-						<Plus aria-hidden="true" data-icon="inline-start" />
-						Add event
-					</Button>
-				</div>
-				<MatchEventsTable events={eventRows} />
-			</section>
-
 			<Dialog
 				className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl"
 				isOpen={isNewEventOpen}
@@ -207,10 +201,7 @@ function MatchDetailPage() {
 					key={`${matchId}:${String(isNewEventOpen)}`}
 					matches={[match]}
 					onSubmit={async (values) => {
-						const transaction = events.insert({
-							id: safeRandomUUID(),
-							...values,
-						});
+						const transaction = createEventTransaction(collections, values);
 						await transaction.isPersisted.promise;
 						setIsNewEventOpen(false);
 					}}
@@ -282,9 +273,7 @@ function ParticipantCard({ warband }: { warband: MatchParticipantWarband }) {
 	return (
 		<Card>
 			<CardHeader className="border-b border-border">
-				<CardTitle className="font-serif text-2xl text-foreground">
-					{warband.name}
-				</CardTitle>
+				<CardTitle>{warband.name}</CardTitle>
 				<CardDescription>
 					{warband.faction} · Captain {warband.captain}
 				</CardDescription>
@@ -372,7 +361,7 @@ function WarbandStat({
 	value: number | string;
 }) {
 	return (
-		<div className="rounded-lg bg-muted/30 px-3 py-2">
+		<div className="rounded-xl bg-muted border px-3 py-2">
 			<dt className="text-xs text-muted-foreground">{label}</dt>
 			<dd className="mt-0.5 truncate font-medium text-foreground">{value}</dd>
 		</div>

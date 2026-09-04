@@ -1,6 +1,5 @@
-import { eq, safeRandomUUID, toArray, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import {
 	type WarbandInlineUpdate,
 	WarbandsTable,
@@ -14,6 +13,11 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { getCollections } from "@/db-collections";
+import {
+	createWarbandTransaction,
+	updateWarbandTransaction,
+} from "@/db-collections/mutations/warbands";
+import { useWarbands } from "@/db-collections/queries/warbands";
 import {
 	IndexEmptyState,
 	IndexPage,
@@ -36,52 +40,12 @@ const initialValues: WarbandFormValues = {
 function WarbandsIndexPage() {
 	const [isNewWarbandOpen, setIsNewWarbandOpen] = useState(false);
 	const { dbClient } = Route.useRouteContext();
-	const { warbands: warbandsCollection, warriors: warriorsCollection } =
-		getCollections(dbClient);
-	const { data: warbands } = useLiveQuery({
-		query: (q) =>
-			q
-				.from({ warband: warbandsCollection })
-				.select(({ warband }) => ({
-					id: warband.id,
-					name: warband.name,
-					faction: warband.faction,
-					captain: warband.captain,
-					rating: warband.rating,
-					wins: warband.wins,
-					status: warband.status,
-					createdAt: warband.createdAt,
-					updatedAt: warband.updatedAt,
-					warriors: toArray(
-						q
-							.from({ warrior: warriorsCollection })
-							.where(({ warrior }) => eq(warrior.warbandId, warband.id))
-							.orderBy(({ warrior }) => warrior.name)
-							.select(({ warrior }) => ({
-								id: warrior.id,
-								name: warrior.name,
-								class: warrior.class,
-								status: warrior.status,
-								warbandId: warrior.warbandId,
-								knocked: warrior.knocked,
-								injuries: warrior.injuries,
-								knockedDowns: warrior.knockedDowns,
-								createdAt: warrior.createdAt,
-								updatedAt: warrior.updatedAt,
-							})),
-					),
-				}))
-				.orderBy(({ warband }) => warband.name, "asc"),
-	});
-	const updateWarband = useCallback(
-		async (id: string, changes: WarbandInlineUpdate) => {
-			const transaction = warbandsCollection.update(id, (draft) => {
-				Object.assign(draft, changes);
-			});
-			await transaction.isPersisted.promise;
-		},
-		[warbandsCollection],
-	);
+	const collections = getCollections(dbClient);
+	const warbands = useWarbands(dbClient);
+	const updateWarband = async (id: string, changes: WarbandInlineUpdate) => {
+		const transaction = updateWarbandTransaction(collections, id, changes);
+		await transaction.isPersisted.promise;
+	};
 
 	return (
 		<IndexPage>
@@ -90,7 +54,6 @@ function WarbandsIndexPage() {
 					<Button onPress={() => setIsNewWarbandOpen(true)}>New warband</Button>
 				}
 				description="Manage every company fighting through the City of the Damned."
-				eyebrow="Campaign records"
 				title="Warbands"
 			/>
 
@@ -122,8 +85,7 @@ function WarbandsIndexPage() {
 				<WarbandForm
 					initialValues={initialValues}
 					onSubmit={async (values) => {
-						const id = safeRandomUUID();
-						const transaction = warbandsCollection.insert({ id, ...values });
+						const transaction = createWarbandTransaction(collections, values);
 						await transaction.isPersisted.promise;
 						setIsNewWarbandOpen(false);
 					}}

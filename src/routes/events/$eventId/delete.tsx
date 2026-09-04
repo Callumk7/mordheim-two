@@ -2,6 +2,7 @@ import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { getCollections } from "@/db-collections";
+import { deleteEventTransaction } from "@/db-collections/mutations/events";
 
 export const Route = createFileRoute("/events/$eventId/delete")({
 	component: DeleteEventPage,
@@ -10,7 +11,8 @@ export const Route = createFileRoute("/events/$eventId/delete")({
 function DeleteEventPage() {
 	const { eventId } = Route.useParams();
 	const { dbClient } = Route.useRouteContext();
-	const { events: eventsCollection } = getCollections(dbClient);
+	const collections = getCollections(dbClient);
+	const { events: eventsCollection } = collections;
 	const navigate = useNavigate({ from: Route.fullPath });
 	const [error, setError] = useState<string>();
 	const [isDeleting, setIsDeleting] = useState(false);
@@ -60,7 +62,10 @@ function DeleteEventPage() {
 							setError(undefined);
 							setIsDeleting(true);
 							try {
-								const transaction = eventsCollection.delete(eventId);
+								const transaction = deleteEventTransaction(
+									collections,
+									eventId,
+								);
 								await transaction.isPersisted.promise;
 								await navigate({ to: "/events" });
 							} catch (cause) {

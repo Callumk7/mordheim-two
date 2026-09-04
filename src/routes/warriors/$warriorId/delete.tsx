@@ -2,7 +2,7 @@ import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { getCollections } from "@/db-collections";
-import { deleteWarriorTransaction } from "@/db-collections/actions";
+import { deleteWarriorTransaction } from "@/db-collections/mutations/warriors";
 
 export const Route = createFileRoute("/warriors/$warriorId/delete")({
 	component: DeleteWarriorPage,

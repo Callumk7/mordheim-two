@@ -16,7 +16,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { getCollections } from "@/db-collections";
-import { createMatchTransaction } from "@/db-collections/actions";
+import { createMatchTransaction } from "@/db-collections/mutations/matches";
 
 export const Route = createFileRoute("/matches/")({
 	component: MatchesIndexPage,
@@ -52,7 +52,6 @@ function MatchesIndexPage() {
 					<Button onPress={() => setIsNewMatchOpen(true)}>New match</Button>
 				}
 				description="Schedule scenarios and track each encounter through completion."
-				eyebrow="Campaign encounters"
 				title="Matches"
 			/>
 

@@ -2,7 +2,7 @@ import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { getCollections } from "@/db-collections";
-import { deleteMatchTransaction } from "@/db-collections/actions";
+import { deleteMatchTransaction } from "@/db-collections/mutations/matches";
 
 export const Route = createFileRoute("/matches/$matchId/delete")({
 	component: DeleteMatchPage,

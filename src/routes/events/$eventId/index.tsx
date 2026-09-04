@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { EventForm } from "@/components/event-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { getCollections } from "@/db-collections";
+import { updateEventTransaction } from "@/db-collections/mutations/events";
 import { getParticipantWarbandIds } from "@/lib/event-options";
 
 export const Route = createFileRoute("/events/$eventId/")({
@@ -12,8 +13,8 @@ export const Route = createFileRoute("/events/$eventId/")({
 function EventDetailPage() {
 	const { eventId } = Route.useParams();
 	const { dbClient } = Route.useRouteContext();
-	const { events, matches, warbandMatches, warbands, warriors } =
-		getCollections(dbClient);
+	const collections = getCollections(dbClient);
+	const { events, matches, warbandMatches, warbands, warriors } = collections;
 	const { data: eventRows } = useLiveQuery({
 		query: (q) =>
 			q.from({ event: events }).where(({ event }) => eq(event.id, eventId)),
@@ -85,9 +86,11 @@ function EventDetailPage() {
 						key={event.id}
 						matches={eligibleMatches}
 						onSubmit={async (values) => {
-							const transaction = events.update(event.id, (draft) => {
-								Object.assign(draft, values);
-							});
+							const transaction = updateEventTransaction(
+								collections,
+								event.id,
+								values,
+							);
 							await transaction.isPersisted.promise;
 						}}
 						participants={participantRows}

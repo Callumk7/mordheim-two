@@ -1,4 +1,4 @@
-import { eq, safeRandomUUID, useLiveQuery } from "@tanstack/react-db";
+import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,11 @@ import {
 import { WarbandForm } from "@/components/warband-form";
 import { WarriorForm, type WarriorFormValues } from "@/components/warrior-form";
 import { getCollections } from "@/db-collections";
+import { updateWarbandTransaction } from "@/db-collections/mutations/warbands";
+import {
+	createWarriorTransaction,
+	updateWarriorTransaction,
+} from "@/db-collections/mutations/warriors";
 
 export const Route = createFileRoute("/warbands/$warbandId/")({
 	component: WarbandDetailPage,
@@ -23,8 +28,9 @@ function WarbandDetailPage() {
 	const [editingWarriorId, setEditingWarriorId] = useState<string | null>(null);
 	const { warbandId } = Route.useParams();
 	const { dbClient } = Route.useRouteContext();
+	const collections = getCollections(dbClient);
 	const { warbands: warbandsCollection, warriors: warriorsCollection } =
-		getCollections(dbClient);
+		collections;
 	const { data: warbands } = useLiveQuery({
 		query: (q) =>
 			q
@@ -202,11 +208,10 @@ function WarbandDetailPage() {
 					initialValues={warband}
 					key={warband.id}
 					onSubmit={async (values) => {
-						const transaction = warbandsCollection.update(
+						const transaction = updateWarbandTransaction(
+							collections,
 							warband.id,
-							(draft) => {
-								Object.assign(draft, values);
-							},
+							values,
 						);
 						await transaction.isPersisted.promise;
 						setIsEditWarbandOpen(false);
@@ -231,10 +236,7 @@ function WarbandDetailPage() {
 					isWarbandLocked
 					key={isNewWarriorOpen ? `new-${warbandId}` : "new-closed"}
 					onSubmit={async (values) => {
-						const transaction = warriorsCollection.insert({
-							id: safeRandomUUID(),
-							...values,
-						});
+						const transaction = createWarriorTransaction(collections, values);
 						await transaction.isPersisted.promise;
 						setIsNewWarriorOpen(false);
 					}}
@@ -263,11 +265,10 @@ function WarbandDetailPage() {
 						isWarbandLocked
 						key={editingWarrior.id}
 						onSubmit={async (values) => {
-							const transaction = warriorsCollection.update(
+							const transaction = updateWarriorTransaction(
+								collections,
 								editingWarrior.id,
-								(draft) => {
-									Object.assign(draft, values);
-								},
+								values,
 							);
 							await transaction.isPersisted.promise;
 							setEditingWarriorId(null);
