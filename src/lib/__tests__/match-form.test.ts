@@ -4,7 +4,7 @@ import {
 	changeMatchParticipantSelection,
 	isMatchParticipantLocked,
 	type MatchFormValues,
-} from "./match-form";
+} from "../match-form";
 
 const values: MatchFormValues = {
 	name: "The Encounter",
