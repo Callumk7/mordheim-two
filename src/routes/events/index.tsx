@@ -1,6 +1,7 @@
-import { eq, safeRandomUUID, useLiveQuery } from "@tanstack/react-db";
+import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useEvents } from "#/db-collections/queries/events";
 import { EventForm } from "@/components/event-form";
 import {
 	IndexEmptyState,
@@ -16,6 +17,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { getCollections } from "@/db-collections";
+import { createEventTransaction } from "@/db-collections/mutations/events";
 import { getParticipantWarbandIds } from "@/lib/event-options";
 
 export const Route = createFileRoute("/events/")({
@@ -26,57 +28,8 @@ function EventsIndexPage() {
 	const [isNewEventOpen, setIsNewEventOpen] = useState(false);
 	const { dbClient } = Route.useRouteContext();
 	const collections = getCollections(dbClient);
-	const { events, matches, warbandMatches, warbands, warriors } = collections;
-	const { data: eventRows } = useLiveQuery({
-		query: (q) =>
-			q
-				.from({ event: events })
-				.innerJoin({ match: matches }, ({ event, match }) =>
-					eq(event.matchId, match.id),
-				)
-				.innerJoin({ attacker: warbands }, ({ event, attacker }) =>
-					eq(event.attackerWarbandId, attacker.id),
-				)
-				.innerJoin({ defender: warbands }, ({ event, defender }) =>
-					eq(event.defenderWarbandId, defender.id),
-				)
-				.innerJoin(
-					{ attackerWarrior: warriors },
-					({ event, attackerWarrior }) =>
-						eq(event.attackerWarriorId, attackerWarrior.id),
-				)
-				.innerJoin(
-					{ defenderWarrior: warriors },
-					({ event, defenderWarrior }) =>
-						eq(event.defenderWarriorId, defenderWarrior.id),
-				)
-				.select(
-					({
-						event,
-						match,
-						attacker,
-						defender,
-						attackerWarrior,
-						defenderWarrior,
-					}) => ({
-						id: event.id,
-						matchId: event.matchId,
-						attackerWarbandId: event.attackerWarbandId,
-						attackerWarriorId: event.attackerWarriorId,
-						defenderWarbandId: event.defenderWarbandId,
-						defenderWarriorId: event.defenderWarriorId,
-						notes: event.notes,
-						createdAt: event.createdAt,
-						updatedAt: event.updatedAt,
-						matchName: match.name,
-						attackerName: attacker.name,
-						attackerWarriorName: attackerWarrior.name,
-						defenderName: defender.name,
-						defenderWarriorName: defenderWarrior.name,
-					}),
-				)
-				.orderBy(({ event }) => event.createdAt, "desc"),
-	});
+	const { matches, warbandMatches, warbands, warriors } = collections;
+	const eventRows = useEvents(dbClient);
 	const { data: matchRows } = useLiveQuery({
 		query: (q) => q.from({ match: matches }).orderBy(({ match }) => match.name),
 	});
@@ -116,7 +69,6 @@ function EventsIndexPage() {
 					<Button onPress={() => setIsNewEventOpen(true)}>New event</Button>
 				}
 				description="Record knock downs as they happen during each match."
-				eyebrow="Campaign action"
 				title="Events"
 			/>
 
@@ -163,10 +115,7 @@ function EventsIndexPage() {
 						}}
 						matches={eligibleMatches}
 						onSubmit={async (values) => {
-							const transaction = events.insert({
-								id: safeRandomUUID(),
-								...values,
-							});
+							const transaction = createEventTransaction(collections, values);
 							await transaction.isPersisted.promise;
 							setIsNewEventOpen(false);
 						}}

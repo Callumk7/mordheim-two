@@ -8,7 +8,6 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { LinkButton } from "#/components/ui/button";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
 
@@ -53,9 +52,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<DbProvider client={dbClient}>
 					<header className="border-b border-border backdrop-blur">
 						<div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-4 sm:px-8">
-							<LinkButton variant="link" to="/">
-								Mordheim Ledger
-							</LinkButton>
 							<nav
 								aria-label="Primary navigation"
 								className="flex items-center gap-2 text-sm"

@@ -1,6 +1,7 @@
 import { eq, or, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { getCollections } from "@/db-collections";
+import { updateWarriorTransaction } from "@/db-collections/mutations/warriors";
 import { Card, CardContent } from "../../../components/ui/card";
 import { WarriorForm } from "../../../components/warrior-form";
 
@@ -11,11 +12,12 @@ export const Route = createFileRoute("/warriors/$warriorId/")({
 function WarriorDetailPage() {
 	const { warriorId } = Route.useParams();
 	const { dbClient } = Route.useRouteContext();
+	const collections = getCollections(dbClient);
 	const {
 		events: eventsCollection,
 		warbands: warbandsCollection,
 		warriors: warriorsCollection,
-	} = getCollections(dbClient);
+	} = collections;
 	const { data: warriors } = useLiveQuery({
 		query: (q) =>
 			q
@@ -83,11 +85,10 @@ function WarriorDetailPage() {
 						isWarbandLocked={eventReferences.length > 0}
 						key={warrior.id}
 						onSubmit={async (values) => {
-							const transaction = warriorsCollection.update(
+							const transaction = updateWarriorTransaction(
+								collections,
 								warrior.id,
-								(draft) => {
-									Object.assign(draft, values);
-								},
+								values,
 							);
 							await transaction.isPersisted.promise;
 						}}

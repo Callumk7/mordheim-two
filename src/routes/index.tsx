@@ -6,10 +6,7 @@ function Home() {
 	return (
 		<main className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-8 sm:py-24">
 			<section className="max-w-3xl">
-				<p className="text-xs font-semibold uppercase tracking-[0.32em] text-primary">
-					Campaign command
-				</p>
-				<h1 className="mt-5 font-serif text-5xl font-semibold leading-tight text-foreground sm:text-7xl">
+				<h1 className="mt-5 font-mordheim text-5xl text-foreground sm:text-7xl">
 					Keep order in the City of the Damned.
 				</h1>
 				<p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
