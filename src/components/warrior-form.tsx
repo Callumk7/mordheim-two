@@ -35,12 +35,14 @@ export function WarriorForm({
 	isWarbandLocked = false,
 	onSubmit,
 	submitLabel,
+	warbandLockDescription = "This warrior’s warband cannot change because they are used in an event.",
 	warbands,
 }: {
 	initialValues: WarriorFormValues;
 	isWarbandLocked?: boolean;
 	onSubmit: (values: WarriorFormValues) => Promise<void>;
 	submitLabel: string;
+	warbandLockDescription?: string;
 	warbands: Warband[];
 }) {
 	const [values, setValues] = useState<WarriorFormValues>(() => ({
@@ -125,8 +127,7 @@ export function WarriorForm({
 					</Select>
 					{isWarbandLocked ? (
 						<FieldDescription id={warbandDescriptionId}>
-							This warrior’s warband cannot change because they are used in an
-							event.
+							{warbandLockDescription}
 						</FieldDescription>
 					) : null}
 				</Field>
