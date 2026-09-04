@@ -1,10 +1,15 @@
 import { useId, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
 	Field,
+	FieldContent,
+	FieldDescription,
 	FieldError,
 	FieldGroup,
 	FieldLabel,
+	FieldLegend,
+	FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
@@ -108,55 +113,57 @@ export function MatchForm({
 				</Field>
 			</FieldGroup>
 
-			<fieldset className="grid gap-3">
-				<legend className="text-sm font-medium text-foreground">
+			<FieldSet className="gap-3">
+				<FieldLegend className="mb-0" variant="label">
 					Participating warbands
-				</legend>
-				<p className="text-sm text-muted-foreground">
+				</FieldLegend>
+				<FieldDescription>
 					Select the warbands taking part. At least two are needed before an
 					event can be recorded.
-				</p>
-				<div className="grid gap-2 sm:grid-cols-2">
+				</FieldDescription>
+				<FieldGroup className="grid gap-2 sm:grid-cols-2">
 					{warbands.map((warband) => {
 						const isChecked = values.participantWarbandIds.includes(warband.id);
 						const isLocked = isChecked && lockedParticipantIds.has(warband.id);
+						const checkboxId = `participant-${warband.id}`;
 						return (
-							<label
+							<Field
 								className={cn(
-									"flex cursor-pointer items-center gap-3 rounded-xl border border-input bg-input/30 px-3 py-2.5 text-sm text-foreground",
-									isLocked && "cursor-not-allowed opacity-70",
+									"rounded-xl border border-input bg-input/30 px-3 py-2.5",
+									isLocked && "opacity-70",
 								)}
+								data-disabled={isLocked || undefined}
 								key={warband.id}
+								orientation="horizontal"
 							>
-								<input
-									checked={isChecked}
-									className="size-4 accent-primary"
-									disabled={isLocked}
-									onChange={() =>
+								<Checkbox
+									id={checkboxId}
+									isDisabled={isLocked}
+									isSelected={isChecked}
+									onChange={(isSelected) =>
 										setValues((current) => ({
 											...current,
-											participantWarbandIds: isChecked
-												? current.participantWarbandIds.filter(
+											participantWarbandIds: isSelected
+												? [...current.participantWarbandIds, warband.id]
+												: current.participantWarbandIds.filter(
 														(id) => id !== warband.id,
-													)
-												: [...current.participantWarbandIds, warband.id],
+													),
 										}))
 									}
-									type="checkbox"
 								/>
-								<span className="grid gap-0.5">
-									<span>{warband.name}</span>
+								<FieldContent>
+									<FieldLabel htmlFor={checkboxId}>{warband.name}</FieldLabel>
 									{isLocked ? (
-										<span className="text-xs text-muted-foreground">
+										<FieldDescription>
 											Used by an event in this match
-										</span>
+										</FieldDescription>
 									) : null}
-								</span>
-							</label>
+								</FieldContent>
+							</Field>
 						);
 					})}
-				</div>
-			</fieldset>
+				</FieldGroup>
+			</FieldSet>
 
 			<FieldError>{error}</FieldError>
 
