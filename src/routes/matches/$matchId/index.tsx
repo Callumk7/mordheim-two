@@ -21,7 +21,10 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { getCollections } from "@/db-collections";
-import { createEventTransaction } from "@/db-collections/mutations/events";
+import {
+	createEventTransaction,
+	setEventOutcomeTransaction,
+} from "@/db-collections/mutations/events";
 import { updateMatchTransaction } from "@/db-collections/mutations/matches";
 import type { MatchParticipantWarband } from "@/db-collections/projections";
 import { useMatchWorkspace } from "@/db-collections/queries";
@@ -133,7 +136,17 @@ function MatchDetailPage() {
 						Add event
 					</Button>
 				</div>
-				<MatchEventsTable events={eventRows} />
+				<MatchEventsTable
+					events={eventRows}
+					onSetOutcome={async (eventId, outcome) => {
+						const transaction = setEventOutcomeTransaction(
+							collections,
+							eventId,
+							outcome,
+						);
+						await transaction.isPersisted.promise;
+					}}
+				/>
 			</section>
 
 			<section aria-labelledby="participants-heading" className="grid gap-4">

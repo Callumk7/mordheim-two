@@ -205,6 +205,7 @@ interface TableCellSelectProps {
 	className?: string;
 	onCommit: (value: string) => Promise<void> | void;
 	options: readonly string[];
+	placeholder?: string;
 	value: string;
 }
 
@@ -213,6 +214,7 @@ function TableCellSelect({
 	className,
 	onCommit,
 	options,
+	placeholder,
 	value,
 }: TableCellSelectProps) {
 	const [selectedValue, setSelectedValue] = useState(value);
@@ -228,6 +230,7 @@ function TableCellSelect({
 				aria-busy={isSaving || undefined}
 				aria-label={ariaLabel}
 				className="w-full"
+				isDisabled={isSaving}
 				isInvalid={Boolean(error)}
 				onChange={async (key) => {
 					if (key !== null) {
@@ -249,7 +252,8 @@ function TableCellSelect({
 						}
 					}
 				}}
-				value={selectedValue}
+				placeholder={placeholder}
+				value={selectedValue || null}
 			>
 				<SelectTrigger
 					aria-describedby={error ? errorId : undefined}

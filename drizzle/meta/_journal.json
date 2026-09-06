@@ -57,6 +57,13 @@
       "when": 1788467418892,
       "tag": "0007_certain_steve_rogers",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1788699121145,
+      "tag": "0008_greedy_cassandra_nova",
+      "breakpoints": true
     }
   ]
 }

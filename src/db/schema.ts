@@ -8,6 +8,7 @@ import {
 	text,
 	uniqueIndex,
 } from "drizzle-orm/sqlite-core";
+import { EVENT_OUTCOMES } from "./event";
 import { MATCH_STATUSES } from "./match";
 import { WARBAND_STATUSES } from "./warband";
 import { WARRIOR_STATUSES } from "./warrior";
@@ -103,6 +104,10 @@ export const events = sqliteTable(
 			.notNull()
 			.references(() => warriors.id, { onDelete: "cascade" }),
 		notes: text("notes"),
+		isProcessed: integer("is_processed", { mode: "boolean" })
+			.notNull()
+			.default(false),
+		outcome: text("outcome", { enum: EVENT_OUTCOMES }),
 		createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 		updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 	},

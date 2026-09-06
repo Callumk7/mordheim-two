@@ -95,6 +95,8 @@ export function useMatchEvents(dbClient: DbClient, matchId: string) {
 						defenderWarbandId: event.defenderWarbandId,
 						defenderWarriorId: event.defenderWarriorId,
 						notes: event.notes,
+						outcome: event.outcome,
+						isProcessed: event.isProcessed,
 						createdAt: event.createdAt,
 						updatedAt: event.updatedAt,
 						attackerName: attacker.name,

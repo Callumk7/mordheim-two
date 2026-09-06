@@ -60,6 +60,15 @@ export function EventsTable({ events }: { events: EventTableRow[] }) {
 						),
 					},
 				),
+				columnHelper.accessor((event) => event.outcome ?? "", {
+					id: "outcome",
+					header: "Outcome",
+					cell: ({ row }) => (
+						<span className="text-muted-foreground">
+							{row.original.outcome || "—"}
+						</span>
+					),
+				}),
 				columnHelper.accessor((event) => event.notes ?? "", {
 					id: "notes",
 					header: "Notes",
@@ -112,7 +121,7 @@ export function EventsTable({ events }: { events: EventTableRow[] }) {
 				})
 			}
 			searchPlaceholder="Search events…"
-			tableClassName="min-w-190"
+			tableClassName="min-w-210"
 		/>
 	);
 }
