@@ -1,113 +1,52 @@
-import { type DbClient, eq, useLiveQuery } from "@tanstack/react-db";
+import { type DbClient, useLiveQuery } from "@tanstack/react-db";
 import { getCollections } from "../index";
 import { projectMatchWorkspace } from "../projections";
+import {
+	allWarbandsQuery,
+	matchEventsQuery,
+	matchParticipantsQuery,
+	matchQuery,
+	matchRosterQuery,
+} from "./match-specifications";
+
+export {
+	allWarbandsQuery,
+	matchEventsQuery,
+	matchParticipantsQuery,
+	matchQuery,
+	matchRosterQuery,
+} from "./match-specifications";
 
 export function useMatch(dbClient: DbClient, matchId: string) {
-	const { matches } = getCollections(dbClient);
-	const { data } = useLiveQuery({
-		query: (q) =>
-			q.from({ match: matches }).where(({ match }) => eq(match.id, matchId)),
-	});
-
+	const collections = getCollections(dbClient);
+	const { data } = useLiveQuery({ query: matchQuery(collections, matchId) });
 	return data[0];
 }
 
 export function useMatchParticipants(dbClient: DbClient, matchId: string) {
-	const { warbandMatches, warbands } = getCollections(dbClient);
+	const collections = getCollections(dbClient);
 	const { data: participants } = useLiveQuery({
-		query: (q) =>
-			q
-				.from({ participant: warbandMatches })
-				.where(({ participant }) => eq(participant.matchId, matchId)),
+		query: matchParticipantsQuery(collections, matchId),
 	});
 	const { data: allWarbands } = useLiveQuery({
-		query: (q) =>
-			q.from({ warband: warbands }).orderBy(({ warband }) => warband.name),
+		query: allWarbandsQuery(collections),
 	});
 	return { allWarbands, participants };
 }
 
 export function useMatchRoster(dbClient: DbClient, matchId: string) {
-	const { warbandMatches, warriors } = getCollections(dbClient);
+	const collections = getCollections(dbClient);
 	const { data } = useLiveQuery({
-		query: (q) =>
-			q
-				.from({ warrior: warriors })
-				.innerJoin(
-					{ participant: warbandMatches },
-					({ warrior, participant }) =>
-						eq(warrior.warbandId, participant.warbandId),
-				)
-				.where(({ participant }) => eq(participant.matchId, matchId))
-				.select(({ warrior }) => ({
-					id: warrior.id,
-					name: warrior.name,
-					class: warrior.class,
-					status: warrior.status,
-					warbandId: warrior.warbandId,
-					knocked: warrior.knocked,
-					injuries: warrior.injuries,
-					knockedDowns: warrior.knockedDowns,
-					createdAt: warrior.createdAt,
-					updatedAt: warrior.updatedAt,
-				}))
-				.orderBy(({ warrior }) => warrior.name),
+		query: matchRosterQuery(collections, matchId),
 	});
-
 	return data;
 }
 
 export function useMatchEvents(dbClient: DbClient, matchId: string) {
-	const { events, warbands, warriors } = getCollections(dbClient);
+	const collections = getCollections(dbClient);
 	const { data } = useLiveQuery({
-		query: (q) =>
-			q
-				.from({ event: events })
-				.where(({ event }) => eq(event.matchId, matchId))
-				.innerJoin({ attacker: warbands }, ({ event, attacker }) =>
-					eq(event.attackerWarbandId, attacker.id),
-				)
-				.innerJoin({ defender: warbands }, ({ event, defender }) =>
-					eq(event.defenderWarbandId, defender.id),
-				)
-				.innerJoin(
-					{ attackerWarrior: warriors },
-					({ event, attackerWarrior }) =>
-						eq(event.attackerWarriorId, attackerWarrior.id),
-				)
-				.innerJoin(
-					{ defenderWarrior: warriors },
-					({ event, defenderWarrior }) =>
-						eq(event.defenderWarriorId, defenderWarrior.id),
-				)
-				.select(
-					({
-						event,
-						attacker,
-						defender,
-						attackerWarrior,
-						defenderWarrior,
-					}) => ({
-						id: event.id,
-						matchId: event.matchId,
-						attackerWarbandId: event.attackerWarbandId,
-						attackerWarriorId: event.attackerWarriorId,
-						defenderWarbandId: event.defenderWarbandId,
-						defenderWarriorId: event.defenderWarriorId,
-						notes: event.notes,
-						outcome: event.outcome,
-						isProcessed: event.isProcessed,
-						createdAt: event.createdAt,
-						updatedAt: event.updatedAt,
-						attackerName: attacker.name,
-						attackerWarriorName: attackerWarrior.name,
-						defenderName: defender.name,
-						defenderWarriorName: defenderWarrior.name,
-					}),
-				)
-				.orderBy(({ event }) => event.createdAt, "desc"),
+		query: matchEventsQuery(collections, matchId),
 	});
-
 	return data;
 }
 
