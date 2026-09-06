@@ -4,7 +4,11 @@ import {
 	getParticipantWarbandIds,
 	getWarriorsForWarband,
 } from "../../lib/event-options";
-import { EventSchema, validateEventMembership } from "../event";
+import {
+	EventSchema,
+	EventUpdateSchema,
+	validateEventMembership,
+} from "../event";
 import { events, warbandMatches, warriors } from "../schema";
 import { WarbandMatchSchema } from "../warband-match";
 
@@ -30,6 +34,36 @@ describe("event relations", () => {
 		expect(
 			EventSchema.safeParse({ ...validEvent, attackerWarriorId: "" }).success,
 		).toBe(false);
+	});
+
+	it("requires outcomes and processing state to change together", () => {
+		expect(
+			EventSchema.safeParse({
+				...validEvent,
+				outcome: "Injury",
+				isProcessed: true,
+			}).success,
+		).toBe(true);
+		expect(
+			EventSchema.safeParse({
+				...validEvent,
+				outcome: "Injury",
+				isProcessed: false,
+			}).success,
+		).toBe(false);
+		expect(
+			EventSchema.safeParse({
+				...validEvent,
+				outcome: null,
+				isProcessed: true,
+			}).success,
+		).toBe(false);
+	});
+
+	it("does not apply creation defaults to partial updates", () => {
+		expect(EventUpdateSchema.parse({ outcome: "Death" })).toEqual({
+			outcome: "Death",
+		});
 	});
 
 	it("rejects non-participants and warriors in the wrong warband", () => {

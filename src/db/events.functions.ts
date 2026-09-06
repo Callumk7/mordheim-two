@@ -85,18 +85,32 @@ export const updateEvent = createServerFn({ method: "POST" })
 			defenderWarriorId: currentEvent.defenderWarriorId,
 			notes: currentEvent.notes,
 			outcome: currentEvent.outcome,
-			processed: currentEvent.processed,
+			isProcessed: currentEvent.isProcessed,
 			...data.changes,
 		});
 		await assertEventMembership(db, nextEvent);
 
-		await db
+		if (currentEvent.isProcessed && !nextEvent.isProcessed) {
+			throw new Error("A processed event cannot be marked as unprocessed.");
+		}
+
+		const isProcessing = !currentEvent.isProcessed && nextEvent.isProcessed;
+		const updatedEvents = await db
 			.update(events)
 			.set({
 				...data.changes,
 				updatedAt: new Date().toISOString(),
 			})
-			.where(eq(events.id, data.id));
+			.where(
+				isProcessing
+					? and(eq(events.id, data.id), eq(events.isProcessed, false))
+					: eq(events.id, data.id),
+			)
+			.returning({ id: events.id });
+
+		if (isProcessing && updatedEvents.length === 0) {
+			throw new Error("This event has already been processed.");
+		}
 	});
 
 export const deleteEvent = createServerFn({ method: "POST" })

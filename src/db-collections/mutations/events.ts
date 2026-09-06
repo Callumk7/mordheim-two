@@ -1,5 +1,5 @@
 import { safeRandomUUID } from "@tanstack/react-db";
-import type { EventInput } from "@/db/event";
+import type { EventInput, EventOutcome } from "@/db/event";
 import type { AppCollections } from "..";
 
 type NewEvent = Omit<EventInput, "id" | "createdAt" | "updatedAt">;
@@ -25,6 +25,17 @@ export function updateEventTransaction(
 ) {
 	return collections.events.update(eventId, (draft) => {
 		Object.assign(draft, changes);
+	});
+}
+
+export function setEventOutcomeTransaction(
+	collections: AppCollections,
+	eventId: string,
+	outcome: EventOutcome,
+) {
+	return collections.events.update(eventId, { optimistic: false }, (draft) => {
+		draft.outcome = outcome;
+		draft.isProcessed = true;
 	});
 }
 

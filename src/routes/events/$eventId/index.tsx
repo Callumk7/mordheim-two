@@ -1,9 +1,13 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { EventForm } from "@/components/event-form";
+import { EventOutcomeForm } from "@/components/event-outcome-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { getCollections } from "@/db-collections";
-import { updateEventTransaction } from "@/db-collections/mutations/events";
+import {
+	setEventOutcomeTransaction,
+	updateEventTransaction,
+} from "@/db-collections/mutations/events";
 import { getParticipantWarbandIds } from "@/lib/event-options";
 
 export const Route = createFileRoute("/events/$eventId/")({
@@ -80,24 +84,38 @@ function EventDetailPage() {
 			</header>
 
 			<Card className="mt-7">
-				<CardContent>
-					<EventForm
-						initialValues={event}
-						key={event.id}
-						matches={eligibleMatches}
-						onSubmit={async (values) => {
-							const transaction = updateEventTransaction(
+				<CardContent className="grid gap-8">
+					<EventOutcomeForm
+						isProcessed={event.isProcessed}
+						onSubmit={async (outcome) => {
+							const transaction = setEventOutcomeTransaction(
 								collections,
 								event.id,
-								values,
+								outcome,
 							);
 							await transaction.isPersisted.promise;
 						}}
-						participants={participantRows}
-						submitLabel="Save changes"
-						warbands={warbandRows}
-						warriors={warriorRows}
+						outcome={event.outcome}
 					/>
+					<div className="border-t border-border pt-8">
+						<EventForm
+							initialValues={event}
+							key={event.id}
+							matches={eligibleMatches}
+							onSubmit={async (values) => {
+								const transaction = updateEventTransaction(
+									collections,
+									event.id,
+									values,
+								);
+								await transaction.isPersisted.promise;
+							}}
+							participants={participantRows}
+							submitLabel="Save changes"
+							warbands={warbandRows}
+							warriors={warriorRows}
+						/>
+					</div>
 				</CardContent>
 			</Card>
 		</div>

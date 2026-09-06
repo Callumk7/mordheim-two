@@ -1,98 +1,131 @@
 import { Link } from "@tanstack/react-router";
 import { useMemo } from "react";
+import {
+	EVENT_OUTCOMES,
+	type EventOutcome,
+	EventOutcomeSchema,
+} from "@/db/event";
 import type { MatchEventRow } from "@/db-collections/projections";
 import { TableActionLink, TableActions } from "../ui/table";
+import { TableCellSelect } from "../ui/table-cell-field";
 import { createDataTableColumnHelper, DataTable } from "./data-table";
 
 const columnHelper = createDataTableColumnHelper<MatchEventRow>();
 
-const columns = columnHelper.columns([
-	columnHelper.accessor("createdAt", {
-		header: "Recorded",
-		cell: ({ row }) => (
-			<time
-				className="whitespace-nowrap text-muted-foreground"
-				dateTime={row.original.createdAt}
-			>
-				{formatRecordedAt(row.original.createdAt)}
-			</time>
-		),
-	}),
-	columnHelper.accessor(
-		(event) => `${event.attackerName} ${event.attackerWarriorName}`,
-		{
-			id: "attacker",
-			header: "Attacker",
-			meta: { isRowHeader: true },
+function createColumns(
+	onSetOutcome: (eventId: string, outcome: EventOutcome) => Promise<void>,
+) {
+	return columnHelper.columns([
+		columnHelper.accessor("createdAt", {
+			header: "Recorded",
 			cell: ({ row }) => (
-				<Link
-					className="font-semibold text-foreground hover:text-primary"
-					params={{ eventId: row.original.id }}
-					to="/events/$eventId"
+				<time
+					className="whitespace-nowrap text-muted-foreground"
+					dateTime={row.original.createdAt}
 				>
-					{row.original.attackerWarriorName}
-					<span className="block text-xs font-normal text-muted-foreground">
-						{row.original.attackerName}
-					</span>
-				</Link>
+					{formatRecordedAt(row.original.createdAt)}
+				</time>
 			),
-		},
-	),
-	columnHelper.accessor(
-		(event) => `${event.defenderName} ${event.defenderWarriorName}`,
-		{
-			id: "defender",
-			header: "Defender",
-			cell: ({ row }) => (
-				<span>
-					{row.original.defenderWarriorName}
-					<span className="block text-xs text-muted-foreground">
-						{row.original.defenderName}
+		}),
+		columnHelper.accessor(
+			(event) => `${event.attackerName} ${event.attackerWarriorName}`,
+			{
+				id: "attacker",
+				header: "Attacker",
+				meta: { isRowHeader: true },
+				cell: ({ row }) => (
+					<Link
+						className="font-semibold text-foreground hover:text-primary"
+						params={{ eventId: row.original.id }}
+						to="/events/$eventId"
+					>
+						{row.original.attackerWarriorName}
+						<span className="block text-xs font-normal text-muted-foreground">
+							{row.original.attackerName}
+						</span>
+					</Link>
+				),
+			},
+		),
+		columnHelper.accessor(
+			(event) => `${event.defenderName} ${event.defenderWarriorName}`,
+			{
+				id: "defender",
+				header: "Defender",
+				cell: ({ row }) => (
+					<span>
+						{row.original.defenderWarriorName}
+						<span className="block text-xs text-muted-foreground">
+							{row.original.defenderName}
+						</span>
 					</span>
+				),
+			},
+		),
+		columnHelper.accessor((event) => event.outcome ?? "", {
+			id: "outcome",
+			header: "Outcome",
+			cell: ({ row }) =>
+				row.original.isProcessed ? (
+					<span className="font-medium text-foreground">
+						{row.original.outcome}
+					</span>
+				) : (
+					<TableCellSelect
+						aria-label={`Process event for ${row.original.attackerWarriorName} against ${row.original.defenderWarriorName}`}
+						onCommit={(outcome) =>
+							onSetOutcome(row.original.id, EventOutcomeSchema.parse(outcome))
+						}
+						options={EVENT_OUTCOMES}
+						placeholder="Pick outcome"
+						value=""
+					/>
+				),
+		}),
+		columnHelper.accessor((event) => event.notes ?? "", {
+			id: "notes",
+			header: "Notes",
+			cell: ({ row }) => (
+				<span className="block max-w-80 truncate text-muted-foreground">
+					{row.original.notes || "—"}
 				</span>
 			),
-		},
-	),
-	columnHelper.accessor((event) => event.notes ?? "", {
-		id: "notes",
-		header: "Notes",
-		cell: ({ row }) => (
-			<span className="block max-w-80 truncate text-muted-foreground">
-				{row.original.notes || "—"}
-			</span>
-		),
-	}),
-	columnHelper.display({
-		id: "actions",
-		header: "Actions",
-		meta: { align: "end" },
-		enableGlobalFilter: false,
-		enableSorting: false,
-		cell: ({ row }) => (
-			<TableActions>
-				<TableActionLink
-					params={{ eventId: row.original.id }}
-					to="/events/$eventId"
-				>
-					View
-				</TableActionLink>
-				<TableActionLink
-					params={{ eventId: row.original.id }}
-					to="/events/$eventId/delete"
-					variant="destructive"
-				>
-					Delete
-				</TableActionLink>
-			</TableActions>
-		),
-	}),
-]);
+		}),
+		columnHelper.display({
+			id: "actions",
+			header: "Actions",
+			meta: { align: "end" },
+			enableGlobalFilter: false,
+			enableSorting: false,
+			cell: ({ row }) => (
+				<TableActions>
+					<TableActionLink
+						params={{ eventId: row.original.id }}
+						to="/events/$eventId"
+					>
+						View
+					</TableActionLink>
+					<TableActionLink
+						params={{ eventId: row.original.id }}
+						to="/events/$eventId/delete"
+						variant="destructive"
+					>
+						Delete
+					</TableActionLink>
+				</TableActions>
+			),
+		}),
+	]);
+}
 
 export function MatchEventsTable({
 	events,
+	onSetOutcome,
 }: {
 	events: readonly MatchEventRow[];
+	onSetOutcome: (eventId: string, outcome: EventOutcome) => Promise<void>;
 }) {
+	const columns = useMemo(() => createColumns(onSetOutcome), [onSetOutcome]);
 	const rows = useMemo(() => [...events], [events]);
 
 	return (
@@ -104,7 +137,7 @@ export function MatchEventsTable({
 			initialSorting={[{ id: "createdAt", desc: true }]}
 			itemLabel={{ singular: "event", plural: "events" }}
 			searchPlaceholder="Search match events…"
-			tableClassName="min-w-190"
+			tableClassName="min-w-210"
 		/>
 	);
 }

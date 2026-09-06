@@ -104,7 +104,7 @@ export const events = sqliteTable(
 			.notNull()
 			.references(() => warriors.id, { onDelete: "cascade" }),
 		notes: text("notes"),
-		processed: integer("is_processed", { mode: "boolean" })
+		isProcessed: integer("is_processed", { mode: "boolean" })
 			.notNull()
 			.default(false),
 		outcome: text("outcome", { enum: EVENT_OUTCOMES }),

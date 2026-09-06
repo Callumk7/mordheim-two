@@ -11,7 +11,7 @@ const EventFieldsShape = {
 	defenderWarriorId: z.string().min(1),
 	notes: z.string().trim().nullable(),
 	outcome: EventOutcomeSchema.nullable().default(null),
-	processed: z.boolean().default(false),
+	isProcessed: z.boolean().default(false),
 };
 
 const differentWarbands = {
@@ -19,12 +19,25 @@ const differentWarbands = {
 	path: ["defenderWarbandId"],
 };
 
+const processedEventsHaveOutcomes = {
+	message: "An event is processed if and only if it has an outcome.",
+	path: ["outcome"],
+};
+
+function hasConsistentProcessingState(event: {
+	isProcessed: boolean;
+	outcome: z.output<typeof EventOutcomeSchema> | null;
+}) {
+	return event.isProcessed === (event.outcome !== null);
+}
+
 export const EventFieldsSchema = z
 	.object(EventFieldsShape)
 	.refine(
 		(event) => event.attackerWarbandId !== event.defenderWarbandId,
 		differentWarbands,
-	);
+	)
+	.refine(hasConsistentProcessingState, processedEventsHaveOutcomes);
 
 export const EventSchema = z
 	.object({
@@ -37,10 +50,19 @@ export const EventSchema = z
 	.refine(
 		(event) => event.attackerWarbandId !== event.defenderWarbandId,
 		differentWarbands,
-	);
+	)
+	.refine(hasConsistentProcessingState, processedEventsHaveOutcomes);
 
-export const EventUpdateSchema = z.object(EventFieldsShape).partial().strict();
+export const EventUpdateSchema = z
+	.object({
+		...EventFieldsShape,
+		outcome: EventOutcomeSchema.nullable(),
+		isProcessed: z.boolean(),
+	})
+	.partial()
+	.strict();
 
+export type EventOutcome = z.output<typeof EventOutcomeSchema>;
 export type Event = z.output<typeof EventSchema>;
 export type EventInput = z.input<typeof EventSchema>;
 
