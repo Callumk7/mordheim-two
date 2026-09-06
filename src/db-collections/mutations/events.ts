@@ -1,8 +1,8 @@
 import { safeRandomUUID } from "@tanstack/react-db";
-import type { Event } from "@/db/event";
+import type { EventInput } from "@/db/event";
 import type { AppCollections } from "..";
 
-type NewEvent = Omit<Event, "id" | "createdAt" | "updatedAt">;
+type NewEvent = Omit<EventInput, "id" | "createdAt" | "updatedAt">;
 type EventChanges = Partial<NewEvent>;
 
 export function createEventTransaction(

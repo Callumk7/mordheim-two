@@ -44,6 +44,8 @@ export function useEvents(dbClient: DbClient) {
 						defenderWarbandId: event.defenderWarbandId,
 						defenderWarriorId: event.defenderWarriorId,
 						notes: event.notes,
+						outcome: event.outcome,
+						processed: event.processed,
 						createdAt: event.createdAt,
 						updatedAt: event.updatedAt,
 						matchName: match.name,

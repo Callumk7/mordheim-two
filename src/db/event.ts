@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+export const EVENT_OUTCOMES = ["Injury", "Death", "Recovery"] as const;
+export const EventOutcomeSchema = z.enum(EVENT_OUTCOMES);
+
 const EventFieldsShape = {
 	matchId: z.string().min(1),
 	attackerWarbandId: z.string().min(1),
@@ -7,6 +10,8 @@ const EventFieldsShape = {
 	defenderWarbandId: z.string().min(1),
 	defenderWarriorId: z.string().min(1),
 	notes: z.string().trim().nullable(),
+	outcome: EventOutcomeSchema.nullable().default(null),
+	processed: z.boolean().default(false),
 };
 
 const differentWarbands = {
@@ -37,6 +42,7 @@ export const EventSchema = z
 export const EventUpdateSchema = z.object(EventFieldsShape).partial().strict();
 
 export type Event = z.output<typeof EventSchema>;
+export type EventInput = z.input<typeof EventSchema>;
 
 export function validateEventMembership(
 	event: Pick<

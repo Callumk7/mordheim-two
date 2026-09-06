@@ -84,6 +84,8 @@ export const updateEvent = createServerFn({ method: "POST" })
 			defenderWarbandId: currentEvent.defenderWarbandId,
 			defenderWarriorId: currentEvent.defenderWarriorId,
 			notes: currentEvent.notes,
+			outcome: currentEvent.outcome,
+			processed: currentEvent.processed,
 			...data.changes,
 		});
 		await assertEventMembership(db, nextEvent);
