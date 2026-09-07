@@ -9,24 +9,35 @@ import type { Warband } from "@/db/warband";
 import type { WarbandMatch } from "@/db/warband-match";
 import type { Warrior } from "@/db/warrior";
 
+type StringKeyedCollection<T extends object> = Collection<
+	T,
+	string,
+	// biome-ignore lint/suspicious/noExplicitAny: Allows arbitrary collection utilities.
+	any,
+	// biome-ignore lint/suspicious/noExplicitAny: Allows arbitrary collection schemas.
+	any,
+	// biome-ignore lint/suspicious/noExplicitAny: Allows arbitrary collection insert inputs.
+	any
+>;
+
 type MatchCollections = {
-	matches: Collection<Match>;
+	matches: StringKeyedCollection<Match>;
 };
 
 type ParticipantCollections = {
-	warbandMatches: Collection<WarbandMatch>;
-	warbands: Collection<Warband>;
+	warbandMatches: StringKeyedCollection<WarbandMatch>;
+	warbands: StringKeyedCollection<Warband>;
 };
 
 type RosterCollections = {
-	warbandMatches: Collection<WarbandMatch>;
-	warriors: Collection<Warrior>;
+	warbandMatches: StringKeyedCollection<WarbandMatch>;
+	warriors: StringKeyedCollection<Warrior>;
 };
 
 type EventCollections = {
-	events: Collection<Event>;
-	warbands: Collection<Warband>;
-	warriors: Collection<Warrior>;
+	events: StringKeyedCollection<Event>;
+	warbands: StringKeyedCollection<Warband>;
+	warriors: StringKeyedCollection<Warrior>;
 };
 
 export function matchQuery({ matches }: MatchCollections, matchId: string) {
