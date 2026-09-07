@@ -35,6 +35,7 @@ export function EventOutcomeForm({
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const selectId = useId();
 
+	// WARN: This looks odd, will need to review this.
 	useEffect(() => setSelectedOutcome(outcome), [outcome]);
 
 	const hasChanges = selectedOutcome !== null && !isResolved;

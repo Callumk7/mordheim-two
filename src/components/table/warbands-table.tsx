@@ -1,4 +1,5 @@
-import { ChevronRight, Users } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { ChevronRight, Trash2, Users } from "lucide-react";
 import { useMemo } from "react";
 import type { Warband } from "#/db/warband";
 import { WARBAND_STATUSES } from "#/db/warband";
@@ -93,6 +94,7 @@ export function WarbandsTable({
 	onUpdate,
 	warbands,
 }: WarbandsTableProps) {
+	const navigate = useNavigate({ from: "/warbands" });
 	const columns = useMemo(
 		() =>
 			columnHelper.columns([
@@ -214,24 +216,24 @@ export function WarbandsTable({
 					enableSorting: false,
 					cell: ({ row }) => (
 						<TableActions>
-							<TableActionLink
-								params={{ warbandId: row.original.id }}
-								to="/warbands/$warbandId"
-							>
-								View
-							</TableActionLink>
-							<TableActionLink
-								params={{ warbandId: row.original.id }}
-								to="/warbands/$warbandId/delete"
+							<Button
+								aria-label={`Delete ${row.original.name}`}
+								onPress={() =>
+									navigate({
+										to: "/warbands/$warbandId/delete",
+										params: { warbandId: row.original.id },
+									})
+								}
+								size="icon-xs"
 								variant="destructive"
 							>
-								Delete
-							</TableActionLink>
+								<Trash2 aria-hidden="true" />
+							</Button>
 						</TableActions>
 					),
 				}),
 			]),
-		[combatStats, onUpdate],
+		[combatStats, onUpdate, navigate],
 	);
 
 	return (
@@ -242,6 +244,12 @@ export function WarbandsTable({
 			emptyMessage="No warbands match your search."
 			initialSorting={[{ id: "name", desc: false }]}
 			itemLabel={{ singular: "warband", plural: "warbands" }}
+			onRowAction={(warband) =>
+				navigate({
+					to: "/warbands/$warbandId",
+					params: { warbandId: warband.id },
+				})
+			}
 			renderExpandedRow={(warband) => (
 				<WarbandWarriors combatStats={combatStats} warband={warband} />
 			)}
