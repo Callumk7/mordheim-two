@@ -72,7 +72,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					<div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-4 sm:px-8">
 						<nav
 							aria-label="Primary navigation"
-							className="flex items-center gap-2 text-sm"
+							className="flex flex-wrap items-center gap-2 text-sm"
 						>
 							<Link
 								activeOptions={{ exact: true }}
@@ -102,6 +102,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 								to="/matches"
 							>
 								Matches
+							</Link>
+							<Link
+								activeProps={{ className: "bg-accent text-primary" }}
+								className="rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
+								to="/stats"
+							>
+								Stats
 							</Link>
 							<Link
 								activeProps={{ className: "bg-accent text-primary" }}

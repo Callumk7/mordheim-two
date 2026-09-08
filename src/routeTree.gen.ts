@@ -19,6 +19,7 @@ import { Route as EventsIndexRouteImport } from './routes/events/index'
 import { Route as EventsEventIdRouteRouteImport } from './routes/events/$eventId/route'
 import { Route as MatchesIndexRouteImport } from './routes/matches/index'
 import { Route as MatchesMatchIdRouteRouteImport } from './routes/matches/$matchId/route'
+import { Route as StatsIndexRouteImport } from './routes/stats/index'
 import { Route as WarbandsIndexRouteImport } from './routes/warbands/index'
 import { Route as WarbandsWarbandIdRouteRouteImport } from './routes/warbands/$warbandId/route'
 import { Route as WarriorsIndexRouteImport } from './routes/warriors/index'
@@ -81,6 +82,11 @@ const MatchesMatchIdRouteRoute = MatchesMatchIdRouteRouteImport.update({
   id: '/$matchId',
   path: '/$matchId',
   getParentRoute: () => MatchesRouteRoute,
+} as any)
+const StatsIndexRoute = StatsIndexRouteImport.update({
+  id: '/stats/',
+  path: '/stats/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const WarbandsIndexRoute = WarbandsIndexRouteImport.update({
   id: '/',
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/warriors/$warriorId': typeof WarriorsWarriorIdRouteRouteWithChildren
   '/events/': typeof EventsIndexRoute
   '/matches/': typeof MatchesIndexRoute
+  '/stats/': typeof StatsIndexRoute
   '/warbands/': typeof WarbandsIndexRoute
   '/warriors/': typeof WarriorsIndexRoute
   '/events/$eventId/delete': typeof EventsEventIdDeleteRoute
@@ -172,6 +179,7 @@ export interface FileRoutesByTo {
   '/demo': typeof DemoRoute
   '/events': typeof EventsIndexRoute
   '/matches': typeof MatchesIndexRoute
+  '/stats': typeof StatsIndexRoute
   '/warbands': typeof WarbandsIndexRoute
   '/warriors': typeof WarriorsIndexRoute
   '/events/$eventId/delete': typeof EventsEventIdDeleteRoute
@@ -197,6 +205,7 @@ export interface FileRoutesById {
   '/warriors/$warriorId': typeof WarriorsWarriorIdRouteRouteWithChildren
   '/events/': typeof EventsIndexRoute
   '/matches/': typeof MatchesIndexRoute
+  '/stats/': typeof StatsIndexRoute
   '/warbands/': typeof WarbandsIndexRoute
   '/warriors/': typeof WarriorsIndexRoute
   '/events/$eventId/delete': typeof EventsEventIdDeleteRoute
@@ -223,6 +232,7 @@ export interface FileRouteTypes {
     | '/warriors/$warriorId'
     | '/events/'
     | '/matches/'
+    | '/stats/'
     | '/warbands/'
     | '/warriors/'
     | '/events/$eventId/delete'
@@ -239,6 +249,7 @@ export interface FileRouteTypes {
     | '/demo'
     | '/events'
     | '/matches'
+    | '/stats'
     | '/warbands'
     | '/warriors'
     | '/events/$eventId/delete'
@@ -263,6 +274,7 @@ export interface FileRouteTypes {
     | '/warriors/$warriorId'
     | '/events/'
     | '/matches/'
+    | '/stats/'
     | '/warbands/'
     | '/warriors/'
     | '/events/$eventId/delete'
@@ -282,6 +294,7 @@ export interface RootRouteChildren {
   WarbandsRouteRoute: typeof WarbandsRouteRouteWithChildren
   WarriorsRouteRoute: typeof WarriorsRouteRouteWithChildren
   DemoRoute: typeof DemoRoute
+  StatsIndexRoute: typeof StatsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -355,6 +368,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/matches/$matchId'
       preLoaderRoute: typeof MatchesMatchIdRouteRouteImport
       parentRoute: typeof MatchesRouteRoute
+    }
+    '/stats/': {
+      id: '/stats/'
+      path: '/stats'
+      fullPath: '/stats/'
+      preLoaderRoute: typeof StatsIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/warbands/': {
       id: '/warbands/'
@@ -564,6 +584,7 @@ const rootRouteChildren: RootRouteChildren = {
   WarbandsRouteRoute: WarbandsRouteRouteWithChildren,
   WarriorsRouteRoute: WarriorsRouteRouteWithChildren,
   DemoRoute: DemoRoute,
+  StatsIndexRoute: StatsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
