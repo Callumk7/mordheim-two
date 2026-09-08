@@ -1,30 +1,32 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Textarea } from "@/components/ui/textarea";
 import { getCollections } from "@/db-collections";
-import { deleteEventTransaction } from "@/db-collections/mutations/events";
+import { voidEventTransaction } from "@/db-collections/mutations/events";
 
 export const Route = createFileRoute("/events/$eventId/delete")({
-	component: DeleteEventPage,
+	component: VoidEventPage,
 });
 
-function DeleteEventPage() {
+function VoidEventPage() {
 	const { eventId } = Route.useParams();
 	const { dbClient } = Route.useRouteContext();
 	const collections = getCollections(dbClient);
-	const { events: eventsCollection } = collections;
 	const navigate = useNavigate({ from: Route.fullPath });
+	const [reason, setReason] = useState("");
 	const [error, setError] = useState<string>();
-	const [isDeleting, setIsDeleting] = useState(false);
+	const [isVoiding, setIsVoiding] = useState(false);
 	const { data } = useLiveQuery({
 		query: (q) =>
 			q
-				.from({ event: eventsCollection })
+				.from({ event: collections.events })
 				.where(({ event }) => eq(event.id, eventId)),
 	});
 	const event = data[0];
-
-	if (!event && !isDeleting) return null;
+	if (!event && !isVoiding) return null;
 
 	return (
 		<div className="mx-auto max-w-2xl">
@@ -35,36 +37,37 @@ function DeleteEventPage() {
 			>
 				← Cancel
 			</Link>
-
 			<section className="mt-7 rounded-xl border border-destructive/50 bg-destructive/10 p-7">
 				<p className="text-xs font-semibold uppercase tracking-[0.28em] text-destructive">
-					Destructive action
+					Historical correction
 				</p>
 				<h1 className="mt-3 font-serif text-4xl font-semibold text-foreground">
-					Delete this event?
+					Void this event?
 				</h1>
 				<p className="mt-3 max-w-xl text-muted-foreground">
-					This permanently removes the knock down from the match record. This
-					action cannot be undone.
+					The event remains in history but no longer contributes to combat
+					stats. Create a new event afterward if a replacement is needed.
 				</p>
-
-				{error ? (
-					<p className="mt-5 rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-						{error}
-					</p>
-				) : null}
-
+				<Field className="mt-6">
+					<FieldLabel>Reason</FieldLabel>
+					<Textarea
+						onChange={(event) => setReason(event.target.value)}
+						placeholder="Why is this event being voided?"
+						value={reason}
+					/>
+				</Field>
+				<FieldError className="mt-3">{error}</FieldError>
 				<div className="mt-7 flex flex-wrap gap-3">
-					<button
-						className="rounded-lg bg-destructive px-5 py-2.5 font-semibold text-destructive-foreground transition hover:bg-destructive/90 disabled:cursor-not-allowed disabled:opacity-50"
-						disabled={isDeleting || !event}
-						onClick={async () => {
+					<Button
+						isDisabled={isVoiding || !event || !reason.trim()}
+						onPress={async () => {
 							setError(undefined);
-							setIsDeleting(true);
+							setIsVoiding(true);
 							try {
-								const transaction = deleteEventTransaction(
+								const transaction = voidEventTransaction(
 									collections,
 									eventId,
+									reason,
 								);
 								await transaction.isPersisted.promise;
 								await navigate({ to: "/events" });
@@ -72,17 +75,17 @@ function DeleteEventPage() {
 								setError(
 									cause instanceof Error
 										? cause.message
-										: "Unable to delete event.",
+										: "Unable to void event.",
 								);
-								setIsDeleting(false);
+								setIsVoiding(false);
 							}
 						}}
-						type="button"
+						variant="destructive"
 					>
-						{isDeleting ? "Deleting…" : "Delete event"}
-					</button>
+						{isVoiding ? "Voiding…" : "Void event"}
+					</Button>
 					<Link
-						className="rounded-lg border border-input px-5 py-2.5 font-semibold text-foreground hover:border-ring hover:text-foreground"
+						className="rounded-lg border border-input px-5 py-2.5 font-semibold text-foreground hover:border-ring"
 						params={{ eventId }}
 						to="/events/$eventId"
 					>

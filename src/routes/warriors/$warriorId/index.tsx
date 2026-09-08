@@ -2,6 +2,10 @@ import { eq, or, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { getCollections } from "@/db-collections";
 import { updateWarriorTransaction } from "@/db-collections/mutations/warriors";
+import {
+	getWarriorCombatStats,
+	projectCombatStats,
+} from "@/db-collections/projections";
 import { Card, CardContent } from "../../../components/ui/card";
 import { WarriorForm } from "../../../components/warrior-form";
 
@@ -42,6 +46,10 @@ function WarriorDetailPage() {
 				.orderBy(({ warband }) => warband.name),
 	});
 	const warrior = warriors[0];
+	const combat = getWarriorCombatStats(
+		projectCombatStats(eventReferences),
+		warriorId,
+	);
 	const warband = warbands.find(
 		(candidate) => candidate.id === warrior?.warbandId,
 	);
@@ -80,6 +88,27 @@ function WarriorDetailPage() {
 
 			<Card className="mt-7">
 				<CardContent>
+					<h2 className="font-serif text-2xl text-foreground">Combat stats</h2>
+					<dl className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
+						<Stat label="Status" value={combat.isDead ? "Dead" : "Alive"} />
+						<Stat label="Knockdowns given" value={combat.knockdownsGiven} />
+						<Stat label="Knockdowns taken" value={combat.knockdownsTaken} />
+						<Stat label="Injuries given" value={combat.injuriesGiven} />
+						<Stat label="Injuries taken" value={combat.injuriesTaken} />
+						<Stat label="Deaths given" value={combat.deathsGiven} />
+					</dl>
+				</CardContent>
+			</Card>
+
+			<Card className="mt-7">
+				<CardContent>
+					<h2 className="mb-2 font-serif text-2xl text-foreground">
+						Profile and manual non-combat baseline
+					</h2>
+					<p className="mb-6 text-sm text-muted-foreground">
+						Legacy injury and knockdown values are kept separately and do not
+						alter combat stats.
+					</p>
 					<WarriorForm
 						initialValues={warrior}
 						isWarbandLocked={eventReferences.length > 0}
@@ -97,6 +126,15 @@ function WarriorDetailPage() {
 					/>
 				</CardContent>
 			</Card>
+		</div>
+	);
+}
+
+function Stat({ label, value }: { label: string; value: number | string }) {
+	return (
+		<div className="rounded-xl bg-muted/40 p-3">
+			<dt className="text-xs text-muted-foreground">{label}</dt>
+			<dd className="mt-1 font-mono text-foreground">{value}</dd>
 		</div>
 	);
 }

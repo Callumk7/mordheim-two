@@ -3,6 +3,11 @@ import { useMemo } from "react";
 import type { Warband } from "#/db/warband";
 import { WARBAND_STATUSES } from "#/db/warband";
 import type { Warrior } from "@/db/warrior";
+import {
+	type CombatStatsProjection,
+	getWarbandCombatStats,
+	getWarriorCombatStats,
+} from "@/db-collections/projections";
 import { Button } from "../ui/button";
 import { TableActionLink, TableActions } from "../ui/table";
 import {
@@ -21,11 +26,18 @@ export type WarbandInlineUpdate = Partial<
 >;
 
 interface WarbandsTableProps {
+	combatStats: CombatStatsProjection;
 	onUpdate: (id: string, changes: WarbandInlineUpdate) => Promise<void>;
 	warbands: WarbandWithWarriors[];
 }
 
-function WarbandWarriors({ warband }: { warband: WarbandWithWarriors }) {
+function WarbandWarriors({
+	combatStats,
+	warband,
+}: {
+	combatStats: CombatStatsProjection;
+	warband: WarbandWithWarriors;
+}) {
 	const warriors = warband.warriors;
 
 	return (
@@ -36,33 +48,36 @@ function WarbandWarriors({ warband }: { warband: WarbandWithWarriors }) {
 			</div>
 			{warriors.length ? (
 				<div className="grid gap-2">
-					{warriors.map((warrior) => (
-						<div
-							className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 rounded-lg border border-border bg-background px-3 py-2 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto]"
-							key={warrior.id}
-						>
-							<div className="min-w-0">
-								<p className="truncate font-medium text-foreground">
-									{warrior.name}
-								</p>
-								<p className="truncate text-xs text-muted-foreground">
-									{warrior.class} · {warrior.status}
-								</p>
-							</div>
-							<span className="hidden text-xs text-muted-foreground sm:block">
-								{warrior.injuries} injuries
-							</span>
-							<span className="hidden text-xs text-muted-foreground sm:block">
-								{warrior.knockedDowns} knock downs
-							</span>
-							<TableActionLink
-								params={{ warriorId: warrior.id }}
-								to="/warriors/$warriorId"
+					{warriors.map((warrior) => {
+						const stats = getWarriorCombatStats(combatStats, warrior.id);
+						return (
+							<div
+								className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 rounded-lg border border-border bg-background px-3 py-2 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto]"
+								key={warrior.id}
 							>
-								View
-							</TableActionLink>
-						</div>
-					))}
+								<div className="min-w-0">
+									<p className="truncate font-medium text-foreground">
+										{warrior.name}
+									</p>
+									<p className="truncate text-xs text-muted-foreground">
+										{warrior.class} · {stats.isDead ? "Dead" : "Alive"}
+									</p>
+								</div>
+								<span className="hidden text-xs text-muted-foreground sm:block">
+									{stats.injuriesTaken} injuries
+								</span>
+								<span className="hidden text-xs text-muted-foreground sm:block">
+									{stats.knockdownsTaken} knockdowns
+								</span>
+								<TableActionLink
+									params={{ warriorId: warrior.id }}
+									to="/warriors/$warriorId"
+								>
+									View
+								</TableActionLink>
+							</div>
+						);
+					})}
 				</div>
 			) : (
 				<p className="text-sm text-muted-foreground">
@@ -73,7 +88,11 @@ function WarbandWarriors({ warband }: { warband: WarbandWithWarriors }) {
 	);
 }
 
-export function WarbandsTable({ onUpdate, warbands }: WarbandsTableProps) {
+export function WarbandsTable({
+	combatStats,
+	onUpdate,
+	warbands,
+}: WarbandsTableProps) {
 	const columns = useMemo(
 		() =>
 			columnHelper.columns([
@@ -163,6 +182,15 @@ export function WarbandsTable({ onUpdate, warbands }: WarbandsTableProps) {
 						/>
 					),
 				}),
+				columnHelper.accessor(
+					(warband) =>
+						getWarbandCombatStats(combatStats, warband.id).deathsGiven,
+					{
+						id: "deathsGiven",
+						header: "Deaths given",
+						meta: { align: "end" },
+					},
+				),
 				columnHelper.accessor("rating", {
 					header: "Rating",
 					meta: { align: "end" },
@@ -203,7 +231,7 @@ export function WarbandsTable({ onUpdate, warbands }: WarbandsTableProps) {
 					),
 				}),
 			]),
-		[onUpdate],
+		[combatStats, onUpdate],
 	);
 
 	return (
@@ -214,7 +242,9 @@ export function WarbandsTable({ onUpdate, warbands }: WarbandsTableProps) {
 			emptyMessage="No warbands match your search."
 			initialSorting={[{ id: "name", desc: false }]}
 			itemLabel={{ singular: "warband", plural: "warbands" }}
-			renderExpandedRow={(warband) => <WarbandWarriors warband={warband} />}
+			renderExpandedRow={(warband) => (
+				<WarbandWarriors combatStats={combatStats} warband={warband} />
+			)}
 			searchPlaceholder="Search warbands…"
 			tableClassName="min-w-180"
 		/>

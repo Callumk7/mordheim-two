@@ -20,11 +20,11 @@ import {
 } from "@/db/event";
 
 export function EventOutcomeForm({
-	isProcessed,
+	isResolved,
 	onSubmit,
 	outcome,
 }: {
-	isProcessed: boolean;
+	isResolved: boolean;
 	onSubmit: (outcome: EventOutcome) => Promise<void>;
 	outcome: EventOutcome | null;
 }) {
@@ -37,8 +37,7 @@ export function EventOutcomeForm({
 
 	useEffect(() => setSelectedOutcome(outcome), [outcome]);
 
-	const hasChanges =
-		selectedOutcome !== null && (!isProcessed || selectedOutcome !== outcome);
+	const hasChanges = selectedOutcome !== null && !isResolved;
 
 	return (
 		<section aria-labelledby="event-outcome-heading" className="grid gap-5">
@@ -55,7 +54,7 @@ export function EventOutcomeForm({
 					</p>
 				</div>
 				<span className="rounded-full border border-border bg-muted/40 px-2.5 py-1 text-xs font-medium text-muted-foreground">
-					{isProcessed ? "Processed" : "Unprocessed"}
+					{isResolved ? "Resolved" : "Unresolved"}
 				</span>
 			</div>
 
@@ -84,6 +83,7 @@ export function EventOutcomeForm({
 					<FieldLabel htmlFor={selectId}>Event outcome</FieldLabel>
 					<Select
 						className="w-full"
+						isDisabled={isResolved}
 						isRequired
 						onChange={(key) => {
 							if (key !== null) {
@@ -106,17 +106,13 @@ export function EventOutcomeForm({
 						</SelectContent>
 					</Select>
 					<FieldDescription>
-						{isProcessed
-							? "Select a different result to correct this event."
-							: "Saving an outcome marks this event as processed."}
+						{isResolved
+							? "Resolved outcomes are immutable. Void and replace the event to correct it."
+							: "Saving an outcome permanently resolves this event."}
 					</FieldDescription>
 				</Field>
 				<Button isDisabled={isSubmitting || !hasChanges} type="submit">
-					{isSubmitting
-						? "Saving…"
-						: isProcessed
-							? "Update outcome"
-							: "Process event"}
+					{isSubmitting ? "Saving…" : "Resolve event"}
 				</Button>
 				<FieldError className="sm:col-span-2">{error}</FieldError>
 			</form>

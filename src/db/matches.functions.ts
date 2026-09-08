@@ -105,8 +105,15 @@ export const deleteMatch = createServerFn({ method: "POST" })
 	.validator(z.object({ id: z.string().min(1) }))
 	.handler(async ({ data }) => {
 		const db = getDb();
+		const referenced = await db
+			.select({ id: events.id })
+			.from(events)
+			.where(eq(events.matchId, data.id))
+			.limit(1);
+		if (referenced.length > 0) {
+			throw new Error("This match has event history and cannot be deleted.");
+		}
 		await db.batch([
-			db.delete(events).where(eq(events.matchId, data.id)),
 			db.delete(warbandMatches).where(eq(warbandMatches.matchId, data.id)),
 			db.delete(matches).where(eq(matches.id, data.id)),
 		]);

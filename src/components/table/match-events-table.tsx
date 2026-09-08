@@ -66,7 +66,10 @@ function createColumns(
 			id: "outcome",
 			header: "Outcome",
 			cell: ({ row }) =>
-				row.original.isProcessed ? (
+				row.original.voidedAt ? (
+					<span className="text-muted-foreground">Voided</span>
+				) : row.original.outcome !== null &&
+					row.original.resolvedAt !== null ? (
 					<span className="font-medium text-foreground">
 						{row.original.outcome}
 					</span>
@@ -105,13 +108,15 @@ function createColumns(
 					>
 						View
 					</TableActionLink>
-					<TableActionLink
-						params={{ eventId: row.original.id }}
-						to="/events/$eventId/delete"
-						variant="destructive"
-					>
-						Delete
-					</TableActionLink>
+					{row.original.voidedAt === null ? (
+						<TableActionLink
+							params={{ eventId: row.original.id }}
+							to="/events/$eventId/delete"
+							variant="destructive"
+						>
+							Void
+						</TableActionLink>
+					) : null}
 				</TableActions>
 			),
 		}),

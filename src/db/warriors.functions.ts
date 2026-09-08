@@ -38,15 +38,20 @@ export const deleteWarrior = createServerFn({ method: "POST" })
 	.validator(z.object({ id: z.string().min(1) }))
 	.handler(async ({ data }) => {
 		const db = getDb();
-		await db.batch([
-			db
-				.delete(events)
-				.where(
-					or(
-						eq(events.attackerWarriorId, data.id),
-						eq(events.defenderWarriorId, data.id),
-					),
+		const referenced = await db
+			.select({ id: events.id })
+			.from(events)
+			.where(
+				or(
+					eq(events.attackerWarriorId, data.id),
+					eq(events.defenderWarriorId, data.id),
 				),
-			db.delete(warriors).where(eq(warriors.id, data.id)),
-		]);
+			)
+			.limit(1);
+		if (referenced.length > 0) {
+			throw new Error(
+				"This warrior is part of event history and cannot be deleted.",
+			);
+		}
+		await db.delete(warriors).where(eq(warriors.id, data.id));
 	});

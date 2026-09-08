@@ -132,7 +132,7 @@ export function WarriorForm({
 					) : null}
 				</Field>
 				<Field>
-					<FieldLabel htmlFor={statusId}>Status</FieldLabel>
+					<FieldLabel htmlFor={statusId}>Manual / non-combat status</FieldLabel>
 					<Select
 						className="w-full"
 						name="status"
@@ -160,7 +160,7 @@ export function WarriorForm({
 				</Field>
 				<NumberField
 					isRequired
-					label="Knocked"
+					label="Manual knockdowns taken"
 					minValue={0}
 					name="knocked"
 					onChange={(knocked) =>
@@ -170,7 +170,7 @@ export function WarriorForm({
 				/>
 				<NumberField
 					isRequired
-					label="Injuries"
+					label="Manual injuries taken"
 					minValue={0}
 					name="injuries"
 					onChange={(injuries) =>
@@ -180,7 +180,7 @@ export function WarriorForm({
 				/>
 				<NumberField
 					isRequired
-					label="Knock downs"
+					label="Manual knockdowns given"
 					minValue={0}
 					name="knockedDowns"
 					onChange={(knockedDowns) =>

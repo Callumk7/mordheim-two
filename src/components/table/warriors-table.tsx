@@ -2,22 +2,33 @@ import { useNavigate } from "@tanstack/react-router";
 import { Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import type { Warrior } from "@/db/warrior";
+import {
+	type CombatStatsProjection,
+	getWarriorCombatStats,
+	type WarriorCombatStats,
+} from "@/db-collections/projections";
 import { Button } from "../ui/button";
 import { TableActions } from "../ui/table";
 import { createDataTableColumnHelper, DataTable } from "./data-table";
 
 type WarriorTableRow = Warrior & {
+	combat: WarriorCombatStats;
 	warbandName: string;
 };
 
 const columnHelper = createDataTableColumnHelper<WarriorTableRow>();
 
 interface WarriorsTableProps {
+	combatStats: CombatStatsProjection;
 	warbandNames: Map<string, string>;
 	warriors: Warrior[];
 }
 
-export function WarriorsTable({ warbandNames, warriors }: WarriorsTableProps) {
+export function WarriorsTable({
+	combatStats,
+	warbandNames,
+	warriors,
+}: WarriorsTableProps) {
 	const navigate = useNavigate({ from: "/warriors" });
 	const columns = useMemo(
 		() =>
@@ -38,20 +49,29 @@ export function WarriorsTable({ warbandNames, warriors }: WarriorsTableProps) {
 					),
 				}),
 				columnHelper.accessor("warbandName", { header: "Warband" }),
-				columnHelper.accessor("status", { header: "Status" }),
-				columnHelper.accessor("injuries", {
-					header: "Injuries",
+				columnHelper.accessor(
+					(row) => (row.combat.isDead ? "Dead" : row.status),
+					{ id: "status", header: "Status" },
+				),
+				columnHelper.accessor((row) => row.combat.injuriesGiven, {
+					id: "injuriesGiven",
+					header: "Injuries given",
 					meta: { align: "end" },
-					cell: ({ getValue }) => (
-						<span className="font-mono text-primary">{getValue()}</span>
-					),
 				}),
-				columnHelper.accessor("knockedDowns", {
-					header: "Knock downs",
+				columnHelper.accessor((row) => row.combat.injuriesTaken, {
+					id: "injuriesTaken",
+					header: "Injuries taken",
 					meta: { align: "end" },
-					cell: ({ getValue }) => (
-						<span className="font-mono text-primary">{getValue()}</span>
-					),
+				}),
+				columnHelper.accessor((row) => row.combat.knockdownsGiven, {
+					id: "knockdownsGiven",
+					header: "KDs given",
+					meta: { align: "end" },
+				}),
+				columnHelper.accessor((row) => row.combat.knockdownsTaken, {
+					id: "knockdownsTaken",
+					header: "KDs taken",
+					meta: { align: "end" },
 				}),
 				columnHelper.display({
 					id: "actions",
@@ -84,9 +104,10 @@ export function WarriorsTable({ warbandNames, warriors }: WarriorsTableProps) {
 		() =>
 			warriors.map((warrior) => ({
 				...warrior,
+				combat: getWarriorCombatStats(combatStats, warrior.id),
 				warbandName: warbandNames.get(warrior.warbandId) ?? "Unknown warband",
 			})),
-		[warbandNames, warriors],
+		[combatStats, warbandNames, warriors],
 	);
 
 	return (
