@@ -78,11 +78,9 @@ function DeleteWarbandPage() {
 					Delete {warband?.name ?? "warband"}?
 				</h1>
 				<p className="mt-3 max-w-xl text-muted-foreground">
-					This permanently removes the warband, {warriorRows.length} warrior
-					{warriorRows.length === 1 ? "" : "s"}, {participantRows.length} match
-					link{participantRows.length === 1 ? "" : "s"}, and {eventIds.length}{" "}
-					event
-					{eventIds.length === 1 ? "" : "s"}. Matches are kept.
+					{eventIds.length > 0
+						? "This warband cannot be deleted because its event history is retained."
+						: `This permanently removes the warband, ${warriorRows.length} warrior${warriorRows.length === 1 ? "" : "s"}, and ${participantRows.length} match link${participantRows.length === 1 ? "" : "s"}. Matches are kept.`}
 				</p>
 
 				{error ? (
@@ -94,7 +92,7 @@ function DeleteWarbandPage() {
 				<div className="mt-7 flex flex-wrap gap-3">
 					<button
 						className="rounded-lg bg-destructive px-5 py-2.5 font-semibold text-destructive-foreground transition hover:bg-destructive/90 disabled:cursor-not-allowed disabled:opacity-50"
-						disabled={isDeleting || !warband}
+						disabled={isDeleting || !warband || eventIds.length > 0}
 						onClick={async () => {
 							setError(undefined);
 							setIsDeleting(true);
@@ -122,7 +120,11 @@ function DeleteWarbandPage() {
 						}}
 						type="button"
 					>
-						{isDeleting ? "Deleting…" : "Delete warband"}
+						{eventIds.length > 0
+							? "Event history prevents deletion"
+							: isDeleting
+								? "Deleting…"
+								: "Delete warband"}
 					</button>
 					<Link
 						className="rounded-lg border border-input px-5 py-2.5 font-semibold text-foreground hover:border-ring hover:text-foreground"

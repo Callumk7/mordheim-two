@@ -68,18 +68,6 @@ export function voidEventTransaction(
 	});
 }
 
-/** Void-and-replace correction. The replacement is always a new unresolved fact. */
-export async function correctEvent(
-	collections: AppCollections,
-	eventId: string,
-	reason: string,
-	replacement: NewEvent,
-) {
-	const voiding = voidEventTransaction(collections, eventId, reason);
-	await voiding.isPersisted.promise;
-	return createEventTransaction(collections, replacement);
-}
-
 /** @deprecated Historical events must be voided, not deleted. */
 export function deleteEventTransaction(
 	collections: AppCollections,
