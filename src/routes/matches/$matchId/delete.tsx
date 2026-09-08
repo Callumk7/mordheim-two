@@ -60,12 +60,9 @@ function DeleteMatchPage() {
 					Delete {match?.name ?? "match"}?
 				</h1>
 				<p className="mt-3 max-w-xl text-muted-foreground">
-					This permanently removes the match, {participantRows.length}{" "}
-					participant
-					{participantRows.length === 1 ? " link" : " links"}, and{" "}
-					{eventRows.length}
-					event{eventRows.length === 1 ? "" : "s"}. Warbands and warriors are
-					kept.
+					{eventRows.length > 0
+						? "This match cannot be deleted because its event history is retained."
+						: `This permanently removes the match and ${participantRows.length} participant link${participantRows.length === 1 ? "" : "s"}. Warbands and warriors are kept.`}
 				</p>
 
 				{error ? (
@@ -77,7 +74,7 @@ function DeleteMatchPage() {
 				<div className="mt-7 flex flex-wrap gap-3">
 					<button
 						className="rounded-lg bg-destructive px-5 py-2.5 font-semibold text-destructive-foreground transition hover:bg-destructive/90 disabled:cursor-not-allowed disabled:opacity-50"
-						disabled={isDeleting || !match}
+						disabled={isDeleting || !match || eventRows.length > 0}
 						onClick={async () => {
 							setError(undefined);
 							setIsDeleting(true);
@@ -102,7 +99,11 @@ function DeleteMatchPage() {
 						}}
 						type="button"
 					>
-						{isDeleting ? "Deleting…" : "Delete match"}
+						{eventRows.length > 0
+							? "Event history prevents deletion"
+							: isDeleting
+								? "Deleting…"
+								: "Delete match"}
 					</button>
 					<Link
 						className="rounded-lg border border-input px-5 py-2.5 font-semibold text-foreground hover:border-ring hover:text-foreground"

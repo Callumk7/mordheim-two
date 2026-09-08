@@ -5,6 +5,7 @@ import {
 	getWarriorsForWarband,
 } from "../../lib/event-options";
 import {
+	EventCreateSchema,
 	EventSchema,
 	EventUpdateSchema,
 	validateEventMembership,
@@ -36,11 +37,12 @@ describe("event relations", () => {
 		).toBe(false);
 	});
 
-	it("requires outcomes and processing state to change together", () => {
+	it("requires consistent resolution and void lifecycle fields", () => {
 		expect(
 			EventSchema.safeParse({
 				...validEvent,
 				outcome: "Injury",
+				resolvedAt: "2026-01-01T00:00:00.000Z",
 				isProcessed: true,
 			}).success,
 		).toBe(true);
@@ -48,13 +50,31 @@ describe("event relations", () => {
 			EventSchema.safeParse({
 				...validEvent,
 				outcome: "Injury",
-				isProcessed: false,
+				resolvedAt: null,
 			}).success,
 		).toBe(false);
 		expect(
 			EventSchema.safeParse({
 				...validEvent,
-				outcome: null,
+				voidedAt: "2026-01-01T00:00:00.000Z",
+				voidReason: "Wrong defender",
+			}).success,
+		).toBe(true);
+		expect(
+			EventSchema.safeParse({
+				...validEvent,
+				voidedAt: "2026-01-01T00:00:00.000Z",
+			}).success,
+		).toBe(false);
+	});
+
+	it("only permits unresolved, active event creation", () => {
+		expect(EventCreateSchema.safeParse(validEvent).success).toBe(true);
+		expect(
+			EventCreateSchema.safeParse({
+				...validEvent,
+				outcome: "Death",
+				resolvedAt: "2026-01-01T00:00:00.000Z",
 				isProcessed: true,
 			}).success,
 		).toBe(false);
@@ -111,6 +131,13 @@ describe("event relations", () => {
 			warriorConfig.indexes.some(
 				(index) =>
 					index.config.name === "warriors_warband_id_unique" &&
+					index.config.unique,
+			),
+		).toBe(true);
+		expect(
+			eventConfig.indexes.some(
+				(index) =>
+					index.config.name === "events_effective_death_defender_unique" &&
 					index.config.unique,
 			),
 		).toBe(true);

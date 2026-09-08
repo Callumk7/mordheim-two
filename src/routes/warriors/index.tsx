@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { getCollections } from "@/db-collections";
 import { createWarriorTransaction } from "@/db-collections/mutations/warriors";
+import { useCombatStats } from "@/db-collections/queries";
 import {
 	IndexEmptyState,
 	IndexPage,
@@ -26,6 +27,7 @@ function WarriorsIndexPage() {
 	const [isNewWarriorOpen, setIsNewWarriorOpen] = useState(false);
 	const { dbClient } = Route.useRouteContext();
 	const collections = getCollections(dbClient);
+	const combatStats = useCombatStats(dbClient);
 	const { warbands: warbandsCollection, warriors: warriorsCollection } =
 		collections;
 	const { data: warriors } = useLiveQuery({
@@ -64,7 +66,11 @@ function WarriorsIndexPage() {
 			/>
 
 			{warriors.length ? (
-				<WarriorsTable warbandNames={warbandNames} warriors={warriors} />
+				<WarriorsTable
+					combatStats={combatStats}
+					warbandNames={warbandNames}
+					warriors={warriors}
+				/>
 			) : (
 				<IndexEmptyState
 					action={

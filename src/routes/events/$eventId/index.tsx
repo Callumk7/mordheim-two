@@ -62,13 +62,15 @@ function EventDetailPage() {
 				>
 					← Events
 				</Link>
-				<Link
-					className="text-sm text-destructive/80 hover:text-destructive"
-					params={{ eventId }}
-					to="/events/$eventId/delete"
-				>
-					Delete event
-				</Link>
+				{event.voidedAt === null ? (
+					<Link
+						className="text-sm text-destructive/80 hover:text-destructive"
+						params={{ eventId }}
+						to="/events/$eventId/delete"
+					>
+						Void event
+					</Link>
+				) : null}
 			</div>
 
 			<header className="mt-7 border-b border-border pb-6">
@@ -85,37 +87,45 @@ function EventDetailPage() {
 
 			<Card className="mt-7">
 				<CardContent className="grid gap-8">
-					<EventOutcomeForm
-						isProcessed={event.isProcessed}
-						onSubmit={async (outcome) => {
-							const transaction = setEventOutcomeTransaction(
-								collections,
-								event.id,
-								outcome,
-							);
-							await transaction.isPersisted.promise;
-						}}
-						outcome={event.outcome}
-					/>
-					<div className="border-t border-border pt-8">
-						<EventForm
-							initialValues={event}
-							key={event.id}
-							matches={eligibleMatches}
-							onSubmit={async (values) => {
-								const transaction = updateEventTransaction(
+					{event.voidedAt ? (
+						<p className="rounded-xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+							Voided: {event.voidReason}
+						</p>
+					) : (
+						<EventOutcomeForm
+							isResolved={event.outcome !== null && event.resolvedAt !== null}
+							onSubmit={async (outcome) => {
+								const transaction = setEventOutcomeTransaction(
 									collections,
 									event.id,
-									values,
+									outcome,
 								);
 								await transaction.isPersisted.promise;
 							}}
-							participants={participantRows}
-							submitLabel="Save changes"
-							warbands={warbandRows}
-							warriors={warriorRows}
+							outcome={event.outcome}
 						/>
-					</div>
+					)}
+					{event.outcome === null && event.voidedAt === null ? (
+						<div className="border-t border-border pt-8">
+							<EventForm
+								initialValues={event}
+								key={event.id}
+								matches={eligibleMatches}
+								onSubmit={async (values) => {
+									const transaction = updateEventTransaction(
+										collections,
+										event.id,
+										values,
+									);
+									await transaction.isPersisted.promise;
+								}}
+								participants={participantRows}
+								submitLabel="Save changes"
+								warbands={warbandRows}
+								warriors={warriorRows}
+							/>
+						</div>
+					) : null}
 				</CardContent>
 			</Card>
 		</div>

@@ -17,6 +17,11 @@ import {
 	createWarriorTransaction,
 	updateWarriorTransaction,
 } from "@/db-collections/mutations/warriors";
+import {
+	getWarbandCombatStats,
+	getWarriorCombatStats,
+} from "@/db-collections/projections";
+import { useCombatStats } from "@/db-collections/queries";
 
 export const Route = createFileRoute("/warbands/$warbandId/")({
 	component: WarbandDetailPage,
@@ -29,6 +34,8 @@ function WarbandDetailPage() {
 	const { warbandId } = Route.useParams();
 	const { dbClient } = Route.useRouteContext();
 	const collections = getCollections(dbClient);
+	const combatStats = useCombatStats(dbClient);
+	const warbandCombat = getWarbandCombatStats(combatStats, warbandId);
 	const { warbands: warbandsCollection, warriors: warriorsCollection } =
 		collections;
 	const { data: warbands } = useLiveQuery({
@@ -103,6 +110,22 @@ function WarbandDetailPage() {
 						<Detail label="Rating" value={warband.rating} />
 						<Detail label="Wins" value={warband.wins} />
 					</dl>
+					<h2 className="mt-8 font-serif text-2xl text-foreground">
+						Combat stats
+					</h2>
+					<dl className="mt-4 grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
+						<Detail label="KDs given" value={warbandCombat.knockdownsGiven} />
+						<Detail label="KDs taken" value={warbandCombat.knockdownsTaken} />
+						<Detail
+							label="Injuries given"
+							value={warbandCombat.injuriesGiven}
+						/>
+						<Detail
+							label="Injuries taken"
+							value={warbandCombat.injuriesTaken}
+						/>
+						<Detail label="Deaths given" value={warbandCombat.deathsGiven} />
+					</dl>
 				</CardContent>
 			</Card>
 
@@ -124,53 +147,58 @@ function WarbandDetailPage() {
 
 				{warriors.length ? (
 					<ul className="mt-5 divide-y divide-border overflow-hidden rounded-2xl bg-card ring-1 ring-foreground/10">
-						{warriors.map((warrior) => (
-							<li
-								className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:justify-between"
-								key={warrior.id}
-							>
-								<div>
-									<Link
-										className="font-serif text-xl font-semibold text-foreground hover:text-primary"
-										params={{ warriorId: warrior.id }}
-										to="/warriors/$warriorId"
-									>
-										{warrior.name}
-									</Link>
-									<p className="mt-1 text-sm text-muted-foreground">
-										{warrior.class} · {warrior.status}
-									</p>
-								</div>
-								<div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
-									<span>
-										<span className="text-muted-foreground">Injuries </span>
-										<span className="font-mono text-primary">
-											{warrior.injuries}
+						{warriors.map((warrior) => {
+							const combat = getWarriorCombatStats(combatStats, warrior.id);
+							return (
+								<li
+									className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:justify-between"
+									key={warrior.id}
+								>
+									<div>
+										<Link
+											className="font-serif text-xl font-semibold text-foreground hover:text-primary"
+											params={{ warriorId: warrior.id }}
+											to="/warriors/$warriorId"
+										>
+											{warrior.name}
+										</Link>
+										<p className="mt-1 text-sm text-muted-foreground">
+											{warrior.class} · {combat.isDead ? "Dead" : "Alive"}
+										</p>
+									</div>
+									<div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+										<span>
+											<span className="text-muted-foreground">Injuries </span>
+											<span className="font-mono text-primary">
+												{combat.injuriesTaken}
+											</span>
 										</span>
-									</span>
-									<span>
-										<span className="text-muted-foreground">Knock downs </span>
-										<span className="font-mono text-primary">
-											{warrior.knockedDowns}
+										<span>
+											<span className="text-muted-foreground">
+												Knock downs{" "}
+											</span>
+											<span className="font-mono text-primary">
+												{combat.knockdownsTaken}
+											</span>
 										</span>
-									</span>
-									<Link
-										className="text-muted-foreground hover:text-foreground"
-										params={{ warriorId: warrior.id }}
-										to="/warriors/$warriorId"
-									>
-										View
-									</Link>
-									<Button
-										size="sm"
-										variant="outline"
-										onPress={() => setEditingWarriorId(warrior.id)}
-									>
-										Edit
-									</Button>
-								</div>
-							</li>
-						))}
+										<Link
+											className="text-muted-foreground hover:text-foreground"
+											params={{ warriorId: warrior.id }}
+											to="/warriors/$warriorId"
+										>
+											View
+										</Link>
+										<Button
+											size="sm"
+											variant="outline"
+											onPress={() => setEditingWarriorId(warrior.id)}
+										>
+											Edit
+										</Button>
+									</div>
+								</li>
+							);
+						})}
 					</ul>
 				) : (
 					<Card className="mt-5 border border-dashed border-border">

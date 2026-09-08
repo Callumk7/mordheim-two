@@ -38,15 +38,22 @@ export const deleteWarband = createServerFn({ method: "POST" })
 	.validator(z.object({ id: z.string().min(1) }))
 	.handler(async ({ data }) => {
 		const db = getDb();
-		await db.batch([
-			db
-				.delete(events)
-				.where(
-					or(
-						eq(events.attackerWarbandId, data.id),
-						eq(events.defenderWarbandId, data.id),
-					),
+		const referenced = await db
+			.select({ id: events.id })
+			.from(events)
+			.where(
+				or(
+					eq(events.attackerWarbandId, data.id),
+					eq(events.defenderWarbandId, data.id),
 				),
+			)
+			.limit(1);
+		if (referenced.length > 0) {
+			throw new Error(
+				"This warband is part of event history and cannot be deleted.",
+			);
+		}
+		await db.batch([
 			db.delete(warbandMatches).where(eq(warbandMatches.warbandId, data.id)),
 			db.delete(warriors).where(eq(warriors.warbandId, data.id)),
 			db.delete(warbands).where(eq(warbands.id, data.id)),

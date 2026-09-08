@@ -17,6 +17,7 @@ import {
 	createWarbandTransaction,
 	updateWarbandTransaction,
 } from "@/db-collections/mutations/warbands";
+import { useCombatStats } from "@/db-collections/queries";
 import { useWarbands } from "@/db-collections/queries/warbands";
 import {
 	IndexEmptyState,
@@ -41,6 +42,7 @@ function WarbandsIndexPage() {
 	const [isNewWarbandOpen, setIsNewWarbandOpen] = useState(false);
 	const { dbClient } = Route.useRouteContext();
 	const collections = getCollections(dbClient);
+	const combatStats = useCombatStats(dbClient);
 	const warbands = useWarbands(dbClient);
 	const updateWarband = async (id: string, changes: WarbandInlineUpdate) => {
 		const transaction = updateWarbandTransaction(collections, id, changes);
@@ -58,7 +60,11 @@ function WarbandsIndexPage() {
 			/>
 
 			{warbands.length ? (
-				<WarbandsTable onUpdate={updateWarband} warbands={warbands} />
+				<WarbandsTable
+					combatStats={combatStats}
+					onUpdate={updateWarband}
+					warbands={warbands}
+				/>
 			) : (
 				<IndexEmptyState
 					action={

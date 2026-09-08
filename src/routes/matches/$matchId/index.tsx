@@ -20,13 +20,20 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import type { Warrior } from "@/db/warrior";
 import { getCollections } from "@/db-collections";
 import {
 	createEventTransaction,
 	setEventOutcomeTransaction,
 } from "@/db-collections/mutations/events";
 import { updateMatchTransaction } from "@/db-collections/mutations/matches";
-import type { MatchParticipantWarband } from "@/db-collections/projections";
+import {
+	type CombatStatsProjection,
+	getWarbandCombatStats,
+	getWarriorCombatStats,
+	type MatchParticipantWarband,
+	projectCombatStats,
+} from "@/db-collections/projections";
 import { useMatchWorkspace } from "@/db-collections/queries";
 
 export const Route = createFileRoute("/matches/$matchId/")({
@@ -53,6 +60,7 @@ function MatchDetailPage() {
 
 	if (!match) return null;
 
+	const matchCombatStats = projectCombatStats(eventRows);
 	const attackerWarbandId = staffedParticipantWarbands[0]?.id ?? "";
 	const defenderWarbandId = staffedParticipantWarbands[1]?.id ?? "";
 
@@ -162,7 +170,11 @@ function MatchDetailPage() {
 				{participantWarbands.length ? (
 					<div className="grid items-start gap-5 lg:grid-cols-2">
 						{participantWarbands.map((warband) => (
-							<ParticipantCard key={warband.id} warband={warband} />
+							<ParticipantCard
+								combatStats={matchCombatStats}
+								key={warband.id}
+								warband={warband}
+							/>
 						))}
 					</div>
 				) : (
@@ -280,8 +292,15 @@ function MatchDetailPage() {
 	);
 }
 
-function ParticipantCard({ warband }: { warband: MatchParticipantWarband }) {
+function ParticipantCard({
+	combatStats,
+	warband,
+}: {
+	combatStats: CombatStatsProjection;
+	warband: MatchParticipantWarband;
+}) {
 	const { warriors } = warband;
+	const stats = getWarbandCombatStats(combatStats, warband.id);
 
 	return (
 		<Card>
@@ -304,9 +323,9 @@ function ParticipantCard({ warband }: { warband: MatchParticipantWarband }) {
 			</CardHeader>
 			<CardContent className="grid gap-5">
 				<dl className="grid grid-cols-3 gap-3">
-					<WarbandStat label="Rating" value={warband.rating} />
-					<WarbandStat label="Wins" value={warband.wins} />
-					<WarbandStat label="Status" value={warband.status} />
+					<WarbandStat label="KDs given" value={stats.knockdownsGiven} />
+					<WarbandStat label="Injuries given" value={stats.injuriesGiven} />
+					<WarbandStat label="Deaths given" value={stats.deathsGiven} />
 				</dl>
 
 				<div>
@@ -317,42 +336,11 @@ function ParticipantCard({ warband }: { warband: MatchParticipantWarband }) {
 					{warriors.length ? (
 						<div className="grid gap-2">
 							{warriors.map((warrior) => (
-								<div
-									className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 rounded-lg border border-border bg-background px-3 py-2 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto]"
+								<ParticipantWarrior
+									combatStats={combatStats}
 									key={warrior.id}
-								>
-									<div className="min-w-0">
-										<Link
-											className="truncate font-medium text-foreground hover:text-primary"
-											params={{ warriorId: warrior.id }}
-											to="/warriors/$warriorId"
-										>
-											{warrior.name}
-										</Link>
-										<p className="truncate text-xs text-muted-foreground">
-											{warrior.class} · {warrior.status}
-										</p>
-										<p className="text-xs text-muted-foreground sm:hidden">
-											{warrior.injuries} injuries · {warrior.knockedDowns} knock
-											downs
-										</p>
-									</div>
-									<span className="hidden text-xs text-muted-foreground sm:block">
-										{warrior.injuries} injuries
-									</span>
-									<span className="hidden text-xs text-muted-foreground sm:block">
-										{warrior.knockedDowns} knock downs
-									</span>
-									<LinkButton
-										aria-label={`View warrior ${warrior.name}`}
-										params={{ warriorId: warrior.id }}
-										size="xs"
-										to="/warriors/$warriorId"
-										variant="ghost"
-									>
-										View
-									</LinkButton>
-								</div>
+									warrior={warrior}
+								/>
 							))}
 						</div>
 					) : (
@@ -363,6 +351,50 @@ function ParticipantCard({ warband }: { warband: MatchParticipantWarband }) {
 				</div>
 			</CardContent>
 		</Card>
+	);
+}
+
+function ParticipantWarrior({
+	combatStats,
+	warrior,
+}: {
+	combatStats: CombatStatsProjection;
+	warrior: Warrior;
+}) {
+	const stats = getWarriorCombatStats(combatStats, warrior.id);
+	return (
+		<div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 rounded-lg border border-border bg-background px-3 py-2 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto]">
+			<div className="min-w-0">
+				<Link
+					className="truncate font-medium text-foreground hover:text-primary"
+					params={{ warriorId: warrior.id }}
+					to="/warriors/$warriorId"
+				>
+					{warrior.name}
+				</Link>
+				<p className="truncate text-xs text-muted-foreground">
+					{warrior.class} · {stats.isDead ? "Dead" : "Alive"}
+				</p>
+				<p className="text-xs text-muted-foreground sm:hidden">
+					{stats.injuriesTaken} injuries · {stats.knockdownsTaken} knockdowns
+				</p>
+			</div>
+			<span className="hidden text-xs text-muted-foreground sm:block">
+				{stats.injuriesTaken} injuries
+			</span>
+			<span className="hidden text-xs text-muted-foreground sm:block">
+				{stats.knockdownsTaken} knockdowns
+			</span>
+			<LinkButton
+				aria-label={`View warrior ${warrior.name}`}
+				params={{ warriorId: warrior.id }}
+				size="xs"
+				to="/warriors/$warriorId"
+				variant="ghost"
+			>
+				View
+			</LinkButton>
+		</div>
 	);
 }
 

@@ -65,7 +65,9 @@ export function EventsTable({ events }: { events: EventTableRow[] }) {
 					header: "Outcome",
 					cell: ({ row }) => (
 						<span className="text-muted-foreground">
-							{row.original.outcome || "—"}
+							{row.original.voidedAt
+								? "Voided"
+								: row.original.outcome || "Unresolved"}
 						</span>
 					),
 				}),
@@ -84,23 +86,24 @@ export function EventsTable({ events }: { events: EventTableRow[] }) {
 					meta: { align: "end" },
 					enableGlobalFilter: false,
 					enableSorting: false,
-					cell: ({ row }) => (
-						<TableActions>
-							<Button
-								aria-label={`Delete event from ${row.original.matchName}`}
-								onPress={() =>
-									navigate({
-										to: "/events/$eventId/delete",
-										params: { eventId: row.original.id },
-									})
-								}
-								size="icon-xs"
-								variant="destructive"
-							>
-								<Trash2 aria-hidden="true" />
-							</Button>
-						</TableActions>
-					),
+					cell: ({ row }) =>
+						row.original.voidedAt === null ? (
+							<TableActions>
+								<Button
+									aria-label={`Void event from ${row.original.matchName}`}
+									onPress={() =>
+										navigate({
+											to: "/events/$eventId/delete",
+											params: { eventId: row.original.id },
+										})
+									}
+									size="icon-xs"
+									variant="destructive"
+								>
+									<Trash2 aria-hidden="true" />
+								</Button>
+							</TableActions>
+						) : null,
 				}),
 			]),
 		[navigate],

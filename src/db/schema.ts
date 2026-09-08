@@ -90,24 +90,27 @@ export const events = sqliteTable(
 		id: text("id").primaryKey(),
 		matchId: text("match_id")
 			.notNull()
-			.references(() => matches.id, { onDelete: "cascade" }),
+			.references(() => matches.id, { onDelete: "restrict" }),
 		attackerWarbandId: text("attacker_warband_id")
 			.notNull()
-			.references(() => warbands.id, { onDelete: "cascade" }),
+			.references(() => warbands.id, { onDelete: "restrict" }),
 		attackerWarriorId: text("attacker_warrior_id")
 			.notNull()
-			.references(() => warriors.id, { onDelete: "cascade" }),
+			.references(() => warriors.id, { onDelete: "restrict" }),
 		defenderWarbandId: text("defender_warband_id")
 			.notNull()
-			.references(() => warbands.id, { onDelete: "cascade" }),
+			.references(() => warbands.id, { onDelete: "restrict" }),
 		defenderWarriorId: text("defender_warrior_id")
 			.notNull()
-			.references(() => warriors.id, { onDelete: "cascade" }),
+			.references(() => warriors.id, { onDelete: "restrict" }),
 		notes: text("notes"),
 		isProcessed: integer("is_processed", { mode: "boolean" })
 			.notNull()
 			.default(false),
 		outcome: text("outcome", { enum: EVENT_OUTCOMES }),
+		resolvedAt: text("resolved_at"),
+		voidedAt: text("voided_at"),
+		voidReason: text("void_reason"),
 		createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 		updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 	},
@@ -136,6 +139,16 @@ export const events = sqliteTable(
 			columns: [table.defenderWarbandId, table.defenderWarriorId],
 			foreignColumns: [warriors.warbandId, warriors.id],
 		}),
+		index("events_match_idx").on(table.matchId),
+		index("events_attacker_warrior_idx").on(table.attackerWarriorId),
+		index("events_defender_warrior_idx").on(table.defenderWarriorId),
+		index("events_attacker_warband_idx").on(table.attackerWarbandId),
+		index("events_defender_warband_idx").on(table.defenderWarbandId),
+		uniqueIndex("events_effective_death_defender_unique")
+			.on(table.defenderWarriorId)
+			.where(
+				sql`${table.outcome} = 'Death' AND ${table.resolvedAt} IS NOT NULL AND ${table.voidedAt} IS NULL`,
+			),
 	],
 );
 

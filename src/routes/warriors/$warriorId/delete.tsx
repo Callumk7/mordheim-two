@@ -61,9 +61,9 @@ function DeleteWarriorPage() {
 					Delete {warrior?.name ?? "warrior"}?
 				</h1>
 				<p className="mt-3 max-w-xl text-muted-foreground">
-					This permanently removes the warrior and {eventIds.length} event
-					{eventIds.length === 1 ? "" : "s"} that reference them. This action
-					cannot be undone.
+					{eventIds.length > 0
+						? "This warrior cannot be deleted because their event history is retained."
+						: "This permanently removes the warrior. This action cannot be undone."}
 				</p>
 
 				{error ? (
@@ -75,7 +75,7 @@ function DeleteWarriorPage() {
 				<div className="mt-7 flex flex-wrap gap-3">
 					<button
 						className="rounded-lg bg-destructive px-5 py-2.5 font-semibold text-destructive-foreground transition hover:bg-destructive/90 disabled:cursor-not-allowed disabled:opacity-50"
-						disabled={isDeleting || !warrior}
+						disabled={isDeleting || !warrior || eventIds.length > 0}
 						onClick={async () => {
 							setError(undefined);
 							setIsDeleting(true);
@@ -99,7 +99,11 @@ function DeleteWarriorPage() {
 						}}
 						type="button"
 					>
-						{isDeleting ? "Deleting…" : "Delete warrior"}
+						{eventIds.length > 0
+							? "Event history prevents deletion"
+							: isDeleting
+								? "Deleting…"
+								: "Delete warrior"}
 					</button>
 					<Link
 						className="rounded-lg border border-input px-5 py-2.5 font-semibold text-foreground hover:border-ring hover:text-foreground"
