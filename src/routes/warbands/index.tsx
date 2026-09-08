@@ -1,10 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import {
-	type WarbandInlineUpdate,
-	WarbandsTable,
-} from "#/components/table/warbands-table";
 import { WarbandForm, type WarbandFormValues } from "#/components/warband-form";
+import { WarbandsTable } from "@/components/table/warbands-table";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -13,10 +10,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { getCollections } from "@/db-collections";
-import {
-	createWarbandTransaction,
-	updateWarbandTransaction,
-} from "@/db-collections/mutations/warbands";
+import { createWarbandTransaction } from "@/db-collections/mutations/warbands";
 import { useCombatStats } from "@/db-collections/queries";
 import { useWarbands } from "@/db-collections/queries/warbands";
 import {
@@ -44,10 +38,6 @@ function WarbandsIndexPage() {
 	const collections = getCollections(dbClient);
 	const combatStats = useCombatStats(dbClient);
 	const warbands = useWarbands(dbClient);
-	const updateWarband = async (id: string, changes: WarbandInlineUpdate) => {
-		const transaction = updateWarbandTransaction(collections, id, changes);
-		await transaction.isPersisted.promise;
-	};
 
 	return (
 		<IndexPage>
@@ -60,11 +50,7 @@ function WarbandsIndexPage() {
 			/>
 
 			{warbands.length ? (
-				<WarbandsTable
-					combatStats={combatStats}
-					onUpdate={updateWarband}
-					warbands={warbands}
-				/>
+				<WarbandsTable combatStats={combatStats} warbands={warbands} />
 			) : (
 				<IndexEmptyState
 					action={

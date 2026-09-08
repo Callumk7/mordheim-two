@@ -1,8 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { ChevronRight, Trash2, Users } from "lucide-react";
 import { useMemo } from "react";
-import type { Warband } from "#/db/warband";
-import { WARBAND_STATUSES } from "#/db/warband";
+import type { Warband } from "@/db/warband";
 import type { Warrior } from "@/db/warrior";
 import {
 	type CombatStatsProjection,
@@ -11,24 +10,14 @@ import {
 } from "@/db-collections/projections";
 import { Button } from "../ui/button";
 import { TableActionLink, TableActions } from "../ui/table";
-import {
-	TableCellInput,
-	TableCellNumberField,
-	TableCellSelect,
-} from "../ui/table-cell-field";
 import { createDataTableColumnHelper, DataTable } from "./data-table";
 
 type WarbandWithWarriors = Warband & { warriors: Warrior[] };
 
 const columnHelper = createDataTableColumnHelper<WarbandWithWarriors>();
 
-export type WarbandInlineUpdate = Partial<
-	Pick<Warband, "captain" | "faction" | "name" | "rating" | "status">
->;
-
 interface WarbandsTableProps {
 	combatStats: CombatStatsProjection;
-	onUpdate: (id: string, changes: WarbandInlineUpdate) => Promise<void>;
 	warbands: WarbandWithWarriors[];
 }
 
@@ -89,11 +78,7 @@ function WarbandWarriors({
 	);
 }
 
-export function WarbandsTable({
-	combatStats,
-	onUpdate,
-	warbands,
-}: WarbandsTableProps) {
+export function WarbandsTable({ combatStats, warbands }: WarbandsTableProps) {
 	const navigate = useNavigate({ from: "/warbands" });
 	const columns = useMemo(
 		() =>
@@ -126,28 +111,12 @@ export function WarbandsTable({
 						meta: { isRowHeader: true },
 						cell: ({ row }) => (
 							<div className="flex min-w-44 flex-col gap-0.5">
-								<TableCellInput
-									aria-label={`Warband name for ${row.original.name}`}
-									className="font-semibold text-foreground"
-									onCommit={(name) =>
-										onUpdate(row.original.id, { name: name.trim() })
-									}
-									validate={(name) =>
-										name.trim() ? undefined : "Warband name is required."
-									}
-									value={row.original.name}
-								/>
-								<TableCellInput
-									aria-label={`Faction for ${row.original.name}`}
-									className="text-xs text-muted-foreground"
-									onCommit={(faction) =>
-										onUpdate(row.original.id, { faction: faction.trim() })
-									}
-									validate={(faction) =>
-										faction.trim() ? undefined : "Faction is required."
-									}
-									value={row.original.faction}
-								/>
+								<span className="font-semibold text-foreground">
+									{row.original.name}
+								</span>
+								<span className="text-xs text-muted-foreground">
+									{row.original.faction}
+								</span>
 							</div>
 						),
 					},
@@ -155,33 +124,15 @@ export function WarbandsTable({
 				columnHelper.accessor("captain", {
 					header: "Captain",
 					cell: ({ row }) => (
-						<TableCellInput
-							aria-label={`Captain for ${row.original.name}`}
-							className="min-w-32"
-							onCommit={(captain) =>
-								onUpdate(row.original.id, { captain: captain.trim() })
-							}
-							validate={(captain) =>
-								captain.trim() ? undefined : "Captain is required."
-							}
-							value={row.original.captain}
-						/>
+						<span className="text-muted-foreground">
+							{row.original.captain}
+						</span>
 					),
 				}),
 				columnHelper.accessor("status", {
 					header: "Status",
 					cell: ({ row }) => (
-						<TableCellSelect
-							aria-label={`Status for ${row.original.name}`}
-							className="min-w-28"
-							onCommit={(status) =>
-								onUpdate(row.original.id, {
-									status: status as Warband["status"],
-								})
-							}
-							options={WARBAND_STATUSES}
-							value={row.original.status}
-						/>
+						<span className="text-muted-foreground">{row.original.status}</span>
 					),
 				}),
 				columnHelper.accessor(
@@ -197,15 +148,9 @@ export function WarbandsTable({
 					header: "Rating",
 					meta: { align: "end" },
 					cell: ({ row }) => (
-						<TableCellNumberField
-							aria-label={`Rating for ${row.original.name}`}
-							className="min-w-20 font-mono text-primary"
-							isRequired
-							minValue={0}
-							onCommit={(rating) => onUpdate(row.original.id, { rating })}
-							step={1}
-							value={row.original.rating}
-						/>
+						<span className="font-mono text-primary">
+							{row.original.rating}
+						</span>
 					),
 				}),
 				columnHelper.display({
@@ -233,7 +178,7 @@ export function WarbandsTable({
 					),
 				}),
 			]),
-		[combatStats, onUpdate, navigate],
+		[combatStats, navigate],
 	);
 
 	return (
