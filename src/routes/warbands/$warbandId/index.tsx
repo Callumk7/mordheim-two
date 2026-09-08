@@ -1,6 +1,7 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { CreateWarriorDialog } from "@/components/shared/create-warrior-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -10,7 +11,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { WarbandForm } from "@/components/warband-form";
-import { WarriorForm, type WarriorFormValues } from "@/components/warrior-form";
+import { WarriorForm } from "@/components/warrior-form";
 import { getCollections } from "@/db-collections";
 import { updateWarbandTransaction } from "@/db-collections/mutations/warbands";
 import {
@@ -55,15 +56,6 @@ function WarbandDetailPage() {
 	const editingWarrior = warriors.find(
 		(warrior) => warrior.id === editingWarriorId,
 	);
-	const newWarriorValues: WarriorFormValues = {
-		name: "",
-		class: "",
-		status: "Alive",
-		warbandId,
-		knocked: 0,
-		injuries: 0,
-		knockedDowns: 0,
-	};
 
 	if (!warband) return null;
 
@@ -248,31 +240,15 @@ function WarbandDetailPage() {
 				/>
 			</Dialog>
 
-			<Dialog
-				className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl"
+			<CreateWarriorDialog
 				isOpen={isNewWarriorOpen}
 				onOpenChange={setIsNewWarriorOpen}
-			>
-				<DialogHeader>
-					<DialogTitle>Add warrior</DialogTitle>
-					<DialogDescription>
-						Recruit a fighter for {warband.name}.
-					</DialogDescription>
-				</DialogHeader>
-				<WarriorForm
-					initialValues={newWarriorValues}
-					isWarbandLocked
-					key={isNewWarriorOpen ? `new-${warbandId}` : "new-closed"}
-					onSubmit={async (values) => {
-						const transaction = createWarriorTransaction(collections, values);
-						await transaction.isPersisted.promise;
-						setIsNewWarriorOpen(false);
-					}}
-					submitLabel="Recruit warrior"
-					warbandLockDescription="This warrior will serve this warband."
-					warbands={[warband]}
-				/>
-			</Dialog>
+				onSubmit={async (values) => {
+					const transaction = createWarriorTransaction(collections, values);
+					await transaction.isPersisted.promise;
+				}}
+				warband={warband}
+			/>
 
 			<Dialog
 				className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl"

@@ -19,22 +19,35 @@ const columnHelper = createDataTableColumnHelper<WarbandWithWarriors>();
 interface WarbandsTableProps {
 	combatStats: CombatStatsProjection;
 	warbands: WarbandWithWarriors[];
+	onAddWarrior: (warband: Warband) => void;
 }
 
 function WarbandWarriors({
 	combatStats,
+	onAddWarrior,
 	warband,
 }: {
 	combatStats: CombatStatsProjection;
+	onAddWarrior: (warband: Warband) => void;
 	warband: WarbandWithWarriors;
 }) {
 	const warriors = warband.warriors;
 
 	return (
 		<div className="px-4 py-4 sm:px-12">
-			<div className="mb-3 flex items-center gap-2 text-sm font-medium text-foreground">
-				<Users aria-hidden="true" className="size-4 text-primary" />
-				{warriors.length} {warriors.length === 1 ? "warrior" : "warriors"}
+			<div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+				<div className="flex items-center gap-2 text-sm font-medium text-foreground">
+					<Users aria-hidden="true" className="size-4 text-primary" />
+					{warriors.length} {warriors.length === 1 ? "warrior" : "warriors"}
+				</div>
+				<Button
+					aria-label={`Add warrior to ${warband.name}`}
+					onPress={() => onAddWarrior(warband)}
+					size="sm"
+					variant="outline"
+				>
+					Add warrior
+				</Button>
 			</div>
 			{warriors.length ? (
 				<div className="grid gap-2">
@@ -78,7 +91,11 @@ function WarbandWarriors({
 	);
 }
 
-export function WarbandsTable({ combatStats, warbands }: WarbandsTableProps) {
+export function WarbandsTable({
+	combatStats,
+	onAddWarrior,
+	warbands,
+}: WarbandsTableProps) {
 	const navigate = useNavigate({ from: "/warbands" });
 	const columns = useMemo(
 		() =>
@@ -196,7 +213,11 @@ export function WarbandsTable({ combatStats, warbands }: WarbandsTableProps) {
 				})
 			}
 			renderExpandedRow={(warband) => (
-				<WarbandWarriors combatStats={combatStats} warband={warband} />
+				<WarbandWarriors
+					combatStats={combatStats}
+					onAddWarrior={onAddWarrior}
+					warband={warband}
+				/>
 			)}
 			searchPlaceholder="Search warbands…"
 			tableClassName="min-w-180"

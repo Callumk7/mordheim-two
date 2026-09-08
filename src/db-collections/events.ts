@@ -1,5 +1,5 @@
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
-import { collectionOptions } from "@tanstack/react-db";
+import { BasicIndex, collectionOptions } from "@tanstack/react-db";
 import type { QueryClient } from "@tanstack/react-query";
 import {
 	EventCreateSchema,
@@ -17,6 +17,8 @@ import {
 export const eventsCollectionOptions = collectionOptions("events", (client) =>
 	queryCollectionOptions({
 		id: "events",
+		autoIndex: "eager",
+		defaultIndexType: BasicIndex,
 		queryKey: ["events"],
 		queryClient: client.requireDependency<QueryClient>("queryClient"),
 		queryFn: () => listEvents(),

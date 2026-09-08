@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { WarbandForm, type WarbandFormValues } from "#/components/warband-form";
+import { CreateWarriorDialog } from "@/components/shared/create-warrior-dialog";
 import { WarbandsTable } from "@/components/table/warbands-table";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,8 +10,10 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import type { Warband } from "@/db/warband";
 import { getCollections } from "@/db-collections";
 import { createWarbandTransaction } from "@/db-collections/mutations/warbands";
+import { createWarriorTransaction } from "@/db-collections/mutations/warriors";
 import { useCombatStats } from "@/db-collections/queries";
 import { useWarbands } from "@/db-collections/queries/warbands";
 import {
@@ -34,6 +37,9 @@ const initialValues: WarbandFormValues = {
 
 function WarbandsIndexPage() {
 	const [isNewWarbandOpen, setIsNewWarbandOpen] = useState(false);
+	const [recruitingWarband, setRecruitingWarband] = useState<Warband | null>(
+		null,
+	);
 	const { dbClient } = Route.useRouteContext();
 	const collections = getCollections(dbClient);
 	const combatStats = useCombatStats(dbClient);
@@ -50,7 +56,11 @@ function WarbandsIndexPage() {
 			/>
 
 			{warbands.length ? (
-				<WarbandsTable combatStats={combatStats} warbands={warbands} />
+				<WarbandsTable
+					combatStats={combatStats}
+					onAddWarrior={setRecruitingWarband}
+					warbands={warbands}
+				/>
 			) : (
 				<IndexEmptyState
 					action={
@@ -62,6 +72,20 @@ function WarbandsIndexPage() {
 					title="No warbands yet"
 				/>
 			)}
+
+			{recruitingWarband ? (
+				<CreateWarriorDialog
+					isOpen
+					onOpenChange={(isOpen) => {
+						if (!isOpen) setRecruitingWarband(null);
+					}}
+					onSubmit={async (values) => {
+						const transaction = createWarriorTransaction(collections, values);
+						await transaction.isPersisted.promise;
+					}}
+					warband={recruitingWarband}
+				/>
+			) : null}
 
 			<Dialog
 				className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl"
