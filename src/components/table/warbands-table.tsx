@@ -1,7 +1,7 @@
-import { ChevronRight, Users } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { ChevronRight, Trash2, Users } from "lucide-react";
 import { useMemo } from "react";
-import type { Warband } from "#/db/warband";
-import { WARBAND_STATUSES } from "#/db/warband";
+import type { Warband } from "@/db/warband";
 import type { Warrior } from "@/db/warrior";
 import {
 	type CombatStatsProjection,
@@ -10,41 +10,44 @@ import {
 } from "@/db-collections/projections";
 import { Button } from "../ui/button";
 import { TableActionLink, TableActions } from "../ui/table";
-import {
-	TableCellInput,
-	TableCellNumberField,
-	TableCellSelect,
-} from "../ui/table-cell-field";
 import { createDataTableColumnHelper, DataTable } from "./data-table";
 
 type WarbandWithWarriors = Warband & { warriors: Warrior[] };
 
 const columnHelper = createDataTableColumnHelper<WarbandWithWarriors>();
 
-export type WarbandInlineUpdate = Partial<
-	Pick<Warband, "captain" | "faction" | "name" | "rating" | "status">
->;
-
 interface WarbandsTableProps {
 	combatStats: CombatStatsProjection;
-	onUpdate: (id: string, changes: WarbandInlineUpdate) => Promise<void>;
 	warbands: WarbandWithWarriors[];
+	onAddWarrior: (warband: Warband) => void;
 }
 
 function WarbandWarriors({
 	combatStats,
+	onAddWarrior,
 	warband,
 }: {
 	combatStats: CombatStatsProjection;
+	onAddWarrior: (warband: Warband) => void;
 	warband: WarbandWithWarriors;
 }) {
 	const warriors = warband.warriors;
 
 	return (
 		<div className="px-4 py-4 sm:px-12">
-			<div className="mb-3 flex items-center gap-2 text-sm font-medium text-foreground">
-				<Users aria-hidden="true" className="size-4 text-primary" />
-				{warriors.length} {warriors.length === 1 ? "warrior" : "warriors"}
+			<div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+				<div className="flex items-center gap-2 text-sm font-medium text-foreground">
+					<Users aria-hidden="true" className="size-4 text-primary" />
+					{warriors.length} {warriors.length === 1 ? "warrior" : "warriors"}
+				</div>
+				<Button
+					aria-label={`Add warrior to ${warband.name}`}
+					onPress={() => onAddWarrior(warband)}
+					size="sm"
+					variant="outline"
+				>
+					Add warrior
+				</Button>
 			</div>
 			{warriors.length ? (
 				<div className="grid gap-2">
@@ -90,9 +93,10 @@ function WarbandWarriors({
 
 export function WarbandsTable({
 	combatStats,
-	onUpdate,
+	onAddWarrior,
 	warbands,
 }: WarbandsTableProps) {
+	const navigate = useNavigate({ from: "/warbands" });
 	const columns = useMemo(
 		() =>
 			columnHelper.columns([
@@ -124,28 +128,12 @@ export function WarbandsTable({
 						meta: { isRowHeader: true },
 						cell: ({ row }) => (
 							<div className="flex min-w-44 flex-col gap-0.5">
-								<TableCellInput
-									aria-label={`Warband name for ${row.original.name}`}
-									className="font-semibold text-foreground"
-									onCommit={(name) =>
-										onUpdate(row.original.id, { name: name.trim() })
-									}
-									validate={(name) =>
-										name.trim() ? undefined : "Warband name is required."
-									}
-									value={row.original.name}
-								/>
-								<TableCellInput
-									aria-label={`Faction for ${row.original.name}`}
-									className="text-xs text-muted-foreground"
-									onCommit={(faction) =>
-										onUpdate(row.original.id, { faction: faction.trim() })
-									}
-									validate={(faction) =>
-										faction.trim() ? undefined : "Faction is required."
-									}
-									value={row.original.faction}
-								/>
+								<span className="font-semibold text-foreground">
+									{row.original.name}
+								</span>
+								<span className="text-xs text-muted-foreground">
+									{row.original.faction}
+								</span>
 							</div>
 						),
 					},
@@ -153,33 +141,15 @@ export function WarbandsTable({
 				columnHelper.accessor("captain", {
 					header: "Captain",
 					cell: ({ row }) => (
-						<TableCellInput
-							aria-label={`Captain for ${row.original.name}`}
-							className="min-w-32"
-							onCommit={(captain) =>
-								onUpdate(row.original.id, { captain: captain.trim() })
-							}
-							validate={(captain) =>
-								captain.trim() ? undefined : "Captain is required."
-							}
-							value={row.original.captain}
-						/>
+						<span className="text-muted-foreground">
+							{row.original.captain}
+						</span>
 					),
 				}),
 				columnHelper.accessor("status", {
 					header: "Status",
 					cell: ({ row }) => (
-						<TableCellSelect
-							aria-label={`Status for ${row.original.name}`}
-							className="min-w-28"
-							onCommit={(status) =>
-								onUpdate(row.original.id, {
-									status: status as Warband["status"],
-								})
-							}
-							options={WARBAND_STATUSES}
-							value={row.original.status}
-						/>
+						<span className="text-muted-foreground">{row.original.status}</span>
 					),
 				}),
 				columnHelper.accessor(
@@ -195,15 +165,9 @@ export function WarbandsTable({
 					header: "Rating",
 					meta: { align: "end" },
 					cell: ({ row }) => (
-						<TableCellNumberField
-							aria-label={`Rating for ${row.original.name}`}
-							className="min-w-20 font-mono text-primary"
-							isRequired
-							minValue={0}
-							onCommit={(rating) => onUpdate(row.original.id, { rating })}
-							step={1}
-							value={row.original.rating}
-						/>
+						<span className="font-mono text-primary">
+							{row.original.rating}
+						</span>
 					),
 				}),
 				columnHelper.display({
@@ -214,24 +178,24 @@ export function WarbandsTable({
 					enableSorting: false,
 					cell: ({ row }) => (
 						<TableActions>
-							<TableActionLink
-								params={{ warbandId: row.original.id }}
-								to="/warbands/$warbandId"
-							>
-								View
-							</TableActionLink>
-							<TableActionLink
-								params={{ warbandId: row.original.id }}
-								to="/warbands/$warbandId/delete"
+							<Button
+								aria-label={`Delete ${row.original.name}`}
+								onPress={() =>
+									navigate({
+										to: "/warbands/$warbandId/delete",
+										params: { warbandId: row.original.id },
+									})
+								}
+								size="icon-xs"
 								variant="destructive"
 							>
-								Delete
-							</TableActionLink>
+								<Trash2 aria-hidden="true" />
+							</Button>
 						</TableActions>
 					),
 				}),
 			]),
-		[combatStats, onUpdate],
+		[combatStats, navigate],
 	);
 
 	return (
@@ -242,8 +206,18 @@ export function WarbandsTable({
 			emptyMessage="No warbands match your search."
 			initialSorting={[{ id: "name", desc: false }]}
 			itemLabel={{ singular: "warband", plural: "warbands" }}
+			onRowAction={(warband) =>
+				navigate({
+					to: "/warbands/$warbandId",
+					params: { warbandId: warband.id },
+				})
+			}
 			renderExpandedRow={(warband) => (
-				<WarbandWarriors combatStats={combatStats} warband={warband} />
+				<WarbandWarriors
+					combatStats={combatStats}
+					onAddWarrior={onAddWarrior}
+					warband={warband}
+				/>
 			)}
 			searchPlaceholder="Search warbands…"
 			tableClassName="min-w-180"

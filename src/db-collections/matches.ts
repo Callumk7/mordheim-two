@@ -1,5 +1,5 @@
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
-import { collectionOptions } from "@tanstack/react-db";
+import { BasicIndex, collectionOptions } from "@tanstack/react-db";
 import type { QueryClient } from "@tanstack/react-query";
 import { MatchSchema, MatchUpdateSchema } from "@/db/match";
 import {
@@ -12,6 +12,8 @@ import {
 export const matchesCollectionOptions = collectionOptions("matches", (client) =>
 	queryCollectionOptions({
 		id: "matches",
+		autoIndex: "eager",
+		defaultIndexType: BasicIndex,
 		queryKey: ["matches"],
 		queryClient: client.requireDependency<QueryClient>("queryClient"),
 		queryFn: () => listMatches(),

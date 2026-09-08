@@ -1,5 +1,5 @@
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
-import { collectionOptions } from "@tanstack/react-db";
+import { BasicIndex, collectionOptions } from "@tanstack/react-db";
 import type { QueryClient } from "@tanstack/react-query";
 import { WarbandSchema, WarbandUpdateSchema } from "@/db/warband";
 import {
@@ -14,6 +14,8 @@ export const warbandsCollectionOptions = collectionOptions(
 	(client) =>
 		queryCollectionOptions({
 			id: "warbands",
+			autoIndex: "eager",
+			defaultIndexType: BasicIndex,
 			queryKey: ["warbands"],
 			queryClient: client.requireDependency<QueryClient>("queryClient"),
 			queryFn: () => listWarbands(),
