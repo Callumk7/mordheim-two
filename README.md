@@ -28,8 +28,10 @@ pnpm test
 pnpm db:generate
 pnpm db:migrate:local
 pnpm db:migrate:remote
+pnpm db:reset:local
 pnpm db:seed:local
 pnpm db:seed:remote
+pnpm db:reset-and-seed:local
 pnpm cf-typegen
 pnpm deploy
 ```
@@ -54,7 +56,21 @@ pnpm db:migrate:local
 pnpm db:migrate:remote
 ```
 
-To populate a fresh database with the project's seed data, run `pnpm db:seed:local` for local D1 or `pnpm db:seed:remote` for the configured remote D1 database. Keep database access in server-only code; client-side collections in `src/db-collections/` use the application's server functions.
+To populate a fresh database with the project's dummy data, run `pnpm db:seed:local` for local D1 or `pnpm db:seed:remote` for the configured remote D1 database.
+
+To rebuild the local database without data, stop the development server and run:
+
+```bash
+pnpm db:reset:local
+```
+
+To rebuild it and immediately load the dummy data, run:
+
+```bash
+pnpm db:reset-and-seed:local
+```
+
+The reset command only targets Wrangler's local D1 database; there is intentionally no remote reset command. Keep database access in server-only code; client-side collections in `src/db-collections/` use the application's server functions.
 
 ## Deployment
 
