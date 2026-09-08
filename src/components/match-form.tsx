@@ -19,7 +19,11 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { MATCH_STATUSES, type Match } from "@/db/validation/match";
+import {
+	MATCH_RESULTS,
+	MATCH_STATUSES,
+	type Match,
+} from "@/db/validation/match";
 import type { Warband } from "@/db/validation/warband";
 import {
 	canSubmitMatch,
@@ -48,12 +52,19 @@ export function MatchForm({
 		name: initialValues.name,
 		scenario: initialValues.scenario,
 		status: initialValues.status,
+		result: initialValues.result,
+		winnerWarbandId: initialValues.winnerWarbandId,
 		participantWarbandIds: initialValues.participantWarbandIds,
 	}));
 	const [error, setError] = useState<string>();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const statusId = useId();
+	const resultId = useId();
+	const winnerId = useId();
 	const canSubmit = canSubmitMatch(values);
+	const selectedWarbands = warbands.filter((warband) =>
+		values.participantWarbandIds.includes(warband.id),
+	);
 
 	return (
 		<form
@@ -115,6 +126,68 @@ export function MatchForm({
 						</SelectContent>
 					</Select>
 				</Field>
+				<Field>
+					<FieldLabel htmlFor={resultId}>Result</FieldLabel>
+					<Select
+						className="w-full"
+						name="result"
+						onChange={(key) => {
+							if (key !== null) {
+								const result = String(key) as Match["result"];
+								setValues((current) => ({
+									...current,
+									result,
+									winnerWarbandId:
+										result === "Victory" ? current.winnerWarbandId : null,
+								}));
+							}
+						}}
+						value={values.result}
+					>
+						<SelectTrigger id={resultId}>
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							{MATCH_RESULTS.map((result) => (
+								<SelectItem id={result} key={result}>
+									{result}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</Field>
+				{values.result === "Victory" ? (
+					<Field>
+						<FieldLabel htmlFor={winnerId}>Winning warband</FieldLabel>
+						<Select
+							className="w-full"
+							isDisabled={selectedWarbands.length === 0}
+							name="winnerWarbandId"
+							onChange={(key) =>
+								setValues((current) => ({
+									...current,
+									winnerWarbandId: key === null ? null : String(key),
+								}))
+							}
+							placeholder="Choose winner"
+							value={values.winnerWarbandId ?? undefined}
+						>
+							<SelectTrigger id={winnerId}>
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								{selectedWarbands.map((warband) => (
+									<SelectItem id={warband.id} key={warband.id}>
+										{warband.name}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+						<FieldDescription>
+							Only participating warbands can win the match.
+						</FieldDescription>
+					</Field>
+				) : null}
 			</FieldGroup>
 
 			<FieldSet className="gap-3">
@@ -149,15 +222,26 @@ export function MatchForm({
 									isDisabled={isLocked}
 									isSelected={isChecked}
 									onChange={(isSelected) =>
-										setValues((current) => ({
-											...current,
-											participantWarbandIds: changeMatchParticipantSelection(
-												current.participantWarbandIds,
-												warband.id,
-												isSelected,
-												lockedParticipantWarbandIds,
-											),
-										}))
+										setValues((current) => {
+											const participantWarbandIds =
+												changeMatchParticipantSelection(
+													current.participantWarbandIds,
+													warband.id,
+													isSelected,
+													lockedParticipantWarbandIds,
+												);
+											return {
+												...current,
+												participantWarbandIds,
+												winnerWarbandId:
+													current.winnerWarbandId !== null &&
+													participantWarbandIds.includes(
+														current.winnerWarbandId,
+													)
+														? current.winnerWarbandId
+														: null,
+											};
+										})
 									}
 								/>
 								<FieldContent>

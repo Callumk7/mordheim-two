@@ -26,6 +26,8 @@ const initialValues: MatchFormValues = {
 	name: "",
 	scenario: "",
 	status: "Scheduled",
+	result: "Pending",
+	winnerWarbandId: null,
 	participantWarbandIds: [],
 };
 
@@ -56,7 +58,7 @@ function MatchesIndexPage() {
 			/>
 
 			{matchRows.length ? (
-				<MatchesTable matches={matchRows} />
+				<MatchesTable matches={matchRows} warbands={warbandRows} />
 			) : (
 				<IndexEmptyState
 					action={

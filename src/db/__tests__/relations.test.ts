@@ -4,13 +4,14 @@ import {
 	getParticipantWarbandIds,
 	getWarriorsForWarband,
 } from "../../lib/event-options";
-import { events, warbandMatches, warriors } from "../schema";
+import { events, matches, warbandMatches, warriors } from "../schema";
 import {
 	EventCreateSchema,
 	EventSchema,
 	EventUpdateSchema,
 	validateEventMembership,
 } from "../validation/event";
+import { MatchSchema } from "../validation/match";
 import { WarbandMatchSchema } from "../validation/warband-match";
 
 const validEvent = {
@@ -22,6 +23,51 @@ const validEvent = {
 	defenderWarriorId: "warrior-b",
 	notes: null,
 };
+
+describe("match results", () => {
+	const validMatch = {
+		id: "match-1",
+		name: "The Encounter",
+		scenario: "Street Fight",
+		status: "Completed" as const,
+	};
+
+	it("requires exactly one winner for a victory", () => {
+		expect(
+			MatchSchema.safeParse({
+				...validMatch,
+				result: "Victory",
+				winnerWarbandId: "warband-a",
+			}).success,
+		).toBe(true);
+		expect(
+			MatchSchema.safeParse({
+				...validMatch,
+				result: "Victory",
+				winnerWarbandId: null,
+			}).success,
+		).toBe(false);
+	});
+
+	it("forbids a winner for pending matches and draws", () => {
+		for (const result of ["Pending", "Draw"] as const) {
+			expect(
+				MatchSchema.safeParse({
+					...validMatch,
+					result,
+					winnerWarbandId: null,
+				}).success,
+			).toBe(true);
+			expect(
+				MatchSchema.safeParse({
+					...validMatch,
+					result,
+					winnerWarbandId: "warband-a",
+				}).success,
+			).toBe(false);
+		}
+	});
+});
 
 describe("event relations", () => {
 	it("requires distinct warbands and both warriors", () => {
@@ -116,6 +162,7 @@ describe("event relations", () => {
 	});
 
 	it("enforces unique participation and composite event membership", () => {
+		const matchConfig = getTableConfig(matches);
 		const participantConfig = getTableConfig(warbandMatches);
 		const warriorConfig = getTableConfig(warriors);
 		const eventConfig = getTableConfig(events);
@@ -141,6 +188,12 @@ describe("event relations", () => {
 					index.config.unique,
 			),
 		).toBe(true);
+		expect(matchConfig.foreignKeys.map((key) => key.getName())).toContain(
+			"matches_winner_participant_fk",
+		);
+		expect(matchConfig.checks.map((constraint) => constraint.name)).toContain(
+			"matches_result_winner_consistent",
+		);
 		expect(
 			eventConfig.foreignKeys
 				.map((key) => key.getName())

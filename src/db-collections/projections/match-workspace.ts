@@ -42,6 +42,10 @@ export function projectMatchWorkspace({
 	const staffedWarbands = warbands.filter(
 		(warband) => warband.warriors.length > 0,
 	);
+	const winnerWarband =
+		match?.winnerWarbandId === null
+			? undefined
+			: warbands.find((warband) => warband.id === match?.winnerWarbandId);
 	const lockedParticipantWarbandIds = [
 		...new Set(
 			events.flatMap((event) => [
@@ -53,7 +57,10 @@ export function projectMatchWorkspace({
 
 	return {
 		allWarbands,
-		canAddEvent: Boolean(match) && staffedWarbands.length >= 2,
+		canAddEvent:
+			Boolean(match) &&
+			match?.status !== "Completed" &&
+			staffedWarbands.length >= 2,
 		events,
 		lockedParticipantWarbandIds,
 		match,
@@ -61,6 +68,7 @@ export function projectMatchWorkspace({
 		staffedWarbands,
 		warbands,
 		warriors,
+		winnerWarband,
 	};
 }
 

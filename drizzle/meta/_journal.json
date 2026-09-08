@@ -71,6 +71,13 @@
       "when": 1788876412511,
       "tag": "0009_stormy_overlord",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1788893591732,
+      "tag": "0010_windy_karma",
+      "breakpoints": true
     }
   ]
 }

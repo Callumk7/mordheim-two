@@ -1,6 +1,6 @@
 import { safeRandomUUID } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Pencil, Plus, Users } from "lucide-react";
+import { Pencil, Plus, Trophy, Users } from "lucide-react";
 import { useState } from "react";
 import { EventForm } from "@/components/event-form";
 import { formatStatus, MatchForm } from "@/components/match-form";
@@ -56,6 +56,7 @@ function MatchDetailPage() {
 		staffedWarbands: staffedParticipantWarbands,
 		warbands: participantWarbands,
 		warriors: warriorRows,
+		winnerWarband,
 	} = useMatchWorkspace(dbClient, matchId);
 
 	if (!match) return null;
@@ -90,6 +91,11 @@ function MatchDetailPage() {
 						</p>
 						<span className="rounded-full border border-border bg-muted/40 px-2.5 py-1 text-xs font-medium text-muted-foreground">
 							{formatStatus(match.status)}
+						</span>
+						<span className="rounded-full border border-border bg-muted/40 px-2.5 py-1 text-xs font-medium text-muted-foreground">
+							{match.result === "Victory"
+								? `${winnerWarband?.name ?? "Unknown warband"} won`
+								: match.result}
 						</span>
 					</div>
 					<h1 className="mt-2 font-mordheim text-4xl text-foreground sm:text-5xl">
@@ -172,6 +178,7 @@ function MatchDetailPage() {
 						{participantWarbands.map((warband) => (
 							<ParticipantCard
 								combatStats={matchCombatStats}
+								isWinner={warband.id === match.winnerWarbandId}
 								key={warband.id}
 								warband={warband}
 							/>
@@ -294,9 +301,11 @@ function MatchDetailPage() {
 
 function ParticipantCard({
 	combatStats,
+	isWinner,
 	warband,
 }: {
 	combatStats: CombatStatsProjection;
+	isWinner: boolean;
 	warband: MatchParticipantWarband;
 }) {
 	const { warriors } = warband;
@@ -305,7 +314,12 @@ function ParticipantCard({
 	return (
 		<Card>
 			<CardHeader className="border-b border-border">
-				<CardTitle>{warband.name}</CardTitle>
+				<CardTitle className="flex items-center gap-2">
+					{warband.name}
+					{isWinner ? (
+						<Trophy aria-label="Match winner" className="size-4 text-primary" />
+					) : null}
+				</CardTitle>
 				<CardDescription>
 					{warband.faction} · Captain {warband.captain}
 				</CardDescription>

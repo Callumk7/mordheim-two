@@ -1,7 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { eq, or } from "drizzle-orm";
 import { getDb } from "@/db/index.server";
-import { events, warbandMatches, warbands, warriors } from "@/db/schema";
+import {
+	events,
+	matches,
+	warbandMatches,
+	warbands,
+	warriors,
+} from "@/db/schema";
 import {
 	WarbandDeleteInputSchema,
 	WarbandSchema,
@@ -49,6 +55,16 @@ export const deleteWarband = createServerFn({ method: "POST" })
 		if (referenced.length > 0) {
 			throw new Error(
 				"This warband is part of event history and cannot be deleted.",
+			);
+		}
+		const winningMatch = await db
+			.select({ id: matches.id })
+			.from(matches)
+			.where(eq(matches.winnerWarbandId, data.id))
+			.limit(1);
+		if (winningMatch.length > 0) {
+			throw new Error(
+				"This warband has a recorded match victory and cannot be deleted.",
 			);
 		}
 		await db.batch([
