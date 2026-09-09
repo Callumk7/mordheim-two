@@ -16,12 +16,14 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import type { Warband } from "@/db/validation/warband";
 import { WARRIOR_STATUSES, type Warrior } from "@/db/validation/warrior";
 
 export type WarriorFormValues = Pick<
 	Warrior,
 	| "name"
+	| "description"
 	| "class"
 	| "status"
 	| "warbandId"
@@ -47,6 +49,7 @@ export function WarriorForm({
 }) {
 	const [values, setValues] = useState<WarriorFormValues>(() => ({
 		name: initialValues.name,
+		description: initialValues.description ?? "",
 		class: initialValues.class,
 		status: initialValues.status,
 		warbandId: initialValues.warbandId,
@@ -59,6 +62,7 @@ export function WarriorForm({
 	const warbandId = useId();
 	const warbandDescriptionId = useId();
 	const statusId = useId();
+	const descriptionId = useId();
 
 	return (
 		<form
@@ -93,6 +97,20 @@ export function WarriorForm({
 					}
 					value={values.class}
 				/>
+				<Field className="md:col-span-2">
+					<FieldLabel htmlFor={descriptionId}>
+						Description (optional)
+					</FieldLabel>
+					<Textarea
+						id={descriptionId}
+						name="description"
+						onChange={(event) => {
+							const description = event.target.value;
+							setValues((current) => ({ ...current, description }));
+						}}
+						value={values.description ?? ""}
+					/>
+				</Field>
 				<Field data-disabled={isWarbandLocked}>
 					<FieldLabel htmlFor={warbandId}>Warband</FieldLabel>
 					<Select
