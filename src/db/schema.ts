@@ -17,7 +17,9 @@ import { WARRIOR_STATUSES } from "./validation/warrior";
 export const imageGenerationJobs = sqliteTable("image_generation_jobs", {
 	id: text("id").primaryKey(),
 	prompt: text("prompt").notNull(),
-	status: text("status", { enum: ["pending", "queued", "enqueue_failed"] })
+	status: text("status", {
+		enum: ["pending", "queued", "enqueue_failed", "consumed"],
+	})
 		.notNull()
 		.default("pending"),
 	error: text("error"),

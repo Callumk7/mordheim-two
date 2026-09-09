@@ -1,24 +1,22 @@
-import type { imageGenerationJobs } from "@/db/schema";
 import { ImageGenerationMessageSchema } from "@/db/validation/image-generation";
 
-type Job = typeof imageGenerationJobs.$inferSelect;
-type LoadJob = (jobId: string) => Promise<Job | undefined>;
+type RecordConsumption = (jobId: string) => Promise<{ id: string } | undefined>;
 
 // Kept separate from the Worker entrypoint so delivery behavior is unit-testable.
 export async function consumeImageGenerationBatch(
 	batch: MessageBatch<unknown>,
-	loadJob: LoadJob,
+	recordConsumption: RecordConsumption,
 ) {
 	for (const message of batch.messages) {
 		try {
 			const { jobId } = ImageGenerationMessageSchema.parse(message.body);
-			const job = await loadJob(jobId);
+			// Await durable receipt before acknowledging; D1 failures must retry.
+			const job = await recordConsumption(jobId);
 			if (!job) {
 				throw new Error("Image generation job not found");
 			}
 
-			// Scaffold ONLY: no provider call, result storage, or completion update.
-			// Replace this with durable, idempotent processing before using real jobs.
+			// Receipt only: no provider call or generated image yet.
 			// Never log the prompt or the entire message body.
 			console.info("Image generation scaffold consumed job", { jobId: job.id });
 			message.ack();

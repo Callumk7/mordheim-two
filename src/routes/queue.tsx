@@ -32,7 +32,7 @@ function QueuePage() {
 			const result = await createImageGenerationJob({ data: input.data });
 			setMessage(
 				result.status === "queued"
-					? `Queued job ${result.jobId}. The scaffold consumer only logs receipt; no image will be generated.`
+					? `Queued job ${result.jobId}. The consumer will record receipt in D1; no image will be generated.`
 					: `Job ${result.jobId}: enqueue failed. Delivery may be uncertain; check D1 and the queue before resubmitting.`,
 			);
 		} catch {
@@ -54,8 +54,8 @@ function QueuePage() {
 				</LinkButton>
 				<p className="text-sm text-muted-foreground">
 					Save an image prompt in D1 and send its job ID to the image generation
-					queue. The scaffold consumer loads and acknowledges jobs without
-					generating images.
+					queue. The scaffold consumer records receipt and acknowledges jobs
+					without generating images.
 				</p>
 			</header>
 			<form
@@ -89,9 +89,9 @@ function QueuePage() {
 			<p className="text-sm text-muted-foreground">
 				On the deployed app, check the Cloudflare dashboard for the
 				mordheim-image-generation queue’s message writes and backlog, and D1 for
-				the job record. Check consumer logs for receipt; D1 status tracks
-				enqueueing only. Local development messages stay local. This test
-				endpoint has no application authentication.
+				the job record. A consumed status confirms receipt, not image
+				generation. Local development messages stay local. This test endpoint
+				has no application authentication.
 			</p>
 		</section>
 	);

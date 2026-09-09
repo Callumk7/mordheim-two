@@ -42,8 +42,9 @@ function QueueJobsPage() {
 				<div className="space-y-2">
 					<h1 className="text-3xl">Queue jobs</h1>
 					<p className="text-sm text-muted-foreground">
-						Latest 100 D1 job records, newest first. Status tracks submission,
-						not consumption. This is not the live queue backlog.
+						Latest 100 D1 job records, newest first. Consumed means receipt was
+						recorded by the consumer, not that an image was generated. This is
+						not the live queue backlog.
 					</p>
 				</div>
 				<div className="flex gap-2">
