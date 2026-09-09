@@ -1,20 +1,25 @@
 import { eq, or, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { WarriorPortrait } from "@/components/warrior-portrait";
 import { getCollections } from "@/db-collections";
 import { updateWarriorTransaction } from "@/db-collections/mutations/warriors";
 import {
 	getWarriorCombatStats,
 	projectCombatStats,
 } from "@/db-collections/projections";
+import { getWarriorPortrait } from "@/server/warrior-portraits";
 import { Card, CardContent } from "../../../components/ui/card";
 import { WarriorForm } from "../../../components/warrior-form";
 
 export const Route = createFileRoute("/warriors/$warriorId/")({
+	loader: ({ params }) =>
+		getWarriorPortrait({ data: { warriorId: params.warriorId } }),
 	component: WarriorDetailPage,
 });
 
 function WarriorDetailPage() {
 	const { warriorId } = Route.useParams();
+	const portrait = Route.useLoaderData();
 	const { dbClient } = Route.useRouteContext();
 	const collections = getCollections(dbClient);
 	const {
@@ -85,6 +90,13 @@ function WarriorDetailPage() {
 					Edit this warrior’s campaign record.
 				</p>
 			</header>
+
+			<WarriorPortrait
+				key={warrior.id}
+				warriorId={warrior.id}
+				name={warrior.name}
+				portrait={portrait}
+			/>
 
 			<Card className="mt-7">
 				<CardContent>

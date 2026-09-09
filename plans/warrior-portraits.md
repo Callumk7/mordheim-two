@@ -59,10 +59,10 @@ Keep paid generation disabled by default and leave consumer retry/recovery behav
 - Real SQLite/D1 test adapter and JPEG fixture in `workers/image-generation/src/test-support.ts`; mock R2 patterns in `src/server/__tests__/generated-images.test.ts` and local gallery fixture procedure in `scripts/seed-generated-image-local.mjs`.
 
 ## Steps
-- [ ] Before source edits, load project-mandated TanStack guidance for server functions and router data loading; load Wrangler guidance before any Wrangler invocation. No installs or source changes during planning.
-- [ ] Add the nullable association/migration, server prompt builder and conflict-safe submission; preserve generic enqueue behavior.
-- [ ] Add the warrior-scoped lookup, route loader and portrait UI with reload-only status updates.
-- [ ] Add tests for prompt snapshots, association, duplicate submission, failures and generic-flow compatibility.
+- [x] Before source edits, load project-mandated TanStack guidance for server functions and router data loading; load Wrangler guidance before any Wrangler invocation. No installs or source changes during planning.
+- [x] Add the nullable association/migration, server prompt builder and conflict-safe submission; preserve generic enqueue behavior.
+- [x] Add the warrior-scoped lookup, route loader and portrait UI with reload-only status updates.
+- [x] Add tests for prompt snapshots, association, duplicate submission, failures and generic-flow compatibility.
 - [ ] Run checks, verify using local fixtures with generation disabled, and update rollout documentation. Confirm before applying any database migration.
 
 ## Verification
@@ -71,6 +71,9 @@ Keep paid generation disabled by default and leave consumer retry/recovery behav
 3. **Failure/read tests:** queue-send failure and post-send D1 failure retain existing race protections; warrior A never receives warrior B's job; generic jobs are excluded; all job states and absent jobs are represented accurately; no gallery-100 limit. Existing completed-image/R2 failure tests remain green.
 4. **Checks after implementation:** `pnpm test`, `pnpm format`, `pnpm lint`, `pnpm check`, `pnpm exec tsc --noEmit`, `pnpm exec tsc --noEmit -p workers/image-generation/tsconfig.json`, and `pnpm build`. Report pre-existing failures separately. No checks have been run during planning.
 5. **Manual local verification (after migration approval):** with generation disabled, submit for a saved warrior, confirm pending feedback and disabled controls, then reload to see the disabled-generation failure and persisted association. For success, use the existing local JPEG fixture and a documented local-only D1 fixture association to a different test warrior with no job; reload its detail page and verify the image, another warrior's empty state, and the unchanged gallery. Check missing-image fallback, keyboard activation, narrow layout and unsaved-description notice. No paid generation; visual quality of real generated portraits remains an explicitly deferred check.
+
+## Implementation verification status
+Automated verification passed: 229 tests across 19 files; app and consumer TypeScript checks; `pnpm format`, `pnpm lint`, `pnpm check`, and `pnpm build`. Build reports a bundle-size warning but succeeds. Migration `0016_slimy_mathemanic.sql` and Drizzle metadata generated; corrected Drizzle's emitted ADD COLUMN SQL to include `ON DELETE SET NULL`, covered by real SQLite deletion tests. With user approval, applied pending migrations 0011–0016 to local D1 successfully. No remote migration, deployment or paid provider request performed. Local fixture/browser verification remains pending: an existing user dev server is listening on port 3000 and the consumer Wrangler configuration now has IMAGE_GENERATION_ENABLED set to true. Do not submit verification jobs until generation is explicitly disabled. The user chose to stop agent verification and perform manual testing themselves. Leave the dev server and generation configuration unchanged. Automated checks and documentation are complete; step 5's manual verification is handed off to the user, not claimed as passed.
 
 ## Rollout
 Apply the additive migration before deploying the updated app, with explicit operator approval. Consumer deployment/configuration is unchanged. A failed or uncertain first job is deliberately not replaceable through this spike UI; use the existing documented operator diagnosis/repair process. A future retry/regeneration feature can relax the one-job constraint deliberately.

@@ -8,12 +8,37 @@ import type { ImageGenerationMessage } from "@/db/validation/image-generation";
 import { ImageGenerationInputSchema } from "@/db/validation/image-generation";
 
 export async function enqueueImageGeneration(
-	db: Database,
+	db: Pick<Database, "insert" | "update" | "select">,
 	queue: Pick<Queue<ImageGenerationMessage>, "send">,
 	prompt: string,
+	warriorId?: string,
 ) {
 	const jobId = crypto.randomUUID();
-	await db.insert(imageGenerationJobs).values({ id: jobId, prompt });
+	if (warriorId !== undefined) {
+		const inserted = await db
+			.insert(imageGenerationJobs)
+			.values({ id: jobId, prompt, warriorId })
+			.onConflictDoNothing({ target: imageGenerationJobs.warriorId })
+			.returning({ id: imageGenerationJobs.id })
+			.get();
+		if (!inserted) {
+			const existing = await db
+				.select({
+					jobId: imageGenerationJobs.id,
+					status: imageGenerationJobs.status,
+				})
+				.from(imageGenerationJobs)
+				.where(eq(imageGenerationJobs.warriorId, warriorId))
+				.get();
+			if (!existing)
+				throw new Error(
+					"Portrait association changed. Refresh before trying again.",
+				);
+			return existing;
+		}
+	} else {
+		await db.insert(imageGenerationJobs).values({ id: jobId, prompt });
+	}
 
 	try {
 		// Keep the prompt in D1; the consumer loads it using this ID.

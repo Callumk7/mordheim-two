@@ -12,9 +12,14 @@ export const jpegBytes = Uint8Array.from(atob(jpegBase64), (character) =>
 
 export function setupDatabase(now?: () => number) {
 	const sqlite = new DatabaseSync(":memory:");
+	sqlite.exec("PRAGMA foreign_keys = ON");
 	for (const migration of [
+		"0000_rich_blackheart.sql",
+		"0005_lovely_pestilence.sql",
 		"0011_image_generation_jobs.sql",
 		"0012_tense_echo.sql",
+		"0013_last_charles_xavier.sql",
+		"0016_slimy_mathemanic.sql",
 	]) {
 		sqlite.exec(
 			readFileSync(
