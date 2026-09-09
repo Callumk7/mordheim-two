@@ -5,10 +5,12 @@ import {
 	foreignKey,
 	index,
 	integer,
+	real,
 	sqliteTable,
 	text,
 	uniqueIndex,
 } from "drizzle-orm/sqlite-core";
+import { EQUIPMENT_TYPES } from "./validation/equipment";
 import { EVENT_OUTCOMES } from "./validation/event";
 import { MATCH_RESULTS, MATCH_STATUSES } from "./validation/match";
 import { WARBAND_STATUSES } from "./validation/warband";
@@ -78,6 +80,47 @@ export const warriors = sqliteTable(
 	},
 	(table) => [
 		uniqueIndex("warriors_warband_id_unique").on(table.warbandId, table.id),
+	],
+);
+
+export const equipment = sqliteTable(
+	"equipment",
+	{
+		id: text("id").primaryKey(),
+		name: text("name").notNull(),
+		cost: real("cost").notNull(),
+		availability: text("availability").notNull(),
+		range: text("range").notNull(),
+		strength: text("strength").notNull(),
+		specialRules: text("special_rules", { mode: "json" })
+			.$type<string[]>()
+			.notNull(),
+		type: text("type", { enum: EQUIPMENT_TYPES }).notNull(),
+		save: text("save").notNull(),
+		createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+		updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+	},
+	(table) => [
+		check("equipment_type_valid", sql`${table.type} IN ('weapon', 'armour')`),
+	],
+);
+
+export const warriorEquipment = sqliteTable(
+	"warrior_equipment",
+	{
+		id: text("id").primaryKey(),
+		warriorId: text("warrior_id")
+			.notNull()
+			.references(() => warriors.id, { onDelete: "cascade" }),
+		equipmentId: text("equipment_id")
+			.notNull()
+			.references(() => equipment.id, { onDelete: "cascade" }),
+		createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+		updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+	},
+	(table) => [
+		index("warrior_equipment_warrior_idx").on(table.warriorId),
+		index("warrior_equipment_equipment_idx").on(table.equipmentId),
 	],
 );
 
@@ -207,12 +250,31 @@ export const warbandsRelations = relations(warbands, ({ many }) => ({
 	defendingEvents: many(events, { relationName: "defenderWarband" }),
 }));
 
-export const warriorsRelations = relations(warriors, ({ one }) => ({
+export const warriorsRelations = relations(warriors, ({ many, one }) => ({
 	warband: one(warbands, {
 		fields: [warriors.warbandId],
 		references: [warbands.id],
 	}),
+	equipment: many(warriorEquipment),
 }));
+
+export const equipmentRelations = relations(equipment, ({ many }) => ({
+	warriors: many(warriorEquipment),
+}));
+
+export const warriorEquipmentRelations = relations(
+	warriorEquipment,
+	({ one }) => ({
+		warrior: one(warriors, {
+			fields: [warriorEquipment.warriorId],
+			references: [warriors.id],
+		}),
+		equipment: one(equipment, {
+			fields: [warriorEquipment.equipmentId],
+			references: [equipment.id],
+		}),
+	}),
+);
 
 export const matchesRelations = relations(matches, ({ many }) => ({
 	warbandMatches: many(warbandMatches),
