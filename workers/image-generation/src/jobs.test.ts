@@ -1,97 +1,128 @@
-import { DatabaseSync } from "node:sqlite";
-import { drizzle } from "drizzle-orm/d1";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Database } from "@/db/index.server";
 import { enqueueImageGeneration } from "@/server/image-generation";
-import { recordJobConsumption } from "./jobs";
+import { LEASE_MS } from "./jobs";
+import { jobId, setupDatabase } from "./test-support";
 
 vi.mock("cloudflare:workers", () => ({ env: {} }));
-
-const connections: DatabaseSync[] = [];
+const connections: ReturnType<typeof setupDatabase>[] = [];
+function setup(now?: () => number) {
+	const connection = setupDatabase(now);
+	connections.push(connection);
+	return connection;
+}
 afterEach(() => {
-	vi.useRealTimers();
-	for (const connection of connections) connection.close();
-	connections.length = 0;
+	for (const { sqlite } of connections.splice(0)) sqlite.close();
 });
 
-function setup() {
-	const sqlite = new DatabaseSync(":memory:");
-	connections.push(sqlite);
-	sqlite.exec(`CREATE TABLE image_generation_jobs (
-		id TEXT PRIMARY KEY, prompt TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending',
-		error TEXT, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-		updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-	)`);
-	// Execute Drizzle's generated D1 SQL against real SQLite, without Cloudflare.
-	const binding = {
-		prepare(query: string) {
-			return {
-				bind(...params: (string | number | null)[]) {
-					return {
-						async run() {
-							return sqlite.prepare(query).run(...params);
-						},
-						async raw() {
-							const statement = sqlite.prepare(query);
-							statement.setReturnArrays(true);
-							return statement.all(...params);
-						},
-					};
-				},
-			};
-		},
-	} as unknown as D1Database;
-	return { sqlite, db: drizzle(binding) };
-}
+const result = {
+	resultKey: "key",
+	resultMimeType: "image/jpeg",
+	resultBytes: 68,
+	resultEtag: "etag",
+	resultModel: "model",
+};
 
-describe("durable queue receipt", () => {
+describe("image job atomic lease", () => {
 	it.each([
 		"pending",
 		"queued",
 		"enqueue_failed",
-	])("records receipt from %s and preserves it on duplicate delivery", async (status) => {
-		const { db, sqlite } = setup();
-		sqlite
-			.prepare(
-				"INSERT INTO image_generation_jobs (id, prompt, status, error) VALUES (?, ?, ?, ?)",
-			)
-			.run("job", "portrait", status, "old error");
-		expect(await recordJobConsumption(db, "job")).toEqual({ id: "job" });
-		const first = sqlite.prepare("SELECT * FROM image_generation_jobs").get();
-		expect(first).toMatchObject({ status: "consumed", error: null });
-		vi.useFakeTimers();
-		vi.setSystemTime(new Date("2099-01-01T00:00:00Z"));
-		await recordJobConsumption(db, "job");
-		expect(sqlite.prepare("SELECT * FROM image_generation_jobs").get()).toEqual(
-			first,
+	])("claims %s and rejects concurrent claims", async (status) => {
+		const { jobs, insert } = setup();
+		insert(status);
+		const claims = await Promise.all([
+			jobs.claim(jobId, "one"),
+			jobs.claim(jobId, "two"),
+		]);
+		expect(claims.filter(Boolean)).toHaveLength(1);
+		expect((await jobs.load(jobId))?.status).toBe("processing");
+	});
+	it("reclaims only expired leases and fences stale D1 writes", async () => {
+		let now = 1_000_000;
+		const { jobs, insert } = setup(() => now);
+		insert();
+		await jobs.claim(jobId, "old");
+		now += LEASE_MS - 1;
+		expect(await jobs.claim(jobId, "new")).toBeUndefined();
+		now++;
+		expect(await jobs.claim(jobId, "new")).toBeDefined();
+		await expect(jobs.complete(jobId, "old", result)).rejects.toThrow(
+			"lease lost",
 		);
+		await expect(jobs.fail(jobId, "old", "error")).rejects.toThrow(
+			"lease lost",
+		);
+		await expect(jobs.release(jobId, "old", "error")).rejects.toThrow(
+			"lease lost",
+		);
+		await jobs.complete(jobId, "new", result);
+		expect((await jobs.load(jobId))?.status).toBe("completed");
 	});
-
-	it("does not acknowledge a missing record as a successful write", async () => {
-		const { db } = setup();
-		expect(await recordJobConsumption(db, "missing")).toBeUndefined();
-	});
-
 	it.each([
-		false,
-		true,
-	])("a late producer update cannot overwrite consumption (send throws: %s)", async (sendThrows) => {
-		const { db, sqlite } = setup();
-		await enqueueImageGeneration(
-			db as unknown as Database,
-			{
-				send: async ({ jobId }) => {
-					await recordJobConsumption(db, jobId);
-					if (sendThrows) throw new Error("Uncertain delivery");
-					return {
-						metadata: { metrics: { backlogCount: 0, backlogBytes: 0 } },
-					};
+		"completed",
+		"failed",
+		"consumed",
+	])("never claims or exhausts historical/terminal %s", async (status) => {
+		const { jobs, insert } = setup();
+		insert(status);
+		expect(await jobs.claim(jobId, "owner")).toBeUndefined();
+		await jobs.exhaust(jobId);
+		expect((await jobs.load(jobId))?.status).toBe(status);
+	});
+	it("exhaustion cannot overwrite another live owner", async () => {
+		const { jobs, insert } = setup();
+		insert();
+		await jobs.claim(jobId, "owner");
+		await jobs.exhaust(jobId);
+		expect((await jobs.load(jobId))?.status).toBe("processing");
+	});
+	it.each([
+		null,
+		"Earlier enqueue/provider/storage error",
+	])("records exhaustion on an eligible job with prior error %j", async (error) => {
+		const { jobs, insert, sqlite } = setup();
+		insert();
+		sqlite
+			.prepare("UPDATE image_generation_jobs SET error = ? WHERE id = ?")
+			.run(error, jobId);
+		await jobs.exhaust(jobId);
+		expect(await jobs.load(jobId)).toMatchObject({
+			status: "failed",
+			error: "Delivery retries exhausted; inspect DLQ before resubmitting.",
+		});
+	});
+	it("does not claim missing records", async () => {
+		expect(await setup().jobs.claim(jobId, "owner")).toBeUndefined();
+	});
+	it.each([
+		"processing",
+		"completed",
+		"failed",
+		"consumed",
+	])("producer pending-only race guards preserve %s on successful and uncertain send", async (status) => {
+		for (const sendThrows of [false, true]) {
+			const { db, sqlite } = setup();
+			await enqueueImageGeneration(
+				db as unknown as Database,
+				{
+					send: async ({ jobId: id }) => {
+						sqlite
+							.prepare(
+								"UPDATE image_generation_jobs SET status = ?, error = 'consumer outcome' WHERE id = ?",
+							)
+							.run(status, id);
+						if (sendThrows) throw new Error("Uncertain delivery");
+						return {
+							metadata: { metrics: { backlogCount: 0, backlogBytes: 0 } },
+						};
+					},
 				},
-			},
-			"portrait",
-		);
-		expect(
-			sqlite.prepare("SELECT status, error FROM image_generation_jobs").get(),
-		).toMatchObject({ status: "consumed", error: null });
+				"portrait",
+			);
+			expect(
+				sqlite.prepare("SELECT status, error FROM image_generation_jobs").get(),
+			).toMatchObject({ status, error: "consumer outcome" });
+		}
 	});
 });

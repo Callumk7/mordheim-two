@@ -14,7 +14,7 @@
     "lint": "biome lint",
     "check": "biome check",
     "cf-typegen": "wrangler types",
-    "consumer:typegen": "wrangler types workers/image-generation/worker-configuration.d.ts --config workers/image-generation/wrangler.jsonc --env-interface ImageGenerationConsumerEnv --include-runtime false",
+    "consumer:typegen": "wrangler types workers/image-generation/worker-configuration.d.ts --config workers/image-generation/wrangler.jsonc --env-interface ImageGenerationConsumerEnv --include-runtime false --strict-vars false",
     "consumer:check": "wrangler deploy --config workers/image-generation/wrangler.jsonc --dry-run",
     "consumer:deploy": "wrangler deploy --config workers/image-generation/wrangler.jsonc",
     "db:generate": "drizzle-kit generate",
