@@ -77,6 +77,37 @@ Only generic failure metadata plus message ID/attempt count are logged. Do not e
 
 **Apply the schema migration first. Then app and consumer GitHub builds can deploy independently in either order.** The old guarded producer works with the new consumer; the new app works with the receipt-only consumer (showing consumed and no result). The app now needs its R2 binding on deployment but still needs no Gemini secret. The gallery can be deployed independently of the consumer and requires no new migration beyond the existing result columns. `vite.config.ts` keeps the consumer auxiliary Worker development-only, not coupled to the app production bundle. Avoid rolling back to the receipt-only consumer after generation is enabled: it is not a safe generation retry handler.
 
+## Warrior portraits (one-job spike)
+
+`/warriors/<warriorId>` now offers **Generate portrait** when no linked job exists. Save profile changes first: the server snapshots the saved warrior name, class and description, plus the parent warband's name, faction and captain. Campaign statistics and equipment are excluded. The prompt requests a single head-and-shoulders Mordheim portrait with gothic, weathered illustration details; the existing Gemini adapter appends the John Blanche style instruction. Missing descriptions are allowed. Assembled prompts over 4,000 characters are rejected with instructions to shorten saved details, never silently truncated.
+
+Migration `0016_slimy_mathemanic.sql` adds nullable `warrior_id` with a unique index and `ON DELETE SET NULL`. **Apply this migration before deploying the updated app, with operator approval.** Generic jobs remain unlinked. No consumer deployment, binding changes or new R2 key scheme are needed. Deleting a warrior or its warband detaches jobs; it does not delete images or remove jobs from the gallery.
+
+Only the first insert sends a queue message; concurrent/repeated submissions return the existing job. This is one job per warrior, including failed or uncertain jobs: there are no retry, regenerate or replacement controls. A producer crash between insert and send can leave a pending job requiring operator diagnosis. Existing consumer retries still operate normally. Follow the D1/R2/DLQ diagnosis policy above rather than blindly resubmitting or deleting job rows.
+
+The detail page shows submission feedback, linked status and a completed image through the existing image endpoint. **Refresh the browser page to check progress or retry image loading.** There is no polling. Failed jobs show sanitized errors and their job ID for `/queue-jobs` diagnosis; lookup failures never enable generation as if no job existed. The new portrait POST/GET RPCs have the same unauthenticated-spike limitation as the original endpoints and must be protected before paid generation is enabled. A warrior association is not authorization.
+
+### Local portrait fixture (no paid requests)
+
+After approving/applying local migrations, stop dev and run the existing `node scripts/seed-generated-image-local.mjs` fixture. In **local D1 only**, associate it with a dedicated fixture warrior using the following SQL via `pnpm exec wrangler d1 execute mordheim-two-db --local --file <fixture.sql>`:
+
+```sql
+INSERT INTO warbands (id, name, faction, captain)
+VALUES ('local-portrait-band', 'Portrait fixture', 'Reikland', 'Fixture captain')
+ON CONFLICT(id) DO NOTHING;
+INSERT INTO warriors (id, name, class, description, warband_id)
+VALUES ('local-portrait-warrior', 'Portrait fixture warrior', 'Marksman',
+        'Weathered face and a green hood', 'local-portrait-band')
+ON CONFLICT(id) DO NOTHING;
+UPDATE image_generation_jobs SET warrior_id = 'local-portrait-warrior'
+WHERE id = 'local-gallery-fixture' AND warrior_id IS NULL
+AND NOT EXISTS (
+  SELECT 1 FROM image_generation_jobs WHERE warrior_id = 'local-portrait-warrior'
+);
+```
+
+Restart dev and open `/warriors/local-portrait-warrior`: expect the one-pixel fixture, no generate button and an unchanged gallery. A different warrior should have no portrait. For the failure flow use a different saved test warrior with generation disabled, submit once and refresh to see the disabled-generation failure. Check keyboard activation, narrow layout, unsaved-profile notice and missing-image fallback. Do not use real provider requests to validate this flow. Actual generated portrait quality remains a separate opt-in paid check after authorization prerequisites are satisfied.
+
 ## Local review (no paid requests)
 
 ```sh

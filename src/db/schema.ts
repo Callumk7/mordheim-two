@@ -18,6 +18,9 @@ import { WARRIOR_STATUSES } from "./validation/warrior";
 export const imageGenerationJobs = sqliteTable("image_generation_jobs", {
 	id: text("id").primaryKey(),
 	prompt: text("prompt").notNull(),
+	warriorId: text("warrior_id")
+		.references((): AnySQLiteColumn => warriors.id, { onDelete: "set null" })
+		.unique(),
 	status: text("status", {
 		enum: [
 			"pending",
