@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 import { createServerFn } from "@tanstack/react-start";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { Database } from "@/db/index.server";
 import { getDb } from "@/db/index.server";
 import { imageGenerationJobs } from "@/db/schema";
@@ -16,7 +16,7 @@ export async function enqueueImageGeneration(
 	await db.insert(imageGenerationJobs).values({ id: jobId, prompt });
 
 	try {
-		// Keep the prompt in D1; the future consumer loads it using this ID.
+		// Keep the prompt in D1; the consumer records receipt using this ID.
 		await queue.send({ jobId });
 	} catch {
 		await db
@@ -26,15 +26,26 @@ export async function enqueueImageGeneration(
 				error: "Queue submission failed; delivery may be uncertain.",
 				updatedAt: new Date().toISOString(),
 			})
-			.where(eq(imageGenerationJobs.id, jobId));
+			.where(
+				and(
+					eq(imageGenerationJobs.id, jobId),
+					eq(imageGenerationJobs.status, "pending"),
+				),
+			);
 		return { jobId, status: "enqueue_failed" as const };
 	}
 
 	// Deliberately outside the catch: a D1 failure here does not mean send failed.
+	// Delivery can race this update; never overwrite a consumer's receipt.
 	await db
 		.update(imageGenerationJobs)
 		.set({ status: "queued", updatedAt: new Date().toISOString() })
-		.where(eq(imageGenerationJobs.id, jobId));
+		.where(
+			and(
+				eq(imageGenerationJobs.id, jobId),
+				eq(imageGenerationJobs.status, "pending"),
+			),
+		);
 	return { jobId, status: "queued" as const };
 }
 

@@ -35,10 +35,13 @@ function batch(...messages: Message<unknown>[]): MessageBatch<unknown> {
 afterEach(() => vi.restoreAllMocks());
 
 describe("image generation consumer scaffold", () => {
-	it("loads and acknowledges a job without logging its prompt", async () => {
+	it("records consumption before acknowledging without logging its prompt", async () => {
 		const log = vi.spyOn(console, "info").mockImplementation(() => {});
-		const load = vi.fn().mockResolvedValue(job);
 		const delivery = message({ jobId });
+		const load = vi.fn().mockImplementation(async () => {
+			expect(delivery.ack).not.toHaveBeenCalled();
+			return job;
+		});
 		await consumeImageGenerationBatch(batch(delivery), load);
 		expect(load).toHaveBeenCalledExactlyOnceWith(jobId);
 		expect(delivery.ack).toHaveBeenCalledOnce();
@@ -49,7 +52,7 @@ describe("image generation consumer scaffold", () => {
 		);
 	});
 
-	it("retries invalid payloads without querying D1", async () => {
+	it("retries invalid payloads without writing D1", async () => {
 		vi.spyOn(console, "error").mockImplementation(() => {});
 		const load = vi.fn();
 		const deliveries = [null, {}, { jobId: "bad" }, { jobId: 123 }].map(
@@ -82,7 +85,7 @@ describe("image generation consumer scaffold", () => {
 		expect(successful.retry).not.toHaveBeenCalled();
 	});
 
-	it("tolerates duplicate delivery without database writes or paid side effects", async () => {
+	it("acknowledges duplicate delivery after recording receipt", async () => {
 		vi.spyOn(console, "info").mockImplementation(() => {});
 		const load = vi.fn().mockResolvedValue(job);
 		const deliveries = [message({ jobId }), message({ jobId })];
