@@ -1,8 +1,8 @@
 import { useNavigate } from "@tanstack/react-router";
 import { ChevronRight, Trash2, Users } from "lucide-react";
 import { useMemo } from "react";
-import type { Warband } from "@/db/warband";
-import type { Warrior } from "@/db/warrior";
+import type { Warband } from "@/db/validation/warband";
+import type { Warrior } from "@/db/validation/warrior";
 import {
 	type CombatStatsProjection,
 	getWarbandCombatStats,

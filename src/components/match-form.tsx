@@ -19,8 +19,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { MATCH_STATUSES, type Match } from "@/db/match";
-import type { Warband } from "@/db/warband";
+import { MATCH_STATUSES, type Match } from "@/db/validation/match";
+import type { Warband } from "@/db/validation/warband";
 import {
 	canSubmitMatch,
 	changeMatchParticipantSelection,

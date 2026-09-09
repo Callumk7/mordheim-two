@@ -86,8 +86,9 @@ The deployment command builds the TanStack Start application and invokes Wrangle
 
 - `src/components/ui/` — design-system primitives
 - `src/components/table/` — application table components
-- `src/db/` — Drizzle schema, database access, domain modules, and server functions
+- `src/db/` — Drizzle schema and database access, with Zod schemas in `src/db/validation/`
 - `src/db-collections/` — TanStack DB collections
+- `src/server/` — domain-grouped server functions
 - `src/routes/` — file-based TanStack Router routes
 - `src/lib/` — shared utilities
 - `drizzle/` — generated Drizzle/D1 migrations

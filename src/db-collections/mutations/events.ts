@@ -1,5 +1,5 @@
 import { safeRandomUUID } from "@tanstack/react-db";
-import type { EventInput, EventOutcome } from "@/db/event";
+import type { EventInput, EventOutcome } from "@/db/validation/event";
 import type { AppCollections } from "..";
 
 type NewEvent = Omit<

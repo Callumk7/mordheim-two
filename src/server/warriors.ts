@@ -1,9 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { eq, or } from "drizzle-orm";
-import z from "zod";
-import { getDb } from "./index.server";
-import { events, warriors } from "./schema";
-import { WarriorSchema, WarriorUpdateSchema } from "./warrior";
+import { getDb } from "@/db/index.server";
+import { events, warriors } from "@/db/schema";
+import {
+	WarriorDeleteInputSchema,
+	WarriorSchema,
+	WarriorUpdateInputSchema,
+} from "@/db/validation/warrior";
 
 export const listWarriors = createServerFn({ method: "GET" }).handler(() =>
 	getDb().select().from(warriors).orderBy(warriors.name),
@@ -16,12 +19,7 @@ export const createWarrior = createServerFn({ method: "POST" })
 	});
 
 export const updateWarrior = createServerFn({ method: "POST" })
-	.validator(
-		z.object({
-			id: z.string().min(1),
-			changes: WarriorUpdateSchema,
-		}),
-	)
+	.validator(WarriorUpdateInputSchema)
 	.handler(async ({ data }) => {
 		if (Object.keys(data.changes).length === 0) return;
 
@@ -35,7 +33,7 @@ export const updateWarrior = createServerFn({ method: "POST" })
 	});
 
 export const deleteWarrior = createServerFn({ method: "POST" })
-	.validator(z.object({ id: z.string().min(1) }))
+	.validator(WarriorDeleteInputSchema)
 	.handler(async ({ data }) => {
 		const db = getDb();
 		const referenced = await db

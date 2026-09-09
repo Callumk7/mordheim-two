@@ -1,9 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { eq, or } from "drizzle-orm";
-import { z } from "zod";
-import { getDb } from "./index.server";
-import { events, warbandMatches, warbands, warriors } from "./schema";
-import { WarbandSchema, WarbandUpdateSchema } from "./warband";
+import { getDb } from "@/db/index.server";
+import { events, warbandMatches, warbands, warriors } from "@/db/schema";
+import {
+	WarbandDeleteInputSchema,
+	WarbandSchema,
+	WarbandUpdateInputSchema,
+} from "@/db/validation/warband";
 
 export const listWarbands = createServerFn({ method: "GET" }).handler(() =>
 	getDb().select().from(warbands).orderBy(warbands.name),
@@ -16,12 +19,7 @@ export const createWarband = createServerFn({ method: "POST" })
 	});
 
 export const updateWarband = createServerFn({ method: "POST" })
-	.validator(
-		z.object({
-			id: z.string().min(1),
-			changes: WarbandUpdateSchema,
-		}),
-	)
+	.validator(WarbandUpdateInputSchema)
 	.handler(async ({ data }) => {
 		if (Object.keys(data.changes).length === 0) return;
 
@@ -35,7 +33,7 @@ export const updateWarband = createServerFn({ method: "POST" })
 	});
 
 export const deleteWarband = createServerFn({ method: "POST" })
-	.validator(z.object({ id: z.string().min(1) }))
+	.validator(WarbandDeleteInputSchema)
 	.handler(async ({ data }) => {
 		const db = getDb();
 		const referenced = await db

@@ -1,5 +1,5 @@
-import type { WarbandMatch } from "@/db/warband-match";
-import type { Warrior } from "@/db/warrior";
+import type { WarbandMatch } from "@/db/validation/warband-match";
+import type { Warrior } from "@/db/validation/warrior";
 
 export function getParticipantWarbandIds(
 	matchId: string,

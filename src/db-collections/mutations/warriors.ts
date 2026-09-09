@@ -1,6 +1,6 @@
 import { type DbClient, safeRandomUUID } from "@tanstack/react-db";
-import type { Warrior } from "@/db/warrior";
-import { deleteWarrior } from "@/db/warriors.functions";
+import type { Warrior } from "@/db/validation/warrior";
+import { deleteWarrior } from "@/server/warriors";
 import type { AppCollections } from "..";
 
 type NewWarrior = Omit<Warrior, "id" | "createdAt" | "updatedAt">;

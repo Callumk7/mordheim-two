@@ -10,7 +10,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import type { Warband } from "@/db/warband";
+import type { Warband } from "@/db/validation/warband";
 import { getCollections } from "@/db-collections";
 import { createWarbandTransaction } from "@/db-collections/mutations/warbands";
 import { createWarriorTransaction } from "@/db-collections/mutations/warriors";

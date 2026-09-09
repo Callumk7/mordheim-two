@@ -3,11 +3,11 @@ import {
 	eq,
 	type InitialQueryBuilder,
 } from "@tanstack/react-db";
-import type { Event } from "@/db/event";
-import type { Match } from "@/db/match";
-import type { Warband } from "@/db/warband";
-import type { WarbandMatch } from "@/db/warband-match";
-import type { Warrior } from "@/db/warrior";
+import type { Event } from "@/db/validation/event";
+import type { Match } from "@/db/validation/match";
+import type { Warband } from "@/db/validation/warband";
+import type { WarbandMatch } from "@/db/validation/warband-match";
+import type { Warrior } from "@/db/validation/warrior";
 
 type StringKeyedCollection<T extends object> = Collection<
 	T,

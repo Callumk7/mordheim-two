@@ -4,14 +4,14 @@ import {
 	getParticipantWarbandIds,
 	getWarriorsForWarband,
 } from "../../lib/event-options";
+import { events, warbandMatches, warriors } from "../schema";
 import {
 	EventCreateSchema,
 	EventSchema,
 	EventUpdateSchema,
 	validateEventMembership,
-} from "../event";
-import { events, warbandMatches, warriors } from "../schema";
-import { WarbandMatchSchema } from "../warband-match";
+} from "../validation/event";
+import { WarbandMatchSchema } from "../validation/warband-match";
 
 const validEvent = {
 	id: "event-1",

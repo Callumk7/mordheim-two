@@ -1,4 +1,4 @@
-import type { Match } from "@/db/match";
+import type { Match } from "@/db/validation/match";
 
 export type MatchFormValues = Pick<Match, "name" | "scenario" | "status"> & {
 	participantWarbandIds: string[];
