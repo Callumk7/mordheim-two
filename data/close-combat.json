@@ -1,0 +1,854 @@
+[
+  {
+    "name": "Axe",
+    "cost": 5,
+    "availability": "Common",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Cutting Edge"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Ball and Chain",
+    "cost": 15,
+    "availability": "Common (Goblins only)",
+    "range": "Close Combat",
+    "strength": "As user +2",
+    "specialRules": [
+      "Incredible Force",
+      "Random",
+      "Cumbersome",
+      "Unwieldy"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Barbed Whip",
+    "cost": 15,
+    "availability": "Rare 9 (One Marauders of Chaos Hero only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Whipcrack",
+      "Cannot Be Parried",
+      "Enrage"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Beastlash",
+    "cost": 10,
+    "availability": "Rare 8 (Dark Elves Beastmaster only)",
+    "range": "Close Combat",
+    "strength": "As user -1",
+    "specialRules": [
+      "Beastbane",
+      "Cannot Be Parried",
+      "Whipcrack"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Bec de Corbin",
+    "cost": 0,
+    "availability": "Common",
+    "range": "Close Combat",
+    "strength": "As user +1",
+    "specialRules": [
+      "Two-handed",
+      "Strike First",
+      "Concussion"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Boat Hook",
+    "cost": 8,
+    "availability": "Common (Pirates only)",
+    "range": "Close Combat",
+    "strength": "As user -1",
+    "specialRules": [
+      "Strike First",
+      "Two Handed"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Boss Pole",
+    "cost": 20,
+    "availability": "Common (Forest and Night Goblins only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Strike First",
+      "Unwieldy",
+      "Cavalry Bonus",
+      "Ignore Animosity"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Brass Knuckles",
+    "cost": 20,
+    "availability": "Rare 6",
+    "range": "Close Combat",
+    "strength": "As user +1",
+    "specialRules": [
+      "Pair",
+      "Cumbersome"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Brazier Iron",
+    "cost": 35,
+    "availability": "Rare 7 (Witch Hunters only)",
+    "range": "Close Combat",
+    "strength": "As user +1",
+    "specialRules": [
+      "Two handed",
+      "Fire"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Broadsword",
+    "cost": 15,
+    "availability": "Common (Bretonnian Chapel Guard Knights only)",
+    "range": "Close Combat",
+    "strength": "As user +1",
+    "specialRules": [
+      "Difficult to use",
+      "Strike last"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Cat O' Nine Tails",
+    "cost": 8,
+    "availability": "Common (Pirate Heroes only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Cannot be parried",
+      "Weak",
+      "Whipcrack"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Cathayan Longsword",
+    "cost": 75,
+    "availability": "Rare 12",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Parry",
+      "Mastercrafted",
+      "Cutting Edge"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Censer",
+    "cost": 40,
+    "availability": "Rare 9 (Skaven of Clan Pestilens only)",
+    "range": "Close Combat",
+    "strength": "As user +2",
+    "specialRules": [
+      "Heavy",
+      "Two-handed",
+      "Fog of Death"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Chain Sticks",
+    "cost": 20,
+    "availability": "Rare 7 (Battle Monks of Cathay only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Flurry",
+      "Two-handed"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Claw of the Old Ones",
+    "cost": 30,
+    "availability": "Rare 12 (Amazons (Mordheim) only)",
+    "range": "Close Combat",
+    "strength": "As user +1",
+    "specialRules": [
+      "No save",
+      "Parry"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Cleaver",
+    "cost": 3,
+    "availability": "Common (Mootlanders only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "-1 Save"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Club",
+    "cost": 3,
+    "availability": "Common",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Concussion"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Club, Mace or Hammer",
+    "cost": 3,
+    "availability": "Common",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Concussion"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Dagger",
+    "cost": 2,
+    "availability": "Common",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "+1 Enemy armour save"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Dark Elf Blade",
+    "cost": 20,
+    "availability": "Rare 9 (Dark Elves only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Critical Damage",
+      "Wicked Edge"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Disease Dagger",
+    "cost": 15,
+    "availability": "Rare 8 (Skaven of Clan Pestilens only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "+1 Enemy Armour Save",
+      "Infecting"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Double-handed weapon",
+    "cost": 15,
+    "availability": "Common",
+    "range": "Close Combat",
+    "strength": "As user +2",
+    "specialRules": [
+      "Two-handed",
+      "Strike last"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Dragon Sword",
+    "cost": 20,
+    "availability": "Rare 10 (Battle Monks and Merchant Caravans only)",
+    "range": "Close Combat",
+    "strength": "As user +1",
+    "specialRules": [
+      "Two-handed",
+      "Parry"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Dwarf Axe",
+    "cost": 15,
+    "availability": "Rare 8 (Dwarfs only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Cutting Edge",
+      "Parry"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Fighting Claws",
+    "cost": 35,
+    "availability": "Rare 7 (Skaven only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Pair",
+      "Climb",
+      "Parry",
+      "Cumbersome"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Fist",
+    "cost": 0,
+    "availability": "Common",
+    "range": "Close Combat",
+    "strength": "As user -1",
+    "specialRules": [
+      "Warriors using their fists can only ever make 1 attack.",
+      "+1 Enemy armour save"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Flail",
+    "cost": 15,
+    "availability": "Common",
+    "range": "Close Combat",
+    "strength": "As user +2",
+    "specialRules": [
+      "Heavy",
+      "Two-handed"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Great Axe",
+    "cost": 25,
+    "availability": "Rare 8 (Marauders of Chaos Heroes with the Chosen of Chaos skill only)",
+    "range": "Close Combat",
+    "strength": "As user +2",
+    "specialRules": [
+      "Two-handed",
+      "Strike last",
+      "Cutting Edge"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Gromril Weapon",
+    "cost": 4,
+    "availability": "Rare 11",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Gromril"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Halberd",
+    "cost": 10,
+    "availability": "Common",
+    "range": "Close Combat",
+    "strength": "As user +1",
+    "specialRules": [
+      "Two-handed"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Hammer",
+    "cost": 3,
+    "availability": "Common",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Concussion"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Hobgoblin Poisoned Daggers",
+    "cost": 15,
+    "availability": "Rare 9 (Hobgoblins only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Pair",
+      "Swift",
+      "Poisoned",
+      "+1 Enemy Armour Save"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Horseman's Hammer",
+    "cost": 12,
+    "availability": "Rare 10",
+    "range": "Close Combat",
+    "strength": "As user +1",
+    "specialRules": [
+      "Two-handed",
+      "Cavalry Charge"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Iron Fist",
+    "cost": 15,
+    "availability": "Common (Maneaters only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Parry",
+      "Gloved",
+      "Dual-role"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Ithilmar Weapon",
+    "cost": 3,
+    "availability": "Rare 9",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Ithilmar"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Katar",
+    "cost": 5,
+    "availability": "Rare 4",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "-1 enemy armour save"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Kitchen Knife",
+    "cost": 2,
+    "availability": "Common (Mootlanders only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "+1 Enemy armour save"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Ladle",
+    "cost": 2,
+    "availability": "Common (Mootlanders only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "No save except shields",
+      "Knuckle Cracking"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Lance",
+    "cost": 40,
+    "availability": "Rare 8",
+    "range": "Close Combat",
+    "strength": "As user +2 when charging on horseback",
+    "specialRules": [
+      "Cavalry weapon",
+      "Cavalry bonus"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Mace",
+    "cost": 3,
+    "availability": "Common",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Concussion"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Main Gauche",
+    "cost": 7,
+    "availability": "Rare 7 (Hochland Bandits only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Parry",
+      "+1 Enemy Armour Save"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Man-catcher",
+    "cost": 25,
+    "availability": "Rare 10",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Capture",
+      "Two-handed"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Misericordia",
+    "cost": 10,
+    "availability": "Common (Lustrian Reavers only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "+1 Enemy armour save",
+      "Armour Piercing"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Morning Star",
+    "cost": 15,
+    "availability": "Common",
+    "range": "Close Combat",
+    "strength": "As user +1",
+    "specialRules": [
+      "Heavy",
+      "Difficult to use"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Obsidian Weapon",
+    "cost": 4,
+    "availability": "Rare 12 (Marauders of Chaos, Norse, Beastmen, Chaos Dwarfs, Possessed and Carnival of Chaos only)",
+    "range": "Close Combat",
+    "strength": "As user +1",
+    "specialRules": [
+      "Blemished",
+      "Heavy"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Ogre Club",
+    "cost": 10,
+    "availability": "Common (Maneaters only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Concussion",
+      "Crushing Attack"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Pike (Merchant Caravans)",
+    "cost": 10,
+    "availability": "Rare 8 (Merchant Caravans only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Strike First",
+      "Two Handed"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Pike (Tileans)",
+    "cost": 12,
+    "availability": "Rare 7 (Tileans only)",
+    "range": "Close Combat (3\")",
+    "strength": "As user",
+    "specialRules": [
+      "Strike First",
+      "Long Polearm",
+      "Unwieldy",
+      "Large"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Poison Daggers",
+    "cost": 25,
+    "availability": "Common (Night Goblins only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Paired",
+      "Poisoned",
+      "+1 Enemy armour save"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Quarter Staff",
+    "cost": 15,
+    "availability": "Common (Battle Monks of Cathay only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Balanced",
+      "Parry",
+      "Freestyle"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Rapier",
+    "cost": 15,
+    "availability": "Rare 5 (Reiklanders, Marienburgers, Tileans, Hochland Bandits, and Merchant Caravans only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Parry",
+      "Barrage",
+      "Armour Save"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Serpent Staff",
+    "cost": 30,
+    "availability": "Common (Tomb Guardians Liche Priest only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Parry"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Shortsword",
+    "cost": 7,
+    "availability": "Common (Bretonnian Chapel Guard Knights only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Parry",
+      "+1 Enemy armour save"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Sigmarite Warhammer",
+    "cost": 15,
+    "availability": "Common (Sisters of Sigmar only)",
+    "range": "Close Combat",
+    "strength": "As user +1",
+    "specialRules": [
+      "Concussion",
+      "Holy Weapon"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Sons of Hashut Obsidian Weapon",
+    "cost": 60,
+    "availability": "Rare 10 (Chaos Dwarfs only)",
+    "range": "Close Combat",
+    "strength": "As user +1",
+    "specialRules": [
+      "Personal",
+      "Heavy"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Spear",
+    "cost": 10,
+    "availability": "Common",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Strike first",
+      "Unwieldy",
+      "Cavalry bonus"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Spiked Gauntlet",
+    "cost": 15,
+    "availability": "Common (Pit Fighters only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Parry"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Starblade",
+    "cost": 15,
+    "availability": "Rare 7 (Amazons (Lustria) only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "+1 Enemy armour save",
+      "Potential Parry"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Starsword",
+    "cost": 30,
+    "availability": "Rare 10 (Amazons (Lustria) only)",
+    "range": "Close Combat",
+    "strength": "As user +1",
+    "specialRules": [
+      "Parry",
+      "Ignores Armour"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Steel Whip",
+    "cost": 10,
+    "availability": "Common (Sisters of Sigmar and Chaos Dwarfs only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Cannot be parried",
+      "Whipcrack"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Sword",
+    "cost": 10,
+    "availability": "Common",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Parry"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Sword Breaker",
+    "cost": 30,
+    "availability": "Rare 8",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Parry",
+      "Trap Blade"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Tenderiser",
+    "cost": 3,
+    "availability": "Common (Mootlanders only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Stuns on 2-4"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Trident",
+    "cost": 15,
+    "availability": "Rare 7 (Pit Fighters only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Parry",
+      "Strike first"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Weeping Blades",
+    "cost": 50,
+    "availability": "Rare 9 (Skaven only)",
+    "range": "Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Pair",
+      "Venomous",
+      "Parry"
+    ],
+    "type": "weapon",
+    "save": null
+  }
+]

@@ -1,0 +1,289 @@
+[
+  {
+    "name": "Blunderbuss",
+    "cost": 30,
+    "availability": "Rare 9",
+    "range": "Special",
+    "strength": "3",
+    "specialRules": [
+      "Shot",
+      "Fire Once"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Chaos Dwarf Blunderbuss",
+    "cost": 40,
+    "availability": "Rare 9 (Chaos Dwarfs only)",
+    "range": "16\"",
+    "strength": "3",
+    "specialRules": [
+      "Shot",
+      "Prepare Shot"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Double-barrelled Duelling Pistol",
+    "cost": 45,
+    "availability": "Rare 11 (Rare 12 for a brace) (Gunnery School of Nuln only)",
+    "range": "9\"",
+    "strength": "4",
+    "specialRules": [
+      "Accuracy",
+      "Prepare shot",
+      "Save modifier",
+      "Hand-to-hand",
+      "Double-barrelled"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Double-barrelled Handgun",
+    "cost": 60,
+    "availability": "Rare 10 (Gunnery School of Nuln only)",
+    "range": "24\"",
+    "strength": "4",
+    "specialRules": [
+      "Prepare shot",
+      "Move or fire",
+      "Save Modifier",
+      "Double-barrelled"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Double-barrelled Pistol",
+    "cost": 25,
+    "availability": "Rare 9 (Rare 10 for a brace) (Gunnery School of Nuln only)",
+    "range": "6\"",
+    "strength": "4",
+    "specialRules": [
+      "Prepare Shot",
+      "Save Modifier",
+      "Hand-to-hand",
+      "Double-barrelled"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Duelling Pistol",
+    "cost": 30,
+    "availability": "Rare 10",
+    "range": "10\"",
+    "strength": "4",
+    "specialRules": [
+      "Accuracy",
+      "Prepare shot",
+      "Save modifier",
+      "Hand-to-hand"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Hand-held Mortar",
+    "cost": 80,
+    "availability": "Rare 12 (Gunnery School of Nuln and Maneaters only)",
+    "range": "24\"",
+    "strength": "4",
+    "specialRules": [
+      "Prepare shot",
+      "Move or fire",
+      "Save Modifier",
+      "Scatter",
+      "Experimental",
+      "Explosive Radius"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Handgun",
+    "cost": 35,
+    "availability": "Rare 8",
+    "range": "24\"",
+    "strength": "4",
+    "specialRules": [
+      "Prepare shot",
+      "Move or fire",
+      "Save Modifier"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Hersten-Wenkler Pigeon Bombs",
+    "cost": 30,
+    "availability": "Rare 8 (Gunnery School of Nuln only)",
+    "range": "Unlimited",
+    "strength": "4",
+    "specialRules": [
+      "Move or fire",
+      "Explosive Radius",
+      "Temperamental",
+      "Pigeon Roost"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Hunting Rifle",
+    "cost": 200,
+    "availability": "Rare 11",
+    "range": "48\"",
+    "strength": "4",
+    "specialRules": [
+      "Move or fire",
+      "Prepare shot",
+      "Pick target",
+      "Save modifier"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Ostlander Double-barrelled Hunting Rifle",
+    "cost": 300,
+    "availability": "Rare 12 (Ostlanders only)",
+    "range": "48\"",
+    "strength": "4",
+    "specialRules": [
+      "A double-barrelled gun (of any sort) is treated exactly like a normal version with one exception. Any enemy is hit by two blasts rather than one (ie, a pistol causes two S4 hits rather than one for each successful hit). However, each barrel takes a full turn to reload (although if you reload only one barrel you can fire it like a normal pistol/rifle). If you own a brace of double-barreled pistols you may fire them every other round (rather than every round like a normal brace)."
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Ostlander Double-barrelled Pistol",
+    "cost": 30,
+    "availability": "Rare 10 (Ostlanders only)",
+    "range": "6\"",
+    "strength": "4",
+    "specialRules": [
+      "A double-barrelled gun (of any sort) is treated exactly like a normal version with one exception. Any enemy is hit by two blasts rather than one (ie, a pistol causes two S4 hits rather than one for each successful hit). However, each barrel takes a full turn to reload (although if you reload only one barrel you can fire it like a normal pistol/rifle). If you own a brace of double-barreled pistols you may fire them every other round (rather than every round like a normal brace)."
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Pistol",
+    "cost": 15,
+    "availability": "Rare 8",
+    "range": "6\"",
+    "strength": "4",
+    "specialRules": [
+      "Prepare shot",
+      "Save modifier",
+      "Hand-to-hand"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Repeater Handgun",
+    "cost": 60,
+    "availability": "Rare 11 (Gunnery School of Nuln only)",
+    "range": "24\"",
+    "strength": "4",
+    "specialRules": [
+      "Save Modifier",
+      "Move or Fire",
+      "Fire Thrice",
+      "Experimental",
+      "Slow Reload"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Repeater Pistol",
+    "cost": 30,
+    "availability": "Rare 9 (Gunnery School of Nuln only)",
+    "range": "6\"",
+    "strength": "4",
+    "specialRules": [
+      "Save Modifier",
+      "Fire Thrice",
+      "Experimental",
+      "Quick Reload",
+      "Not a Club"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Swivel Gun",
+    "cost": 65,
+    "availability": "Rare 8 (Pirate Gunners only, max one per warband Limit: 1 per warband)",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Prepare shot",
+      "Move or fire",
+      "Maximum 1 per warband",
+      "Cumbersome",
+      "Blackpowder Rules",
+      "Special Ammunition"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Ball Shot",
+    "cost": 5,
+    "availability": null,
+    "range": "36\"",
+    "strength": "5",
+    "specialRules": [
+      "Armour Save -2",
+      "Concussion"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Chain Shot",
+    "cost": 2,
+    "availability": null,
+    "range": "24\"",
+    "strength": "4",
+    "specialRules": [
+      "Armour Save -1",
+      "All Wrapped Up!"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Grape Shot",
+    "cost": 2,
+    "availability": null,
+    "range": "24\"",
+    "strength": "3",
+    "specialRules": [
+      "It's Everywhere!"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Warplock pistol",
+    "cost": 35,
+    "availability": "Rare 11 (Skaven only)",
+    "range": "8\"",
+    "strength": "5",
+    "specialRules": [
+      "Prepare shot",
+      "Save modifier",
+      "Hand-to-hand"
+    ],
+    "type": "weapon",
+    "save": null
+  }
+]
