@@ -1,0 +1,1 @@
+ALTER TABLE `warriors` ADD `description` text;

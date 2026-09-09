@@ -66,6 +66,7 @@ export const warriors = sqliteTable(
 		id: text("id").primaryKey(),
 		name: text("name").notNull(),
 		class: text("class").notNull(),
+		description: text("description"),
 		status: text("status", { enum: WARRIOR_STATUSES })
 			.notNull()
 			.default("Alive"),
