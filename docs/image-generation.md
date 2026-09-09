@@ -22,7 +22,7 @@ The flag is a deliberate opt-in safety switch, **not** an authorization system. 
 ```ts
 client.interactions.create({
   model: "gemini-3.1-flash-image",
-  input: prompt,
+  input: `${prompt}\n\nCreate the image in the style of John Blanche.`,
   stream: false,
   store: false,
   response_format: {
@@ -30,6 +30,8 @@ client.interactions.create({
   } satisfies Interactions.ImageResponseFormat,
 }, { maxRetries: 0, timeout: 120_000, signal: AbortSignal.timeout(120_000) })
 ```
+
+Every new provider request appends `Create the image in the style of John Blanche.` to the submitted prompt. D1 and the gallery retain the original user prompt; existing stored images are not regenerated.
 
 The response format is checked against the SDK's narrow `Interactions.ImageResponseFormat` type (imported from `@google/genai`), which currently permits JPEG MIME only; the enclosing response-format union also allows arbitrary dictionaries and is insufficient to validate image options.
 

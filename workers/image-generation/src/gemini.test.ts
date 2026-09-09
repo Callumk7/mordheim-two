@@ -48,7 +48,7 @@ describe("Gemini interactions adapter (real SDK, mocked network)", () => {
 		expect(request.url).toContain("/interactions");
 		expect(await request.json()).toMatchObject({
 			model: IMAGE_MODEL,
-			input: "portrait",
+			input: "portrait\n\nCreate the image in the style of John Blanche.",
 			stream: false,
 			store: false,
 			response_format: {

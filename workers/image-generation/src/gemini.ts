@@ -61,7 +61,7 @@ export function createGeminiGenerator(apiKey: string) {
 			const interaction = await client.interactions.create(
 				{
 					model: IMAGE_MODEL,
-					input: prompt,
+					input: `${prompt}\n\nCreate the image in the style of John Blanche.`,
 					stream: false,
 					store: false,
 					response_format: {
