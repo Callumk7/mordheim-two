@@ -16,7 +16,7 @@ export async function enqueueImageGeneration(
 	await db.insert(imageGenerationJobs).values({ id: jobId, prompt });
 
 	try {
-		// Keep the prompt in D1; the consumer records receipt using this ID.
+		// Keep the prompt in D1; the consumer loads it using this ID.
 		await queue.send({ jobId });
 	} catch {
 		await db
@@ -36,7 +36,7 @@ export async function enqueueImageGeneration(
 	}
 
 	// Deliberately outside the catch: a D1 failure here does not mean send failed.
-	// Delivery can race this update; never overwrite a consumer's receipt.
+	// Delivery can race this update; never overwrite a consumer's job state.
 	await db
 		.update(imageGenerationJobs)
 		.set({ status: "queued", updatedAt: new Date().toISOString() })

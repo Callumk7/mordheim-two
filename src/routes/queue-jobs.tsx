@@ -42,9 +42,9 @@ function QueueJobsPage() {
 				<div className="space-y-2">
 					<h1 className="text-3xl">Queue jobs</h1>
 					<p className="text-sm text-muted-foreground">
-						Latest 100 D1 job records, newest first. Consumed means receipt was
-						recorded by the consumer, not that an image was generated. This is
-						not the live queue backlog.
+						Latest 100 D1 jobs, newest first. Completed means a JPEG is stored
+						in private R2. Consumed is a historical receipt, not a generated
+						image. This is not the live queue backlog.
 					</p>
 				</div>
 				<div className="flex gap-2">
@@ -66,6 +66,8 @@ function QueueJobsPage() {
 						<TableHead>Prompt</TableHead>
 						<TableHead>Status</TableHead>
 						<TableHead>Error</TableHead>
+						<TableHead>Private result</TableHead>
+						<TableHead>Completed (UTC)</TableHead>
 						<TableHead>Created (UTC)</TableHead>
 						<TableHead>Updated (UTC)</TableHead>
 					</TableHeader>
@@ -82,6 +84,20 @@ function QueueJobsPage() {
 								<TableCell className="max-w-xs break-words whitespace-pre-wrap">
 									{job.error ?? "—"}
 								</TableCell>
+								<TableCell className="max-w-xs break-all whitespace-normal">
+									{job.resultKey ? (
+										<div className="space-y-1">
+											<code className="text-xs">{job.resultKey}</code>
+											<p className="text-xs text-muted-foreground">
+												{job.resultMimeType} · {job.resultBytes} bytes ·{" "}
+												{job.resultModel}
+											</p>
+										</div>
+									) : (
+										"—"
+									)}
+								</TableCell>
+								<TableCell>{job.completedAt ?? "—"}</TableCell>
 								<TableCell>{job.createdAt}</TableCell>
 								<TableCell>{job.updatedAt}</TableCell>
 							</TableRow>
@@ -92,7 +108,8 @@ function QueueJobsPage() {
 			<p className="text-sm text-muted-foreground">
 				Showing {jobs.length} records. Refresh to query D1 again. This
 				diagnostic page has no application authentication; do not submit private
-				prompts.
+				prompts. Images remain private: keys are metadata, not public download
+				links.
 			</p>
 		</section>
 	);

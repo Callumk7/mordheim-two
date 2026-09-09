@@ -18,11 +18,27 @@ export const imageGenerationJobs = sqliteTable("image_generation_jobs", {
 	id: text("id").primaryKey(),
 	prompt: text("prompt").notNull(),
 	status: text("status", {
-		enum: ["pending", "queued", "enqueue_failed", "consumed"],
+		enum: [
+			"pending",
+			"queued",
+			"enqueue_failed",
+			"consumed",
+			"processing",
+			"completed",
+			"failed",
+		],
 	})
 		.notNull()
 		.default("pending"),
 	error: text("error"),
+	leaseToken: text("lease_token"),
+	leaseExpiresAt: integer("lease_expires_at"),
+	resultKey: text("result_key"),
+	resultMimeType: text("result_mime_type"),
+	resultBytes: integer("result_bytes"),
+	resultEtag: text("result_etag"),
+	resultModel: text("result_model"),
+	completedAt: text("completed_at"),
 	createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 	updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
