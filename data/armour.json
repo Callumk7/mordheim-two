@@ -1,0 +1,233 @@
+[
+  {
+    "name": "Barding",
+    "cost": 80,
+    "availability": "Rare 8 (Warhorses only)",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Movement Penalty",
+      "Durability"
+    ],
+    "type": "armour",
+    "save": "+1 to existing save"
+  },
+  {
+    "name": "Bretonnian Barding",
+    "cost": 30,
+    "availability": "Rare 11 (Bretonnian Warhorses only)",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Durability"
+    ],
+    "type": "armour",
+    "save": "+1 to existing save"
+  },
+  {
+    "name": "Buckler",
+    "cost": 5,
+    "availability": "Common",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Parry"
+    ],
+    "type": "armour",
+    "save": null
+  },
+  {
+    "name": "Chaos Armour",
+    "cost": 185,
+    "availability": "Rare 13 (Marauders of Chaos, Norse, Beastmen, Chaos Dwarfs, Possessed and Carnival of Chaos only)",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Rarity",
+      "Cost",
+      "Gift of Chaos",
+      "Spellcasters",
+      "Movement Penalty"
+    ],
+    "type": "armour",
+    "save": "4+"
+  },
+  {
+    "name": "Cooking Pot Helmet",
+    "cost": 8,
+    "availability": "Common (Mootlanders only)",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Avoid Stun"
+    ],
+    "type": "armour",
+    "save": null
+  },
+  {
+    "name": "Enchanted Skins",
+    "cost": 20,
+    "availability": "Rare 6 (Amazons (Lustria) only)",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "To represent this, any model wearing Skins and Charms receives a 6+ special save versus any wounds inflicted. In addition, the wearer of Skins and Charms is unaffected by enemy magic on a roll of 5+."
+    ],
+    "type": "armour",
+    "save": null
+  },
+  {
+    "name": "Gromril Armour",
+    "cost": 150,
+    "availability": "Rare 11",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Movement Penalty"
+    ],
+    "type": "armour",
+    "save": "4+"
+  },
+  {
+    "name": "Heavy Armour",
+    "cost": 50,
+    "availability": "Common",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Movement Penalty"
+    ],
+    "type": "armour",
+    "save": "5+"
+  },
+  {
+    "name": "Helmet",
+    "cost": 10,
+    "availability": "Common",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Avoid Stun"
+    ],
+    "type": "armour",
+    "save": null
+  },
+  {
+    "name": "Ithilmar Armour",
+    "cost": 90,
+    "availability": "Rare 11",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Movement Penalty"
+    ],
+    "type": "armour",
+    "save": "5+"
+  },
+  {
+    "name": "Kite Shield",
+    "cost": 10,
+    "availability": "Common (Bretonnian Chapel Guard Knights only)",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Save"
+    ],
+    "type": "armour",
+    "save": "5+ on foot, 6+ mounted (or +2 on foot, +1 mounted with armour)"
+  },
+  {
+    "name": "Lamellar Armour",
+    "cost": 120,
+    "availability": "Rare 9",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Movement Penalty"
+    ],
+    "type": "armour",
+    "save": "4+"
+  },
+  {
+    "name": "Light Armour",
+    "cost": 20,
+    "availability": "Common",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Movement Penalty"
+    ],
+    "type": "armour",
+    "save": "6+"
+  },
+  {
+    "name": "Masterwork Heavy Armour",
+    "cost": 0,
+    "availability": "Common",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Movement Penalty"
+    ],
+    "type": "armour",
+    "save": "4+"
+  },
+  {
+    "name": "Mechanical Suit",
+    "cost": 225,
+    "availability": "Rare 14 (Chaos Dwarfs only)",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Rarity",
+      "Cost",
+      "Gift of Chaos",
+      "Spellcasters",
+      "Suited and Booted",
+      "Movement Penalty"
+    ],
+    "type": "armour",
+    "save": null
+  },
+  {
+    "name": "Pavise",
+    "cost": 25,
+    "availability": "Rare 8",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Cover",
+      "Combined Save",
+      "Movement Penalty"
+    ],
+    "type": "armour",
+    "save": "6+"
+  },
+  {
+    "name": "Shield",
+    "cost": 5,
+    "availability": "Common",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Combined Save",
+      "Movement Penalty"
+    ],
+    "type": "armour",
+    "save": "6+"
+  },
+  {
+    "name": "Toughened Leathers",
+    "cost": 5,
+    "availability": "Common",
+    "range": null,
+    "strength": null,
+    "specialRules": [
+      "Compatibility",
+      "Sellback",
+      "Spell Casting"
+    ],
+    "type": "armour",
+    "save": "6+"
+  }
+]

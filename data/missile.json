@@ -1,0 +1,274 @@
+[
+  {
+    "name": "Belaying Pins",
+    "cost": 3,
+    "availability": "Common (Pirates only)",
+    "range": "6\"",
+    "strength": "As user -1",
+    "specialRules": [
+      "Awkward Thrown Weapon",
+      "Weak"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Blowpipe",
+    "cost": 25,
+    "availability": "Rare 7 (Skaven, Lizardmen and Forest Goblins only. Common for Forest Goblins.)",
+    "range": "8\"",
+    "strength": "1",
+    "specialRules": [
+      "Poison",
+      "Stealthy"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Bolas",
+    "cost": 5,
+    "availability": "Common (Lizardmen, Amazons (Lustria) only)",
+    "range": "16\"",
+    "strength": "Special",
+    "specialRules": [
+      "Dangerous",
+      "Entangle"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Bow",
+    "cost": 10,
+    "availability": "Common",
+    "range": "24\"",
+    "strength": "3",
+    "specialRules": [],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Cathayan Candles",
+    "cost": 25,
+    "availability": "Rare 9",
+    "range": "6\"",
+    "strength": "6",
+    "specialRules": [
+      "Thrown Weapon",
+      "Volatile",
+      "Set on Fire"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Crossbow",
+    "cost": 25,
+    "availability": "Common",
+    "range": "30\"",
+    "strength": "4",
+    "specialRules": [
+      "Move or Fire"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Crossbow pistol",
+    "cost": 35,
+    "availability": "Rare 9",
+    "range": "10\"",
+    "strength": "4",
+    "specialRules": [
+      "Shoot In Hand-To-Hand Combat",
+      "Hand-To-Hand"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Elf Bow",
+    "cost": 35,
+    "availability": "Rare 12",
+    "range": "36\"",
+    "strength": "3",
+    "specialRules": [
+      "Save Modifier"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Firepots Miragliano",
+    "cost": 0,
+    "availability": "Common",
+    "range": "8\"",
+    "strength": "2",
+    "specialRules": [
+      "Awkward Thrown Weapon",
+      "Smoke"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Fish-Hook Shot",
+    "cost": 10,
+    "availability": "Rare 7 (Battle Monks of Cathay only)",
+    "range": "3\"",
+    "strength": "3",
+    "specialRules": [
+      "Thrown Weapon",
+      "Precise",
+      "Caused Fall"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Harpoon Crossbow",
+    "cost": 50,
+    "availability": "Rare 10 (Maneaters only)",
+    "range": "30\"",
+    "strength": "5",
+    "specialRules": [
+      "Move or fire",
+      "Prepare shot"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Javelins",
+    "cost": 5,
+    "availability": "Common (Amazons (Mordheim), Norse Explorers, Pit Fighters only)",
+    "range": "8\"",
+    "strength": "As user",
+    "specialRules": [
+      "Thrown weapon"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Long Bow",
+    "cost": 15,
+    "availability": "Common",
+    "range": "30\"",
+    "strength": "3",
+    "specialRules": [],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Nehekharan Javelins",
+    "cost": 10,
+    "availability": "Common (Tomb Guardians Tomb Lord only)",
+    "range": "8\"",
+    "strength": "As user",
+    "specialRules": [
+      "+1 to hit"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Repeater Crossbow",
+    "cost": 40,
+    "availability": "Rare 8",
+    "range": "24\"",
+    "strength": "3",
+    "specialRules": [
+      "Fire twice"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Short Bow",
+    "cost": 5,
+    "availability": "Common",
+    "range": "16\"",
+    "strength": "3",
+    "specialRules": [],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Sling",
+    "cost": 2,
+    "availability": "Common",
+    "range": "18\"",
+    "strength": "3",
+    "specialRules": [
+      "Fire twice at half range"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Sun Gauntlet",
+    "cost": 40,
+    "availability": "Rare 12 (Amazons (Mordheim) only)",
+    "range": "12\"",
+    "strength": "4",
+    "specialRules": [
+      "Accurate",
+      "No Save",
+      "Hand-To-Hand"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Sunstaff",
+    "cost": 50,
+    "availability": "Rare 12 (Amazons (Mordheim) only)",
+    "range": "24\"",
+    "strength": "4",
+    "specialRules": [
+      "Accurate",
+      "No Save"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Sunstaff (Lustria)",
+    "cost": 35,
+    "availability": "Rare 10 (Amazons (Lustria) only)",
+    "range": "12\" / Close Combat",
+    "strength": "As user",
+    "specialRules": [
+      "Sunbolt"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Throwing Knives/Stars",
+    "cost": 15,
+    "availability": "Rare 5",
+    "range": "6\"",
+    "strength": "As user",
+    "specialRules": [
+      "Thrown Weapon"
+    ],
+    "type": "weapon",
+    "save": null
+  },
+  {
+    "name": "Tufenk",
+    "cost": 15,
+    "availability": "Rare 10",
+    "range": "8\"",
+    "strength": "2",
+    "specialRules": [
+      "Fire",
+      "Prepare Shot"
+    ],
+    "type": "weapon",
+    "save": null
+  }
+]
