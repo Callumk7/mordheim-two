@@ -1,16 +1,16 @@
 import { createServerFn } from "@tanstack/react-start";
 import { and, eq, inArray, isNull } from "drizzle-orm";
-import { z } from "zod";
+import { type Database, getDb } from "@/db/index.server";
+import { events, warbandMatches, warriors } from "@/db/schema";
 import {
 	type Event,
 	EventCreateSchema,
-	EventFactUpdateSchema,
+	EventFactUpdateInputSchema,
 	EventFieldsSchema,
-	EventOutcomeSchema,
+	EventResolutionInputSchema,
+	EventVoidInputSchema,
 	validateEventMembership,
-} from "./event";
-import { type Database, getDb } from "./index.server";
-import { events, warbandMatches, warriors } from "./schema";
+} from "@/db/validation/event";
 
 export const listEvents = createServerFn({ method: "GET" }).handler(() =>
 	getDb().select().from(events).orderBy(events.createdAt),
@@ -68,12 +68,7 @@ export const createEvent = createServerFn({ method: "POST" })
 	});
 
 export const updateEvent = createServerFn({ method: "POST" })
-	.validator(
-		z.object({
-			id: z.string().min(1),
-			changes: EventFactUpdateSchema,
-		}),
-	)
+	.validator(EventFactUpdateInputSchema)
 	.handler(async ({ data }) => {
 		if (Object.keys(data.changes).length === 0) return;
 		const db = getDb();
@@ -111,7 +106,7 @@ export const updateEvent = createServerFn({ method: "POST" })
 	});
 
 export const resolveEvent = createServerFn({ method: "POST" })
-	.validator(z.object({ id: z.string().min(1), outcome: EventOutcomeSchema }))
+	.validator(EventResolutionInputSchema)
 	.handler(async ({ data }) => {
 		const now = new Date().toISOString();
 		const updated = await getDb()
@@ -137,9 +132,7 @@ export const resolveEvent = createServerFn({ method: "POST" })
 	});
 
 export const voidEvent = createServerFn({ method: "POST" })
-	.validator(
-		z.object({ id: z.string().min(1), reason: z.string().trim().min(1) }),
-	)
+	.validator(EventVoidInputSchema)
 	.handler(async ({ data }) => {
 		const now = new Date().toISOString();
 		const updated = await getDb()

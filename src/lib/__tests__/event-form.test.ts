@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import type { Warband } from "@/db/warband";
-import type { WarbandMatch } from "@/db/warband-match";
-import type { Warrior } from "@/db/warrior";
+import type { Warband } from "@/db/validation/warband";
+import type { WarbandMatch } from "@/db/validation/warband-match";
+import type { Warrior } from "@/db/validation/warrior";
 import {
 	canSubmitEvent,
 	changeEventAttackerWarband,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Event, EventOutcome } from "@/db/event";
+import type { Event, EventOutcome } from "@/db/validation/event";
 import {
 	getWarbandCombatStats,
 	getWarriorCombatStats,

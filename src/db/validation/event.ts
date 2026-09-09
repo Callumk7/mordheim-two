@@ -110,6 +110,21 @@ export const EventUpdateSchema = z
 	.partial()
 	.strict();
 
+export const EventFactUpdateInputSchema = z.object({
+	id: z.string().min(1),
+	changes: EventFactUpdateSchema,
+});
+
+export const EventResolutionInputSchema = z.object({
+	id: z.string().min(1),
+	outcome: EventOutcomeSchema,
+});
+
+export const EventVoidInputSchema = z.object({
+	id: z.string().min(1),
+	reason: z.string().trim().min(1),
+});
+
 export function isEventResolved(
 	event: Pick<Event, "outcome" | "resolvedAt">,
 ): event is Pick<Event, "outcome" | "resolvedAt"> & {

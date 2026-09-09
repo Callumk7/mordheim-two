@@ -14,10 +14,10 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import type { Match } from "@/db/match";
-import type { Warband } from "@/db/warband";
-import type { WarbandMatch } from "@/db/warband-match";
-import type { Warrior } from "@/db/warrior";
+import type { Match } from "@/db/validation/match";
+import type { Warband } from "@/db/validation/warband";
+import type { WarbandMatch } from "@/db/validation/warband-match";
+import type { Warrior } from "@/db/validation/warrior";
 import {
 	canSubmitEvent,
 	changeEventAttackerWarband,

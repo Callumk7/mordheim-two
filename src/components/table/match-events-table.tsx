@@ -4,7 +4,7 @@ import {
 	EVENT_OUTCOMES,
 	type EventOutcome,
 	EventOutcomeSchema,
-} from "@/db/event";
+} from "@/db/validation/event";
 import type { MatchEventRow } from "@/db-collections/projections";
 import { TableActionLink, TableActions } from "../ui/table";
 import { TableCellSelect } from "../ui/table-cell-field";

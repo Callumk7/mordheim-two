@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { Trash2 } from "lucide-react";
 import { useMemo } from "react";
-import type { Warrior } from "@/db/warrior";
+import type { Warrior } from "@/db/validation/warrior";
 import {
 	type CombatStatsProjection,
 	getWarriorCombatStats,

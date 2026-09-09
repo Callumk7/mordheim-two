@@ -8,10 +8,10 @@ import {
 	text,
 	uniqueIndex,
 } from "drizzle-orm/sqlite-core";
-import { EVENT_OUTCOMES } from "./event";
-import { MATCH_STATUSES } from "./match";
-import { WARBAND_STATUSES } from "./warband";
-import { WARRIOR_STATUSES } from "./warrior";
+import { EVENT_OUTCOMES } from "./validation/event";
+import { MATCH_STATUSES } from "./validation/match";
+import { WARBAND_STATUSES } from "./validation/warband";
+import { WARRIOR_STATUSES } from "./validation/warrior";
 
 export const warbands = sqliteTable("warbands", {
 	id: text("id").primaryKey(),

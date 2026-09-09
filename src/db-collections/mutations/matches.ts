@@ -1,11 +1,11 @@
 import type { DbClient } from "@tanstack/react-db";
-import type { Match } from "@/db/match";
+import type { Match } from "@/db/validation/match";
+import type { WarbandMatch } from "@/db/validation/warband-match";
 import {
 	createMatchWithParticipants,
 	deleteMatch,
 	updateMatchWithParticipants,
-} from "@/db/matches.functions";
-import type { WarbandMatch } from "@/db/warband-match";
+} from "@/server/matches";
 import type { AppCollections } from "..";
 
 export function createMatchTransaction(

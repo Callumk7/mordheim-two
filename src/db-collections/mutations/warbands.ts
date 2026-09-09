@@ -1,6 +1,6 @@
 import { type DbClient, safeRandomUUID } from "@tanstack/react-db";
-import type { Warband } from "@/db/warband";
-import { deleteWarband } from "@/db/warbands.functions";
+import type { Warband } from "@/db/validation/warband";
+import { deleteWarband } from "@/server/warbands";
 import type { AppCollections } from "..";
 
 type NewWarband = Omit<Warband, "id" | "createdAt" | "updatedAt">;

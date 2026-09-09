@@ -20,7 +20,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import type { Warrior } from "@/db/warrior";
+import type { Warrior } from "@/db/validation/warrior";
 import { getCollections } from "@/db-collections";
 import {
 	createEventTransaction,

@@ -1,13 +1,13 @@
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
 import { BasicIndex, collectionOptions } from "@tanstack/react-db";
 import type { QueryClient } from "@tanstack/react-query";
-import { WarriorSchema, WarriorUpdateSchema } from "@/db/warrior";
+import { WarriorSchema, WarriorUpdateSchema } from "@/db/validation/warrior";
 import {
 	createWarrior,
 	deleteWarrior,
 	listWarriors,
 	updateWarrior,
-} from "@/db/warriors.functions";
+} from "@/server/warriors";
 
 export const warriorsCollectionOptions = collectionOptions(
 	"warriors",

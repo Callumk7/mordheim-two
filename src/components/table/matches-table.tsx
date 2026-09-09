@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { Trash2 } from "lucide-react";
 import { useMemo } from "react";
-import type { Match } from "@/db/match";
+import type { Match } from "@/db/validation/match";
 import { formatStatus } from "../match-form";
 import { Button } from "../ui/button";
 import { TableActions } from "../ui/table";

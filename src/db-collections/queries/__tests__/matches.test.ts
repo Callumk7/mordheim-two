@@ -5,11 +5,14 @@ import {
 	queryOnce,
 } from "@tanstack/react-db";
 import { describe, expect, it } from "vitest";
-import { type Event, EventSchema } from "@/db/event";
-import { type Match, MatchSchema } from "@/db/match";
-import { type Warband, WarbandSchema } from "@/db/warband";
-import { type WarbandMatch, WarbandMatchSchema } from "@/db/warband-match";
-import { type Warrior, WarriorSchema } from "@/db/warrior";
+import { type Event, EventSchema } from "@/db/validation/event";
+import { type Match, MatchSchema } from "@/db/validation/match";
+import { type Warband, WarbandSchema } from "@/db/validation/warband";
+import {
+	type WarbandMatch,
+	WarbandMatchSchema,
+} from "@/db/validation/warband-match";
+import { type Warrior, WarriorSchema } from "@/db/validation/warrior";
 import {
 	matchEventsQuery,
 	matchParticipantsQuery,

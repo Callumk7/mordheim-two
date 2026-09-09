@@ -1,13 +1,13 @@
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
 import { BasicIndex, collectionOptions } from "@tanstack/react-db";
 import type { QueryClient } from "@tanstack/react-query";
-import { WarbandSchema, WarbandUpdateSchema } from "@/db/warband";
+import { WarbandSchema, WarbandUpdateSchema } from "@/db/validation/warband";
 import {
 	createWarband,
 	deleteWarband,
 	listWarbands,
 	updateWarband,
-} from "@/db/warbands.functions";
+} from "@/server/warbands";
 
 export const warbandsCollectionOptions = collectionOptions(
 	"warbands",

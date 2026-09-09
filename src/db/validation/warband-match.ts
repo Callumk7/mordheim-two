@@ -11,4 +11,8 @@ export const WarbandMatchSchema = WarbandMatchFieldsSchema.extend({
 	updatedAt: z.string().default(() => new Date().toISOString()),
 });
 
+export const WarbandMatchDeleteInputSchema = z.object({
+	id: z.string().min(1),
+});
+
 export type WarbandMatch = z.output<typeof WarbandMatchSchema>;

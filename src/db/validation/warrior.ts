@@ -22,4 +22,11 @@ export const WarriorSchema = WarriorFieldsSchema.extend({
 
 export const WarriorUpdateSchema = WarriorFieldsSchema.partial().strict();
 
+export const WarriorUpdateInputSchema = z.object({
+	id: z.string().min(1),
+	changes: WarriorUpdateSchema,
+});
+
+export const WarriorDeleteInputSchema = z.object({ id: z.string().min(1) });
+
 export type Warrior = z.output<typeof WarriorSchema>;

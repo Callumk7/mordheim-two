@@ -1,13 +1,13 @@
 import { queryCollectionOptions } from "@tanstack/query-db-collection";
 import { BasicIndex, collectionOptions } from "@tanstack/react-db";
 import type { QueryClient } from "@tanstack/react-query";
-import { MatchSchema, MatchUpdateSchema } from "@/db/match";
+import { MatchSchema, MatchUpdateSchema } from "@/db/validation/match";
 import {
 	createMatch,
 	deleteMatch,
 	listMatches,
 	updateMatch,
-} from "@/db/matches.functions";
+} from "@/server/matches";
 
 export const matchesCollectionOptions = collectionOptions("matches", (client) =>
 	queryCollectionOptions({

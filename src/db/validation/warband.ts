@@ -21,4 +21,11 @@ export const WarbandSchema = WarbandFieldsSchema.extend({
 
 export const WarbandUpdateSchema = WarbandFieldsSchema.partial().strict();
 
+export const WarbandUpdateInputSchema = z.object({
+	id: z.string().min(1),
+	changes: WarbandUpdateSchema,
+});
+
+export const WarbandDeleteInputSchema = z.object({ id: z.string().min(1) });
+
 export type Warband = z.output<typeof WarbandSchema>;

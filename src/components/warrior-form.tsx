@@ -16,8 +16,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import type { Warband } from "../db/warband";
-import { WARRIOR_STATUSES, type Warrior } from "../db/warrior";
+import type { Warband } from "@/db/validation/warband";
+import { WARRIOR_STATUSES, type Warrior } from "@/db/validation/warrior";
 
 export type WarriorFormValues = Pick<
 	Warrior,

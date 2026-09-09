@@ -1,5 +1,5 @@
-import type { Event } from "@/db/event";
-import { isEffectiveEvent } from "@/db/event";
+import type { Event } from "@/db/validation/event";
+import { isEffectiveEvent } from "@/db/validation/event";
 
 export interface CombatStats {
 	knockdownsGiven: number;

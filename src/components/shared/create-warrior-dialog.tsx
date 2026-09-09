@@ -5,7 +5,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { WarriorForm, type WarriorFormValues } from "@/components/warrior-form";
-import type { Warband } from "@/db/warband";
+import type { Warband } from "@/db/validation/warband";
 
 export function CreateWarriorDialog({
 	isOpen,

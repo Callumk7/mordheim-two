@@ -1,11 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
 import type { BatchItem } from "drizzle-orm/batch";
-import { z } from "zod";
-import { getDb } from "./index.server";
-import { MatchSchema, MatchUpdateSchema } from "./match";
-import { events, matches, warbandMatches } from "./schema";
-import { WarbandMatchSchema } from "./warband-match";
+import { getDb } from "@/db/index.server";
+import { events, matches, warbandMatches } from "@/db/schema";
+import {
+	MatchDeleteInputSchema,
+	MatchParticipantsUpdateInputSchema,
+	MatchSchema,
+	MatchUpdateInputSchema,
+	MatchWithParticipantsSchema,
+} from "@/db/validation/match";
 
 export const listMatches = createServerFn({ method: "GET" }).handler(() =>
 	getDb().select().from(matches).orderBy(matches.createdAt),
@@ -18,12 +22,7 @@ export const createMatch = createServerFn({ method: "POST" })
 	});
 
 export const createMatchWithParticipants = createServerFn({ method: "POST" })
-	.validator(
-		z.object({
-			match: MatchSchema,
-			participants: z.array(WarbandMatchSchema),
-		}),
-	)
+	.validator(MatchWithParticipantsSchema)
 	.handler(async ({ data }) => {
 		if (
 			data.participants.some(
@@ -45,12 +44,7 @@ export const createMatchWithParticipants = createServerFn({ method: "POST" })
 	});
 
 export const updateMatch = createServerFn({ method: "POST" })
-	.validator(
-		z.object({
-			id: z.string().min(1),
-			changes: MatchUpdateSchema,
-		}),
-	)
+	.validator(MatchUpdateInputSchema)
 	.handler(async ({ data }) => {
 		if (Object.keys(data.changes).length === 0) return;
 
@@ -64,14 +58,7 @@ export const updateMatch = createServerFn({ method: "POST" })
 	});
 
 export const updateMatchWithParticipants = createServerFn({ method: "POST" })
-	.validator(
-		z.object({
-			id: z.string().min(1),
-			changes: MatchUpdateSchema,
-			additions: z.array(WarbandMatchSchema),
-			removals: z.array(z.string().min(1)),
-		}),
-	)
+	.validator(MatchParticipantsUpdateInputSchema)
 	.handler(async ({ data }) => {
 		if (data.additions.some((participant) => participant.matchId !== data.id)) {
 			throw new Error("Every participant must belong to the updated match.");
@@ -102,7 +89,7 @@ export const updateMatchWithParticipants = createServerFn({ method: "POST" })
 	});
 
 export const deleteMatch = createServerFn({ method: "POST" })
-	.validator(z.object({ id: z.string().min(1) }))
+	.validator(MatchDeleteInputSchema)
 	.handler(async ({ data }) => {
 		const db = getDb();
 		const referenced = await db

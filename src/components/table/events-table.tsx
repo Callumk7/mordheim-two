@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { Trash2 } from "lucide-react";
 import { useMemo } from "react";
-import type { Event } from "@/db/event";
+import type { Event } from "@/db/validation/event";
 import { Button } from "../ui/button";
 import { TableActions } from "../ui/table";
 import { createDataTableColumnHelper, DataTable } from "./data-table";

@@ -17,7 +17,7 @@ import {
 	EVENT_OUTCOMES,
 	type EventOutcome,
 	EventOutcomeSchema,
-} from "@/db/event";
+} from "@/db/validation/event";
 
 export function EventOutcomeForm({
 	isResolved,

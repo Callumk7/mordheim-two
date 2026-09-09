@@ -5,14 +5,14 @@ import {
 	EventCreateSchema,
 	EventFactUpdateSchema,
 	EventSchema,
-} from "@/db/event";
+} from "@/db/validation/event";
 import {
 	createEvent,
 	listEvents,
 	resolveEvent,
 	updateEvent,
 	voidEvent,
-} from "@/db/events.functions";
+} from "@/server/events";
 
 export const eventsCollectionOptions = collectionOptions("events", (client) =>
 	queryCollectionOptions({
