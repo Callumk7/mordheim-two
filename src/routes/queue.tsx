@@ -49,9 +49,14 @@ function QueuePage() {
 		<section className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-6">
 			<header className="space-y-2">
 				<h1 className="text-3xl">Queue playground</h1>
-				<LinkButton to="/queue-jobs" variant="outline">
-					View D1 jobs
-				</LinkButton>
+				<div className="flex flex-wrap gap-2">
+					<LinkButton to="/queue-jobs" variant="outline">
+						View D1 jobs
+					</LinkButton>
+					<LinkButton to="/generated-images" variant="outline">
+						View generated images
+					</LinkButton>
+				</div>
 				<p className="text-sm text-muted-foreground">
 					Save an image prompt in D1 and send its job ID to the image generation
 					queue. When explicitly enabled, the consumer generates a square JPEG

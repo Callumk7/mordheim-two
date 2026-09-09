@@ -47,7 +47,10 @@ function QueueJobsPage() {
 						image. This is not the live queue backlog.
 					</p>
 				</div>
-				<div className="flex gap-2">
+				<div className="flex flex-wrap gap-2">
+					<LinkButton to="/generated-images" variant="outline">
+						View generated images
+					</LinkButton>
 					<LinkButton to="/queue" variant="outline">
 						Send a job
 					</LinkButton>
@@ -108,8 +111,8 @@ function QueueJobsPage() {
 			<p className="text-sm text-muted-foreground">
 				Showing {jobs.length} records. Refresh to query D1 again. This
 				diagnostic page has no application authentication; do not submit private
-				prompts. Images remain private: keys are metadata, not public download
-				links.
+				prompts. R2 remains private, but generated images are accessible through
+				the unprotected gallery and app image endpoint.
 			</p>
 		</section>
 	);
