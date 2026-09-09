@@ -6,6 +6,14 @@
         "nodejs_compat"
     ],
     "main": "@tanstack/react-start/server-entry",
+    "queues": {
+        "producers": [
+            {
+                "binding": "IMAGE_GENERATION_QUEUE",
+                "queue": "mordheim-image-generation"
+            }
+        ]
+    },
     "d1_databases": [
         {
             "binding": "DB",

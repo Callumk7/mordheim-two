@@ -14,6 +14,17 @@ import { MATCH_RESULTS, MATCH_STATUSES } from "./validation/match";
 import { WARBAND_STATUSES } from "./validation/warband";
 import { WARRIOR_STATUSES } from "./validation/warrior";
 
+export const imageGenerationJobs = sqliteTable("image_generation_jobs", {
+	id: text("id").primaryKey(),
+	prompt: text("prompt").notNull(),
+	status: text("status", { enum: ["pending", "queued", "enqueue_failed"] })
+		.notNull()
+		.default("pending"),
+	error: text("error"),
+	createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+	updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
 export const warbands = sqliteTable("warbands", {
 	id: text("id").primaryKey(),
 	name: text("name").notNull(),
