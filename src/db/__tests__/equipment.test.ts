@@ -11,13 +11,16 @@ import { WarriorEquipmentSchema } from "../validation/warrior-equipment";
 const validEquipment = {
 	id: "equipment-1",
 	name: "Sword",
-	cost: 10,
+	cost: "10 gc",
 	availability: "Common",
 	range: "Close combat",
 	strength: "As user",
 	specialRules: ["Parry"],
 	type: "weapon" as const,
-	save: "-",
+	save: null,
+	sourceUrl: null,
+	sourceText: null,
+	notes: null,
 };
 
 describe("equipment model", () => {
@@ -36,16 +39,27 @@ describe("equipment model", () => {
 	it("rejects unsupported types, invalid costs, and malformed special rules", () => {
 		for (const invalid of [
 			{ ...validEquipment, type: "shield" },
-			{ ...validEquipment, cost: -1 },
-			{ ...validEquipment, cost: Number.POSITIVE_INFINITY },
+			{ ...validEquipment, cost: 10 },
+			{ ...validEquipment, cost: " " },
 			{ ...validEquipment, specialRules: "Parry" },
+			{ ...validEquipment, specialRules: [" "] },
+			{ ...validEquipment, range: "" },
+			{ ...validEquipment, sourceUrl: "not a URL" },
+			{ ...validEquipment, sourceText: " " },
+			{ ...validEquipment, notes: " " },
 		]) {
 			expect(EquipmentSchema.safeParse(invalid).success).toBe(false);
 		}
 	});
 
 	it("only permits known fields in partial updates", () => {
-		expect(EquipmentUpdateSchema.parse({ cost: 15 })).toEqual({ cost: 15 });
+		expect(EquipmentUpdateSchema.parse({ cost: "15 gc" })).toEqual({
+			cost: "15 gc",
+		});
+		expect(EquipmentUpdateSchema.parse({ cost: null, range: null })).toEqual({
+			cost: null,
+			range: null,
+		});
 		expect(EquipmentUpdateSchema.safeParse({ unknown: "field" }).success).toBe(
 			false,
 		);

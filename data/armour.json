@@ -1,7 +1,7 @@
 [
   {
     "name": "Barding",
-    "cost": 80,
+    "cost": "80 gc",
     "availability": "Rare 8 (Warhorses only)",
     "range": null,
     "strength": null,
@@ -10,11 +10,14 @@
       "Durability"
     ],
     "type": "armour",
-    "save": "+1 to existing save"
+    "save": "+1 to existing save",
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/armour#barding",
+    "sourceText": "Barding\n\nMordheim Rulebook (core)\n\nCost: 80 gc\nAvailability: Rare 8 (Warhorses only)\n\nSave: +1 to existing save\n\nSpecial Rules\n\nMovement Penalty: Armour, called barding, may be purchased for a warhorse. It adds a further +1 bonus to the model's armour save, but subtracts one from its Movement. A normal horse may not wear barding.\n\nDurability: A barded warhorse is only killed on a serious injury roll of ‘1' if the model goes out of action.",
+    "notes": null
   },
   {
     "name": "Bretonnian Barding",
-    "cost": 30,
+    "cost": "30 gc",
     "availability": "Rare 11 (Bretonnian Warhorses only)",
     "range": null,
     "strength": null,
@@ -22,11 +25,14 @@
       "Durability"
     ],
     "type": "armour",
-    "save": "+1 to existing save"
+    "save": "+1 to existing save",
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/armour#bretonnian-barding",
+    "sourceText": "Bretonnian Barding\n\nTown Cryer #8 (1b)\n\nCost: 30 gc\nAvailability: Rare 11 (Bretonnian Warhorses only)\n\nBarding is armour for a horse in the same way that light armour is armour for a human. It covers the mount’s hide, and in some cases, its head.\n\nSave: +1 to existing save\n\nSpecial Rules\n\nDurability: A model mounted on a barded horse receives an extra +1 to their armour save (+2 instead of the usual +1 for being mounted). In addition, a mount wearing barding will only be killed on a D6 roll of a 1 if the model is taken out of action (instead of a 1 or 2). Barding may only ever be bought for a warhorse.\n\nNote\n\nMordheim Annual 2002, Page 103: The cost and rarity of Bretonnian barding differs radically from that listed on the trading chart. This is special Bretonnian blessed horse armour not normally available except to Bretonnian knights.",
+    "notes": null
   },
   {
     "name": "Buckler",
-    "cost": 5,
+    "cost": "5 gc",
     "availability": "Common",
     "range": null,
     "strength": null,
@@ -34,11 +40,14 @@
       "Parry"
     ],
     "type": "armour",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/armour#buckler",
+    "sourceText": "Buckler\n\nMordheim Rulebook (core)\n\nCost: 5 gc\nAvailability: Common\n\nBucklers are small, round shields designed for parrying or deflecting blows. They are usually made of steel for they need to be tremendously durable to survive the brutal blows of hand-to-hand combat. Using a buckler requires great skill, but a nimble warrior can protect himself from blows which would otherwise cripple him.\n\nSpecial Rules\n\nParry: A model equipped with a buckler may parry the first blow in each round of hand-to-hand combat. When his opponent scores a hit, a model with a buckler may roll 1D6. If the score is greater than the highest to hit score of his opponent, the model has parried the blow, and that attack is discarded. A model may not parry attacks made with double or more its own Strength – they are simply too powerful to be stopped.",
+    "notes": null
   },
   {
     "name": "Chaos Armour",
-    "cost": 185,
+    "cost": "185 gc",
     "availability": "Rare 13 (Marauders of Chaos, Norse, Beastmen, Chaos Dwarfs, Possessed and Carnival of Chaos only)",
     "range": null,
     "strength": null,
@@ -50,11 +59,14 @@
       "Movement Penalty"
     ],
     "type": "armour",
-    "save": "4+"
+    "save": "4+",
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/armour#chaos-armour",
+    "sourceText": "Chaos Armour\n\nBorder Town Burning supplement (1c)\n\nCost: 185 gc\nAvailability: Rare 13 (Marauders of Chaos, Norse, Beastmen, Chaos Dwarfs, Possessed and Carnival of Chaos only)\n\nChaos Armour is a suit of strangely-worked and unnatural metal. It is the mark of a Dark God's favour. While most suits of Chaos Armour are received as Gifts from an Infernal Patron, they can be acquired, though only from Chaos Dwarfs in an exclusive exchange for many captives or perhaps some impossible deed to further their interests.\n\nSave: 4+\n\nSpecial Rules\n\nRarity: When searching for Chaos armour a warrior gains +1 on his Rarity roll for each model he took out of action in the previous battle.\n\nCost: The cost for found Chaos armour is decreased by 1 gold crown for each Experience point the Hero has.\n\nGift of Chaos: Chaos armour is a gift from the Dark Gods to the worthy warrior. A Hero who has successfully purchased a suit of Chaos armour will never give it away to another warband member but put it on himself immediately. Chaos armour becomes fused to the body of its wearer. It can never be removed.\n\nSpellcasters: Chaos armour does not hinder its wearer from casting spells or rituals. It can be worn by spellcasters but they cannot combine it with a shield or buckler without appropriate skills.\n\nMovement Penalty: There is no Movement penalty for combining Chaos Armour with a Shield.",
+    "notes": null
   },
   {
     "name": "Cooking Pot Helmet",
-    "cost": 8,
+    "cost": "8 gc",
     "availability": "Common (Mootlanders only)",
     "range": null,
     "strength": null,
@@ -62,11 +74,14 @@
       "Avoid Stun"
     ],
     "type": "armour",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/armour#cooking-pot-helmet",
+    "sourceText": "Cooking Pot Helmet\n\nCitadel Journal 36 (1b)\n\nCost: 8 gc\nAvailability: Common (Mootlanders only)\n\nAny Master Chef worth his salt will remove his silly white hat and put on an even sillier looking cooking pot for protection when a fight is brewing. It may look incredibly stupid, but often results in an intact Halfling head after the battle.\n\nSpecial Rules\n\nAvoid Stun: A Master Chef equipped with a cooking pot helmet has a special save of 5+ against being stunned. This save is never modified.",
+    "notes": null
   },
   {
     "name": "Enchanted Skins",
-    "cost": 20,
+    "cost": "20 gc",
     "availability": "Rare 6 (Amazons (Lustria) only)",
     "range": null,
     "strength": null,
@@ -74,11 +89,14 @@
       "To represent this, any model wearing Skins and Charms receives a 6+ special save versus any wounds inflicted. In addition, the wearer of Skins and Charms is unaffected by enemy magic on a roll of 5+."
     ],
     "type": "armour",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/armour#enchanted-skins",
+    "sourceText": "Enchanted Skins\n\nTown Cryer #15 (1b)\n\nCost: 20 gc\nAvailability: Rare 6 (Amazons (Lustria) only)\n\nThe protective skins and charms that the Amazons wear have been warded with defensive magic.\n\nSpecial Rules\n\nTo represent this, any model wearing Skins and Charms receives a 6+ special save versus any wounds inflicted. In addition, the wearer of Skins and Charms is unaffected by enemy magic on a roll of 5+.",
+    "notes": null
   },
   {
     "name": "Gromril Armour",
-    "cost": 150,
+    "cost": "150 gc",
     "availability": "Rare 11",
     "range": null,
     "strength": null,
@@ -86,11 +104,14 @@
       "Movement Penalty"
     ],
     "type": "armour",
-    "save": "4+"
+    "save": "4+",
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/armour#gromril-armour",
+    "sourceText": "Gromril Armour\n\nMordheim Rulebook (core)\n\nCost: 150 gc\nAvailability: Rare 11\n\nGromril is the rarest and strongest metal known of in the Old World. Only a very few Dwarf smiths know the secret of forging gromril, and a suit of armour made from it fetches a huge price.\n\nSave: 4+\n\nSpecial Rules\n\nMovement Penalty: Gromril armour gives the wearer a 4+ basic save, and does not slow him down if he is also armed with a shield.",
+    "notes": null
   },
   {
     "name": "Heavy Armour",
-    "cost": 50,
+    "cost": "50 gc",
     "availability": "Common",
     "range": null,
     "strength": null,
@@ -98,11 +119,14 @@
       "Movement Penalty"
     ],
     "type": "armour",
-    "save": "5+"
+    "save": "5+",
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/armour#heavy-armour",
+    "sourceText": "Heavy Armour\n\nMordheim Rulebook (core)\n\nCost: 50 gc\nAvailability: Common\n\nTypical heavy armour is made from metal links and is called chain mail. Forging chain mail is a laborious and time consuming process, as the blacksmith must put together hundreds, sometimes thousands, of metal links. This makes chain mail expensive, but this type of armour provides excellent protection for anyone who can afford it.\n\nThere are other types of heavy armour as well, of which the best known are the steel breastplates and greaves worn by the foot knights of the Templar orders.\n\nSave: 5+\n\nSpecial Rules\n\nMovement Penalty: A warrior that is armed with both heavy armour and a shield suffers a -1 Movement penalty",
+    "notes": null
   },
   {
     "name": "Helmet",
-    "cost": 10,
+    "cost": "10 gc",
     "availability": "Common",
     "range": null,
     "strength": null,
@@ -110,11 +134,14 @@
       "Avoid Stun"
     ],
     "type": "armour",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/armour#helmet",
+    "sourceText": "Helmet\n\nMordheim Rulebook (core)\n\nCost: 10 gc\nAvailability: Common\n\nFrom the shining steel helmets of Bretonnian knights to the leather caps of the Skaven, all sensible warriors try to protect the most vulnerable part of their body – their head. Even the most vain fighters still use a helmet, as it can be festooned with plumes, horns and other decorations.\n\nHelmets come in varying shapes and sizes, but their basic function remains the same.\n\nSpecial Rules\n\nAvoid Stun: A model that is equipped with a helmet has a special 4+ save on a D6 against being stunned. If the save is made, treat the stunned result as knocked down instead. This save is not modified by the opponent's Strength.",
+    "notes": null
   },
   {
     "name": "Ithilmar Armour",
-    "cost": 90,
+    "cost": "90 gc",
     "availability": "Rare 11",
     "range": null,
     "strength": null,
@@ -122,11 +149,14 @@
       "Movement Penalty"
     ],
     "type": "armour",
-    "save": "5+"
+    "save": "5+",
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/armour#ithilmar-armour",
+    "sourceText": "Ithilmar Armour\n\nMordheim Rulebook (core)\n\nCost: 90 gc\nAvailability: Rare 11\n\nIthilmar is a silvery metal which is as light as silk and stronger than steel. Elves are experts at fashioning weapons and armour from ithilmar, and the Elven kingdom of Caledor is the only place in the world where this metal can be found.\n\nSave: 5+\n\nSpecial Rules\n\nMovement Penalty: Ithilmar armour gives the wearer a 5+ basic save, and does not slow him down if he is also armed with a shield.",
+    "notes": null
   },
   {
     "name": "Kite Shield",
-    "cost": 10,
+    "cost": "10 gc",
     "availability": "Common (Bretonnian Chapel Guard Knights only)",
     "range": null,
     "strength": null,
@@ -134,11 +164,14 @@
       "Save"
     ],
     "type": "armour",
-    "save": "5+ on foot, 6+ mounted (or +2 on foot, +1 mounted with armour)"
+    "save": "5+ on foot, 6+ mounted (or +2 on foot, +1 mounted with armour)",
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/armour#kite-shield",
+    "sourceText": "Kite Shield\n\nBretonnian Chapel Guard (1c)\n\nCost: 10 gc\nAvailability: Common (Bretonnian Chapel Guard Knights only)\n\nSave: 5+ on foot, 6+ mounted (or +2 on foot, +1 mounted with armour)\n\nSpecial Rules\n\nSave: A model with a kite shield has a basic save of 5+ on a D6 while on foot, and 6+ while mounted (or, if the model is already wearing armour, as +2 on foot, and +1 save while mounted). This cannot bring a save over 1+.\n\n(Note: If your gaming group already uses house rules for enhanced shields [ex. Ones that provide +2 AS in combat], remove Kite Shield from the equipment list.)",
+    "notes": null
   },
   {
     "name": "Lamellar Armour",
-    "cost": 120,
+    "cost": "120 gc",
     "availability": "Rare 9",
     "range": null,
     "strength": null,
@@ -146,11 +179,14 @@
       "Movement Penalty"
     ],
     "type": "armour",
-    "save": "4+"
+    "save": "4+",
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/armour#lamellar-armour",
+    "sourceText": "Lamellar Armour\n\nBorder Town Burning supplement (1c)\n\nCost: 120 gc\nAvailability: Rare 9\n\nThe blacksmiths forge these heavy armours for in Cathay those noble knights protect the farmsteads. Especially among the Palace Guard of the Cathayan Emperor the plate armour is very common. The armour covers not only its wearer's torso but also the upper arm and thigh.\n\nSave: 4+\n\nSpecial Rules\n\nMovement Penalty: A warrior that is armed with both a lamellar armour and a shield suffers a –1 Movement penalty.",
+    "notes": "The source marks its rarity with an editorial question icon; Rare 9 is retained without resolving that uncertainty."
   },
   {
     "name": "Light Armour",
-    "cost": 20,
+    "cost": "20 gc",
     "availability": "Common",
     "range": null,
     "strength": null,
@@ -158,11 +194,14 @@
       "Movement Penalty"
     ],
     "type": "armour",
-    "save": "6+"
+    "save": "6+",
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/armour#light-armour",
+    "sourceText": "Light Armour\n\nMordheim Rulebook (core)\n\nCost: 20 gc\nAvailability: Common\n\nLight Armour encompasses a wide variety of materials from hardened leather tunics to chain shirts forged from steel. It does not offer complete protection against arrows or swords, but it is better than having nothing at all. Light armour does not inhibit movement.\n\nSave: 6+\n\nSpecial Rules\n\nMovement Penalty: No penalty when worn with a shield.",
+    "notes": null
   },
   {
     "name": "Masterwork Heavy Armour",
-    "cost": 0,
+    "cost": null,
     "availability": "Common",
     "range": null,
     "strength": null,
@@ -170,11 +209,14 @@
       "Movement Penalty"
     ],
     "type": "armour",
-    "save": "4+"
+    "save": "4+",
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/armour#masterwork-heavy-armour",
+    "sourceText": "Masterwork Heavy Armour\n\nLustrian Reavers (1c)\n\nAvailability: Common\n\nAn heirloom brought from Tilea, where the craft of forging highly ornate and almost impenetrable heavy armour is taught.\n\nSave: 4+\n\nSpecial Rules\n\nMovement Penalty: It grants 4+ Armour Save, but suffers from -1M even without a shield.",
+    "notes": "The source does not state a cost; null means unknown, not free."
   },
   {
     "name": "Mechanical Suit",
-    "cost": 225,
+    "cost": "225 gc",
     "availability": "Rare 14 (Chaos Dwarfs only)",
     "range": null,
     "strength": null,
@@ -187,11 +229,14 @@
       "Movement Penalty"
     ],
     "type": "armour",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/armour#mechanical-suit",
+    "sourceText": "Mechanical Suit\n\nBorder Town Burning supplement (1c)\n\nCost: 225 gc\nAvailability: Rare 14 (Chaos Dwarfs only)\n\nThe Curse of Stone comes to all Chaos Dwarf Sorcerers, gradually transforming them to rock from the feet up. Engineers have crafted machines which can transport their Priests as they begin to pay the price for working dark rituals.\n\nSpecial Rules\n\nRarity: When searching for Chaos armour a warrior gains +1 on his Rarity roll for each model he took out of action in the previous battle.\n\nCost: The cost for found Chaos armour is decreased by 1 gold crown for each Experience point the Hero has.\n\nGift of Chaos: Chaos armour is a gift from the Dark Gods to the worthy warrior. A Hero who has successfully purchased a suit of Chaos armour will never give it away to another warband member but put it on himself immediately. Chaos armour becomes fused to the body of its wearer. It can never be removed.\n\nSpellcasters: Chaos armour does not hinder its wearer from casting spells or rituals. It can be worn by spellcasters but they cannot combine it with a shield or buckler without appropriate skills.\n\nSuited and Booted: A Sorcerer equipped with a Mechanical suit receives +3 to Movement.\n\nMovement Penalty: There is no Movement penalty for combining Chaos Armour with a Shield.",
+    "notes": "Source ambiguity: no save is stated, and several rules refer to Chaos armour rather than Mechanical Suit. Those paragraphs are retained without inferring a save or resolving the wording."
   },
   {
     "name": "Pavise",
-    "cost": 25,
+    "cost": "25 gc",
     "availability": "Rare 8",
     "range": null,
     "strength": null,
@@ -201,11 +246,14 @@
       "Movement Penalty"
     ],
     "type": "armour",
-    "save": "6+"
+    "save": "6+",
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/armour#pavise",
+    "sourceText": "Pavise\n\nYe Old Curiosity Shoppe, Mordheim Annual 2002 (1a)\n\nCost: 25 gc\nAvailability: Rare 8\n\nA pavise is a huge shield commonly used by regiments of warriors in battle to defend themselves from the arrows of their enemies. It is a weighty item and little use in a long protracted combat but excellent against shooting.\n\nSave: 6+\n\nSpecial Rules\n\nCover: A warrior using a pavise counts as if he is in cover against missile attacks (-1 to hit). In close combat, The pavise counts as a shield (+1 armour save) but only if the warrior was charged to his front.\n\nCombined Save: As explained in the Armour section, shields combine with armour to give +1 to the save.\n\nMovement Penalty: Because the Pavise is so heavy and cumbersome, the bearer moves at half pace.",
+    "notes": null
   },
   {
     "name": "Shield",
-    "cost": 5,
+    "cost": "5 gc",
     "availability": "Common",
     "range": null,
     "strength": null,
@@ -214,11 +262,14 @@
       "Movement Penalty"
     ],
     "type": "armour",
-    "save": "6+"
+    "save": "6+",
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/armour#shield",
+    "sourceText": "Shield\n\nMordheim Rulebook (core)\n\nCost: 5 gc\nAvailability: Common\n\nThere are two types of shield common to the warriors of Mordheim: the first is made of wood, occasionally reinforced with metal plates. This basic type of shield, although strong, does tend to splinter, but this can sometimes save the user's life as his enemy's weapon can get trapped allowing him to strike back whilst his enemy struggles to free his weapon.\n\nMetal shields are heavy and cumbersome, but last much longer and can take a battering. A typical Empire shield is either round or triangular, and carries the emblem of the province or city of its owner.\n\nSave: 6+\n\nSpecial Rules\n\nCombined Save: As explained in the Armour section, shields combine with armour to give +1 to the save.\n\nMovement Penalty: There is no movement penalty.",
+    "notes": null
   },
   {
     "name": "Toughened Leathers",
-    "cost": 5,
+    "cost": "5 gc",
     "availability": "Common",
     "range": null,
     "strength": null,
@@ -228,6 +279,9 @@
       "Spell Casting"
     ],
     "type": "armour",
-    "save": "6+"
+    "save": "6+",
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/armour#toughened-leathers",
+    "sourceText": "Toughened Leathers\n\nOpulent Goods, Mordheim Annual 2002 (1a)\n\nCost: 5 gc\nAvailability: Common\n\nExpert leatherworkers are able to turn leather coats into armour (after a fashion) and those with limited funds often favor these jackets and coats as armour is very expensive. Covered with crusted salt, alcohol and other less savory materials, toughened leather is hard to penetrate and offers some protection in combat.\n\nSave: 6+\n\nSpecial Rules\n\nCompatibility: Toughened leathers cannot be combined with the effects of any other armour except a helmet or buckler (so not a shield).\n\nSellback: Toughened leathers cannot be sold back at the Trading Posts; the stench alone is enough to drive away even the most desperate of buyers!\n\nSpell Casting: Even though Toughened Leathers are purchased as miscellaneous equipment and need not be listed on a Hero’s starting armour list to be taken, they are still armour and prevent spell casting.",
+    "notes": null
   }
 ]

@@ -1,7 +1,7 @@
 [
   {
     "name": "Belaying Pins",
-    "cost": 3,
+    "cost": "3 gc",
     "availability": "Common (Pirates only)",
     "range": "6\"",
     "strength": "As user -1",
@@ -10,11 +10,14 @@
       "Weak"
     ],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#belaying-pins",
+    "sourceText": "Belaying Pins\n\nTown Cryer #9 (1b)\n\nCost: 3 gc\nAvailability: Common (Pirates only)\n\nA typical ship contains hundreds of these short lengths of carved wood. They are set up in racks in convenient places in the ship, around which the running rigging can be secured or belayed. These also make good weapons, and pirates quickly become proficient with hurling them as short range weapons.\n\nRange: 6\"\nStrength: As user -1\n\nSpecial Rules\n\nAwkward Thrown Weapon: Models using Belaying Pins do not suffer any penalties for range, but still suffer a -1 to hit penalty if they use them after moving that turn.\n\nWeak: They also do not hit very hard, so strike at User Strength -1 and give the target +1 to its armour save (or a 6+ if they have none), exactly as if the enemy had been hit by a bare fist.",
+    "notes": null
   },
   {
     "name": "Blowpipe",
-    "cost": 25,
+    "cost": "25 gc",
     "availability": "Rare 7 (Skaven, Lizardmen and Forest Goblins only. Common for Forest Goblins.)",
     "range": "8\"",
     "strength": "1",
@@ -23,11 +26,14 @@
       "Stealthy"
     ],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#blowpipe",
+    "sourceText": "Blowpipe\n\nMordheim Rulebook (core)\n\nCost: 25 gc\nAvailability: Rare 7 (Skaven, Lizardmen and Forest Goblins only. Common for Forest Goblins.)\n\nThe blowpipe is a short hollow tube which can be used to shoot poisoned darts. While the darts by themselves are too small to cause significant damage, the poison used can cause searing agony and eventual death. The other advantage of a blowpipe is that it is silent, and a well-hidden shooter can fire the darts undetected.\n\nRange: 8\"\nStrength: 1\n\nSpecial Rules\n\nPoison: The needles fired by a blowpipe are coated in a venom very similar in its effects to the Black Lotus (if you roll a 6 on the To Hit roll, the victim is automatically wounded). A blowpipe cannot cause critical hits. This weapon has a positive armour save modifier, so a model that normally has a save of 5+ will get a save of 4+ against a blowpipe dart. Even models that normally do not have an armour save will get a 6+ save to take into account protection offered by clothes, fur or the like.\n\nStealthy: A model armed with a blowpipe can fire while hidden without revealing his position to the enemy. The target model can take an Initiative test in order to try to spot the firing model. If the test is successful, the model no longer counts as hidden.",
+    "notes": null
   },
   {
     "name": "Bolas",
-    "cost": 5,
+    "cost": "5 gc",
     "availability": "Common (Lizardmen, Amazons (Lustria) only)",
     "range": "16\"",
     "strength": "Special",
@@ -36,21 +42,27 @@
       "Entangle"
     ],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#bolas",
+    "sourceText": "Bolas\n\nTown Cryer #11 (1b)\n\nCost: 5 gc\nAvailability: Common (Lizardmen, Amazons (Lustria) only)\n\nBolas are a set of three bronze balls on strings tied together. They are thrown similar to a sling and are rotated around the head for speed. The bolas is a hunting weapon and doesn't harm the animal. It immobilises it and allows the hunter to either subdue it or put it out with his spear. The bolas has a range of 16\" and can only be used once per battle. They are automatically recovered after each battle.\n\nRange: 16\"\nStrength: Special\n\nSpecial Rules\n\nDangerous: If the to hit roll is a natural 1, the bolas brain the wielder with a Strength 3 hit.\n\nEntangle: A model hit by bolas isn't hurt, but his legs are entangled and he is unable to move. The model also suffers a –2 Weapon Skill penalty in hand-to-hand combat, but may still shoot normally. The model may try to free himself in the Recovery phase. If the model rolls a 4+ on a D6 he is freed and may move and fight normally.",
+    "notes": null
   },
   {
     "name": "Bow",
-    "cost": 10,
+    "cost": "10 gc",
     "availability": "Common",
     "range": "24\"",
     "strength": "3",
     "specialRules": [],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#bow",
+    "sourceText": "Bow\n\nMordheim Rulebook (core)\n\nCost: 10 gc\nAvailability: Common\n\nThe bow is carried by most races and used extensively in warfare. It is a compact yet powerful weapon, that is cheap to make and easy to maintain.\n\nRange: 24\"\nStrength: 3",
+    "notes": null
   },
   {
     "name": "Cathayan Candles",
-    "cost": 25,
+    "cost": "25 + 1D6 gc",
     "availability": "Rare 9",
     "range": "6\"",
     "strength": "6",
@@ -60,11 +72,14 @@
       "Set on Fire"
     ],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#cathayan-candles",
+    "sourceText": "Cathayan Candles\n\nBorder Town Burning Supplement (1c)\n\nCost: 25 + 1D6 gc\nAvailability: Rare 9\n\nCathayan Candles are explosive pots or sticks, made with black powder and other foreign ingredients. These volatile Bombas as peddled by Arabyan dealers, ‘usually' detonate on impact, igniting objects and bodies with which they make contact.\n\nRange: 6\"\nStrength: 6\n\nSpecial Rules\n\nThrown Weapon: A model using Cathayan candles does not suffer penalties for range or moving.\n\nVolatile: On a roll of 1 to hit, Cathayan candles explode in the throwers hand. Roll to wound treating the throwing model as the target.\n\nSet on Fire: If you hit with the Cathayan candles roll a D6. If you score a 5+ your opponent has been set on fire. They must roll a D6 in the Recovery phase and score a 4+ to put themselves out or they will suffer a Strength 4 hit and will be unable to do anything other than move for each turn they are on fire. Allies may also attempt to put the warrior out. They must be in base contact and need a 4+ to be successful.",
+    "notes": null
   },
   {
     "name": "Crossbow",
-    "cost": 25,
+    "cost": "25 gc",
     "availability": "Common",
     "range": "30\"",
     "strength": "4",
@@ -72,11 +87,14 @@
       "Move or Fire"
     ],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#crossbow",
+    "sourceText": "Crossbow\n\nMordheim Rulebook (core)\n\nCost: 25 gc\nAvailability: Common\n\nA crossbow consists of a short, strong bowstave mounted on a wooden or steel stock. The crossbows of the Empire are made of steel and often include a winding mechanism to draw back the string. It takes a long time to prepare a crossbow, but a bolt fired from one has a tremendous range and can penetrate armour easily.\n\nCrossbows take much longer than other bows to make, so they are expensive and relatively rare weapons. Still, they are the preferred weapon of many in Mordheim because of their power and long range.\n\nRange: 30\"\nStrength: 4\n\nSpecial Rules\n\nMove or Fire: You may not move and fire a crossbow on the same turn, other than to pivot on the spot to face your target or to stand up.",
+    "notes": null
   },
   {
     "name": "Crossbow pistol",
-    "cost": 35,
+    "cost": "35 gc",
     "availability": "Rare 9",
     "range": "10\"",
     "strength": "4",
@@ -85,11 +103,14 @@
       "Hand-To-Hand"
     ],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#crossbow-pistol",
+    "sourceText": "Crossbow pistol\n\nMordheim Rulebook (core)\n\nCost: 35 gc\nAvailability: Rare 9\n\nCrossbow pistols are masterpieces made by expert weaponsmiths. They are miniature crossbows with all the power and accuracy of the real thing. As these weapons may be easily concealed, they are the favoured weapon of assassins.\n\nRange: 10\"\nStrength: 4\n\nSpecial Rules\n\nShoot In Hand-To-Hand Combat: A model armed with a crossbow pistol may shoot it in the first round of a hand-to-hand combat and this shot is always resolved first, before any blows are struck. This shot has an extra -2 to hit penalty. Use model's Ballistic Skill to see whether it hits or not. This bonus attack is in addition to any close combat weapon attacks.\n\nHand-To-Hand: Pistols can be used in hand-to-hand combat as well as for shooting. A model armed with a pistol and another close combat weapon gains +1 Attack, which is resolved at Strength 4. This bonus attack can be used only once per combat. If you are firing a brace of pistols, your model can fight with 2 Attacks in the first turn of close combat. These attacks are resolved with a model's Weapon Skill like any normal close combat attack and likewise may be parried. Successful hits are resolved at Strength 4, regardless of the firer's Strength.",
+    "notes": "Source ambiguity: both Shoot In Hand-To-Hand Combat (Ballistic Skill) and Hand-To-Hand (Weapon Skill) are displayed. Both are retained; their interaction is not resolved here."
   },
   {
     "name": "Elf Bow",
-    "cost": 35,
+    "cost": "35 + 3D6 gc",
     "availability": "Rare 12",
     "range": "36\"",
     "strength": "3",
@@ -97,11 +118,14 @@
       "Save Modifier"
     ],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#elf-bow",
+    "sourceText": "Elf Bow\n\nMordheim Rulebook (core)\n\nCost: 35 + 3D6 gc\nAvailability: Rare 12\n\nElven bows are the finest missile weapons of their kind. Constructed from ithilmar or wood from the Elf forests, with strings woven from the hair of Elf maidens, Elven bows are far superior to any missile weapons made by other races. In the hands of an Elven archer, the Elf bow is a truly potent weapon, its long range and penetrating power making it far superior to any bow made by humans.\n\nRange: 36\"\nStrength: 3\n\nSpecial Rules\n\nSave Modifier: An Elf bow has a -1 save modifier on armour saves against it.",
+    "notes": null
   },
   {
     "name": "Firepots Miragliano",
-    "cost": 0,
+    "cost": null,
     "availability": "Common",
     "range": "8\"",
     "strength": "2",
@@ -110,11 +134,14 @@
       "Smoke"
     ],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#firepots-miragliano",
+    "sourceText": "Firepots Miragliano\n\nLustrian Reavers (1c)\n\nAvailability: Common\n\nThese primitive hand grenades made of clay contain alchemic Tilean Fire which bursts into flames when exposed to air.\n\nRange: 8\"\nStrength: 2\n\nSpecial Rules\n\nAwkward Thrown Weapon: Models using Firepots Miragliano do not suffer any penalties for range, but still suffer a -1 to hit penalty if they use them after moving that turn.\n\nSmoke: If the orb hits, the target suffers 1 S2 hit from the bursting flames, and in addition the model needs to roll under the Initiative at the start of its next turn in order to see through the smoke. If the model fails, it cannot charge or shoot until the beginning of its next turn, though can otherwise move or act normally, and fight in hand-to-hand combat.",
+    "notes": "The source does not state a cost; null means unknown, not free."
   },
   {
     "name": "Fish-Hook Shot",
-    "cost": 10,
+    "cost": "10 gc",
     "availability": "Rare 7 (Battle Monks of Cathay only)",
     "range": "3\"",
     "strength": "3",
@@ -124,11 +151,14 @@
       "Caused Fall"
     ],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#fish-hook-shot",
+    "sourceText": "Fish-Hook Shot\n\nBorder Town Burning (1c)\n\nCost: 10 gc\nAvailability: Rare 7 (Battle Monks of Cathay only)\n\nRange: 3\"\nStrength: 3\n\nSpecial Rules\n\nThrown Weapon: Models using a fish-hook shot do not suffer penalties for range or moving as it is designed for short-range use anyway.\n\nPrecise: A model using a fish-hook shot is so well-trained in the use of this weapon that he may attack enemy models that are engaged in close combat. However, the hook shot is useless when the monk himself is engaged in close combat.\n\nCaused Fall: The warrior may declare to try and cause an enemy model to fall instead of causing damage. The warrior must roll to hit as normal and then pass a Strength test. If the test is successful, the enemy model counts as knocked down. Apply a +1 modifier to the Strength test against large models. When a mount gets knocked down, the rider falls off (see 3-4 on the Whoa Boy! table).",
+    "notes": null
   },
   {
     "name": "Harpoon Crossbow",
-    "cost": 50,
+    "cost": "50 gc",
     "availability": "Rare 10 (Maneaters only)",
     "range": "30\"",
     "strength": "5",
@@ -137,11 +167,14 @@
       "Prepare shot"
     ],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#harpoon-crossbow",
+    "sourceText": "Harpoon Crossbow\n\nBorder Town Burning supplement (1c)\n\nCost: 50 gc\nAvailability: Rare 10 (Maneaters only)\n\nLittle more than a crude crossbow hybrid, scaled up for the sake of a titanic marksman.\n\nRange: 30\"\nStrength: 5\n\nSpecial Rules\n\nMove or fire: May not move and fire in the same turn.\n\nPrepare shot: Requires a full turn to prepare before shooting.",
+    "notes": null
   },
   {
     "name": "Javelins",
-    "cost": 5,
+    "cost": "5 gc",
     "availability": "Common (Amazons (Mordheim), Norse Explorers, Pit Fighters only)",
     "range": "8\"",
     "strength": "As user",
@@ -149,21 +182,27 @@
       "Thrown weapon"
     ],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#javelins",
+    "sourceText": "Javelins\n\nTown Cryer #23 (1b)\n\nCost: 5 gc\nAvailability: Common (Amazons (Mordheim), Norse Explorers, Pit Fighters only)\n\nJavelins are short throwing spears specially weighted to travel quite a distance. Although they have a much reduced range when compared to an arrow they can cause quite considerable damage when thrown by a person of great strength.\n\nRange: 8\"\nStrength: As user\n\nSpecial Rules\n\nThrown weapon: Javelins are thrown weapons and the warrior suffers no penalty for range or moving.\n\nConflicting Source Material\n\nThere are entries for Javelin in TC #11, #14, #21, #23 and Border Town Burning. In all those issues there are no less than four different versions for the javelins' thrown weapon special rule and range.\n\nIt was decided to use the thrown weapon rule from the original rulebook (used by throwing knives, blessed water, net, etc), which ignores both moving and range. This is the same as the most recent version of Javelins.\n\n4 out of 5 sources used 8\" range, so this was decided as the norm (only new Pit Fighters had 10\", whereas the Norse, Lizardmen, old Pit Fighters, and Amazons all are 8\").",
+    "notes": null
   },
   {
     "name": "Long Bow",
-    "cost": 15,
+    "cost": "15 gc",
     "availability": "Common",
     "range": "30\"",
     "strength": "3",
     "specialRules": [],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#long-bow",
+    "sourceText": "Long Bow\n\nMordheim Rulebook (core)\n\nCost: 15 gc\nAvailability: Common\n\nA long bow is made of alternating layers of either yew or elm. A skilled archer can hit a chosen leaf on a tree from three hundred paces with this weapon.\n\nThe long bow is favoured by experienced archers due to its great reach and accuracy.\n\nRange: 30\"\nStrength: 3",
+    "notes": null
   },
   {
     "name": "Nehekharan Javelins",
-    "cost": 10,
+    "cost": "10 gc",
     "availability": "Common (Tomb Guardians Tomb Lord only)",
     "range": "8\"",
     "strength": "As user",
@@ -171,11 +210,14 @@
       "+1 to hit"
     ],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#nehekharan-javelins",
+    "sourceText": "Nehekharan Javelins\n\nTown Cryer 18 (1b)\n\nCost: 10 gc\nAvailability: Common (Tomb Guardians Tomb Lord only)\n\nThese warriors throw javelins equipped with a becket; a string wound around the javelin. When it is thrown, the Javelin spins like a bullet increasing its accuracy.\n\nRange: 8\"\nStrength: As user\n\nSpecial Rules\n\n+1 to hit: These javelins receive +1 to hit when thrown.\n\nRange and movement penalty\n\nNote that the original writing merely had a +1 to hit included. Normal javelins are thrown weapons and the warrior suffers no penalty for range or moving, it is suggested to combine the rules for a normal javelin with the +1 to hit.",
+    "notes": null
   },
   {
     "name": "Repeater Crossbow",
-    "cost": 40,
+    "cost": "40 gc",
     "availability": "Rare 8",
     "range": "24\"",
     "strength": "3",
@@ -183,21 +225,27 @@
       "Fire twice"
     ],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#repeater-crossbow",
+    "sourceText": "Repeater Crossbow\n\nMordheim Rulebook (core)\n\nCost: 40 gc\nAvailability: Rare 8\n\nRepeater crossbows are extremely complex devices, expensive to acquire and difficult to make. While this makes them rare, they certainly have their uses: they can rain a deadly hail of bolts on enemies, and a warrior using one may move quite fast and still fire his weapon.\n\nRange: 24\"\nStrength: 3\n\nSpecial Rules\n\nFire twice: A model armed with a repeater crossbow may choose to fire twice per turn with an extra -1 to hit penalty on both shots.",
+    "notes": null
   },
   {
     "name": "Short Bow",
-    "cost": 5,
+    "cost": "5 gc",
     "availability": "Common",
     "range": "16\"",
     "strength": "3",
     "specialRules": [],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#short-bow",
+    "sourceText": "Short Bow\n\nMordheim Rulebook (core)\n\nCost: 5 gc\nAvailability: Common\n\nShort bows are small, short-ranged bows that are cheap and require little strength to use. Some cavalry carry a shortened bow which is easier to shoot from horseback than a larger bow. Halflings also use short bows, as they lack the strength and height required to use a long bow.\n\nRange: 16\"\nStrength: 3",
+    "notes": null
   },
   {
     "name": "Sling",
-    "cost": 2,
+    "cost": "2 gc",
     "availability": "Common",
     "range": "18\"",
     "strength": "3",
@@ -205,11 +253,14 @@
       "Fire twice at half range"
     ],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#sling",
+    "sourceText": "Sling\n\nMordheim Rulebook (core)\n\nCost: 2 gc\nAvailability: Common\n\nSlings are rarely used, mainly because they are no more powerful than bows and have a shorter range. A sling is little more than a looped strip of cloth or leather into which a stone is placed. The sling is whirled about the slinger's head and the sling stone is then released towards the target.\n\nWhile this weapon is looked down upon by most archers, a skilled slinger can slay a man from a considerable distance, and the ammunition is easy to find: rocks are everywhere and free!\n\nRange: 18\"\nStrength: 3\n\nSpecial Rules\n\nFire twice at half range: A slinger may fire twice in the shooting phase if he does not move in the movement phase. He cannot shoot over half range (9\") though, if he fires twice. If the model fires twice then each shot is at -1 to hit.",
+    "notes": null
   },
   {
     "name": "Sun Gauntlet",
-    "cost": 40,
+    "cost": "40 gc",
     "availability": "Rare 12 (Amazons (Mordheim) only)",
     "range": "12\"",
     "strength": "4",
@@ -219,11 +270,14 @@
       "Hand-To-Hand"
     ],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#sun-gauntlet",
+    "sourceText": "Sun Gauntlet\n\nTown Cryer #23 (1b)\n\nCost: 40 gc\nAvailability: Rare 12 (Amazons (Mordheim) only)\n\nThis, as with all strange arcane Amazon items, is made from an unknown multicoloured metal that is impervious to damage or corrosion. It is covered in strange runes and a bright gemstone is set into the hilt. In many ways this weapon resembles a blackpowder pistol. It can be held in one hand and when pointed at an enemy unleashes a blinding beam of energy like the Sunstaff.\n\nRange: 12\"\nStrength: 4\n\nSpecial Rules\n\nAccurate: The Sun Gauntlet does not suffer the usual -1 modifier to hit for long range.\n\nNo Save: The beam from a Sun Gauntlet can literally cut through anything. A warrior wounded by a Sun Gauntlet receives no armour save whatsoever.\n\nHand-To-Hand: The Sun Gauntlet can be used with another close combat weapon in hand-to-hand combat with Strength 4 and no armour save. Because it does not require prepared shot, this bonus attack may be used in each turn of combat.",
+    "notes": null
   },
   {
     "name": "Sunstaff",
-    "cost": 50,
+    "cost": "50 gc",
     "availability": "Rare 12 (Amazons (Mordheim) only)",
     "range": "24\"",
     "strength": "4",
@@ -232,11 +286,14 @@
       "No Save"
     ],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#sunstaff",
+    "sourceText": "Sunstaff\n\nTown Cryer #23 (1b)\n\nCost: 50 gc\nAvailability: Rare 12 (Amazons (Mordheim) only)\n\nThe Sunstaff is a long tubular stick that is made from a strange multicoloured metal with one end hollow like a tube. Strange runes are carved along its length and a large gemstone is set into the pommel. Despite being extremely ancient (Elf Loremasters of the White Tower of Hoeth claim to have found a similar device that they surmise is more than 20,000 years old – older than the Elven race itself!), the wielder of the Sunstaff can discharge a beam of energy akin to the rays of the sun.\n\nRange: 24\"\nStrength: 4\n\nSpecial Rules\n\nAccurate: The Sunstaff does not suffer the usual -1 modifier to hit for long range.\n\nNo Save: The beam from a Sunstaff can literally cut through anything. A warrior wounded by a Sunstaff receives no armour save whatsoever.",
+    "notes": null
   },
   {
     "name": "Sunstaff (Lustria)",
-    "cost": 35,
+    "cost": "35 gc",
     "availability": "Rare 10 (Amazons (Lustria) only)",
     "range": "12\" / Close Combat",
     "strength": "As user",
@@ -244,11 +301,14 @@
       "Sunbolt"
     ],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#sunstaff-(lustria)",
+    "sourceText": "Sunstaff (Lustria)\n\nTown Cryer #15 (1b)\n\nCost: 35 gc\nAvailability: Rare 10 (Amazons (Lustria) only)\n\nThe Sunstaff is a long staff made from a strange multicoloured metal with one end hollow like a tube. Strange runes are carves along its length and a large gemstone is set into the pommel.\n\nRange: 12\" / Close Combat\nStrength: As user\n\nSpecial Rules\n\nSunbolt: The wielder of the sunstaff can discharge a beam of energy in the shooting phase that is akin to rays of the sun. The Sunbolt has a range of 12\" and hits at Strength 4. Aside from ward and dodge saves a Sunbolt ignores armour saves and penalties for long range.",
+    "notes": null
   },
   {
     "name": "Throwing Knives/Stars",
-    "cost": 15,
+    "cost": "15 gc",
     "availability": "Rare 5",
     "range": "6\"",
     "strength": "As user",
@@ -256,11 +316,14 @@
       "Thrown Weapon"
     ],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#throwing-knives/stars",
+    "sourceText": "Throwing Knives/Stars\n\nMordheim Rulebook (core)\n\nCost: 15 gc\nAvailability: Rare 5\n\nThrowing stars are used mainly by the assassins of the sinister House of Shadows, or by street thugs who specialise in ambushing the unwary. A perfectly balanced knife thrown from behind has ended the life of many a noble and merchant in Mordheim. Throwing knives are not suitable for close combat, as their balance makes them unwieldy in close quarters.\n\nRange: 6\"\nStrength: As user\n\nSpecial Rules\n\nThrown Weapon: Models using throwing stars or knives do not suffer penalties for range or moving as these weapons are perfectly balanced for throwing. They cannot be used in close combat.",
+    "notes": null
   },
   {
     "name": "Tufenk",
-    "cost": 15,
+    "cost": "15 gc",
     "availability": "Rare 10",
     "range": "8\"",
     "strength": "2",
@@ -269,6 +332,9 @@
       "Prepare Shot"
     ],
     "type": "weapon",
-    "save": null
+    "save": null,
+    "sourceUrl": "https://mordheimer.net/docs/weapons-armour/missile#tufenk",
+    "sourceText": "Tufenk\n\nKhemri setting, Town Cryer #17 (1b)\n\nCost: 15 gc\nAvailability: Rare 10\n\nThis is a blowpipe that projects alchemical fire about eight feet causing burning damage.\n\nRange: 8\"\nStrength: 2\n\nSpecial Rules\n\nFire: If you hit roll a D6, on a 4+ your opponent is set on fire. They must roll a D6 each Recovery phase, on a 4+ they extinguish the fire or they immediately suffer a S4 hit and may only move. Friendly models may help in extinguishing the model that is ablaze. They must be in base-to-base contact and need to roll a 4+ on a D6. Against dry targets like Mummies they are Strength 3 and on a 2+ on 1D6 the Mummy catches fire.\n\nPrepare Shot: The Tufenk takes a complete turn to reload, so your model may only fire every other turn.",
+    "notes": null
   }
 ]

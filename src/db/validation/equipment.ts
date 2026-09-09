@@ -4,15 +4,23 @@ export const EQUIPMENT_TYPES = ["weapon", "armour"] as const;
 
 export const EquipmentTypeSchema = z.enum(EQUIPMENT_TYPES);
 
+const EquipmentTextSchema = z.string().trim().min(1);
+
 export const EquipmentFieldsSchema = z.object({
-	name: z.string().trim().min(1),
-	cost: z.number().finite().nonnegative(),
-	availability: z.string().trim().min(1),
-	range: z.string().trim().min(1),
-	strength: z.string().trim().min(1),
-	specialRules: z.array(z.string().trim().min(1)),
+	name: EquipmentTextSchema,
+	// Display text, not a calculated price: costs can include dice, braces or multipliers.
+	cost: EquipmentTextSchema.nullable(),
+	availability: EquipmentTextSchema.nullable(),
+	range: EquipmentTextSchema.nullable(),
+	strength: EquipmentTextSchema.nullable(),
+	specialRules: z.array(EquipmentTextSchema),
 	type: EquipmentTypeSchema,
-	save: z.string().trim().min(1),
+	// The displayed armour-save stat; conditional saving effects remain in sourceText.
+	save: EquipmentTextSchema.nullable(),
+	sourceUrl: z.url().nullable(),
+	// Per-item source transcription includes rules, tables and introductory qualifications.
+	sourceText: EquipmentTextSchema.nullable(),
+	notes: EquipmentTextSchema.nullable(),
 });
 
 export const EquipmentSchema = EquipmentFieldsSchema.extend({
