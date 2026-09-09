@@ -1,35 +1,42 @@
 {
-	"$schema": "../../node_modules/wrangler/config-schema.json",
-	"name": "mordheim-image-generation-consumer",
-	"main": "src/index.ts",
-	"compatibility_date": "2026-09-04",
-	"workers_dev": false,
-	"preview_urls": false,
-	"observability": { "enabled": true },
-	// Opt in only after Access/authorization protects the app AND submission RPC.
-	"vars": { "IMAGE_GENERATION_ENABLED": "false" },
-	"r2_buckets": [
-		{ "binding": "IMAGE_GENERATION_BUCKET", "bucket_name": "mordheim-generated-images" }
-	],
-	"queues": {
-		"consumers": [
-			{
-				"queue": "mordheim-image-generation",
-				"max_batch_size": 1,
-				"max_batch_timeout": 5,
-				"max_retries": 3,
-				"retry_delay": 30,
-				"max_concurrency": 1,
-				"dead_letter_queue": "mordheim-image-generation-dlq"
-			}
-		]
-	},
-	"d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "mordheim-two-db",
-			"database_id": "45d02283-1ed1-4ff0-ade4-83fe6c36d59c",
-			"migrations_dir": "../../drizzle"
-		}
-	]
+    "$schema": "../../node_modules/wrangler/config-schema.json",
+    "name": "mordheim-image-generation-consumer",
+    "main": "src/index.ts",
+    "compatibility_date": "2026-09-04",
+    "workers_dev": false,
+    "preview_urls": false,
+    "observability": {
+        "enabled": true
+    },
+    // Opt in only after Access/authorization protects the app AND submission RPC.
+    "vars": {
+        "IMAGE_GENERATION_ENABLED": "true"
+    },
+    "r2_buckets": [
+        {
+            "binding": "IMAGE_GENERATION_BUCKET",
+            "bucket_name": "mordheim-generated-images"
+        }
+    ],
+    "queues": {
+        "consumers": [
+            {
+                "queue": "mordheim-image-generation",
+                "max_batch_size": 1,
+                "max_batch_timeout": 5,
+                "max_retries": 3,
+                "retry_delay": 30,
+                "max_concurrency": 1,
+                "dead_letter_queue": "mordheim-image-generation-dlq"
+            }
+        ]
+    },
+    "d1_databases": [
+        {
+            "binding": "DB",
+            "database_name": "mordheim-two-db",
+            "database_id": "45d02283-1ed1-4ff0-ade4-83fe6c36d59c",
+            "migrations_dir": "../../drizzle"
+        }
+    ]
 }
