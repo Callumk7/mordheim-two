@@ -15,6 +15,7 @@ import { Route as EventsRouteRouteImport } from './routes/events/route'
 import { Route as GenRouteRouteImport } from './routes/gen/route'
 import { Route as MatchesRouteRouteImport } from './routes/matches/route'
 import { Route as QueueRouteImport } from './routes/queue'
+import { Route as QueueJobsRouteImport } from './routes/queue-jobs'
 import { Route as WarbandsRouteRouteImport } from './routes/warbands/route'
 import { Route as WarriorsRouteRouteImport } from './routes/warriors/route'
 import { Route as EventsIndexRouteImport } from './routes/events/index'
@@ -63,6 +64,11 @@ const MatchesRouteRoute = MatchesRouteRouteImport.update({
 const QueueRoute = QueueRouteImport.update({
   id: '/queue',
   path: '/queue',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QueueJobsRoute = QueueJobsRouteImport.update({
+  id: '/queue-jobs',
+  path: '/queue-jobs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WarbandsRouteRoute = WarbandsRouteRouteImport.update({
@@ -170,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/warriors': typeof WarriorsRouteRouteWithChildren
   '/demo': typeof DemoRoute
   '/queue': typeof QueueRoute
+  '/queue-jobs': typeof QueueJobsRoute
   '/events/$eventId': typeof EventsEventIdRouteRouteWithChildren
   '/matches/$matchId': typeof MatchesMatchIdRouteRouteWithChildren
   '/warbands/$warbandId': typeof WarbandsWarbandIdRouteRouteWithChildren
@@ -193,6 +200,7 @@ export interface FileRoutesByTo {
   '/gen': typeof GenRouteRoute
   '/demo': typeof DemoRoute
   '/queue': typeof QueueRoute
+  '/queue-jobs': typeof QueueJobsRoute
   '/events': typeof EventsIndexRoute
   '/matches': typeof MatchesIndexRoute
   '/stats': typeof StatsIndexRoute
@@ -217,6 +225,7 @@ export interface FileRoutesById {
   '/warriors': typeof WarriorsRouteRouteWithChildren
   '/demo': typeof DemoRoute
   '/queue': typeof QueueRoute
+  '/queue-jobs': typeof QueueJobsRoute
   '/events/$eventId': typeof EventsEventIdRouteRouteWithChildren
   '/matches/$matchId': typeof MatchesMatchIdRouteRouteWithChildren
   '/warbands/$warbandId': typeof WarbandsWarbandIdRouteRouteWithChildren
@@ -246,6 +255,7 @@ export interface FileRouteTypes {
     | '/warriors'
     | '/demo'
     | '/queue'
+    | '/queue-jobs'
     | '/events/$eventId'
     | '/matches/$matchId'
     | '/warbands/$warbandId'
@@ -269,6 +279,7 @@ export interface FileRouteTypes {
     | '/gen'
     | '/demo'
     | '/queue'
+    | '/queue-jobs'
     | '/events'
     | '/matches'
     | '/stats'
@@ -292,6 +303,7 @@ export interface FileRouteTypes {
     | '/warriors'
     | '/demo'
     | '/queue'
+    | '/queue-jobs'
     | '/events/$eventId'
     | '/matches/$matchId'
     | '/warbands/$warbandId'
@@ -320,6 +332,7 @@ export interface RootRouteChildren {
   WarriorsRouteRoute: typeof WarriorsRouteRouteWithChildren
   DemoRoute: typeof DemoRoute
   QueueRoute: typeof QueueRoute
+  QueueJobsRoute: typeof QueueJobsRoute
   StatsIndexRoute: typeof StatsIndexRoute
 }
 
@@ -365,6 +378,13 @@ declare module '@tanstack/react-router' {
       path: '/queue'
       fullPath: '/queue'
       preLoaderRoute: typeof QueueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/queue-jobs': {
+      id: '/queue-jobs'
+      path: '/queue-jobs'
+      fullPath: '/queue-jobs'
+      preLoaderRoute: typeof QueueJobsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/warbands': {
@@ -626,6 +646,7 @@ const rootRouteChildren: RootRouteChildren = {
   WarriorsRouteRoute: WarriorsRouteRouteWithChildren,
   DemoRoute: DemoRoute,
   QueueRoute: QueueRoute,
+  QueueJobsRoute: QueueJobsRoute,
   StatsIndexRoute: StatsIndexRoute,
 }
 export const routeTree = rootRouteImport
