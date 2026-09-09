@@ -7,6 +7,7 @@ export const WarriorStatusSchema = z.enum(WARRIOR_STATUSES);
 export const WarriorFieldsSchema = z.object({
 	name: z.string().trim().min(1),
 	class: z.string().trim().min(1),
+	description: z.string().trim().nullable().optional(),
 	status: WarriorStatusSchema,
 	warbandId: z.string().min(1),
 	knocked: z.number().int().nonnegative(),
