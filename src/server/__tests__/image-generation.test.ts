@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
-import { enqueueImageGeneration } from "@/db/image-generation.server";
 import type { Database } from "@/db/index.server";
 import { ImageGenerationInputSchema } from "@/db/validation/image-generation";
+import { enqueueImageGeneration } from "../image-generation";
 
 function setup() {
 	const values = vi.fn().mockResolvedValue(undefined);

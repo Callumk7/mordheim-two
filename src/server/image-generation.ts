@@ -7,7 +7,7 @@ import { imageGenerationJobs } from "@/db/schema";
 import type { ImageGenerationMessage } from "@/db/validation/image-generation";
 import { ImageGenerationInputSchema } from "@/db/validation/image-generation";
 
-async function enqueueImageGeneration(
+export async function enqueueImageGeneration(
 	db: Database,
 	queue: Pick<Queue<ImageGenerationMessage>, "send">,
 	prompt: string,
