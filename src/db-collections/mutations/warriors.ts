@@ -41,6 +41,7 @@ export function deleteWarriorTransaction(
 			await Promise.all([
 				collections.warriors.utils.refetch(),
 				collections.events.utils.refetch(),
+				collections.warriorEquipment.utils.refetch(),
 			]);
 		},
 	});

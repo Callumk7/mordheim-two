@@ -43,6 +43,7 @@ export function deleteWarbandTransaction(
 				collections.warriors.utils.refetch(),
 				collections.warbandMatches.utils.refetch(),
 				collections.events.utils.refetch(),
+				collections.warriorEquipment.utils.refetch(),
 			]);
 		},
 	});

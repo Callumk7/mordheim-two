@@ -14,13 +14,14 @@ import {
 
 export const equipmentCollectionOptions = collectionOptions(
 	"equipment",
-	(client) =>
-		queryCollectionOptions({
+	(client) => {
+		const queryClient = client.requireDependency<QueryClient>("queryClient");
+		return queryCollectionOptions({
 			id: "equipment",
 			autoIndex: "eager",
 			defaultIndexType: BasicIndex,
 			queryKey: ["equipment"],
-			queryClient: client.requireDependency<QueryClient>("queryClient"),
+			queryClient,
 			queryFn: () => listEquipment(),
 			getKey: (item) => item.id,
 			schema: EquipmentSchema,
@@ -51,6 +52,8 @@ export const equipmentCollectionOptions = collectionOptions(
 						deleteEquipment({ data: { id: mutation.original.id } }),
 					),
 				);
+				await queryClient.refetchQueries({ queryKey: ["warriorEquipment"] });
 			},
-		}),
+		});
+	},
 );
