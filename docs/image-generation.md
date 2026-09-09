@@ -1,28 +1,35 @@
-# Image generation producer
+# Image generation queue scaffold
 
-This is a producer-only scaffold in the existing TanStack Start Worker. The `/queue` playground provides a minimal submission UI. No consumer, image provider, R2 bucket, or Cloudflare Workflows resource is added.
+One repository, two independently deployed Workers:
 
-## Flow
-
-1. Call `createImageGenerationJob` (a TanStack Start POST RPC endpoint).
-2. Validate and trim the prompt (1–4,000 characters).
-3. Insert an `image_generation_jobs` D1 row with status `pending`.
-4. Await `IMAGE_GENERATION_QUEUE.send({ jobId })`. The prompt stays in D1.
-5. Mark the row `queued` and return `{ jobId, status: "queued" }`.
-6. If sending throws, record `enqueue_failed` with a generic error and return `{ jobId, status: "enqueue_failed" }` instead.
-
-Example call from app code:
-
-```ts
-import { createImageGenerationJob } from "@/server/image-generation";
-
-const result = await createImageGenerationJob({
-  data: { prompt: "A grim woodcut portrait of a Mordheim mercenary" },
-});
-// Check result.status; receiving a response alone does not imply enqueue success.
+```text
+wrangler.jsonc                            # TanStack Start app / producer
+src/server/image-generation.ts            # Submission RPC
+src/db/schema.ts                          # Shared D1 schema
+src/db/validation/image-generation.ts      # Shared message contract
+workers/image-generation/
+  wrangler.jsonc                          # Consumer bindings, retries, DLQ
+  tsconfig.json
+  worker-configuration.d.ts                # Generated consumer bindings
+  src/index.ts                            # Queue entrypoint, Drizzle connection
+  src/consumer.ts                         # Message handling scaffold
+  src/consumer.test.ts                     # Injected-loader unit tests
 ```
 
-There is no hand-written REST URL: Start exposes the server function as its generated RPC endpoint.
+The consumer imports shared schema/validation, not the app's TanStack server functions or `getDb()`. It creates its own Drizzle connection using its own `env.DB` binding to the same database. No separate package install or repository is required.
+
+## What this scaffold does (and does not do)
+
+**The consumer acknowledges and removes valid jobs from the queue after loading them and logging their ID. It does not generate images. Do not deploy it against a backlog you intend to actually generate.** No provider, R2 bucket, paid API calls, or completion tracking is configured.
+
+1. `createImageGenerationJob` validates/trims a prompt (1–4,000 characters).
+2. The app inserts a D1 job with status `pending`, then sends `{ jobId }`. The prompt stays in D1.
+3. The app records `queued` when send succeeds, or `enqueue_failed` with a generic error if sending throws.
+4. The consumer validates the message and loads the job from D1. It accepts `pending` and `enqueue_failed` too: delivery can race the producer update, and a send failure may mean delivery is uncertain.
+5. It logs only the job ID, then acknowledges that message. **D1 status remains the producer's enqueue status, not a processing/completion status.**
+6. Invalid payloads, missing jobs, and D1 errors are retried individually. Other messages in the batch continue. After three retries, Cloudflare moves the message to `mordheim-image-generation-dlq`.
+
+The consumer processes messages sequentially, with batches of up to five and consumer concurrency capped at one. These are conservative starting settings, not a production throughput recommendation. Duplicate deliveries are harmless in this read-only scaffold (logs may repeat); this is not an exactly-once generation implementation.
 
 ## Local review
 
@@ -31,34 +38,49 @@ pnpm db:migrate:local
 pnpm dev
 ```
 
-Open `/queue`, enter a prompt, and click **Send to queue**. The page displays the job ID and enqueue outcome. You can also call the function from application code as above. Then inspect D1:
+`vite.config.ts` registers the consumer as a **development-only auxiliary Worker**, so both Workers and their queue run in the same local runtime. They share the default root `.wrangler/state` D1 persistence. Do not start a second standalone consumer dev process expecting it to connect automatically.
+
+Open `/queue` and submit a prompt. The page displays the job ID and enqueue outcome; the dev terminal should show `Image generation scaffold consumed job` with that ID. D1 still shows `queued` (see the distinction above). Local messages never go to the production queue or dashboard.
 
 ```sh
 pnpm exec wrangler d1 execute mordheim-two-db --local --command "SELECT * FROM image_generation_jobs ORDER BY created_at DESC LIMIT 10"
+pnpm test
+pnpm consumer:check
 ```
 
-The Cloudflare Vite plugin supplies a local queue binding; local sends do not send production messages. No consumer is registered, so jobs will not generate images or advance beyond `queued`.
+`consumer:check` bundles and validates the consumer with Wrangler's dry run; it does not deploy. Unit tests cover validation, lookup, per-message acknowledgements/retries, batch isolation, and duplicate delivery. Cloudflare's actual retry scheduling/DLQ routing requires runtime verification.
 
-## Dashboard verification
+## Provisioning and deployment (manual; not performed by this change)
 
-After provisioning and deploying, submit a prompt on the deployed `/queue` route. In the Cloudflare dashboard, open `mordheim-image-generation` under Queues and check message writes and backlog (analytics may take time to update). With no consumer, messages remain until retention expires. Inspect the `image_generation_jobs` table in the D1 console to match the displayed job ID to its prompt and status. The queue message contains only `{ jobId }`, not the prompt.
-
-Local development uses simulated bindings and will not appear in the Cloudflare dashboard.
-
-## Provisioning (not performed by this change)
+Create the queues if they do not already exist:
 
 ```sh
 pnpm exec wrangler queues create mordheim-image-generation
+pnpm exec wrangler queues create mordheim-image-generation-dlq
 pnpm db:migrate:remote
+pnpm consumer:deploy
 pnpm deploy
 ```
 
-Worker binding types are checked in; regenerate with `pnpm cf-typegen` after changing bindings.
+`consumer:deploy` uses the consumer's own Wrangler configuration and registers its queue subscription. `deploy` still builds/deploys only the web app. The consumer has no public HTTP endpoint (`workers_dev` and preview URLs are disabled, with no routes or fetch handler).
 
-## Deliberate limitations
+Regenerate binding types after configuration changes:
 
-- Like the existing mutation endpoints, this scaffold has no application authentication. Add authorization and rate limiting before exposing it publicly or connecting paid generation.
-- D1 and Queues are not one atomic transaction. A crash can leave a `pending` row, including after a successful send. A send error may also mean delivery is uncertain. `queued` means the send was acknowledged, not that the message still exists or generation completed.
-- If the post-send D1 update fails, the endpoint throws but the message may already be queued. There is no automatic resend or reconciliation. Repeating the request creates a new job.
-- Queue retention still applies without a consumer; D1 records outlive expired messages. Do not enqueue real work expecting indefinite storage.
-- A future consumer should load the prompt by `jobId`, handle duplicate delivery idempotently, and add processing/completed/failed states and result storage. Add reconciliation/request idempotency before production use.
+```sh
+pnpm cf-typegen
+pnpm consumer:typegen
+```
+
+After deploying, inspect consumer logs and the main queue/DLQ in Cloudflare. Successful scaffold consumption drains the main queue; D1 alone cannot tell you that consumption happened. No DLQ consumer is configured: inspect and arrange replay explicitly, before its retention window expires.
+
+## Before real generation
+
+- Replace the marked scaffold block in `workers/image-generation/src/consumer.ts` with a provider adapter and durable result storage. Acknowledge only after persisting the result.
+- Add processing/completed/failed state, durable duplicate protection and recovery of interrupted work. Use `jobId` as a provider idempotency key where supported. A concurrency cap is not an idempotency mechanism.
+- Guard producer status updates so a late `queued`/`enqueue_failed` write cannot overwrite a consumer's processing/completed state.
+- Configure provider secrets and R2 bindings on the consumer, not the frontend. Do not log prompts or credentials.
+- Add authentication, authorization and rate limiting to the submission endpoint before exposing paid generation.
+- D1 and Queues are not an atomic transaction. A crash can leave a pending row or an uncertain delivery; add reconciliation/request idempotency before production use. Retrying the current RPC creates a new job.
+- Add monitoring and a DLQ inspection/replay procedure. Queue retention applies to both queues; the DLQ is not permanent storage.
+
+References: [Queues local development](https://developers.cloudflare.com/queues/configuration/local-development/), [Vite auxiliary Workers](https://developers.cloudflare.com/workers/vite-plugin/reference/api/), [Retries and acknowledgements](https://developers.cloudflare.com/queues/configuration/batching-retries/).

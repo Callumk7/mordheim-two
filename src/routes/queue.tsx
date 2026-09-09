@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { TextField } from "react-aria-components";
-import { Button } from "@/components/ui/button";
+import { Button, LinkButton } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageGenerationInputSchema } from "@/db/validation/image-generation";
@@ -32,7 +32,7 @@ function QueuePage() {
 			const result = await createImageGenerationJob({ data: input.data });
 			setMessage(
 				result.status === "queued"
-					? `Queued job ${result.jobId}. No consumer is configured, so no image will be generated.`
+					? `Queued job ${result.jobId}. The scaffold consumer only logs receipt; no image will be generated.`
 					: `Job ${result.jobId}: enqueue failed. Delivery may be uncertain; check D1 and the queue before resubmitting.`,
 			);
 		} catch {
@@ -49,9 +49,13 @@ function QueuePage() {
 		<section className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-6">
 			<header className="space-y-2">
 				<h1 className="text-3xl">Queue playground</h1>
+				<LinkButton to="/queue-jobs" variant="outline">
+					View D1 jobs
+				</LinkButton>
 				<p className="text-sm text-muted-foreground">
 					Save an image prompt in D1 and send its job ID to the image generation
-					queue. This is a producer-only test; no images are generated.
+					queue. The scaffold consumer loads and acknowledges jobs without
+					generating images.
 				</p>
 			</header>
 			<form
@@ -85,7 +89,8 @@ function QueuePage() {
 			<p className="text-sm text-muted-foreground">
 				On the deployed app, check the Cloudflare dashboard for the
 				mordheim-image-generation queue’s message writes and backlog, and D1 for
-				the job record. Local development messages stay local. This test
+				the job record. Check consumer logs for receipt; D1 status tracks
+				enqueueing only. Local development messages stay local. This test
 				endpoint has no application authentication.
 			</p>
 		</section>
