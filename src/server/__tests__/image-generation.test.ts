@@ -3,6 +3,9 @@ import type { Database } from "@/db/index.server";
 import { ImageGenerationInputSchema } from "@/db/validation/image-generation";
 import { enqueueImageGeneration } from "../image-generation";
 
+// These unit tests inject DB and queue doubles; no Workers runtime is needed.
+vi.mock("cloudflare:workers", () => ({ env: {} }));
+
 function setup() {
 	const values = vi.fn().mockResolvedValue(undefined);
 	const where = vi.fn().mockResolvedValue(undefined);
