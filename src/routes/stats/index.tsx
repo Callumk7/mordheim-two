@@ -1,6 +1,4 @@
-import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo } from "react";
 import {
 	Bar,
 	BarChart,
@@ -11,7 +9,6 @@ import {
 	YAxis,
 } from "recharts";
 import { IndexPage, IndexPageHeader } from "@/components/index-page";
-import { buildCombatLeaderboard } from "@/components/shared/combat-leaderboard";
 import {
 	CombatLeaderboard,
 	ReservedStatSection,
@@ -32,7 +29,7 @@ import {
 	ChartTooltipContent,
 } from "@/components/ui/chart";
 import { getCollections } from "@/db-collections";
-import { useCombatStats } from "@/db-collections/queries";
+import { useStatsDashboard } from "@/db-collections/queries";
 
 const combatChartConfig = {
 	knockdownsGiven: { label: "Knockdowns", color: "var(--chart-1)" },
@@ -56,44 +53,15 @@ export const Route = createFileRoute("/stats/")({
 
 function StatsIndexPage() {
 	const { dbClient } = Route.useRouteContext();
-	const { warbands: warbandsCollection, warriors: warriorsCollection } =
-		getCollections(dbClient);
-	const combatStats = useCombatStats(dbClient);
-	const { data: warbands } = useLiveQuery({
-		query: (q) => q.from({ warband: warbandsCollection }),
-	});
-	const { data: warriors } = useLiveQuery({
-		query: (q) => q.from({ warrior: warriorsCollection }),
-	});
-
-	const warbandRows = useMemo(
-		() => buildCombatLeaderboard(warbands, combatStats.warbands),
-		[combatStats.warbands, warbands],
-	);
-	const warriorRows = useMemo(
-		() => buildCombatLeaderboard(warriors, combatStats.warriors),
-		[combatStats.warriors, warriors],
-	);
-	const warbandById = useMemo(
-		() => new Map(warbands.map((warband) => [warband.id, warband])),
-		[warbands],
-	);
-	const warriorById = useMemo(
-		() => new Map(warriors.map((warrior) => [warrior.id, warrior])),
-		[warriors],
-	);
-	const totals = useMemo(
-		() =>
-			Array.from(combatStats.warbands.values()).reduce(
-				(total, stats) => ({
-					knockdowns: total.knockdowns + stats.knockdownsGiven,
-					injuries: total.injuries + stats.injuriesGiven,
-					deaths: total.deaths + stats.deathsGiven,
-				}),
-				{ knockdowns: 0, injuries: 0, deaths: 0 },
-			),
-		[combatStats.warbands],
-	);
+	const {
+		warbandRows,
+		warriorRows,
+		warbandById,
+		warriorById,
+		totals,
+		hasCombat,
+		leadingWarbands,
+	} = useStatsDashboard(dbClient);
 
 	const outcomeData = [
 		{
@@ -112,12 +80,6 @@ function StatsIndexPage() {
 			fill: "var(--color-deathsGiven)",
 		},
 	];
-	const hasCombat = outcomeData.some((outcome) => outcome.count > 0);
-	const leadingWarbands = warbandRows
-		.filter(
-			(row) => row.knockdownsGiven + row.injuriesGiven + row.deathsGiven > 0,
-		)
-		.slice(0, 8);
 
 	return (
 		<main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-8">
