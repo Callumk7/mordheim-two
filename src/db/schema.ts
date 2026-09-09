@@ -1,5 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import {
+	type AnySQLiteColumn,
 	check,
 	foreignKey,
 	index,
@@ -9,7 +10,7 @@ import {
 	uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import { EVENT_OUTCOMES } from "./validation/event";
-import { MATCH_STATUSES } from "./validation/match";
+import { MATCH_RESULTS, MATCH_STATUSES } from "./validation/match";
 import { WARBAND_STATUSES } from "./validation/warband";
 import { WARRIOR_STATUSES } from "./validation/warrior";
 
@@ -51,17 +52,6 @@ export const warriors = sqliteTable(
 	],
 );
 
-export const matches = sqliteTable("matches", {
-	id: text("id").primaryKey(),
-	name: text("name").notNull(),
-	scenario: text("scenario").notNull(),
-	status: text("status", { enum: MATCH_STATUSES })
-		.notNull()
-		.default("Scheduled"),
-	createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
-	updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
-});
-
 export const warbandMatches = sqliteTable(
 	"warband_matches",
 	{
@@ -71,7 +61,7 @@ export const warbandMatches = sqliteTable(
 			.references(() => warbands.id, { onDelete: "cascade" }),
 		matchId: text("match_id")
 			.notNull()
-			.references(() => matches.id, { onDelete: "cascade" }),
+			.references((): AnySQLiteColumn => matches.id, { onDelete: "cascade" }),
 		createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 		updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 	},
@@ -81,6 +71,35 @@ export const warbandMatches = sqliteTable(
 			table.warbandId,
 		),
 		index("warband_matches_warband_idx").on(table.warbandId),
+	],
+);
+
+export const matches = sqliteTable(
+	"matches",
+	{
+		id: text("id").primaryKey(),
+		name: text("name").notNull(),
+		scenario: text("scenario").notNull(),
+		status: text("status", { enum: MATCH_STATUSES })
+			.notNull()
+			.default("Scheduled"),
+		result: text("result", { enum: MATCH_RESULTS })
+			.notNull()
+			.default("Pending"),
+		winnerWarbandId: text("winner_warband_id"),
+		createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+		updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+	},
+	(table) => [
+		check(
+			"matches_result_winner_consistent",
+			sql`(${table.result} = 'Pending' AND ${table.winnerWarbandId} IS NULL) OR (${table.result} = 'Draw' AND ${table.winnerWarbandId} IS NULL) OR (${table.result} = 'Victory' AND ${table.winnerWarbandId} IS NOT NULL)`,
+		),
+		foreignKey({
+			name: "matches_winner_participant_fk",
+			columns: [table.id, table.winnerWarbandId],
+			foreignColumns: [warbandMatches.matchId, warbandMatches.warbandId],
+		}),
 	],
 );
 

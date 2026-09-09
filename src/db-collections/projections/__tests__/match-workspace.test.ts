@@ -11,6 +11,8 @@ const match: Match = {
 	name: "The Encounter",
 	scenario: "Street Fight",
 	status: "InProgress",
+	result: "Pending",
+	winnerWarbandId: null,
 	createdAt: "2026-01-01T00:00:00.000Z",
 	updatedAt: "2026-01-01T00:00:00.000Z",
 };
@@ -88,18 +90,20 @@ function makeEvent(
 function project({
 	allWarbands = [],
 	events = [],
+	projectedMatch = match,
 	participants = [],
 	warriors = [],
 }: {
 	allWarbands?: Warband[];
 	events?: MatchEventRow[];
+	projectedMatch?: Match;
 	participants?: WarbandMatch[];
 	warriors?: Warrior[];
 } = {}) {
 	return projectMatchWorkspace({
 		allWarbands,
 		events,
-		match,
+		match: projectedMatch,
 		participants,
 		warriors,
 	});
@@ -156,6 +160,31 @@ describe("projectMatchWorkspace", () => {
 				],
 			}).canAddEvent,
 		).toBe(true);
+	});
+
+	it("resolves the winner and prevents events after completion", () => {
+		const alpha = makeWarband("alpha");
+		const beta = makeWarband("beta");
+		const workspace = project({
+			allWarbands: [alpha, beta],
+			projectedMatch: {
+				...match,
+				status: "Completed",
+				result: "Victory",
+				winnerWarbandId: alpha.id,
+			},
+			participants: [
+				makeParticipant("participant-alpha", alpha.id),
+				makeParticipant("participant-beta", beta.id),
+			],
+			warriors: [
+				makeWarrior("alpha-warrior", alpha.id),
+				makeWarrior("beta-warrior", beta.id),
+			],
+		});
+
+		expect(workspace.winnerWarband?.id).toBe(alpha.id);
+		expect(workspace.canAddEvent).toBe(false);
 	});
 
 	it("does not expose match capabilities before the match is available", () => {

@@ -1,6 +1,9 @@
 import type { Match } from "@/db/validation/match";
 
-export type MatchFormValues = Pick<Match, "name" | "scenario" | "status"> & {
+export type MatchFormValues = Pick<
+	Match,
+	"name" | "scenario" | "status" | "result" | "winnerWarbandId"
+> & {
 	participantWarbandIds: string[];
 };
 
@@ -42,5 +45,12 @@ export function changeMatchParticipantSelection(
 }
 
 export function canSubmitMatch(values: MatchFormValues) {
-	return Boolean(values.name.trim() && values.scenario.trim());
+	if (!values.name.trim() || !values.scenario.trim()) return false;
+	if (values.result === "Victory") {
+		return (
+			values.winnerWarbandId !== null &&
+			values.participantWarbandIds.includes(values.winnerWarbandId)
+		);
+	}
+	return values.winnerWarbandId === null;
 }

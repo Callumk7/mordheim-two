@@ -38,7 +38,9 @@ export function updateMatchTransaction(
 	collections: AppCollections,
 	input: {
 		id: string;
-		changes: Partial<Pick<Match, "name" | "scenario" | "status">>;
+		changes: Partial<
+			Pick<Match, "name" | "scenario" | "status" | "result" | "winnerWarbandId">
+		>;
 		additions: WarbandMatch[];
 		removals: WarbandMatch[];
 	},

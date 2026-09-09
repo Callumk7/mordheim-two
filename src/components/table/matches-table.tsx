@@ -2,6 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import type { Match } from "@/db/validation/match";
+import type { Warband } from "@/db/validation/warband";
 import { formatStatus } from "../match-form";
 import { Button } from "../ui/button";
 import { TableActions } from "../ui/table";
@@ -11,9 +12,10 @@ const columnHelper = createDataTableColumnHelper<Match>();
 
 interface MatchesTableProps {
 	matches: Match[];
+	warbands: Warband[];
 }
 
-export function MatchesTable({ matches }: MatchesTableProps) {
+export function MatchesTable({ matches, warbands }: MatchesTableProps) {
 	const navigate = useNavigate({ from: "/matches" });
 	const columns = useMemo(
 		() =>
@@ -32,6 +34,16 @@ export function MatchesTable({ matches }: MatchesTableProps) {
 					id: "status",
 					header: "Status",
 				}),
+				columnHelper.accessor(
+					(match) => {
+						if (match.result !== "Victory") return match.result;
+						const winner = warbands.find(
+							(warband) => warband.id === match.winnerWarbandId,
+						);
+						return `${winner?.name ?? "Unknown warband"} won`;
+					},
+					{ id: "result", header: "Result" },
+				),
 				columnHelper.display({
 					id: "actions",
 					header: "Actions",
@@ -57,7 +69,7 @@ export function MatchesTable({ matches }: MatchesTableProps) {
 					),
 				}),
 			]),
-		[navigate],
+		[navigate, warbands],
 	);
 
 	return (

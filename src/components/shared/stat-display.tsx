@@ -14,7 +14,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import type { CombatLeaderboardRow } from "./combat-leaderboard";
+import type { CombatLeaderboardRow } from "@/db-collections/projections/combat-leaderboard";
 
 export function StatTile({ label, value }: { label: string; value: number }) {
 	return (

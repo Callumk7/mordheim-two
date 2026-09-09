@@ -10,6 +10,8 @@ const values: MatchFormValues = {
 	name: "The Encounter",
 	scenario: "Street Fight",
 	status: "Scheduled",
+	result: "Pending",
+	winnerWarbandId: null,
 	participantWarbandIds: ["alpha", "beta"],
 };
 
@@ -77,7 +79,42 @@ describe("match submit eligibility", () => {
 		expect(canSubmitMatch({ ...values, scenario: "\n" })).toBe(false);
 	});
 
-	it("does not require participants to save a match", () => {
+	it("does not require participants to save a pending match", () => {
 		expect(canSubmitMatch({ ...values, participantWarbandIds: [] })).toBe(true);
+	});
+
+	it("requires a participating winner for a victory", () => {
+		expect(
+			canSubmitMatch({
+				...values,
+				result: "Victory",
+				winnerWarbandId: "alpha",
+			}),
+		).toBe(true);
+		expect(
+			canSubmitMatch({
+				...values,
+				result: "Victory",
+				winnerWarbandId: null,
+			}),
+		).toBe(false);
+		expect(
+			canSubmitMatch({
+				...values,
+				result: "Victory",
+				winnerWarbandId: "outsider",
+			}),
+		).toBe(false);
+	});
+
+	it("forbids a winner for pending matches and draws", () => {
+		expect(canSubmitMatch({ ...values, result: "Draw" })).toBe(true);
+		expect(
+			canSubmitMatch({
+				...values,
+				result: "Draw",
+				winnerWarbandId: "alpha",
+			}),
+		).toBe(false);
 	});
 });
