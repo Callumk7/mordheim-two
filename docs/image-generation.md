@@ -1,17 +1,17 @@
 # Gemini image generation queue
 
-One repository, two independently built/deployed Workers. The app sends `{ jobId }`; the consumer loads the prompt from shared D1, generates a JPEG, writes private R2, then records completion in D1 **before acknowledging**. No image-serving route or public bucket is added.
+One repository, two independently built/deployed Workers. The app sends `{ jobId }`; the consumer loads the prompt from shared D1, generates a JPEG, writes private R2, then records completion in D1 **before acknowledging**. The app now lists completed jobs at `/generated-images` and streams their JPEGs through `/api/generated-images/<jobId>`. The bucket itself remains private.
 
 ## Safe defaults and authorization
 
 **`IMAGE_GENERATION_ENABLED` defaults to the string `"false"` on the consumer.** Only exact `"true"` enables new provider requests. With generation disabled, valid new deliveries become **`failed` in D1 and are acknowledged/discarded**, with a disabled error. They are not a paused backlog. Enabling later does **not** regenerate these jobs; submit a new job intentionally. Existing R2 results can still be recovered while disabled.
 
-The app's submission RPC and `/queue-jobs` diagnostic RPC currently have **no application authentication**. The latter exposes prompts. Before production enablement:
+The app's submission RPC, `/queue-jobs` diagnostic RPC, `/generated-images` listing RPC and image GET endpoint currently have **no application authentication**, deliberately accepted for this spike. The listings expose prompts and the GET endpoint exposes images to anyone who can reach the app; a private R2 bucket does not make these endpoints private. Before production enablement:
 
 - Protect the **entire app, including server-function/RPC paths**, with Cloudflare Access and an authorized-user policy, or implement verified server-side authorization and rate limiting. Protecting only `/queue` or hiding its button is insufficient.
 - Close alternate origins (`workers.dev`, preview URLs, unprotected custom domains) that could bypass that policy. Verify anonymous direct RPC requests are denied.
 - Restrict who can write to the queue, budget/quota the provider key, set spending alerts, and review any existing backlog. Concurrency one is not rate limiting or authorization.
-- Keep the R2 bucket private: no `r2.dev`, public domain, or public ACL. This change deliberately shows a key, not an image URL. Image access/ownership is a separate decision.
+- Keep the R2 bucket private: no `r2.dev`, public domain, or public ACL. Protect the gallery listing RPC and `/api/generated-images/*` as well as submission paths before using private data. Image ownership/authorization remains outside the spike.
 
 The flag is a deliberate opt-in safety switch, **not** an authorization system. Do not turn it on for the current unprotected public producer.
 
@@ -67,10 +67,13 @@ Only generic failure metadata plus message ID/attempt count are logged. Do not e
 - `src/server/image-generation.ts`: existing producer and pending-only race guards.
 - `src/db/schema.ts`, `drizzle/0012_tense_echo.sql`: additive nullable lease/result columns; unconstrained TEXT status adds processing/completed/failed at the TypeScript layer. Existing rows are unchanged.
 - `workers/image-generation/src/{index,consumer,jobs,gemini}.ts`: worker binding composition, delivery policy, atomic D1 state, provider adapter.
-- `workers/image-generation/wrangler.jsonc`: consumer-only R2 binding/flag and queue configuration.
-- `/queue`, `/queue-jobs`: enqueue feedback and D1 status/private-result metadata, using existing UI primitives.
+- `workers/image-generation/wrangler.jsonc`: consumer R2 binding/flag and queue configuration.
+- `wrangler.jsonc`: app R2 binding to the same `mordheim-generated-images` bucket; no public bucket access or generation flag is added.
+- `/queue`, `/queue-jobs`: enqueue feedback and D1 status/result metadata, with links to the gallery.
+- `/generated-images`: latest 100 completed D1 jobs, ordered by completion time then ID descending, with prompts, UTC completion times, lazy-loaded JPEGs, accessible enlargement dialogs and manual refresh. Missing images have a retry-through-refresh placeholder; queued/failed/historical consumed jobs are omitted. No bucket listing, orphan recovery, polling, upload, delete or regenerate controls.
+- `src/server/generated-images.server.ts`, `src/server/generated-images.ts`, `/api/generated-images/$jobId`: completed-job query and unprotected image streaming. GET resolves the job's deterministic result key in D1, returns 404 for missing/noncompleted jobs or missing objects, and sanitized 503 for D1/R2 failures (502 for non-JPEG metadata). Responses use `no-store`; arbitrary bucket keys are not accepted.
 
-**Apply the schema migration first. Then app and consumer GitHub builds can deploy independently in either order.** The old guarded producer works with the new consumer; the new app works with the receipt-only consumer (showing consumed and no result). No app R2 binding or Gemini secret is needed. `vite.config.ts` keeps the consumer auxiliary Worker development-only, not coupled to the app production bundle. Avoid rolling back to the receipt-only consumer after generation is enabled: it is not a safe generation retry handler.
+**Apply the schema migration first. Then app and consumer GitHub builds can deploy independently in either order.** The old guarded producer works with the new consumer; the new app works with the receipt-only consumer (showing consumed and no result). The app now needs its R2 binding on deployment but still needs no Gemini secret. The gallery can be deployed independently of the consumer and requires no new migration beyond the existing result columns. `vite.config.ts` keeps the consumer auxiliary Worker development-only, not coupled to the app production bundle. Avoid rolling back to the receipt-only consumer after generation is enabled: it is not a safe generation retry handler.
 
 ## Local review (no paid requests)
 
@@ -81,6 +84,20 @@ pnpm dev
 ```
 
 Keep the example flag false and API key empty. The development-only Vite auxiliary Worker shares the root local D1/R2/queue runtime; do not start an unrelated second consumer process. Submit at `/queue`, refresh `/queue-jobs`, and expect `failed` with the disabled explanation. Local queue/R2/D1 operations stay local; **true + a real Gemini key makes paid Internet calls even in local development**.
+
+### Local gallery fixture (no queue or paid requests)
+
+With `pnpm dev` stopped, run:
+
+```sh
+pnpm db:migrate:local
+node scripts/seed-generated-image-local.mjs
+pnpm dev
+```
+
+The script writes a one-pixel JPEG and the fixed `local-gallery-fixture` completed job to **local** R2/D1 only, using explicit `--local` flags. It is safe to rerun; only that fixture's completion time and object are refreshed. It never submits to the queue, reads a provider key, or writes production data. The root Wrangler and Vite runtime share default `.wrangler/state` persistence; do not add `remote: true` bindings. Local results do not appear in deployed storage and vice versa.
+
+Open `/generated-images`, check the fixture's prompt/time, enlarge it, close with Escape, and refresh. Follow the links from `/queue` and `/queue-jobs`. To exercise missing-object handling, stop dev and run `pnpm exec wrangler r2 object delete mordheim-generated-images/image-generation/local-gallery-fixture.jpg --local`, restart dev and refresh; expect the unavailable placeholder. Rerun the fixture script to restore it. Test empty state before seeding in a fresh local database. Deployed verification uses existing completed jobs after deploying the updated app binding; this fixture script has no remote mode.
 
 ```sh
 pnpm test

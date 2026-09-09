@@ -12,7 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoRouteImport } from './routes/demo'
 import { Route as EventsRouteRouteImport } from './routes/events/route'
-import { Route as GenRouteRouteImport } from './routes/gen/route'
+import { Route as GeneratedImagesRouteImport } from './routes/generated-images'
 import { Route as MatchesRouteRouteImport } from './routes/matches/route'
 import { Route as QueueRouteImport } from './routes/queue'
 import { Route as QueueJobsRouteImport } from './routes/queue-jobs'
@@ -27,6 +27,7 @@ import { Route as WarbandsIndexRouteImport } from './routes/warbands/index'
 import { Route as WarbandsWarbandIdRouteRouteImport } from './routes/warbands/$warbandId/route'
 import { Route as WarriorsIndexRouteImport } from './routes/warriors/index'
 import { Route as WarriorsWarriorIdRouteRouteImport } from './routes/warriors/$warriorId/route'
+import { Route as ApiGeneratedImagesJobIdRouteImport } from './routes/api/generated-images/$jobId'
 import { Route as EventsEventIdIndexRouteImport } from './routes/events/$eventId/index'
 import { Route as EventsEventIdDeleteRouteImport } from './routes/events/$eventId/delete'
 import { Route as MatchesMatchIdIndexRouteImport } from './routes/matches/$matchId/index'
@@ -51,9 +52,9 @@ const EventsRouteRoute = EventsRouteRouteImport.update({
   path: '/events',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GenRouteRoute = GenRouteRouteImport.update({
-  id: '/gen',
-  path: '/gen',
+const GeneratedImagesRoute = GeneratedImagesRouteImport.update({
+  id: '/generated-images',
+  path: '/generated-images',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MatchesRouteRoute = MatchesRouteRouteImport.update({
@@ -126,6 +127,11 @@ const WarriorsWarriorIdRouteRoute = WarriorsWarriorIdRouteRouteImport.update({
   path: '/$warriorId',
   getParentRoute: () => WarriorsRouteRoute,
 } as any)
+const ApiGeneratedImagesJobIdRoute = ApiGeneratedImagesJobIdRouteImport.update({
+  id: '/api/generated-images/$jobId',
+  path: '/api/generated-images/$jobId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EventsEventIdIndexRoute = EventsEventIdIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -170,11 +176,11 @@ const WarriorsWarriorIdDeleteRoute = WarriorsWarriorIdDeleteRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/events': typeof EventsRouteRouteWithChildren
-  '/gen': typeof GenRouteRoute
   '/matches': typeof MatchesRouteRouteWithChildren
   '/warbands': typeof WarbandsRouteRouteWithChildren
   '/warriors': typeof WarriorsRouteRouteWithChildren
   '/demo': typeof DemoRoute
+  '/generated-images': typeof GeneratedImagesRoute
   '/queue': typeof QueueRoute
   '/queue-jobs': typeof QueueJobsRoute
   '/events/$eventId': typeof EventsEventIdRouteRouteWithChildren
@@ -186,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/stats/': typeof StatsIndexRoute
   '/warbands/': typeof WarbandsIndexRoute
   '/warriors/': typeof WarriorsIndexRoute
+  '/api/generated-images/$jobId': typeof ApiGeneratedImagesJobIdRoute
   '/events/$eventId/delete': typeof EventsEventIdDeleteRoute
   '/matches/$matchId/delete': typeof MatchesMatchIdDeleteRoute
   '/warbands/$warbandId/delete': typeof WarbandsWarbandIdDeleteRoute
@@ -197,8 +204,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/gen': typeof GenRouteRoute
   '/demo': typeof DemoRoute
+  '/generated-images': typeof GeneratedImagesRoute
   '/queue': typeof QueueRoute
   '/queue-jobs': typeof QueueJobsRoute
   '/events': typeof EventsIndexRoute
@@ -206,6 +213,7 @@ export interface FileRoutesByTo {
   '/stats': typeof StatsIndexRoute
   '/warbands': typeof WarbandsIndexRoute
   '/warriors': typeof WarriorsIndexRoute
+  '/api/generated-images/$jobId': typeof ApiGeneratedImagesJobIdRoute
   '/events/$eventId/delete': typeof EventsEventIdDeleteRoute
   '/matches/$matchId/delete': typeof MatchesMatchIdDeleteRoute
   '/warbands/$warbandId/delete': typeof WarbandsWarbandIdDeleteRoute
@@ -219,11 +227,11 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/events': typeof EventsRouteRouteWithChildren
-  '/gen': typeof GenRouteRoute
   '/matches': typeof MatchesRouteRouteWithChildren
   '/warbands': typeof WarbandsRouteRouteWithChildren
   '/warriors': typeof WarriorsRouteRouteWithChildren
   '/demo': typeof DemoRoute
+  '/generated-images': typeof GeneratedImagesRoute
   '/queue': typeof QueueRoute
   '/queue-jobs': typeof QueueJobsRoute
   '/events/$eventId': typeof EventsEventIdRouteRouteWithChildren
@@ -235,6 +243,7 @@ export interface FileRoutesById {
   '/stats/': typeof StatsIndexRoute
   '/warbands/': typeof WarbandsIndexRoute
   '/warriors/': typeof WarriorsIndexRoute
+  '/api/generated-images/$jobId': typeof ApiGeneratedImagesJobIdRoute
   '/events/$eventId/delete': typeof EventsEventIdDeleteRoute
   '/matches/$matchId/delete': typeof MatchesMatchIdDeleteRoute
   '/warbands/$warbandId/delete': typeof WarbandsWarbandIdDeleteRoute
@@ -249,11 +258,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/events'
-    | '/gen'
     | '/matches'
     | '/warbands'
     | '/warriors'
     | '/demo'
+    | '/generated-images'
     | '/queue'
     | '/queue-jobs'
     | '/events/$eventId'
@@ -265,6 +274,7 @@ export interface FileRouteTypes {
     | '/stats/'
     | '/warbands/'
     | '/warriors/'
+    | '/api/generated-images/$jobId'
     | '/events/$eventId/delete'
     | '/matches/$matchId/delete'
     | '/warbands/$warbandId/delete'
@@ -276,8 +286,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/gen'
     | '/demo'
+    | '/generated-images'
     | '/queue'
     | '/queue-jobs'
     | '/events'
@@ -285,6 +295,7 @@ export interface FileRouteTypes {
     | '/stats'
     | '/warbands'
     | '/warriors'
+    | '/api/generated-images/$jobId'
     | '/events/$eventId/delete'
     | '/matches/$matchId/delete'
     | '/warbands/$warbandId/delete'
@@ -297,11 +308,11 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/events'
-    | '/gen'
     | '/matches'
     | '/warbands'
     | '/warriors'
     | '/demo'
+    | '/generated-images'
     | '/queue'
     | '/queue-jobs'
     | '/events/$eventId'
@@ -313,6 +324,7 @@ export interface FileRouteTypes {
     | '/stats/'
     | '/warbands/'
     | '/warriors/'
+    | '/api/generated-images/$jobId'
     | '/events/$eventId/delete'
     | '/matches/$matchId/delete'
     | '/warbands/$warbandId/delete'
@@ -326,14 +338,15 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EventsRouteRoute: typeof EventsRouteRouteWithChildren
-  GenRouteRoute: typeof GenRouteRoute
   MatchesRouteRoute: typeof MatchesRouteRouteWithChildren
   WarbandsRouteRoute: typeof WarbandsRouteRouteWithChildren
   WarriorsRouteRoute: typeof WarriorsRouteRouteWithChildren
   DemoRoute: typeof DemoRoute
+  GeneratedImagesRoute: typeof GeneratedImagesRoute
   QueueRoute: typeof QueueRoute
   QueueJobsRoute: typeof QueueJobsRoute
   StatsIndexRoute: typeof StatsIndexRoute
+  ApiGeneratedImagesJobIdRoute: typeof ApiGeneratedImagesJobIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -359,11 +372,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/gen': {
-      id: '/gen'
-      path: '/gen'
-      fullPath: '/gen'
-      preLoaderRoute: typeof GenRouteRouteImport
+    '/generated-images': {
+      id: '/generated-images'
+      path: '/generated-images'
+      fullPath: '/generated-images'
+      preLoaderRoute: typeof GeneratedImagesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/matches': {
@@ -463,6 +476,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/warriors/$warriorId'
       preLoaderRoute: typeof WarriorsWarriorIdRouteRouteImport
       parentRoute: typeof WarriorsRouteRoute
+    }
+    '/api/generated-images/$jobId': {
+      id: '/api/generated-images/$jobId'
+      path: '/api/generated-images/$jobId'
+      fullPath: '/api/generated-images/$jobId'
+      preLoaderRoute: typeof ApiGeneratedImagesJobIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/events/$eventId/': {
       id: '/events/$eventId/'
@@ -640,14 +660,15 @@ const WarriorsRouteRouteWithChildren = WarriorsRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EventsRouteRoute: EventsRouteRouteWithChildren,
-  GenRouteRoute: GenRouteRoute,
   MatchesRouteRoute: MatchesRouteRouteWithChildren,
   WarbandsRouteRoute: WarbandsRouteRouteWithChildren,
   WarriorsRouteRoute: WarriorsRouteRouteWithChildren,
   DemoRoute: DemoRoute,
+  GeneratedImagesRoute: GeneratedImagesRoute,
   QueueRoute: QueueRoute,
   QueueJobsRoute: QueueJobsRoute,
   StatsIndexRoute: StatsIndexRoute,
+  ApiGeneratedImagesJobIdRoute: ApiGeneratedImagesJobIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
