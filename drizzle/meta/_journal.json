@@ -78,6 +78,13 @@
       "when": 1788893591732,
       "tag": "0010_windy_karma",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1788965810439,
+      "tag": "0011_image_generation_jobs",
+      "breakpoints": true
     }
   ]
 }
