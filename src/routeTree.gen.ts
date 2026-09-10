@@ -10,7 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DemoRouteImport } from './routes/demo'
+import { Route as EquipmentRouteImport } from './routes/equipment'
 import { Route as EventsRouteRouteImport } from './routes/events/route'
 import { Route as GeneratedImagesRouteImport } from './routes/generated-images'
 import { Route as MatchesRouteRouteImport } from './routes/matches/route'
@@ -42,9 +42,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoRoute = DemoRouteImport.update({
-  id: '/demo',
-  path: '/demo',
+const EquipmentRoute = EquipmentRouteImport.update({
+  id: '/equipment',
+  path: '/equipment',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsRouteRoute = EventsRouteRouteImport.update({
@@ -179,7 +179,7 @@ export interface FileRoutesByFullPath {
   '/matches': typeof MatchesRouteRouteWithChildren
   '/warbands': typeof WarbandsRouteRouteWithChildren
   '/warriors': typeof WarriorsRouteRouteWithChildren
-  '/demo': typeof DemoRoute
+  '/equipment': typeof EquipmentRoute
   '/generated-images': typeof GeneratedImagesRoute
   '/queue': typeof QueueRoute
   '/queue-jobs': typeof QueueJobsRoute
@@ -204,7 +204,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/demo': typeof DemoRoute
+  '/equipment': typeof EquipmentRoute
   '/generated-images': typeof GeneratedImagesRoute
   '/queue': typeof QueueRoute
   '/queue-jobs': typeof QueueJobsRoute
@@ -230,7 +230,7 @@ export interface FileRoutesById {
   '/matches': typeof MatchesRouteRouteWithChildren
   '/warbands': typeof WarbandsRouteRouteWithChildren
   '/warriors': typeof WarriorsRouteRouteWithChildren
-  '/demo': typeof DemoRoute
+  '/equipment': typeof EquipmentRoute
   '/generated-images': typeof GeneratedImagesRoute
   '/queue': typeof QueueRoute
   '/queue-jobs': typeof QueueJobsRoute
@@ -261,7 +261,7 @@ export interface FileRouteTypes {
     | '/matches'
     | '/warbands'
     | '/warriors'
-    | '/demo'
+    | '/equipment'
     | '/generated-images'
     | '/queue'
     | '/queue-jobs'
@@ -286,7 +286,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/demo'
+    | '/equipment'
     | '/generated-images'
     | '/queue'
     | '/queue-jobs'
@@ -311,7 +311,7 @@ export interface FileRouteTypes {
     | '/matches'
     | '/warbands'
     | '/warriors'
-    | '/demo'
+    | '/equipment'
     | '/generated-images'
     | '/queue'
     | '/queue-jobs'
@@ -341,7 +341,7 @@ export interface RootRouteChildren {
   MatchesRouteRoute: typeof MatchesRouteRouteWithChildren
   WarbandsRouteRoute: typeof WarbandsRouteRouteWithChildren
   WarriorsRouteRoute: typeof WarriorsRouteRouteWithChildren
-  DemoRoute: typeof DemoRoute
+  EquipmentRoute: typeof EquipmentRoute
   GeneratedImagesRoute: typeof GeneratedImagesRoute
   QueueRoute: typeof QueueRoute
   QueueJobsRoute: typeof QueueJobsRoute
@@ -358,11 +358,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo': {
-      id: '/demo'
-      path: '/demo'
-      fullPath: '/demo'
-      preLoaderRoute: typeof DemoRouteImport
+    '/equipment': {
+      id: '/equipment'
+      path: '/equipment'
+      fullPath: '/equipment'
+      preLoaderRoute: typeof EquipmentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/events': {
@@ -663,7 +663,7 @@ const rootRouteChildren: RootRouteChildren = {
   MatchesRouteRoute: MatchesRouteRouteWithChildren,
   WarbandsRouteRoute: WarbandsRouteRouteWithChildren,
   WarriorsRouteRoute: WarriorsRouteRouteWithChildren,
-  DemoRoute: DemoRoute,
+  EquipmentRoute: EquipmentRoute,
   GeneratedImagesRoute: GeneratedImagesRoute,
   QueueRoute: QueueRoute,
   QueueJobsRoute: QueueJobsRoute,

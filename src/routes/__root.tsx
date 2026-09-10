@@ -99,6 +99,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 							<Link
 								activeProps={{ className: "bg-accent text-primary" }}
 								className="rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
+								to="/equipment"
+							>
+								Equipment
+							</Link>
+							<Link
+								activeProps={{ className: "bg-accent text-primary" }}
+								className="rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
 								to="/matches"
 							>
 								Matches

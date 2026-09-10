@@ -61,7 +61,6 @@ export const warbands = sqliteTable("warbands", {
 	updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
-// TODO: Stats need to be projections from events at some point.
 export const warriors = sqliteTable(
 	"warriors",
 	{
