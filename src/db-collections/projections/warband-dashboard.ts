@@ -100,7 +100,7 @@ export function projectWarbandDashboard({
 		}))
 		.sort((a, b) => compareNewest(a.createdAt, b.createdAt));
 	const completedMatches = matchRows.filter(
-		(match) => match.outcome !== "Pending",
+		(match) => match.status === "Completed" && match.outcome !== "Pending",
 	);
 	const wins = completedMatches.filter(
 		(match) => match.outcome === "Win",

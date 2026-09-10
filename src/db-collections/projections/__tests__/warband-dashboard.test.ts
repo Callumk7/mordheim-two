@@ -98,6 +98,8 @@ describe("projectWarbandDashboard", () => {
 				match("loss", "Victory", "blue", "2026-01-02T00:00:00.000Z"),
 				match("draw", "Draw", null, "2026-01-03T00:00:00.000Z"),
 				match("pending", "Pending", null, "2026-01-04T00:00:00.000Z"),
+				{ ...match("scheduled-result", "Victory", "red"), status: "Scheduled" },
+				{ ...match("completed-pending", "Pending", null), status: "Completed" },
 				match("unrelated", "Victory", "blue"),
 			],
 			participants: [
@@ -105,7 +107,9 @@ describe("projectWarbandDashboard", () => {
 				participant("p2", "loss", "red"),
 				participant("p3", "draw", "red"),
 				participant("p4", "pending", "red"),
-				participant("p5", "unrelated", "blue"),
+				participant("p5", "scheduled-result", "red"),
+				participant("p6", "completed-pending", "red"),
+				participant("p7", "unrelated", "blue"),
 			],
 			events: [],
 		});
@@ -117,6 +121,8 @@ describe("projectWarbandDashboard", () => {
 			{ id: "draw", outcome: "Draw" },
 			{ id: "loss", outcome: "Loss" },
 			{ id: "win", outcome: "Win" },
+			{ id: "scheduled-result", outcome: "Win" },
+			{ id: "completed-pending", outcome: "Pending" },
 		]);
 		expect(dashboard.matchStats).toEqual({
 			played: 3,
