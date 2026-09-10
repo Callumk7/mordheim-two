@@ -1,10 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 import type { Database } from "@/db/index.server";
+import { enqueueImageGeneration } from "@/db/operations/image-generation.server";
 import { ImageGenerationInputSchema } from "@/db/validation/image-generation";
-import { enqueueImageGeneration } from "../image-generation";
 
 // These unit tests inject DB and queue doubles; no Workers runtime is needed.
-vi.mock("cloudflare:workers", () => ({ env: {} }));
 
 function setup() {
 	const values = vi.fn().mockResolvedValue(undefined);

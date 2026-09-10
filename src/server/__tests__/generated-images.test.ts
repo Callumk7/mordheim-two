@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
 	queryGeneratedImages,
 	serveGeneratedImage,
-} from "@/server/generated-images.server";
+} from "@/db/operations/generated-images.server";
 import {
 	jobId,
 	jpegBytes,
