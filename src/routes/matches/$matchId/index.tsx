@@ -35,6 +35,7 @@ import {
 	projectCombatStats,
 } from "@/db-collections/projections";
 import { useMatchWorkspace } from "@/db-collections/queries";
+import { buildUpdateMatchCommand } from "@/lib/match-commands";
 
 export const Route = createFileRoute("/matches/$matchId/")({
 	component: MatchDetailPage,
@@ -264,30 +265,21 @@ function MatchDetailPage() {
 					}}
 					key={`${match.id}:${String(isEditMatchOpen)}`}
 					lockedParticipantWarbandIds={lockedParticipantWarbandIds}
-					onSubmit={async ({ participantWarbandIds, ...changes }) => {
-						const selectedIds = new Set(participantWarbandIds);
-						const existingIds = new Set(
-							participantRows.map((participant) => participant.warbandId),
+					onSubmit={async (values) => {
+						const command = buildUpdateMatchCommand(
+							matchId,
+							values,
+							participantRows,
+							{
+								newId: safeRandomUUID,
+								now: () => new Date().toISOString(),
+							},
 						);
-						const now = new Date().toISOString();
-						const additions = participantWarbandIds
-							.filter((warbandId) => !existingIds.has(warbandId))
-							.map((warbandId) => ({
-								id: safeRandomUUID(),
-								matchId,
-								warbandId,
-								createdAt: now,
-								updatedAt: now,
-							}));
-						const removals = participantRows.filter(
-							(participant) => !selectedIds.has(participant.warbandId),
+						const transaction = updateMatchTransaction(
+							dbClient,
+							collections,
+							command,
 						);
-						const transaction = updateMatchTransaction(dbClient, collections, {
-							id: matchId,
-							changes,
-							additions,
-							removals,
-						});
 						await transaction.isPersisted.promise;
 						setIsEditMatchOpen(false);
 					}}
