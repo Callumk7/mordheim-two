@@ -1,12 +1,11 @@
-import { eq, or, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { WarriorPortrait } from "@/components/warrior-portrait";
-import { getCollections } from "@/db-collections";
-import { updateWarriorTransaction } from "@/db-collections/mutations/warriors";
+import { useWarriorMutations } from "@/db-collections/mutations/warriors";
 import {
 	getWarriorCombatStats,
 	projectCombatStats,
 } from "@/db-collections/projections";
+import { useWarriorDetails } from "@/db-collections/queries";
 import { getWarriorPortrait } from "@/server/warrior-portraits";
 import { Card, CardContent } from "../../../components/ui/card";
 import { WarriorForm } from "../../../components/warrior-form";
@@ -21,36 +20,11 @@ function WarriorDetailPage() {
 	const { warriorId } = Route.useParams();
 	const portrait = Route.useLoaderData();
 	const { dbClient } = Route.useRouteContext();
-	const collections = getCollections(dbClient);
-	const {
-		events: eventsCollection,
-		warbands: warbandsCollection,
-		warriors: warriorsCollection,
-	} = collections;
-	const { data: warriors } = useLiveQuery({
-		query: (q) =>
-			q
-				.from({ warrior: warriorsCollection })
-				.where(({ warrior }) => eq(warrior.id, warriorId)),
-	});
-	const { data: eventReferences } = useLiveQuery({
-		query: (q) =>
-			q
-				.from({ event: eventsCollection })
-				.where(({ event }) =>
-					or(
-						eq(event.attackerWarriorId, warriorId),
-						eq(event.defenderWarriorId, warriorId),
-					),
-				),
-	});
-	const { data: warbands } = useLiveQuery({
-		query: (q) =>
-			q
-				.from({ warband: warbandsCollection })
-				.orderBy(({ warband }) => warband.name),
-	});
-	const warrior = warriors[0];
+	const { updateWarrior } = useWarriorMutations(dbClient);
+	const { eventReferences, warbands, warrior } = useWarriorDetails(
+		dbClient,
+		warriorId,
+	);
 	const combat = getWarriorCombatStats(
 		projectCombatStats(eventReferences),
 		warriorId,
@@ -125,14 +99,7 @@ function WarriorDetailPage() {
 						initialValues={warrior}
 						isWarbandLocked={eventReferences.length > 0}
 						key={warrior.id}
-						onSubmit={async (values) => {
-							const transaction = updateWarriorTransaction(
-								collections,
-								warrior.id,
-								values,
-							);
-							await transaction.isPersisted.promise;
-						}}
+						onSubmit={(values) => updateWarrior(warrior.id, values)}
 						submitLabel="Save changes"
 						warbands={warbands}
 					/>

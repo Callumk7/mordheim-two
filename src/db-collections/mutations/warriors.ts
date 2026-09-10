@@ -1,10 +1,11 @@
 import { type DbClient, safeRandomUUID } from "@tanstack/react-db";
+import { useCallback } from "react";
 import type { Warrior } from "@/db/validation/warrior";
 import { deleteWarrior } from "@/server/warriors";
-import type { AppCollections } from "..";
+import { type AppCollections, getCollections } from "..";
 
-type NewWarrior = Omit<Warrior, "id" | "createdAt" | "updatedAt">;
-type WarriorChanges = Partial<NewWarrior>;
+export type NewWarrior = Omit<Warrior, "id" | "createdAt" | "updatedAt">;
+export type WarriorChanges = Partial<NewWarrior>;
 
 export function createWarriorTransaction(
 	collections: AppCollections,
@@ -50,4 +51,43 @@ export function deleteWarriorTransaction(
 		collections.warriors.delete(warriorId);
 	});
 	return transaction;
+}
+
+export function useWarriorMutations(dbClient: DbClient) {
+	const createWarrior = useCallback(
+		async (values: NewWarrior) => {
+			const transaction = createWarriorTransaction(
+				getCollections(dbClient),
+				values,
+			);
+			await transaction.isPersisted.promise;
+		},
+		[dbClient],
+	);
+	const updateWarrior = useCallback(
+		async (warriorId: string, changes: WarriorChanges) => {
+			const transaction = updateWarriorTransaction(
+				getCollections(dbClient),
+				warriorId,
+				changes,
+			);
+			await transaction.isPersisted.promise;
+		},
+		[dbClient],
+	);
+	const removeWarrior = useCallback(
+		async (warriorId: string, eventIds: string[]) => {
+			const collections = getCollections(dbClient);
+			const transaction = deleteWarriorTransaction(
+				dbClient,
+				collections,
+				warriorId,
+				eventIds,
+			);
+			await transaction.isPersisted.promise;
+		},
+		[dbClient],
+	);
+
+	return { createWarrior, removeWarrior, updateWarrior };
 }

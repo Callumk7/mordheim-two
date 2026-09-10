@@ -1,8 +1,7 @@
-import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { getCollections } from "@/db-collections";
-import { deleteWarriorTransaction } from "@/db-collections/mutations/warriors";
+import { useWarriorMutations } from "@/db-collections/mutations/warriors";
+import { useWarriorDeletion } from "@/db-collections/queries";
 
 export const Route = createFileRoute("/warriors/$warriorId/delete")({
 	component: DeleteWarriorPage,
@@ -11,35 +10,11 @@ export const Route = createFileRoute("/warriors/$warriorId/delete")({
 function DeleteWarriorPage() {
 	const { warriorId } = Route.useParams();
 	const { dbClient } = Route.useRouteContext();
-	const collections = getCollections(dbClient);
-	const { events, warriors: warriorsCollection } = collections;
 	const navigate = useNavigate({ from: Route.fullPath });
 	const [error, setError] = useState<string>();
 	const [isDeleting, setIsDeleting] = useState(false);
-	const { data } = useLiveQuery({
-		query: (q) =>
-			q
-				.from({ warrior: warriorsCollection })
-				.where(({ warrior }) => eq(warrior.id, warriorId)),
-	});
-	const { data: attackingEvents } = useLiveQuery({
-		query: (q) =>
-			q
-				.from({ event: events })
-				.where(({ event }) => eq(event.attackerWarriorId, warriorId)),
-	});
-	const { data: defendingEvents } = useLiveQuery({
-		query: (q) =>
-			q
-				.from({ event: events })
-				.where(({ event }) => eq(event.defenderWarriorId, warriorId)),
-	});
-	const eventIds = [
-		...new Set(
-			[...attackingEvents, ...defendingEvents].map((event) => event.id),
-		),
-	];
-	const warrior = data[0];
+	const { removeWarrior } = useWarriorMutations(dbClient);
+	const { eventIds, warrior } = useWarriorDeletion(dbClient, warriorId);
 
 	if (!warrior && !isDeleting) return null;
 
@@ -80,13 +55,7 @@ function DeleteWarriorPage() {
 							setError(undefined);
 							setIsDeleting(true);
 							try {
-								const transaction = deleteWarriorTransaction(
-									dbClient,
-									collections,
-									warriorId,
-									eventIds,
-								);
-								await transaction.isPersisted.promise;
+								await removeWarrior(warriorId, eventIds);
 								await navigate({ to: "/warriors" });
 							} catch (cause) {
 								setError(

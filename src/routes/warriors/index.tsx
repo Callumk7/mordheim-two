@@ -1,4 +1,3 @@
-import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { WarriorsTable } from "#/components/table/warriors-table";
@@ -10,9 +9,8 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import { getCollections } from "@/db-collections";
-import { createWarriorTransaction } from "@/db-collections/mutations/warriors";
-import { useCombatStats } from "@/db-collections/queries";
+import { useWarriorMutations } from "@/db-collections/mutations/warriors";
+import { useCombatStats, useWarriorsIndex } from "@/db-collections/queries";
 import {
 	IndexEmptyState,
 	IndexPage,
@@ -26,22 +24,9 @@ export const Route = createFileRoute("/warriors/")({
 function WarriorsIndexPage() {
 	const [isNewWarriorOpen, setIsNewWarriorOpen] = useState(false);
 	const { dbClient } = Route.useRouteContext();
-	const collections = getCollections(dbClient);
 	const combatStats = useCombatStats(dbClient);
-	const { warbands: warbandsCollection, warriors: warriorsCollection } =
-		collections;
-	const { data: warriors } = useLiveQuery({
-		query: (q) =>
-			q
-				.from({ warrior: warriorsCollection })
-				.orderBy(({ warrior }) => warrior.name, "asc"),
-	});
-	const { data: warbands } = useLiveQuery({
-		query: (q) =>
-			q
-				.from({ warband: warbandsCollection })
-				.orderBy(({ warband }) => warband.name),
-	});
+	const { createWarrior } = useWarriorMutations(dbClient);
+	const { warbands, warriors } = useWarriorsIndex(dbClient);
 	const warbandNames = new Map(
 		warbands.map((warband) => [warband.id, warband.name]),
 	);
@@ -98,8 +83,7 @@ function WarriorsIndexPage() {
 					<WarriorForm
 						initialValues={initialValues}
 						onSubmit={async (values) => {
-							const transaction = createWarriorTransaction(collections, values);
-							await transaction.isPersisted.promise;
+							await createWarrior(values);
 							setIsNewWarriorOpen(false);
 						}}
 						submitLabel="Create warrior"
