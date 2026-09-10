@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { WarriorEquipment } from "@/components/warrior-equipment";
 import { WarriorPortrait } from "@/components/warrior-portrait";
 import { useWarriorMutations } from "@/db-collections/mutations/warriors";
 import {
@@ -71,6 +72,8 @@ function WarriorDetailPage() {
 				name={warrior.name}
 				portrait={portrait}
 			/>
+
+			<WarriorEquipment collections={collections} warriorId={warrior.id} />
 
 			<Card className="mt-7">
 				<CardContent>
