@@ -120,6 +120,13 @@
       "when": 1788986063914,
       "tag": "0016_slimy_mathemanic",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "6",
+      "when": 1789071899465,
+      "tag": "0017_glorious_the_hunter",
+      "breakpoints": true
     }
   ]
 }

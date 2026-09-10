@@ -125,6 +125,10 @@ export const EventVoidInputSchema = z.object({
 	reason: z.string().trim().min(1),
 });
 
+export const EventImageInputSchema = z.object({
+	eventId: z.string().min(1),
+});
+
 export function isEventResolved(
 	event: Pick<Event, "outcome" | "resolvedAt">,
 ): event is Pick<Event, "outcome" | "resolvedAt"> & {
