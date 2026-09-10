@@ -1,0 +1,12 @@
+{
+	"$schema": "../../../../node_modules/wrangler/config-schema.json",
+	"name": "mordheim-operations-test",
+	"compatibility_date": "2025-09-02",
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "mordheim-operations-test",
+			"database_id": "00000000-0000-0000-0000-000000000000"
+		}
+	]
+}

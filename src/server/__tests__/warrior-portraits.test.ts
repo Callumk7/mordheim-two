@@ -1,16 +1,15 @@
 import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { WarriorPortraitInputSchema } from "@/db/validation/warrior-portrait";
-import { enqueueImageGeneration } from "@/server/image-generation";
+import { enqueueImageGeneration } from "@/db/operations/image-generation.server";
 import {
 	buildWarriorPortraitPrompt,
 	queryWarriorPortrait,
 	submitWarriorPortrait,
-} from "@/server/warrior-portraits.server";
+} from "@/db/operations/warrior-portraits.server";
+import { WarriorPortraitInputSchema } from "@/db/validation/warrior-portrait";
 import { setupDatabase } from "../../../workers/image-generation/src/test-support";
 
-vi.mock("cloudflare:workers", () => ({ env: {} }));
 const connections: ReturnType<typeof setupDatabase>[] = [];
 function setup() {
 	const connection = setupDatabase();

@@ -1,10 +1,9 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import type { Database } from "@/db/index.server";
-import { enqueueImageGeneration } from "@/server/image-generation";
+import { enqueueImageGeneration } from "@/db/operations/image-generation.server";
 import { LEASE_MS } from "./jobs";
 import { jobId, setupDatabase } from "./test-support";
 
-vi.mock("cloudflare:workers", () => ({ env: {} }));
 const connections: ReturnType<typeof setupDatabase>[] = [];
 function setup(now?: () => number) {
 	const connection = setupDatabase(now);

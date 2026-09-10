@@ -1,24 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
-import { eq } from "drizzle-orm";
 import { getDb } from "@/db/index.server";
-import { warbandMatches } from "@/db/schema";
+import * as operations from "@/db/operations/warband-matches.server";
 import {
 	WarbandMatchDeleteInputSchema,
 	WarbandMatchSchema,
 } from "@/db/validation/warband-match";
 
 export const listWarbandMatches = createServerFn({ method: "GET" }).handler(
-	() => getDb().select().from(warbandMatches),
+	() => operations.listWarbandMatches(getDb()),
 );
 
 export const createWarbandMatch = createServerFn({ method: "POST" })
 	.validator(WarbandMatchSchema)
-	.handler(async ({ data }) => {
-		await getDb().insert(warbandMatches).values(data);
-	});
+	.handler(({ data }) => operations.createWarbandMatch(getDb(), data));
 
 export const deleteWarbandMatch = createServerFn({ method: "POST" })
 	.validator(WarbandMatchDeleteInputSchema)
-	.handler(async ({ data }) => {
-		await getDb().delete(warbandMatches).where(eq(warbandMatches.id, data.id));
-	});
+	.handler(({ data }) => operations.deleteWarbandMatch(getDb(), data));

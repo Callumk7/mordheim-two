@@ -1,11 +1,11 @@
 import { env } from "cloudflare:workers";
 import { createServerFn } from "@tanstack/react-start";
 import { getDb } from "@/db/index.server";
-import { WarriorPortraitInputSchema } from "@/db/validation/warrior-portrait";
 import {
 	queryWarriorPortrait,
 	submitWarriorPortrait,
-} from "@/server/warrior-portraits.server";
+} from "@/db/operations/warrior-portraits.server";
+import { WarriorPortraitInputSchema } from "@/db/validation/warrior-portrait";
 
 // Unauthenticated spike RPCs: protect these along with the rest of the app
 // before enabling paid generation. A warrior association is not authorization.
