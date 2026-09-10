@@ -3,14 +3,15 @@ import { Plus, Trash2 } from "lucide-react";
 import { useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
+	Combobox,
+	ComboboxContent,
+	ComboboxEmpty,
+	ComboboxInput,
+	ComboboxItem,
+	ComboboxList,
+} from "@/components/ui/combobox";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import type { AppCollections } from "@/db-collections";
 import {
 	equipWarriorTransaction,
@@ -73,34 +74,46 @@ export function WarriorEquipment({
 				>
 					<Field className="sm:max-w-md">
 						<FieldLabel htmlFor={selectId}>Catalogue item</FieldLabel>
-						<Select
+						<Combobox
+							allowsEmptyCollection
 							className="w-full"
 							isDisabled={isLoading || catalogue.length === 0}
 							name="equipmentId"
-							onChange={(key) =>
+							onSelectionChange={(key) =>
 								setEquipmentId(key === null ? undefined : String(key))
 							}
-							placeholder={
-								isLoading ? "Loading equipment…" : "Select equipment"
-							}
-							value={equipmentId ?? null}
+							selectedKey={equipmentId ?? null}
 						>
-							<SelectTrigger id={selectId}>
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								{catalogue.map((item) => (
-									<SelectItem id={item.id} key={item.id} textValue={item.name}>
-										<span className="flex flex-col">
-											<span>{item.name}</span>
-											<span className="text-xs text-muted-foreground">
-												{equipmentSummary(item)}
+							<ComboboxInput
+								disabled={isLoading || catalogue.length === 0}
+								id={selectId}
+								placeholder={
+									isLoading ? "Loading equipment…" : "Search equipment"
+								}
+							/>
+							<ComboboxContent>
+								<ComboboxList
+									renderEmptyState={() => (
+										<ComboboxEmpty>No equipment found.</ComboboxEmpty>
+									)}
+								>
+									{catalogue.map((item) => (
+										<ComboboxItem
+											id={item.id}
+											key={item.id}
+											textValue={item.name}
+										>
+											<span className="flex flex-col">
+												<span>{item.name}</span>
+												<span className="text-xs text-muted-foreground">
+													{equipmentSummary(item)}
+												</span>
 											</span>
-										</span>
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
+										</ComboboxItem>
+									))}
+								</ComboboxList>
+							</ComboboxContent>
+						</Combobox>
 					</Field>
 					<Button
 						isDisabled={!equipmentId || isAdding || isLoading}
