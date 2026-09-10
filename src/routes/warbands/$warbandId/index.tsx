@@ -1,7 +1,19 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+	Activity,
+	HeartPulse,
+	type LucideIcon,
+	Pencil,
+	Shield,
+	Skull,
+	Swords,
+	Trophy,
+	Users,
+} from "lucide-react";
 import { useState } from "react";
 import { CreateWarriorDialog } from "@/components/shared/create-warrior-dialog";
+import { CombatLeaderboard } from "@/components/shared/stat-display";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -18,11 +30,8 @@ import {
 	createWarriorTransaction,
 	updateWarriorTransaction,
 } from "@/db-collections/mutations/warriors";
-import {
-	getWarbandCombatStats,
-	getWarriorCombatStats,
-} from "@/db-collections/projections";
-import { useCombatStats } from "@/db-collections/queries";
+import { getWarbandCombatStats } from "@/db-collections/projections";
+import { useWarbandDashboard } from "@/db-collections/queries";
 
 export const Route = createFileRoute("/warbands/$warbandId/")({
 	component: WarbandDetailPage,
@@ -35,35 +44,29 @@ function WarbandDetailPage() {
 	const { warbandId } = Route.useParams();
 	const { dbClient } = Route.useRouteContext();
 	const collections = getCollections(dbClient);
-	const combatStats = useCombatStats(dbClient);
-	const warbandCombat = getWarbandCombatStats(combatStats, warbandId);
-	const { warbands: warbandsCollection, warriors: warriorsCollection } =
-		collections;
+	const { warbands: warbandsCollection } = collections;
 	const { data: warbands } = useLiveQuery({
 		query: (q) =>
 			q
 				.from({ warband: warbandsCollection })
 				.where(({ warband }) => eq(warband.id, warbandId)),
 	});
-	const { data: warriors } = useLiveQuery({
-		query: (q) =>
-			q
-				.from({ warrior: warriorsCollection })
-				.where(({ warrior }) => eq(warrior.warbandId, warbandId))
-				.orderBy(({ warrior }) => warrior.name, "asc"),
-	});
+	const dashboard = useWarbandDashboard(dbClient, warbandId);
 	const warband = warbands[0];
-	const editingWarrior = warriors.find(
+	const allRoster = [...dashboard.livingRoster, ...dashboard.graveyard];
+	const editingWarrior = allRoster.find(
 		(warrior) => warrior.id === editingWarriorId,
 	);
 
 	if (!warband) return null;
 
+	const warbandCombat = getWarbandCombatStats(dashboard.combatStats, warbandId);
+
 	return (
-		<div className="mx-auto max-w-4xl">
+		<div className="grid gap-10">
 			<div className="flex items-center justify-between gap-4">
 				<Link
-					className="text-sm text-muted-foreground hover:text-primary/80"
+					className="text-sm text-muted-foreground hover:text-primary"
 					to="/warbands"
 				>
 					← Warbands
@@ -77,109 +80,153 @@ function WarbandDetailPage() {
 				</Link>
 			</div>
 
-			<header className="mt-7 border-b border-border pb-6">
-				<p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
-					{warband.faction}
-				</p>
-				<div className="mt-2 flex flex-wrap items-center justify-between gap-4">
-					<h1 className="font-serif text-4xl font-semibold text-foreground">
-						{warband.name}
-					</h1>
-					<Button variant="outline" onPress={() => setIsEditWarbandOpen(true)}>
-						Edit warband
-					</Button>
-				</div>
-				<p className="mt-2 text-muted-foreground">
-					Campaign record and roster.
-				</p>
-			</header>
-
-			<Card className="mt-7">
-				<CardContent>
-					<dl className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-						<Detail label="Captain" value={warband.captain} />
-						<Detail label="Status" value={warband.status} />
-						<Detail label="Rating" value={warband.rating} />
-						<Detail label="Wins" value={warband.wins} />
-					</dl>
-					<h2 className="mt-8 font-serif text-2xl text-foreground">
-						Combat stats
-					</h2>
-					<dl className="mt-4 grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
-						<Detail label="KDs given" value={warbandCombat.knockdownsGiven} />
-						<Detail label="KDs taken" value={warbandCombat.knockdownsTaken} />
-						<Detail
-							label="Injuries given"
-							value={warbandCombat.injuriesGiven}
-						/>
-						<Detail
-							label="Injuries taken"
-							value={warbandCombat.injuriesTaken}
-						/>
-						<Detail label="Deaths given" value={warbandCombat.deathsGiven} />
-					</dl>
-				</CardContent>
-			</Card>
-
-			<section className="mt-10" aria-labelledby="roster-heading">
-				<div className="flex flex-wrap items-end justify-between gap-4">
+			<section className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+				<div className="absolute inset-x-0 top-0 h-1 bg-primary" />
+				<div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
 					<div>
-						<p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
-							Campaign roster
+						<div className="flex flex-wrap items-center gap-3">
+							<p className="text-xs font-semibold tracking-[0.28em] text-primary uppercase">
+								{warband.faction}
+							</p>
+							<span className="rounded-full border border-border bg-muted/50 px-2.5 py-1 text-xs text-muted-foreground">
+								{warband.status}
+							</span>
+						</div>
+						<h1 className="mt-3 font-mordheim text-5xl text-foreground sm:text-6xl">
+							{warband.name}
+						</h1>
+						<p className="mt-3 text-muted-foreground">
+							Led by{" "}
+							<span className="font-medium text-foreground">
+								{warband.captain}
+							</span>
 						</p>
-						<h2
-							className="mt-2 font-serif text-3xl font-semibold text-foreground"
-							id="roster-heading"
-						>
-							Warriors
-						</h2>
 					</div>
+					<div className="flex items-end gap-6">
+						<div className="text-right">
+							<p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">
+								Warband rating
+							</p>
+							<p className="mt-1 font-mordheim text-5xl tabular-nums text-primary">
+								{warband.rating}
+							</p>
+						</div>
+						<Button
+							variant="outline"
+							onPress={() => setIsEditWarbandOpen(true)}
+						>
+							<Pencil aria-hidden="true" data-icon="inline-start" />
+							Edit
+						</Button>
+					</div>
+				</div>
+				<div className="grid border-t border-border bg-muted/20 sm:grid-cols-2 lg:grid-cols-4">
+					<HeroStat
+						icon={Trophy}
+						label="Wins"
+						value={dashboard.matchStats.wins}
+					/>
+					<HeroStat
+						icon={Swords}
+						label="Matches played"
+						value={dashboard.matchStats.played}
+					/>
+					<HeroStat
+						icon={Users}
+						label="Living warriors"
+						value={dashboard.livingRoster.length}
+					/>
+					<HeroStat
+						icon={Skull}
+						label="Fallen warriors"
+						value={dashboard.graveyard.length}
+					/>
+				</div>
+			</section>
+
+			<section aria-labelledby="record-heading">
+				<SectionHeading
+					description="Results are calculated from completed matches involving this warband."
+					eyebrow="Campaign performance"
+					id="record-heading"
+					title="Match record"
+				/>
+				<div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+					<MetricCard label="Played" value={dashboard.matchStats.played} />
+					<MetricCard label="Wins" value={dashboard.matchStats.wins} />
+					<MetricCard label="Losses" value={dashboard.matchStats.losses} />
+					<MetricCard label="Draws" value={dashboard.matchStats.draws} />
+					<MetricCard
+						label="Win rate"
+						suffix="%"
+						value={dashboard.matchStats.winRate}
+					/>
+				</div>
+				{dashboard.matches.length === 0 ? (
+					<EmptyState
+						className="mt-4"
+						description="Add this warband to a match to begin its campaign record."
+						title="No matches yet"
+					/>
+				) : null}
+			</section>
+
+			<section aria-labelledby="combat-heading">
+				<SectionHeading
+					description="A live summary projected from active event records."
+					eyebrow="Battle scars"
+					id="combat-heading"
+					title="Combat record"
+				/>
+				<div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+					<MetricCard
+						label="Knockdowns given"
+						value={warbandCombat.knockdownsGiven}
+					/>
+					<MetricCard
+						label="Knockdowns taken"
+						value={warbandCombat.knockdownsTaken}
+					/>
+					<MetricCard
+						label="Injuries given"
+						value={warbandCombat.injuriesGiven}
+					/>
+					<MetricCard
+						label="Injuries taken"
+						value={warbandCombat.injuriesTaken}
+					/>
+					<MetricCard label="Deaths given" value={warbandCombat.deathsGiven} />
+				</div>
+			</section>
+
+			<section aria-labelledby="roster-heading">
+				<div className="flex flex-wrap items-end justify-between gap-4">
+					<SectionHeading
+						description="The fighters currently able to carry the warband’s colors."
+						eyebrow="Campaign roster"
+						id="roster-heading"
+						title="Living warriors"
+					/>
 					<Button onPress={() => setIsNewWarriorOpen(true)}>Add warrior</Button>
 				</div>
-
-				{warriors.length ? (
-					<ul className="mt-5 divide-y divide-border overflow-hidden rounded-2xl bg-card ring-1 ring-foreground/10">
-						{warriors.map((warrior) => {
-							const combat = getWarriorCombatStats(combatStats, warrior.id);
-							return (
-								<li
-									className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:justify-between"
-									key={warrior.id}
-								>
-									<div>
-										<Link
-											className="font-serif text-xl font-semibold text-foreground hover:text-primary"
-											params={{ warriorId: warrior.id }}
-											to="/warriors/$warriorId"
-										>
-											{warrior.name}
-										</Link>
-										<p className="mt-1 text-sm text-muted-foreground">
-											{warrior.class} · {combat.isDead ? "Dead" : "Alive"}
-										</p>
-									</div>
-									<div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
-										<span>
-											<span className="text-muted-foreground">Injuries </span>
-											<span className="font-mono text-primary">
-												{combat.injuriesTaken}
-											</span>
-										</span>
-										<span>
-											<span className="text-muted-foreground">
-												Knock downs{" "}
-											</span>
-											<span className="font-mono text-primary">
-												{combat.knockdownsTaken}
-											</span>
-										</span>
-										<Link
-											className="text-muted-foreground hover:text-foreground"
-											params={{ warriorId: warrior.id }}
-											to="/warriors/$warriorId"
-										>
-											View
-										</Link>
+				{dashboard.livingRoster.length ? (
+					<ul className="mt-5 grid gap-4 md:grid-cols-2">
+						{dashboard.livingRoster.map((warrior) => (
+							<li key={warrior.id}>
+								<Card className="h-full" size="sm">
+									<CardContent className="flex items-center justify-between gap-5">
+										<div className="min-w-0">
+											<Link
+												className="font-serif text-xl font-semibold text-foreground hover:text-primary"
+												params={{ warriorId: warrior.id }}
+												to="/warriors/$warriorId"
+											>
+												{warrior.name}
+											</Link>
+											<p className="mt-1 text-sm text-muted-foreground">
+												{warrior.class}
+											</p>
+										</div>
 										<Button
 											size="sm"
 											variant="outline"
@@ -187,29 +234,156 @@ function WarbandDetailPage() {
 										>
 											Edit
 										</Button>
-									</div>
-								</li>
-							);
-						})}
+									</CardContent>
+								</Card>
+							</li>
+						))}
 					</ul>
 				) : (
-					<Card className="mt-5 border border-dashed border-border">
-						<CardContent className="py-10 text-center">
-							<h3 className="font-serif text-2xl text-foreground">
-								No warriors recruited
-							</h3>
-							<p className="mx-auto mt-2 max-w-md text-muted-foreground">
-								This warband has no fighters yet. Recruit the first warrior to
-								begin building its roster.
-							</p>
-							<Button
-								className="mt-6"
-								onPress={() => setIsNewWarriorOpen(true)}
-							>
-								Recruit the first warrior
-							</Button>
+					<EmptyState
+						className="mt-5"
+						description="Recruit a fighter to begin building this warband’s active roster."
+						title="No living warriors"
+					>
+						<Button onPress={() => setIsNewWarriorOpen(true)}>
+							Recruit a warrior
+						</Button>
+					</EmptyState>
+				)}
+			</section>
+
+			<CombatLeaderboard
+				description="Ranked by deaths, then injuries, then knockdowns given. Fallen warriors remain in the standings."
+				detailFor={(row) =>
+					allRoster.find((warrior) => warrior.id === row.id)?.class
+				}
+				emptyMessage="Recruit a warrior to establish this warband’s standings."
+				entityLabel="Warrior"
+				rows={dashboard.warriorLeaderboard}
+				title="Warrior leaderboard"
+			/>
+
+			<section aria-labelledby="graveyard-heading">
+				<SectionHeading
+					description="Warriors marked dead or lost to an active death event."
+					eyebrow="In memoriam"
+					id="graveyard-heading"
+					title="Graveyard"
+				/>
+				{dashboard.graveyard.length ? (
+					<ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+						{dashboard.graveyard.map((warrior) => (
+							<li key={warrior.id}>
+								<Card
+									className="h-full border border-border bg-muted/20"
+									size="sm"
+								>
+									<CardContent>
+										<Skull
+											aria-hidden="true"
+											className="size-5 text-muted-foreground"
+										/>
+										<Link
+											className="mt-3 block font-serif text-xl font-semibold text-foreground hover:text-primary"
+											params={{ warriorId: warrior.id }}
+											to="/warriors/$warriorId"
+										>
+											{warrior.name}
+										</Link>
+										<p className="text-sm text-muted-foreground">
+											{warrior.class}
+										</p>
+										<p className="mt-4 text-xs leading-5 text-muted-foreground">
+											{warrior.killerName
+												? `Slain by ${warrior.killerName}`
+												: "Remembered among the fallen"}
+											{warrior.matchName ? ` at ${warrior.matchName}` : ""}
+											{warrior.deathAt
+												? ` · ${formatDate(warrior.deathAt)}`
+												: ""}
+										</p>
+									</CardContent>
+								</Card>
+							</li>
+						))}
+					</ul>
+				) : (
+					<EmptyState
+						className="mt-5"
+						description="No warriors from this warband have been recorded among the fallen."
+						title="The graveyard is empty"
+					/>
+				)}
+			</section>
+
+			<section aria-labelledby="events-heading">
+				<SectionHeading
+					description="Every recorded encounter involving this warband, newest first."
+					eyebrow="Chronicle"
+					id="events-heading"
+					title="Warband event log"
+				/>
+				{dashboard.events.length ? (
+					<Card className="mt-5">
+						<CardContent>
+							<ol className="divide-y divide-border">
+								{dashboard.events.map((event) => (
+									<li
+										className="grid gap-3 py-5 first:pt-0 last:pb-0 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-start"
+										key={event.id}
+									>
+										<div className="flex size-9 items-center justify-center rounded-full border border-border bg-muted/50">
+											{event.outcome === "Death" ? (
+												<Skull aria-hidden="true" className="size-4" />
+											) : event.outcome === "Injury" ? (
+												<HeartPulse aria-hidden="true" className="size-4" />
+											) : (
+												<Activity aria-hidden="true" className="size-4" />
+											)}
+										</div>
+										<div>
+											<Link
+												className="font-medium text-foreground hover:text-primary"
+												params={{ eventId: event.id }}
+												to="/events/$eventId"
+											>
+												{event.attackerWarriorName} struck{" "}
+												{event.defenderWarriorName}
+											</Link>
+											<p className="mt-1 text-sm text-muted-foreground">
+												{event.attackerName} vs. {event.defenderName} ·{" "}
+												{event.matchName}
+											</p>
+											{event.notes ? (
+												<p className="mt-2 text-sm text-muted-foreground">
+													{event.notes}
+												</p>
+											) : null}
+										</div>
+										<div className="sm:text-right">
+											<span className="rounded-full border border-border bg-muted/40 px-2.5 py-1 text-xs font-medium text-foreground">
+												{event.voidedAt
+													? "Voided"
+													: (event.outcome ?? "Unresolved")}
+											</span>
+											<time
+												className="mt-2 block text-xs text-muted-foreground"
+												dateTime={event.createdAt}
+											>
+												{formatDate(event.createdAt)}
+											</time>
+										</div>
+									</li>
+								))}
+							</ol>
 						</CardContent>
 					</Card>
+				) : (
+					<EmptyState
+						className="mt-5"
+						description="Events will appear here when this warband enters combat."
+						title="No events recorded"
+					/>
 				)}
 			</section>
 
@@ -287,13 +461,110 @@ function WarbandDetailPage() {
 	);
 }
 
-function Detail({ label, value }: { label: string; value: string | number }) {
+function HeroStat({
+	icon: Icon,
+	label,
+	value,
+}: {
+	icon: LucideIcon;
+	label: string;
+	value: number;
+}) {
+	return (
+		<div className="flex items-center gap-3 border-border p-5 sm:[&:not(:nth-child(odd))]:border-l lg:[&:not(:first-child)]:border-l">
+			<Icon aria-hidden="true" className="size-5 text-primary" />
+			<div>
+				<p className="font-mordheim text-2xl tabular-nums text-foreground">
+					{value}
+				</p>
+				<p className="text-xs text-muted-foreground">{label}</p>
+			</div>
+		</div>
+	);
+}
+
+function MetricCard({
+	label,
+	suffix = "",
+	value,
+}: {
+	label: string;
+	suffix?: string;
+	value: number;
+}) {
+	return (
+		<Card size="sm">
+			<CardContent>
+				<p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+					{label}
+				</p>
+				<p className="mt-2 font-mordheim text-4xl tabular-nums text-primary">
+					{value}
+					{suffix}
+				</p>
+			</CardContent>
+		</Card>
+	);
+}
+
+function SectionHeading({
+	description,
+	eyebrow,
+	id,
+	title,
+}: {
+	description: string;
+	eyebrow: string;
+	id: string;
+	title: string;
+}) {
 	return (
 		<div>
-			<dt className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-				{label}
-			</dt>
-			<dd className="mt-2 text-lg font-medium text-foreground">{value}</dd>
+			<p className="text-xs font-semibold tracking-[0.28em] text-primary uppercase">
+				{eyebrow}
+			</p>
+			<h2 className="mt-2 font-mordheim text-3xl text-foreground" id={id}>
+				{title}
+			</h2>
+			<p className="mt-1 text-sm text-muted-foreground">{description}</p>
 		</div>
+	);
+}
+
+function EmptyState({
+	children,
+	className = "",
+	description,
+	title,
+}: {
+	children?: React.ReactNode;
+	className?: string;
+	description: string;
+	title: string;
+}) {
+	return (
+		<div
+			className={`rounded-2xl border border-dashed border-input bg-card/40 px-6 py-10 text-center ${className}`}
+		>
+			<Shield
+				aria-hidden="true"
+				className="mx-auto size-6 text-muted-foreground"
+			/>
+			<h3 className="mt-3 font-serif text-xl font-semibold text-foreground">
+				{title}
+			</h3>
+			<p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
+				{description}
+			</p>
+			{children ? <div className="mt-5">{children}</div> : null}
+		</div>
+	);
+}
+
+function formatDate(value: string) {
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) return value;
+	return new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(
+		date,
 	);
 }
