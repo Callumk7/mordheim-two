@@ -203,4 +203,16 @@ describe("breaking projector alerts", () => {
 		).toEqual([]);
 		expect(findBreakingAlerts(completed, new Set()).alerts).toEqual([]);
 	});
+
+	it("emits every new live event even when the highlights segment is capped", () => {
+		const events = Array.from({ length: 7 }, (_, index) => ({
+			...event(index % 2 === 0 ? "Injury" : "Death"),
+			id: `event-${index}`,
+			createdAt: `2026-09-10T12:00:0${index}.000Z`,
+		}));
+		const result = findBreakingAlerts(input(events), new Set());
+		expect(projectProjectorData(input(events)).highlights).toHaveLength(6);
+		expect(result.alerts).toHaveLength(7);
+		expect(findBreakingAlerts(input(events), result.seen).alerts).toEqual([]);
+	});
 });

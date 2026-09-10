@@ -98,10 +98,16 @@ export function findBreakingAlerts(
 	seen: ReadonlySet<string>,
 ): { alerts: BreakingAlert[]; seen: Set<string> } {
 	const nextSeen = new Set(seen);
-	const data = projectProjectorData(input);
-	const inProgressIds = new Set(data.matches.live.map((match) => match.id));
+	const inProgressIds = new Set(
+		input.matches
+			.filter((match) => match.status === "InProgress")
+			.map((match) => match.id),
+	);
 	const highlightsById = new Map(
-		data.highlights.map((highlight) => [highlight.id, highlight]),
+		projectProjectorHighlights(input).map((highlight) => [
+			highlight.id,
+			highlight,
+		]),
 	);
 	const alerts: BreakingAlert[] = [];
 
@@ -121,10 +127,6 @@ export function projectProjectorData(input: ProjectorInput): ProjectorData {
 	const warbandById = new Map(
 		input.warbands.map((warband) => [warband.id, warband]),
 	);
-	const warriorById = new Map(
-		input.warriors.map((warrior) => [warrior.id, warrior]),
-	);
-	const matchById = new Map(input.matches.map((match) => [match.id, match]));
 	const combat = projectCombatStats(input.events);
 
 	const standings = [...input.warbands].sort(
@@ -183,7 +185,23 @@ export function projectProjectorData(input: ProjectorInput): ProjectorData {
 			.slice(0, 4),
 	};
 
-	const highlights = input.events
+	const highlights = projectProjectorHighlights(input).slice(0, 6);
+
+	return {
+		standings,
+		warriors,
+		matches,
+		highlights,
+		ticker: buildTicker(standings, matches.live, highlights),
+	};
+}
+
+function projectProjectorHighlights(input: ProjectorInput) {
+	const matchById = new Map(input.matches.map((match) => [match.id, match]));
+	const warriorById = new Map(
+		input.warriors.map((warrior) => [warrior.id, warrior]),
+	);
+	return input.events
 		.filter((event) => event.voidedAt === null)
 		.sort(compareEventRecency)
 		.flatMap((event): ProjectorHighlight[] => {
@@ -204,16 +222,7 @@ export function projectProjectorData(input: ProjectorInput): ProjectorData {
 					resolvedAt: event.resolvedAt,
 				},
 			];
-		})
-		.slice(0, 6);
-
-	return {
-		standings,
-		warriors,
-		matches,
-		highlights,
-		ticker: buildTicker(standings, matches.live, highlights),
-	};
+		});
 }
 
 function highlightPhase(event: Pick<Event, "outcome">) {
