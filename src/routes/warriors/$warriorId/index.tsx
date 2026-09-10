@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { WarriorEquipment } from "@/components/warrior-equipment";
 import { WarriorPortrait } from "@/components/warrior-portrait";
+import { getCollections } from "@/db-collections";
 import { useWarriorMutations } from "@/db-collections/mutations/warriors";
 import {
 	getWarriorCombatStats,
@@ -21,6 +22,7 @@ function WarriorDetailPage() {
 	const { warriorId } = Route.useParams();
 	const portrait = Route.useLoaderData();
 	const { dbClient } = Route.useRouteContext();
+	const collections = getCollections(dbClient);
 	const { updateWarrior } = useWarriorMutations(dbClient);
 	const { eventReferences, warbands, warrior } = useWarriorDetails(
 		dbClient,
