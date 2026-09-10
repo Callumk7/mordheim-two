@@ -1,16 +1,32 @@
 import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createEquipment } from "@/db/operations/equipment.server";
+import {
+	queryEventImage,
+	submitEventImage,
+} from "@/db/operations/event-images.server";
+import { createEvent, resolveEvent } from "@/db/operations/events.server";
 import { queryGeneratedImages } from "@/db/operations/generated-images.server";
 import { enqueueImageGeneration } from "@/db/operations/image-generation.server";
 import { listQueueJobs } from "@/db/operations/queue-jobs.server";
 import { createWarband } from "@/db/operations/warbands.server";
+import { createWarriorEquipment } from "@/db/operations/warrior-equipment.server";
 import {
 	queryWarriorPortrait,
 	submitWarriorPortrait,
 } from "@/db/operations/warrior-portraits.server";
 import { createWarrior, deleteWarrior } from "@/db/operations/warriors.server";
 import { imageGenerationJobs } from "@/db/schema";
-import { clock, updatedAt, warband, warrior } from "./fixtures";
+import {
+	assignment,
+	clock,
+	equipment,
+	event,
+	seedMatch,
+	updatedAt,
+	warband,
+	warrior,
+} from "./fixtures";
 import { createTestDatabase } from "./test-database";
 
 let connection: Awaited<ReturnType<typeof createTestDatabase>>;
@@ -122,6 +138,56 @@ describe("image job operations on local D1", () => {
 		await expect(
 			submitWarriorPortrait(db, queue, "missing", clock),
 		).resolves.toHaveProperty("error");
+	});
+
+	it("queues one contextual illustration for a resolved injury event", async () => {
+		const { db } = connection;
+		await seedMatch(db);
+		await createEquipment(db, equipment("rusty-sword"));
+		await createWarriorEquipment(
+			db,
+			assignment("attacker-sword", "wa", "rusty-sword"),
+		);
+		await createEvent(db, {
+			...event(),
+			notes: "The marksman lunged across a broken chapel stair.",
+		});
+		await resolveEvent(db, { id: "event", outcome: "Injury" }, clock);
+		const queue = { send: vi.fn().mockResolvedValue(undefined) };
+
+		const first = await submitEventImage(db, queue, "event", clock);
+		const second = await submitEventImage(db, queue, "event", clock);
+
+		expect(first).toHaveProperty("job.status", "queued");
+		expect(second).toHaveProperty("job.jobId", first.job?.jobId);
+		expect(second).toHaveProperty("job.status", "queued");
+		expect(queue.send).toHaveBeenCalledTimes(1);
+		expect(await queryEventImage(db, "event")).toEqual(
+			expect.objectContaining({ status: "queued" }),
+		);
+		expect(await listQueueJobs(db)).toContainEqual(
+			expect.objectContaining({
+				eventId: "event",
+				prompt: expect.stringMatching(
+					/The marksman lunged.*Attacking warrior: wa.*rusty-sword.*Defending warrior: wb/s,
+				),
+			}),
+		);
+	});
+
+	it("does not queue event images for unresolved or recovery events", async () => {
+		const { db } = connection;
+		await seedMatch(db);
+		await createEvent(db, event());
+		const queue = { send: vi.fn().mockResolvedValue(undefined) };
+		expect(await submitEventImage(db, queue, "event", clock)).toEqual({
+			job: null,
+		});
+		await resolveEvent(db, { id: "event", outcome: "Recovery" }, clock);
+		expect(await submitEventImage(db, queue, "event", clock)).toEqual({
+			job: null,
+		});
+		expect(queue.send).not.toHaveBeenCalled();
 	});
 
 	it("bounds and orders diagnostic and completed-image listings", async () => {

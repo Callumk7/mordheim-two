@@ -15,11 +15,23 @@ export function setupDatabase(now?: () => number) {
 	sqlite.exec("PRAGMA foreign_keys = ON");
 	for (const migration of [
 		"0000_rich_blackheart.sql",
+		"0001_optimal_chat.sql",
+		"0002_flowery_mariko_yashida.sql",
+		"0003_sticky_prowler.sql",
+		"0004_charming_gressill.sql",
 		"0005_lovely_pestilence.sql",
+		"0006_left_krista_starr.sql",
+		"0007_certain_steve_rogers.sql",
+		"0008_greedy_cassandra_nova.sql",
+		"0009_stormy_overlord.sql",
+		"0010_windy_karma.sql",
 		"0011_image_generation_jobs.sql",
 		"0012_tense_echo.sql",
 		"0013_last_charles_xavier.sql",
+		"0014_cool_callisto.sql",
+		"0015_equipment_source_catalogue.sql",
 		"0016_slimy_mathemanic.sql",
+		"0017_glorious_the_hunter.sql",
 	]) {
 		sqlite.exec(
 			readFileSync(

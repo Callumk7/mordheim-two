@@ -1,6 +1,7 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { EventForm } from "@/components/event-form";
+import { EventImage } from "@/components/event-image";
 import { EventOutcomeForm } from "@/components/event-outcome-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { getCollections } from "@/db-collections";
@@ -9,13 +10,17 @@ import {
 	updateEventTransaction,
 } from "@/db-collections/mutations/events";
 import { getParticipantWarbandIds } from "@/lib/event-options";
+import { getEventImage } from "@/server/event-images";
 
 export const Route = createFileRoute("/events/$eventId/")({
+	loader: ({ params }) => getEventImage({ data: { eventId: params.eventId } }),
 	component: EventDetailPage,
 });
 
 function EventDetailPage() {
 	const { eventId } = Route.useParams();
+	const image = Route.useLoaderData();
+	const router = useRouter();
 	const { dbClient } = Route.useRouteContext();
 	const collections = getCollections(dbClient);
 	const { events, matches, warbandMatches, warbands, warriors } = collections;
@@ -39,6 +44,12 @@ function EventDetailPage() {
 	});
 	const event = eventRows[0];
 	const match = matchRows.find((candidate) => candidate.id === event?.matchId);
+	const attacker = warriorRows.find(
+		(candidate) => candidate.id === event?.attackerWarriorId,
+	);
+	const defender = warriorRows.find(
+		(candidate) => candidate.id === event?.defenderWarriorId,
+	);
 	const eligibleMatches = matchRows.filter((candidate) => {
 		const participantIds = getParticipantWarbandIds(
 			candidate.id,
@@ -101,6 +112,7 @@ function EventDetailPage() {
 									outcome,
 								);
 								await transaction.isPersisted.promise;
+								await router.invalidate({ sync: true });
 							}}
 							outcome={event.outcome}
 						/>
@@ -128,6 +140,13 @@ function EventDetailPage() {
 					) : null}
 				</CardContent>
 			</Card>
+
+			<EventImage
+				attackerName={attacker?.name ?? "The attacker"}
+				defenderName={defender?.name ?? "the defender"}
+				image={image}
+				outcome={event.outcome}
+			/>
 		</div>
 	);
 }

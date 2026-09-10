@@ -82,7 +82,7 @@ export async function submitWarriorPortrait(
 		db,
 		queue,
 		built.prompt,
-		warriorId,
+		{ warriorId },
 		clock,
 	);
 	return { job };
