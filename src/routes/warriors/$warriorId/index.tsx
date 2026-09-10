@@ -1,5 +1,6 @@
 import { eq, or, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { WarriorEquipment } from "@/components/warrior-equipment";
 import { WarriorPortrait } from "@/components/warrior-portrait";
 import { getCollections } from "@/db-collections";
 import { updateWarriorTransaction } from "@/db-collections/mutations/warriors";
@@ -97,6 +98,8 @@ function WarriorDetailPage() {
 				name={warrior.name}
 				portrait={portrait}
 			/>
+
+			<WarriorEquipment collections={collections} warriorId={warrior.id} />
 
 			<Card className="mt-7">
 				<CardContent>

@@ -8,9 +8,15 @@ import { getCollections } from "@/db-collections";
 
 export const Route = createFileRoute("/warriors/$warriorId")({
 	loader: async ({ context, params }) => {
-		const { warriors: collection } = getCollections(context.dbClient);
-		await collection.preload();
-		if (!collection.get(params.warriorId)) throw notFound();
+		const { equipment, warriorEquipment, warriors } = getCollections(
+			context.dbClient,
+		);
+		await Promise.all([
+			equipment.preload(),
+			warriorEquipment.preload(),
+			warriors.preload(),
+		]);
+		if (!warriors.get(params.warriorId)) throw notFound();
 		return null;
 	},
 	component: () => <Outlet />,
