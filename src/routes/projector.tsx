@@ -3,6 +3,10 @@ import { useServerFn } from "@tanstack/react-start";
 import {
 	Activity,
 	AlertTriangle,
+	Maximize,
+	Pause,
+	Play,
+	Radio,
 	Shield,
 	Skull,
 	Swords,
@@ -11,6 +15,9 @@ import {
 	Zap,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import "@/projector.css";
 import { type AppCollections, getCollections } from "@/db-collections";
 import type { ProjectorWarrior } from "@/lib/projector";
 import {
@@ -65,6 +72,9 @@ function ProjectorPage() {
 	);
 	const [data, setData] = useState(() => projectProjectorData(initialInput));
 	const [isStale, setIsStale] = useState(false);
+	const [paused, setPaused] = useState(false);
+	const [fullscreenError, setFullscreenError] = useState("");
+	const screen = useRef<HTMLElement>(null);
 	const [segmentIndex, setSegmentIndex] = useState(0);
 	const [rotationCount, setRotationCount] = useState(0);
 	const [alerts, setAlerts] = useState<BreakingAlert[]>([]);
@@ -111,13 +121,13 @@ function ProjectorPage() {
 	}, [collections]);
 
 	useEffect(() => {
-		if (activeAlert) return;
-		const interval = window.setInterval(() => {
-			setSegmentIndex((current) => (current + 1) % SEGMENTS.length);
+		if (activeAlert || paused) return;
+		const interval = window.setTimeout(() => {
+			setSegmentIndex((segmentIndex + 1) % SEGMENTS.length);
 			setRotationCount((current) => current + 1);
 		}, rotation * 1_000);
-		return () => window.clearInterval(interval);
-	}, [activeAlert, rotation]);
+		return () => window.clearTimeout(interval);
+	}, [activeAlert, rotation, paused, segmentIndex]);
 
 	useEffect(() => {
 		if (!activeAlert) return;
@@ -129,56 +139,152 @@ function ProjectorPage() {
 	}, [activeAlert]);
 
 	return (
-		<main className="fixed inset-0 flex h-dvh w-full flex-col overflow-hidden bg-background text-foreground">
-			<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,var(--color-muted),transparent_42%)] opacity-50" />
-			<header className="relative flex shrink-0 items-center justify-between border-b border-border px-[clamp(1rem,3vw,3rem)] py-4">
-				<div>
-					<p className="font-mordheim text-[clamp(1.7rem,3vw,3.2rem)] leading-none tracking-wide">
-						Warband News Network
-					</p>
-					<p className="mt-1 text-xs font-semibold uppercase tracking-[0.32em] text-muted-foreground">
-						Live campaign ledger
-					</p>
+		<main
+			ref={screen}
+			className={cn(
+				"projector-screen fixed inset-0 flex h-dvh w-full flex-col overflow-hidden bg-background text-foreground",
+				paused && "projector-paused",
+			)}
+		>
+			<header className="broadcast-header">
+				<div
+					className="broadcast-logo"
+					role="img"
+					aria-label="Warband News Network"
+				>
+					<strong>warband</strong>
+					<span>news</span>
 				</div>
-				<div className="flex items-center gap-3">
-					{isStale ? (
-						<span
-							aria-live="polite"
-							className="flex items-center gap-2 rounded-full border border-destructive/60 bg-destructive/10 px-4 py-2 text-sm font-bold uppercase tracking-widest text-destructive"
-						>
-							<AlertTriangle className="size-4" /> Data stale
-						</span>
-					) : (
-						<span className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
-							<span className="size-2 rounded-full bg-primary" /> Polling every
-							5s
-						</span>
-					)}
+				<div className="broadcast-location">
+					<Radio className="size-4" />
+					<span>
+						Mordheim <b>•</b> The city of the damned
+					</span>
+				</div>
+				<div className="broadcast-status">
+					<output className={cn("on-air", isStale && "signal-lost")}>
+						{isStale ? (
+							<AlertTriangle className="size-4" />
+						) : (
+							<span className="live-dot" />
+						)}
+						{isStale ? "Signal delayed" : "Live"}
+					</output>
+					<BroadcastClock />
 				</div>
 			</header>
+			<div className="broadcast-strap">
+				<span>Campaign centre</span>
+				<p>Every warband. Every battle. Every bad decision.</p>
+				<span>WNN / 24</span>
+			</div>
 
-			<section
-				aria-live={activeAlert ? "assertive" : "off"}
-				className="relative min-h-0 flex-1 px-[clamp(1rem,3vw,3rem)] py-[clamp(1rem,2.5vh,2rem)]"
-			>
-				{activeAlert ? (
-					<BreakingNews alert={activeAlert} />
-				) : (
-					<Segment
-						data={data}
-						index={segmentIndex}
-						spotlightIndex={Math.floor(rotationCount / SEGMENTS.length)}
-					/>
-				)}
-			</section>
+			<div className="broadcast-body">
+				<section
+					aria-label="Current broadcast"
+					aria-live={activeAlert ? "assertive" : "off"}
+					className="broadcast-stage"
+				>
+					<div
+						className="broadcast-segment"
+						key={
+							activeAlert
+								? `${activeAlert.id}:${activeAlert.phase}`
+								: segmentIndex
+						}
+					>
+						{activeAlert ? (
+							<BreakingNews alert={activeAlert} />
+						) : (
+							<Segment
+								data={data}
+								index={segmentIndex}
+								spotlightIndex={Math.floor(rotationCount / SEGMENTS.length)}
+							/>
+						)}
+					</div>
+				</section>
+				<BroadcastRail data={data} isStale={isStale} />
+			</div>
 
-			<footer className="relative shrink-0 border-t border-border bg-card/95">
+			<nav className="broadcast-rundown" aria-label="Broadcast segments">
+				<span className="rundown-label">
+					{activeAlert ? "News flash" : paused ? "On hold" : "On air"}
+				</span>
+				{SEGMENTS.map((segment, index) => (
+					<Button
+						key={segment}
+						variant="ghost"
+						className={cn(
+							"rundown-item",
+							index === segmentIndex && "is-current",
+						)}
+						aria-current={index === segmentIndex ? "step" : undefined}
+						isDisabled={!!activeAlert}
+						onPress={() => {
+							if (index === segmentIndex) return;
+							setSegmentIndex(index);
+							setRotationCount((current) => current + 1);
+						}}
+					>
+						<span className="rundown-number">0{index + 1}</span>
+						{segment}
+						{index === segmentIndex && !activeAlert && (
+							<span
+								key={`${segmentIndex}-${paused}-${rotationCount}`}
+								className="rundown-progress"
+								style={{
+									animationDuration: `${rotation}s`,
+									animationPlayState: paused ? "paused" : "running",
+								}}
+							/>
+						)}
+					</Button>
+				))}
+				<div className="broadcast-controls">
+					<Button
+						variant="ghost"
+						size="icon"
+						aria-label={
+							paused
+								? "Resume broadcast rotation and ticker"
+								: "Pause broadcast rotation and ticker"
+						}
+						aria-pressed={paused}
+						onPress={() => setPaused((current) => !current)}
+					>
+						{paused ? <Play /> : <Pause />}
+					</Button>
+					<Button
+						variant="ghost"
+						size="icon"
+						aria-label="Toggle fullscreen"
+						onPress={async () => {
+							try {
+								if (document.fullscreenElement) await document.exitFullscreen();
+								else await screen.current?.requestFullscreen();
+								setFullscreenError("");
+							} catch {
+								setFullscreenError(
+									"Fullscreen unavailable. Use your browser’s fullscreen option.",
+								);
+							}
+						}}
+					>
+						<Maximize />
+					</Button>
+				</div>
+			</nav>
+			{fullscreenError && (
+				<output className="fullscreen-error">{fullscreenError}</output>
+			)}
+			<footer className="broadcast-footer relative shrink-0 border-t border-border bg-card/95">
 				<div className="flex items-stretch overflow-hidden">
-					<div className="z-10 flex shrink-0 items-center bg-primary px-5 py-3 text-sm font-black uppercase tracking-[0.24em] text-primary-foreground">
-						WNN ticker
+					<div className="ticker-label z-10 flex shrink-0 items-center px-5 py-3 text-sm font-black uppercase tracking-[0.12em]">
+						{activeAlert ? "Breaking news" : "Latest news"}
 					</div>
 					<div className="projector-ticker min-w-0 flex-1 overflow-hidden py-3 text-[clamp(0.9rem,1.3vw,1.2rem)] font-semibold">
-						<div className="projector-ticker-track flex w-max gap-12 whitespace-nowrap px-8">
+						<div className="projector-ticker-track flex w-max whitespace-nowrap">
 							<div className="flex gap-12">
 								{data.ticker.map((item) => (
 									<span key={item}>
@@ -201,6 +307,108 @@ function ProjectorPage() {
 	);
 }
 
+function BroadcastClock() {
+	const [now, setNow] = useState(() => new Date());
+	useEffect(() => {
+		const timer = window.setInterval(() => setNow(new Date()), 1_000);
+		return () => window.clearInterval(timer);
+	}, []);
+	return (
+		<time className="broadcast-clock" dateTime={now.toISOString()}>
+			{now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+		</time>
+	);
+}
+
+function BroadcastRail({
+	data,
+	isStale,
+}: {
+	data: ProjectorData;
+	isStale: boolean;
+}) {
+	const matches = data.matches.live.length
+		? data.matches.live
+		: data.matches.scheduled;
+	const leader = data.standings[0];
+	return (
+		<aside className="broadcast-rail" aria-label="Campaign at a glance">
+			<div className="rail-heading">
+				<Activity className="size-4" /> Around the grounds
+			</div>
+			<div className="rail-score">
+				<strong>{String(data.matches.live.length).padStart(2, "0")}</strong>
+				<span>
+					Battles
+					<br />
+					in progress
+				</span>
+				<span className="live-dot" />
+			</div>
+			<div className="rail-fixtures">
+				<p className="rail-label">
+					{data.matches.live.length ? "In the field" : "Coming up"}
+				</p>
+				{matches.length ? (
+					matches.slice(0, 3).map((match) => (
+						<article key={match.id} className="rail-fixture">
+							<span>{match.scenario}</span>
+							<h3>
+								{match.participantNames.length
+									? match.participantNames.map((name, index) => (
+											<span key={name}>
+												{index > 0 && <small>vs</small>}
+												{name}
+											</span>
+										))
+									: match.name}
+							</h3>
+							<p>
+								{match.status === "InProgress"
+									? "Battle underway"
+									: "Awaiting deployment"}
+							</p>
+						</article>
+					))
+				) : (
+					<div className="rail-quiet">
+						<Swords className="size-8" />
+						<h3>
+							All quiet.
+							<br />
+							For now.
+						</h3>
+						<p>No battles scheduled. An unusually good day to be alive.</p>
+					</div>
+				)}
+			</div>
+			{leader && (
+				<div className="rail-leader">
+					<p className="rail-label">
+						<Trophy className="size-4" /> Setting the pace
+					</p>
+					<h3>{leader.name}</h3>
+					<div>
+						<strong>{leader.rating}</strong>
+						<span>rating · {leader.wins} wins</span>
+					</div>
+				</div>
+			)}
+			<div className="rail-signoff">
+				<span>Campaign wire</span>
+				<strong>
+					{data.standings.length} warbands / {data.warriors.length} warriors
+				</strong>
+				<p>
+					{isStale
+						? "Connection interrupted · showing last known data"
+						: "Ledger updates every 5 seconds"}
+				</p>
+			</div>
+		</aside>
+	);
+}
+
 function Segment({
 	data,
 	index,
@@ -212,11 +420,11 @@ function Segment({
 }) {
 	switch (index) {
 		case 0:
-			return <Standings data={data} />;
+			return <Standings data={data} page={spotlightIndex} />;
 		case 1:
 			return <WarriorSpotlight data={data} index={spotlightIndex} />;
 		case 2:
-			return <MatchCenter data={data} />;
+			return <MatchCenter data={data} page={spotlightIndex} />;
 		default:
 			return <Highlights highlights={data.highlights} />;
 	}
@@ -230,7 +438,7 @@ function SegmentHeading({
 	title: string;
 }) {
 	return (
-		<header className="mb-[clamp(1rem,2vh,2rem)] flex items-end justify-between gap-6">
+		<header className="segment-heading mb-[clamp(1rem,2vh,2rem)] flex items-end justify-between gap-6">
 			<div>
 				<p className="text-xs font-bold uppercase tracking-[0.3em] text-primary">
 					{eyebrow}
@@ -247,14 +455,18 @@ function SegmentHeading({
 	);
 }
 
-function Standings({ data }: { data: ProjectorData }) {
+function Standings({ data, page }: { data: ProjectorData; page: number }) {
+	const pageSize = 6;
+	const start =
+		(page % Math.max(1, Math.ceil(data.standings.length / pageSize))) *
+		pageSize;
 	return (
 		<div className="flex h-full flex-col">
 			<SegmentHeading eyebrow="Campaign table" title="Warband standings" />
 			{data.standings.length === 0 ? (
 				<EmptyState message="No warbands have entered the campaign." />
 			) : (
-				<div className="min-h-0 overflow-hidden rounded-xl border border-border bg-card/80">
+				<div className="standings-board min-h-0 overflow-auto border border-border bg-card/80">
 					<div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.4fr)_0.7fr_0.7fr_1fr] gap-4 border-b border-border bg-muted/50 px-6 py-3 text-xs font-bold uppercase tracking-widest text-muted-foreground">
 						<span>Warband</span>
 						<span>Faction</span>
@@ -262,34 +474,48 @@ function Standings({ data }: { data: ProjectorData }) {
 						<span className="text-right">Wins</span>
 						<span className="text-right">Status</span>
 					</div>
-					{data.standings.slice(0, 8).map((warband, index) => (
-						<div
-							className="grid grid-cols-[minmax(0,2fr)_minmax(0,1.4fr)_0.7fr_0.7fr_1fr] items-center gap-4 border-b border-border/60 px-6 py-[clamp(0.55rem,1.3vh,1rem)] last:border-0"
-							key={warband.id}
-						>
-							<div className="flex min-w-0 items-baseline gap-4">
-								<span className="font-mono text-xl text-muted-foreground">
-									{index + 1}
+					{data.standings
+						.slice(start, start + pageSize)
+						.map((warband, index) => (
+							<div
+								className={cn(
+									"standings-row grid grid-cols-[minmax(0,2fr)_minmax(0,1.4fr)_0.7fr_0.7fr_1fr] items-center gap-4 border-b border-border/60 px-6 py-[clamp(0.55rem,1.3vh,1rem)] last:border-0",
+									start + index === 0 && "standings-leader",
+								)}
+								key={warband.id}
+							>
+								<div className="flex min-w-0 items-baseline gap-4">
+									<span className="rank-number font-mono text-xl text-muted-foreground">
+										{start + index + 1}
+									</span>
+									<strong className="truncate font-serif text-[clamp(1.2rem,2.2vw,2.1rem)]">
+										{warband.name}
+									</strong>
+								</div>
+								<span className="truncate text-[clamp(0.9rem,1.3vw,1.2rem)] text-muted-foreground">
+									{warband.faction}
 								</span>
-								<strong className="truncate font-serif text-[clamp(1.2rem,2.2vw,2.1rem)]">
-									{warband.name}
+								<strong className="text-right font-mono text-[clamp(1.2rem,2vw,2rem)]">
+									{warband.rating}
 								</strong>
+								<strong className="text-right font-mono text-[clamp(1.2rem,2vw,2rem)]">
+									{warband.wins}
+								</strong>
+								<span className="text-right text-sm font-bold uppercase tracking-wide text-primary">
+									{warband.status}
+								</span>
 							</div>
-							<span className="truncate text-[clamp(0.9rem,1.3vw,1.2rem)] text-muted-foreground">
-								{warband.faction}
-							</span>
-							<strong className="text-right font-mono text-[clamp(1.2rem,2vw,2rem)]">
-								{warband.rating}
-							</strong>
-							<strong className="text-right font-mono text-[clamp(1.2rem,2vw,2rem)]">
-								{warband.wins}
-							</strong>
-							<span className="text-right text-sm font-bold uppercase tracking-wide text-primary">
-								{warband.status}
-							</span>
-						</div>
-					))}
+						))}
 				</div>
+			)}
+			{data.standings.length > 0 && (
+				<p className="broadcast-page-note">
+					Ranked by warband rating{" "}
+					<span>
+						{start + 1}–{Math.min(start + pageSize, data.standings.length)} of{" "}
+						{data.standings.length} warbands
+					</span>
+				</p>
 			)}
 		</div>
 	);
@@ -313,7 +539,7 @@ function WarriorSpotlight({
 				title="Warrior spotlight"
 			/>
 			{warrior ? (
-				<div className="grid min-h-0 flex-1 gap-[clamp(1rem,4vw,4rem)] md:grid-cols-[minmax(16rem,0.8fr)_1.3fr]">
+				<div className="spotlight-board grid min-h-0 flex-1 gap-[clamp(1rem,3vw,3rem)] md:grid-cols-[minmax(12rem,0.8fr)_1.3fr]">
 					<Portrait warriorId={warrior.id} name={warrior.name} />
 					<div className="flex min-h-0 flex-col justify-center">
 						<p className="text-sm font-bold uppercase tracking-[0.28em] text-primary">
@@ -362,7 +588,7 @@ function CombatStats({ warrior }: { warrior: ProjectorWarrior }) {
 	);
 }
 
-function MatchCenter({ data }: { data: ProjectorData }) {
+function MatchCenter({ data, page }: { data: ProjectorData; page: number }) {
 	const groups = [
 		["Live", data.matches.live, <Activity className="size-5" key="live" />],
 		[
@@ -376,28 +602,37 @@ function MatchCenter({ data }: { data: ProjectorData }) {
 		<div className="flex h-full flex-col">
 			<SegmentHeading eyebrow="Fixtures and results" title="Match center" />
 			<div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-3">
-				{groups.map(([title, matches, icon]) => (
-					<section
-						className="min-h-0 overflow-hidden rounded-xl border border-border bg-card/80 p-5"
-						key={title}
-					>
-						<h2 className="flex items-center gap-2 border-b border-border pb-3 font-serif text-[clamp(1.4rem,2.3vw,2.2rem)]">
-							{icon}
-							{title}
-						</h2>
-						<div className="mt-3 space-y-3">
-							{matches.length === 0 ? (
-								<p className="py-8 text-center text-muted-foreground">
-									No {title.toLowerCase()} matches.
+				{groups.map(([title, matches, icon]) => {
+					const start = (page % Math.max(1, Math.ceil(matches.length / 2))) * 2;
+					return (
+						<section
+							className="match-column min-h-0 overflow-auto border border-border bg-card/80 p-4"
+							key={title}
+						>
+							<h2 className="flex items-center gap-2 border-b border-border pb-3 font-serif text-[clamp(1.4rem,2.3vw,2.2rem)]">
+								{icon}
+								{title}
+							</h2>
+							<div className="mt-3 space-y-3">
+								{matches.length === 0 ? (
+									<p className="py-8 text-center text-muted-foreground">
+										No {title.toLowerCase()} matches.
+									</p>
+								) : (
+									matches
+										.slice(start, start + 2)
+										.map((match) => <MatchCard key={match.id} match={match} />)
+								)}
+							</div>
+							{matches.length > 2 && (
+								<p className="broadcast-page-note">
+									{start + 1}–{Math.min(start + 2, matches.length)} of{" "}
+									{matches.length} · more next rotation
 								</p>
-							) : (
-								matches
-									.slice(0, 4)
-									.map((match) => <MatchCard key={match.id} match={match} />)
 							)}
-						</div>
-					</section>
-				))}
+						</section>
+					);
+				})}
 			</div>
 		</div>
 	);
@@ -409,7 +644,7 @@ function MatchCard({ match }: { match: ProjectorMatch }) {
 			? `${match.winnerName ?? "Unknown warband"} won`
 			: match.result;
 	return (
-		<article className="rounded-lg border border-border/70 bg-background/60 p-4">
+		<article className="match-card border border-border/70 bg-background/60 p-4">
 			<div className="flex items-start justify-between gap-3">
 				<h3 className="font-serif text-[clamp(1.15rem,1.7vw,1.6rem)] font-bold">
 					{match.name}
@@ -450,7 +685,7 @@ function Highlights({ highlights }: { highlights: ProjectorHighlight[] }) {
 
 function HighlightCard({ highlight }: { highlight: ProjectorHighlight }) {
 	return (
-		<article className="grid min-h-0 grid-cols-[5rem_1fr] gap-4 overflow-hidden rounded-xl border border-border bg-card/80 p-4">
+		<article className="highlight-card grid min-h-0 grid-cols-[5rem_1fr] gap-4 overflow-auto border border-border bg-card/80 p-4">
 			<Portrait
 				compact
 				warriorId={highlight.defenderId}
@@ -479,11 +714,11 @@ function HighlightCard({ highlight }: { highlight: ProjectorHighlight }) {
 function BreakingNews({ alert }: { alert: BreakingAlert }) {
 	return (
 		<div className="flex h-full items-center justify-center">
-			<article className="grid w-full max-w-6xl gap-[clamp(1.5rem,5vw,5rem)] rounded-2xl border-2 border-destructive bg-card p-[clamp(1.5rem,4vw,4rem)] shadow-2xl md:grid-cols-[minmax(14rem,0.7fr)_1.3fr]">
+			<article className="breaking-board grid w-full max-w-6xl gap-[clamp(1.5rem,3vw,3rem)] border-2 border-destructive bg-card p-[clamp(1.5rem,3vw,3rem)] shadow-2xl md:grid-cols-[minmax(10rem,0.7fr)_1.3fr]">
 				<Portrait warriorId={alert.defenderId} name={alert.defenderName} />
 				<div className="self-center">
 					<p className="flex items-center gap-3 text-[clamp(1rem,2vw,1.5rem)] font-black uppercase tracking-[0.3em] text-destructive">
-						<AlertTriangle className="size-7" /> Breaking alert
+						<AlertTriangle className="size-7" /> Breaking news
 					</p>
 					<h1 className="mt-4 font-mordheim text-[clamp(3.5rem,9vw,9rem)] leading-[0.85]">
 						{alert.phase}
