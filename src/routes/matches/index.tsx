@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { getCollections } from "@/db-collections";
 import { createMatchTransaction } from "@/db-collections/mutations/matches";
+import { buildCreateMatchCommand } from "@/lib/match-commands";
 
 export const Route = createFileRoute("/matches/")({
 	component: MatchesIndexPage,
@@ -84,21 +85,11 @@ function MatchesIndexPage() {
 				</DialogHeader>
 				<MatchForm
 					initialValues={initialValues}
-					onSubmit={async ({ participantWarbandIds, ...values }) => {
-						const now = new Date().toISOString();
-						const match = {
-							id: safeRandomUUID(),
-							...values,
-							createdAt: now,
-							updatedAt: now,
-						};
-						const participants = participantWarbandIds.map((warbandId) => ({
-							id: safeRandomUUID(),
-							matchId: match.id,
-							warbandId,
-							createdAt: now,
-							updatedAt: now,
-						}));
+					onSubmit={async (values) => {
+						const { match, participants } = buildCreateMatchCommand(values, {
+							newId: safeRandomUUID,
+							now: () => new Date().toISOString(),
+						});
 						const transaction = createMatchTransaction(
 							dbClient,
 							collections,
