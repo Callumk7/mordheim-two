@@ -154,3 +154,32 @@ body {
     @apply font-sans;
   }
 }
+
+@keyframes projector-ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.projector-ticker-track {
+  animation: projector-ticker 45s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .projector-ticker {
+    overflow-x: auto;
+  }
+
+  .projector-ticker-track {
+    animation: none;
+    width: auto;
+    white-space: normal;
+  }
+
+  .projector-ticker-track > :nth-child(n + 2) {
+    display: none;
+  }
+}
