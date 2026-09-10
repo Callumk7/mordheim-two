@@ -12,7 +12,10 @@ import {
 	warriors,
 } from "@/db/schema";
 import type { ImageGenerationMessage } from "@/db/validation/image-generation";
-import { ImageGenerationInputSchema } from "@/db/validation/image-generation";
+import {
+	IMAGE_GENERATION_PROMPT_MAX_LENGTH,
+	ImageGenerationInputSchema,
+} from "@/db/validation/image-generation";
 
 export function queryEventImage(db: Pick<Database, "select">, eventId: string) {
 	return db
@@ -47,6 +50,28 @@ function clip(value: string | null, maximum: number) {
 		: `${normalized.slice(0, maximum - 12)} [truncated]`;
 }
 
+function clipMiddle(value: string, maximum: number) {
+	if (value.length <= maximum) return value;
+	const marker = "\n[context truncated]\n";
+	const available = maximum - marker.length;
+	// Keep the section heading while favoring trailing fields such as scenario and
+	// equipment, which would otherwise disappear first.
+	const startLength = Math.floor((available * 2) / 5);
+	return `${value.slice(0, startLength)}${marker}${value.slice(
+		-(available - startLength),
+	)}`;
+}
+
+function fitSectionsToBudget(sections: string[], budget: number) {
+	let remaining = budget;
+	return sections.map((section, index) => {
+		const maximum = Math.floor(remaining / (sections.length - index));
+		const fitted = clipMiddle(section, maximum);
+		remaining -= fitted.length;
+		return fitted;
+	});
+}
+
 function describeWarrior(role: string, warrior: WarriorContext) {
 	const equipmentList = warrior.equipment.length
 		? warrior.equipment
@@ -73,19 +98,29 @@ export function buildEventImagePrompt(context: {
 	attacker: WarriorContext;
 	defender: WarriorContext;
 }) {
-	const prompt = `
-Depict the decisive moment of a Mordheim combat event.
-Outcome: the defending warrior suffers ${context.outcome.toLowerCase()}.
-Event description: ${clip(context.notes, 900)}
+	const opening = `Depict the decisive moment of a Mordheim combat event.
+Outcome: the defending warrior suffers ${context.outcome.toLowerCase()}.`;
+	const sections = [
+		`Event description: ${clip(context.notes, 900)}
 Match: ${clip(context.matchName, 120)}
-Scenario: ${clip(context.scenario, 120)}
-
-${describeWarrior("Attacking", context.attacker)}
-
-${describeWarrior("Defending", context.defender)}
-
-Create a dramatic square action scene with both warriors clearly distinguishable. Show the attacker using plausible recorded equipment and the defender receiving the stated outcome. Keep the violence intense but non-graphic. Use a grim, gothic, weathered, hand-rendered Mordheim illustration with scratchy ink, muted earth tones and restrained crimson accents. No text, lettering, logos, modern objects or unrelated characters.
-`;
+Scenario: ${clip(context.scenario, 120)}`,
+		describeWarrior("Attacking", context.attacker),
+		describeWarrior("Defending", context.defender),
+	];
+	const direction =
+		"Create a dramatic square action scene with both warriors clearly distinguishable. Show the attacker using plausible recorded equipment and the defender receiving the stated outcome. Keep the violence intense but non-graphic. Use a grim, gothic, weathered, hand-rendered Mordheim illustration with scratchy ink, muted earth tones and restrained crimson accents. No text, lettering, logos, modern objects or unrelated characters.";
+	const compose = ([eventDetails, attacker, defender]: string[]) =>
+		`${opening}\n${eventDetails}\n\n${attacker}\n\n${defender}\n\n${direction}`;
+	let prompt = compose(sections);
+	if (prompt.length > IMAGE_GENERATION_PROMPT_MAX_LENGTH) {
+		const fixedLength = compose(["", "", ""]).length;
+		prompt = compose(
+			fitSectionsToBudget(
+				sections,
+				IMAGE_GENERATION_PROMPT_MAX_LENGTH - fixedLength,
+			),
+		);
+	}
 	return ImageGenerationInputSchema.parse({ prompt }).prompt;
 }
 

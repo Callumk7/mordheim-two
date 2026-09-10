@@ -8,15 +8,24 @@ import {
 import { createEvent, resolveEvent } from "@/db/operations/events.server";
 import { queryGeneratedImages } from "@/db/operations/generated-images.server";
 import { enqueueImageGeneration } from "@/db/operations/image-generation.server";
+import { updateMatch } from "@/db/operations/matches.server";
 import { listQueueJobs } from "@/db/operations/queue-jobs.server";
-import { createWarband } from "@/db/operations/warbands.server";
+import { createWarband, updateWarband } from "@/db/operations/warbands.server";
 import { createWarriorEquipment } from "@/db/operations/warrior-equipment.server";
 import {
 	queryWarriorPortrait,
 	submitWarriorPortrait,
 } from "@/db/operations/warrior-portraits.server";
-import { createWarrior, deleteWarrior } from "@/db/operations/warriors.server";
+import {
+	createWarrior,
+	deleteWarrior,
+	updateWarrior,
+} from "@/db/operations/warriors.server";
 import { imageGenerationJobs } from "@/db/schema";
+import {
+	IMAGE_GENERATION_PROMPT_MAX_LENGTH,
+	ImageGenerationInputSchema,
+} from "@/db/validation/image-generation";
 import {
 	assignment,
 	clock,
@@ -172,6 +181,70 @@ describe("image job operations on local D1", () => {
 					/The marksman lunged.*Attacking warrior: wa.*rusty-sword.*Defending warrior: wb/s,
 				),
 			}),
+		);
+	});
+
+	it("queues an event image within the prompt limit for maximum context", async () => {
+		const { db } = connection;
+		const maximumContext = "Detailed Mordheim context. ".repeat(200);
+		await seedMatch(db);
+		await updateMatch(db, {
+			id: "match",
+			changes: { name: maximumContext, scenario: maximumContext },
+		});
+		for (const [warbandId, warriorId] of [
+			["a", "wa"],
+			["b", "wb"],
+		] as const) {
+			await updateWarband(db, {
+				id: warbandId,
+				changes: {
+					name: maximumContext,
+					faction: maximumContext,
+					captain: maximumContext,
+				},
+			});
+			await updateWarrior(db, {
+				id: warriorId,
+				changes: {
+					name: maximumContext,
+					class: maximumContext,
+					description: maximumContext,
+				},
+			});
+			const equipmentId = `${warbandId}-maximum-equipment`;
+			await createEquipment(db, {
+				...equipment(equipmentId),
+				name: maximumContext,
+				specialRules: [maximumContext],
+			});
+			await createWarriorEquipment(
+				db,
+				assignment(`${warbandId}-maximum-assignment`, warriorId, equipmentId),
+			);
+		}
+		await createEvent(db, { ...event(), notes: maximumContext });
+		await resolveEvent(db, { id: "event", outcome: "Death" }, clock);
+		const queue = { send: vi.fn().mockResolvedValue(undefined) };
+
+		const result = await submitEventImage(db, queue, "event", clock);
+
+		expect(result).toHaveProperty("job.status", "queued");
+		expect(queue.send).toHaveBeenCalledTimes(1);
+		const queuedJob = (await listQueueJobs(db)).find(
+			(job) => job.eventId === "event",
+		);
+		expect(queuedJob).toBeDefined();
+		if (!queuedJob) throw new Error("Expected an event image job.");
+		expect(queuedJob.prompt.length).toBeLessThanOrEqual(
+			IMAGE_GENERATION_PROMPT_MAX_LENGTH,
+		);
+		expect(
+			ImageGenerationInputSchema.safeParse({ prompt: queuedJob.prompt })
+				.success,
+		).toBe(true);
+		expect(queuedJob.prompt).toMatch(
+			/Attacking warrior:.*Equipment:.*Defending warrior:.*Equipment:.*Create a dramatic square action scene/s,
 		);
 	});
 
