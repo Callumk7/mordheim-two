@@ -118,6 +118,16 @@ describe("projector rotation", () => {
 		expect(parseRotationSeconds("99")).toBe(60);
 		expect(parseRotationSeconds("10.5")).toBe(DEFAULT_ROTATION_SECONDS);
 	});
+
+	it("accepts numbers from Router's JSON search parser", () => {
+		expect(parseRotationSeconds(5)).toBe(5);
+		expect(parseRotationSeconds(10)).toBe(10);
+		expect(parseRotationSeconds(0)).toBe(5);
+		expect(parseRotationSeconds(99)).toBe(60);
+		for (const value of [10.5, -1, NaN, Infinity, true, null, {}, []]) {
+			expect(parseRotationSeconds(value)).toBe(DEFAULT_ROTATION_SECONDS);
+		}
+	});
 });
 
 describe("projector data", () => {

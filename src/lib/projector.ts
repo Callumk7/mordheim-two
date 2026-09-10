@@ -59,8 +59,13 @@ export type ProjectorData = {
 export type BreakingAlert = ProjectorHighlight;
 
 export function parseRotationSeconds(value: unknown) {
+	// Router's JSON search parser supplies numbers for unquoted query values.
 	const parsed =
-		typeof value === "string" && /^\d+$/.test(value) ? Number(value) : NaN;
+		typeof value === "number" && Number.isInteger(value) && value >= 0
+			? value
+			: typeof value === "string" && /^\d+$/.test(value)
+				? Number(value)
+				: NaN;
 	if (!Number.isFinite(parsed)) return DEFAULT_ROTATION_SECONDS;
 	return Math.min(MAX_ROTATION_SECONDS, Math.max(MIN_ROTATION_SECONDS, parsed));
 }
