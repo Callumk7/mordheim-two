@@ -160,6 +160,7 @@ function TableCellNumberField({
 			errorMessage={error}
 			groupClassName={cn(tableCellControlClassName, "px-0", className)}
 			inputClassName="px-1 text-right"
+			isDisabled={isSaving}
 			isInvalid={error ? true : undefined}
 			maxValue={maxValue}
 			minValue={minValue}
