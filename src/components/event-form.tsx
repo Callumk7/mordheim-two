@@ -14,6 +14,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import type { Match } from "@/db/validation/match";
 import type { Warband } from "@/db/validation/warband";
 import type { WarbandMatch } from "@/db/validation/warband-match";
@@ -165,10 +166,10 @@ export function EventForm({
 			<Field>
 				<FieldLabel htmlFor={notesId}>Notes</FieldLabel>
 				<FieldDescription>Optional</FieldDescription>
-				<textarea
+				<Textarea
+					className="min-h-28"
 					id={notesId}
 					name="notes"
-					className="min-h-28 resize-y rounded-2xl border border-input bg-input/30 px-3 py-2.5 text-sm text-foreground outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 					onChange={(event) =>
 						setValues((current) => ({
 							...current,

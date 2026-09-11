@@ -9,6 +9,7 @@ import {
 	useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import schoenspergerFontUrl from "../../fonts/Schoensperger.otf?url";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
 
@@ -31,7 +32,21 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				title: "Mordheim Campaign Ledger",
 			},
 		],
+		styles: [
+			{
+				children: `@font-face{font-family:'Schoensperger';src:url('${schoenspergerFontUrl}') format('opentype');font-style:normal;font-weight:400;font-display:block}`,
+			},
+		],
 		links: [
+			{
+				rel: "preload",
+				href: schoenspergerFontUrl,
+				as: "font",
+				type: "font/otf",
+				crossOrigin: "anonymous",
+				fetchPriority: "high",
+				blocking: "render",
+			},
 			{
 				rel: "stylesheet",
 				href: appCss,
