@@ -3,8 +3,21 @@ import { useRef, useState } from "react";
 import { TextField } from "react-aria-components";
 import { Button, LinkButton } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ImageGenerationInputSchema } from "@/db/validation/image-generation";
+import {
+	GEMINI_IMAGE_MODEL,
+	IMAGE_GENERATION_MODELS,
+	ImageGenerationInputSchema,
+	type ImageGenerationModel,
+	OPENAI_IMAGE_MODEL,
+} from "@/db/validation/image-generation";
 import { createImageGenerationJob } from "@/server/image-generation";
 
 export const Route = createFileRoute("/queue")({
@@ -13,13 +26,14 @@ export const Route = createFileRoute("/queue")({
 
 function QueuePage() {
 	const [prompt, setPrompt] = useState("");
+	const [model, setModel] = useState<ImageGenerationModel>(GEMINI_IMAGE_MODEL);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [message, setMessage] = useState("");
 	const submitting = useRef(false);
 
 	async function submit() {
 		if (submitting.current) return;
-		const input = ImageGenerationInputSchema.safeParse({ prompt });
+		const input = ImageGenerationInputSchema.safeParse({ prompt, model });
 		if (!input.success) {
 			setMessage("Enter a prompt between 1 and 4,000 characters.");
 			return;
@@ -59,9 +73,10 @@ function QueuePage() {
 				</div>
 				<p className="text-sm text-muted-foreground">
 					Save an image prompt in D1 and send its job ID to the image generation
-					queue. When explicitly enabled, the consumer generates a square JPEG
-					with Gemini and saves it to private R2 storage. Disabled jobs are
-					marked failed, not held for later generation.
+					queue. Choose the image model for this job; when explicitly enabled,
+					the consumer generates a square JPEG and saves it to private R2
+					storage. Disabled jobs are marked failed, not held for later
+					generation.
 				</p>
 			</header>
 			<form
@@ -87,6 +102,30 @@ function QueuePage() {
 						/>
 					</Field>
 				</TextField>
+				<Field>
+					<FieldLabel htmlFor="image-model">Image model</FieldLabel>
+					<Select
+						className="w-full"
+						isDisabled={isSubmitting}
+						onChange={(key) => {
+							const selected = IMAGE_GENERATION_MODELS.find(
+								(candidate) => candidate === key,
+							);
+							if (selected) setModel(selected);
+						}}
+						value={model}
+					>
+						<SelectTrigger id="image-model">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem id={GEMINI_IMAGE_MODEL}>
+								Gemini 3.1 Flash Image
+							</SelectItem>
+							<SelectItem id={OPENAI_IMAGE_MODEL}>GPT Image 2</SelectItem>
+						</SelectContent>
+					</Select>
+				</Field>
 				<Button type="submit" isDisabled={isSubmitting || !prompt.trim()}>
 					{isSubmitting ? "Sending…" : "Send to queue"}
 				</Button>
@@ -97,8 +136,8 @@ function QueuePage() {
 				mordheim-image-generation queue’s message writes and backlog, and D1 for
 				the job record. Completed means the image and result metadata are
 				stored. Consumed is a historical receipt only. Local queues and storage
-				stay local, but enabling Gemini makes paid network calls even in
-				development. This endpoint has no application authentication; protect
+				stay local, but enabling either provider makes paid network calls even
+				in development. This endpoint has no application authentication; protect
 				the app and submission RPC with Access/authorization before enabling
 				generation.
 			</p>

@@ -9,5 +9,5 @@ import { ImageGenerationInputSchema } from "@/db/validation/image-generation";
 export const createImageGenerationJob = createServerFn({ method: "POST" })
 	.validator(ImageGenerationInputSchema)
 	.handler(({ data }) =>
-		enqueueImageGeneration(getDb(), env.IMAGE_GENERATION_QUEUE, data.prompt),
+		enqueueImageGeneration(getDb(), env.IMAGE_GENERATION_QUEUE, data),
 	);

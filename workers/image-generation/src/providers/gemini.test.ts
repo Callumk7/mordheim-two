@@ -1,12 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import {
-	createGeminiGenerator,
-	decodeJpeg,
-	GENERATION_TIMEOUT_MS,
-	IMAGE_MODEL,
-	MAX_IMAGE_BYTES,
-} from "./gemini";
-import { jpegBase64, jpegBytes } from "./test-support";
+import { GEMINI_IMAGE_MODEL } from "@/db/validation/image-generation";
+import { GENERATION_TIMEOUT_MS } from "../generation/config";
+import { jpegBase64, jpegBytes } from "../test-support";
+import { createGeminiGenerator } from "./gemini";
 
 afterEach(() => {
 	vi.unstubAllGlobals();
@@ -37,9 +33,9 @@ describe("Gemini interactions adapter (real SDK, mocked network)", () => {
 			},
 		});
 		const timeout = vi.spyOn(AbortSignal, "timeout");
-		expect(await createGeminiGenerator("test-only-key")("portrait")).toEqual(
-			jpegBytes,
-		);
+		expect(
+			await createGeminiGenerator("test-only-key").generate("shared prompt"),
+		).toEqual(jpegBytes);
 		expect(fetch).toHaveBeenCalledOnce();
 		const calls: unknown[][] = fetch.mock.calls;
 		const request = calls[0][0];
@@ -47,8 +43,8 @@ describe("Gemini interactions adapter (real SDK, mocked network)", () => {
 		if (!(request instanceof Request)) throw new Error("Expected SDK request");
 		expect(request.url).toContain("/interactions");
 		expect(await request.json()).toMatchObject({
-			model: IMAGE_MODEL,
-			input: "portrait\n\nCreate the image in the style of John Blanche.",
+			model: GEMINI_IMAGE_MODEL,
+			input: "shared prompt",
 			stream: false,
 			store: false,
 			response_format: {
@@ -74,7 +70,7 @@ describe("Gemini interactions adapter (real SDK, mocked network)", () => {
 			status,
 		);
 		await expect(
-			createGeminiGenerator("test-only-key")("portrait"),
+			createGeminiGenerator("test-only-key").generate("portrait"),
 		).rejects.toMatchObject({
 			message: `Image provider HTTP ${status}.`,
 			permanent: status === 400,
@@ -87,7 +83,7 @@ describe("Gemini interactions adapter (real SDK, mocked network)", () => {
 			.mockRejectedValue(new DOMException("private details", "TimeoutError"));
 		vi.stubGlobal("fetch", fetch);
 		await expect(
-			createGeminiGenerator("test-only-key")("portrait"),
+			createGeminiGenerator("test-only-key").generate("portrait"),
 		).rejects.toMatchObject({
 			message: "Image provider request failed or timed out.",
 			permanent: false,
@@ -101,7 +97,7 @@ describe("Gemini interactions adapter (real SDK, mocked network)", () => {
 	])("permanently fails a %s response with no final image", async (status) => {
 		mockFetch({ id: "interaction", status, output_text: "no image" });
 		await expect(
-			createGeminiGenerator("test-only-key")("portrait"),
+			createGeminiGenerator("test-only-key").generate("portrait"),
 		).rejects.toMatchObject({
 			permanent: true,
 			message: "Provider did not return a completed image.",
@@ -118,32 +114,8 @@ describe("Gemini interactions adapter (real SDK, mocked network)", () => {
 			},
 		});
 		await expect(
-			createGeminiGenerator("test-only-key")("portrait"),
+			createGeminiGenerator("test-only-key").generate("portrait"),
 		).rejects.toMatchObject({ permanent: true });
 		expect(fetch).toHaveBeenCalledOnce();
-	});
-});
-
-describe("decodeJpeg", () => {
-	it("accepts JPEG bytes", () =>
-		expect(decodeJpeg(jpegBase64, "image/jpeg")).toEqual(jpegBytes));
-	it.each([
-		[undefined, "image/jpeg"],
-		[jpegBase64, "image/png"],
-		["%%%", "image/jpeg"],
-		[btoa("not an image"), "image/jpeg"],
-		[btoa(""), "image/jpeg"],
-		[btoa(String.fromCharCode(0xff, 0xd8, 0xff, 0xff, 0xd9)), "image/jpeg"],
-		[btoa(String.fromCharCode(...jpegBytes.slice(0, -2))), "image/jpeg"],
-	])("rejects invalid MIME, encoding or signature: %j", (data, mimeType) => {
-		expect(() => decodeJpeg(data, mimeType)).toThrow();
-	});
-	it("bounds encoded size before decoding", () => {
-		expect(() =>
-			decodeJpeg(
-				"A".repeat(4 * Math.ceil(MAX_IMAGE_BYTES / 3) + 1),
-				"image/jpeg",
-			),
-		).toThrow("oversized");
 	});
 });

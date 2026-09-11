@@ -11,8 +11,11 @@ import {
 	warriorEquipment,
 	warriors,
 } from "@/db/schema";
-import type { ImageGenerationMessage } from "@/db/validation/image-generation";
-import { ImageGenerationInputSchema } from "@/db/validation/image-generation";
+import {
+	GEMINI_IMAGE_MODEL,
+	ImageGenerationInputSchema,
+	type ImageGenerationMessage,
+} from "@/db/validation/image-generation";
 
 export function queryEventImage(db: Pick<Database, "select">, eventId: string) {
 	return db
@@ -168,8 +171,11 @@ export async function submitEventImage(
 	const job = await enqueueImageGeneration(
 		db,
 		queue,
-		prompt,
-		{ eventId },
+		{
+			prompt,
+			model: GEMINI_IMAGE_MODEL,
+			association: { eventId },
+		},
 		clock,
 	);
 	return { job } as const;

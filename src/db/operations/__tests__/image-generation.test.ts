@@ -17,6 +17,7 @@ import {
 } from "@/db/operations/warrior-portraits.server";
 import { createWarrior, deleteWarrior } from "@/db/operations/warriors.server";
 import { imageGenerationJobs } from "@/db/schema";
+import { GEMINI_IMAGE_MODEL } from "@/db/validation/image-generation";
 import {
 	assignment,
 	clock,
@@ -46,6 +47,7 @@ describe("image job operations on local D1", () => {
 					id: jobId,
 					status: "pending",
 					prompt: "A ruined city",
+					model: GEMINI_IMAGE_MODEL,
 				}),
 			);
 			return { metadata: { metrics: { backlogCount: 1, backlogBytes: 0 } } };
@@ -53,8 +55,7 @@ describe("image job operations on local D1", () => {
 		const job = await enqueueImageGeneration(
 			db,
 			{ send },
-			"A ruined city",
-			undefined,
+			{ prompt: "A ruined city", model: GEMINI_IMAGE_MODEL },
 			clock,
 		);
 		expect(send).toHaveBeenCalledExactlyOnceWith({ jobId: job.jobId });
@@ -76,8 +77,7 @@ describe("image job operations on local D1", () => {
 		const failed = await enqueueImageGeneration(
 			db,
 			{ send: vi.fn().mockRejectedValue(new Error("private details")) },
-			"Prompt",
-			undefined,
+			{ prompt: "Prompt", model: GEMINI_IMAGE_MODEL },
 			clock,
 		);
 		expect(await listQueueJobs(db)).toContainEqual(
@@ -101,8 +101,7 @@ describe("image job operations on local D1", () => {
 					};
 				},
 			},
-			"Another",
-			undefined,
+			{ prompt: "Another", model: GEMINI_IMAGE_MODEL },
 			clock,
 		);
 		expect(await listQueueJobs(db)).toContainEqual(
@@ -128,7 +127,11 @@ describe("image job operations on local D1", () => {
 		expect(queue.send).toHaveBeenCalledTimes(1);
 		expect(await listQueueJobs(db)).toHaveLength(1);
 		expect(await listQueueJobs(db)).toContainEqual(
-			expect.objectContaining({ warriorId: "wa", updatedAt }),
+			expect.objectContaining({
+				warriorId: "wa",
+				model: GEMINI_IMAGE_MODEL,
+				updatedAt,
+			}),
 		);
 		await deleteWarrior(db, { id: "wa" });
 		expect(await queryWarriorPortrait(db, "wa")).toBeUndefined();
@@ -168,6 +171,7 @@ describe("image job operations on local D1", () => {
 		expect(await listQueueJobs(db)).toContainEqual(
 			expect.objectContaining({
 				eventId: "event",
+				model: GEMINI_IMAGE_MODEL,
 				prompt: expect.stringMatching(
 					/The marksman lunged.*Attacking warrior: wa.*rusty-sword.*Defending warrior: wb/s,
 				),

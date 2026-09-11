@@ -1,0 +1,1 @@
+ALTER TABLE `image_generation_jobs` ADD `model` text DEFAULT 'gemini-3.1-flash-image' NOT NULL;

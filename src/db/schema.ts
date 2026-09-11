@@ -11,12 +11,19 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { EQUIPMENT_TYPES } from "./validation/equipment";
 import { EVENT_OUTCOMES } from "./validation/event";
+import {
+	GEMINI_IMAGE_MODEL,
+	IMAGE_GENERATION_MODELS,
+} from "./validation/image-generation";
 import { MATCH_RESULTS, MATCH_STATUSES } from "./validation/match";
 import { WARRIOR_STATUSES } from "./validation/warrior";
 
 export const imageGenerationJobs = sqliteTable("image_generation_jobs", {
 	id: text("id").primaryKey(),
 	prompt: text("prompt").notNull(),
+	model: text("model", { enum: IMAGE_GENERATION_MODELS })
+		.notNull()
+		.default(GEMINI_IMAGE_MODEL),
 	warriorId: text("warrior_id")
 		.references((): AnySQLiteColumn => warriors.id, { onDelete: "set null" })
 		.unique(),

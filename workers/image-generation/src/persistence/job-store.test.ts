@@ -1,8 +1,9 @@
 import { afterEach, describe, expect, it } from "vitest";
 import type { Database } from "@/db/index.server";
 import { enqueueImageGeneration } from "@/db/operations/image-generation.server";
-import { LEASE_MS } from "./jobs";
-import { jobId, setupDatabase } from "./test-support";
+import { GEMINI_IMAGE_MODEL } from "@/db/validation/image-generation";
+import { jobId, setupDatabase } from "../test-support";
+import { LEASE_MS } from "./job-store";
 
 const connections: ReturnType<typeof setupDatabase>[] = [];
 function setup(now?: () => number) {
@@ -117,7 +118,7 @@ describe("image job atomic lease", () => {
 						};
 					},
 				},
-				"portrait",
+				{ prompt: "portrait", model: GEMINI_IMAGE_MODEL },
 			);
 			expect(
 				sqlite.prepare("SELECT status, error FROM image_generation_jobs").get(),
