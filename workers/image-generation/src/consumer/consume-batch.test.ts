@@ -1,8 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { consumeImageGenerationBatch, imageKey } from "./consumer";
-import { GenerationError, IMAGE_MODEL } from "./gemini";
-import { LEASE_MS, MAX_DELIVERY_ATTEMPTS } from "./jobs";
-import { jobId, jpegBytes, setupDatabase } from "./test-support";
+import {
+	GEMINI_IMAGE_MODEL,
+	OPENAI_IMAGE_MODEL,
+} from "@/db/validation/image-generation";
+import { GenerationError } from "../generation/errors";
+import type { ImageGenerator } from "../generation/types";
+import { LEASE_MS, MAX_DELIVERY_ATTEMPTS } from "../persistence/job-store";
+import { jobId, jpegBytes, setupDatabase } from "../test-support";
+import { consumeImageGenerationBatch, imageKey } from "./consume-batch";
 
 function message(body: unknown = { jobId }, attempts = 1): Message<unknown> {
 	return {
@@ -57,11 +62,17 @@ function setup(status = "queued") {
 			},
 		),
 	};
+	const generate = vi.fn(async () => jpegBytes);
+	const generator = {
+		model: GEMINI_IMAGE_MODEL,
+		generate,
+	} satisfies ImageGenerator;
 	const dependencies = {
 		jobs: connection.jobs,
 		bucket,
 		enabled: true,
-		generate: vi.fn(async () => jpegBytes),
+		getGenerator: vi.fn(() => generator),
+		generate,
 	};
 	return { ...connection, dependencies, bucket, getStored: () => stored };
 }
@@ -78,14 +89,14 @@ describe("image generation consumer", () => {
 		const complete = vi.spyOn(jobs, "complete");
 		await consumeImageGenerationBatch(batch(delivery), dependencies);
 		expect(dependencies.generate).toHaveBeenCalledExactlyOnceWith(
-			"private portrait prompt",
+			"private portrait prompt\n\nCreate the image in the style of John Blanche.",
 		);
 		expect(bucket.put).toHaveBeenCalledExactlyOnceWith(
 			`image-generation/${jobId}.jpg`,
 			jpegBytes,
 			{
 				httpMetadata: { contentType: "image/jpeg" },
-				customMetadata: { jobId, model: IMAGE_MODEL },
+				customMetadata: { jobId, model: GEMINI_IMAGE_MODEL },
 				onlyIf: { etagDoesNotMatch: "*" },
 			},
 		);
@@ -94,7 +105,7 @@ describe("image generation consumer", () => {
 			resultKey: imageKey(jobId),
 			resultBytes: jpegBytes.length,
 			resultMimeType: "image/jpeg",
-			resultModel: IMAGE_MODEL,
+			resultModel: GEMINI_IMAGE_MODEL,
 			resultEtag: "etag",
 			completedAt: expect.any(String),
 			error: null,
@@ -108,6 +119,27 @@ describe("image generation consumer", () => {
 		);
 		expect(delivery.retry).not.toHaveBeenCalled();
 		expect(console.error).not.toHaveBeenCalled();
+	});
+	it("dispatches and persists the model selected by the job", async () => {
+		const { dependencies, jobs, bucket, sqlite } = setup();
+		sqlite
+			.prepare("UPDATE image_generation_jobs SET model = ? WHERE id = ?")
+			.run(OPENAI_IMAGE_MODEL, jobId);
+		await consumeImageGenerationBatch(batch(message()), dependencies);
+		expect(dependencies.getGenerator).toHaveBeenCalledExactlyOnceWith(
+			OPENAI_IMAGE_MODEL,
+		);
+		expect(bucket.put).toHaveBeenCalledWith(
+			expect.any(String),
+			expect.any(Uint8Array),
+			expect.objectContaining({
+				customMetadata: { jobId, model: OPENAI_IMAGE_MODEL },
+			}),
+		);
+		expect(await jobs.load(jobId)).toMatchObject({
+			model: OPENAI_IMAGE_MODEL,
+			resultModel: OPENAI_IMAGE_MODEL,
+		});
 	});
 	it("does not ack while the D1 completion promise is outstanding", async () => {
 		const { jobs, dependencies } = setup();
@@ -251,7 +283,7 @@ describe("image generation consumer", () => {
 		await jobs.claim(jobId, "crashed");
 		await bucket.put(imageKey(jobId), jpegBytes, {
 			httpMetadata: { contentType: "image/jpeg" },
-			customMetadata: { jobId, model: IMAGE_MODEL },
+			customMetadata: { jobId, model: GEMINI_IMAGE_MODEL },
 		});
 		sqlite.exec("UPDATE image_generation_jobs SET lease_expires_at = 0");
 		dependencies.enabled = false;
@@ -382,7 +414,7 @@ describe("image generation consumer", () => {
 		const { dependencies, bucket, jobs } = setup();
 		const object = await bucket.put(imageKey(jobId), jpegBytes, {
 			httpMetadata: { contentType: "image/jpeg" },
-			customMetadata: { jobId, model: IMAGE_MODEL },
+			customMetadata: { jobId, model: GEMINI_IMAGE_MODEL },
 		});
 		bucket.head.mockResolvedValue({
 			...object,
@@ -392,7 +424,7 @@ describe("image generation consumer", () => {
 				: {}),
 			...(field === "size" ? { size: 0 } : {}),
 			...(field === "jobId"
-				? { customMetadata: { jobId: "other", model: IMAGE_MODEL } }
+				? { customMetadata: { jobId: "other", model: GEMINI_IMAGE_MODEL } }
 				: {}),
 			...(field === "model"
 				? { customMetadata: { jobId, model: "other" } }

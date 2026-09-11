@@ -11,6 +11,8 @@ import {
 	rowExpandingFeature,
 	rowSortingFeature,
 	type SortingState,
+	sortFn_alphanumeric,
+	sortFn_text,
 	type TableOptions,
 	tableFeatures,
 } from "@tanstack/react-table";
@@ -45,6 +47,7 @@ const features = tableFeatures({
 	expandedRowModel: createExpandedRowModel(),
 	rowSortingFeature,
 	sortedRowModel: createSortedRowModel(),
+	sortFns: { alphanumeric: sortFn_alphanumeric, text: sortFn_text },
 });
 
 const { createAppColumnHelper, useAppTable } = createTableHook({

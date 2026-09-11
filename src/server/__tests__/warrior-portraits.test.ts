@@ -7,6 +7,7 @@ import {
 	queryWarriorPortrait,
 	submitWarriorPortrait,
 } from "@/db/operations/warrior-portraits.server";
+import { GEMINI_IMAGE_MODEL } from "@/db/validation/image-generation";
 import { WarriorPortraitInputSchema } from "@/db/validation/warrior-portrait";
 import { setupDatabase } from "../../../workers/image-generation/src/test-support";
 
@@ -178,8 +179,22 @@ describe("warrior portrait persistence", () => {
 	it("allows multiple generic jobs and scopes reads by warrior, not gallery limits", async () => {
 		const { db, sqlite, send } = setup();
 		const result = await submitWarriorPortrait(db, { send }, "warrior");
-		await enqueueImageGeneration(db, { send }, "Generic one");
-		await enqueueImageGeneration(db, { send }, "Generic two");
+		await enqueueImageGeneration(
+			db,
+			{ send },
+			{
+				prompt: "Generic one",
+				model: GEMINI_IMAGE_MODEL,
+			},
+		);
+		await enqueueImageGeneration(
+			db,
+			{ send },
+			{
+				prompt: "Generic two",
+				model: GEMINI_IMAGE_MODEL,
+			},
+		);
 		const insert = sqlite.prepare(
 			"INSERT INTO image_generation_jobs (id, prompt, status) VALUES (?, 'Generic', 'completed')",
 		);

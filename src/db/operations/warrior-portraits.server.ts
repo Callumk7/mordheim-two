@@ -6,6 +6,7 @@ import { imageGenerationJobs, warbands, warriors } from "@/db/schema";
 import {
 	ImageGenerationInputSchema,
 	type ImageGenerationMessage,
+	OPENAI_IMAGE_MODEL,
 } from "@/db/validation/image-generation";
 
 export function queryWarriorPortrait(
@@ -81,8 +82,11 @@ export async function submitWarriorPortrait(
 	const job = await enqueueImageGeneration(
 		db,
 		queue,
-		built.prompt,
-		{ warriorId },
+		{
+			prompt: built.prompt,
+			model: OPENAI_IMAGE_MODEL,
+			association: { warriorId },
+		},
 		clock,
 	);
 	return { job };

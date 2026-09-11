@@ -1,30 +1,41 @@
-import { ImageGenerationMessageSchema } from "@/db/validation/image-generation";
-import { GenerationError, IMAGE_MODEL, MAX_IMAGE_BYTES } from "./gemini";
+import {
+	ImageGenerationMessageSchema,
+	type ImageGenerationModel,
+	ImageGenerationModelSchema,
+} from "@/db/validation/image-generation";
+import { MAX_IMAGE_BYTES } from "../generation/config";
+import { GenerationError } from "../generation/errors";
+import { prepareImagePrompt } from "../generation/prompt";
+import type { GetImageGenerator } from "../generation/types";
 import {
 	type ImageResult,
 	type JobStore,
 	LEASE_MS,
 	MAX_DELIVERY_ATTEMPTS,
-} from "./jobs";
+} from "../persistence/job-store";
 
 type ImageBucket = Pick<R2Bucket, "head" | "put">;
 export interface ConsumerDependencies {
 	jobs: JobStore;
 	bucket: ImageBucket;
 	enabled: boolean;
-	generate: (prompt: string) => Promise<Uint8Array>;
+	getGenerator: GetImageGenerator;
 }
 
 export const imageKey = (jobId: string) => `image-generation/${jobId}.jpg`;
 
-function storedResult(object: R2Object, jobId: string): ImageResult {
+function storedResult(
+	object: R2Object,
+	jobId: string,
+	model: ImageGenerationModel,
+): ImageResult {
 	if (
 		object.key !== imageKey(jobId) ||
 		object.httpMetadata?.contentType !== "image/jpeg" ||
 		object.size <= 5 ||
 		object.size > MAX_IMAGE_BYTES ||
 		object.customMetadata?.jobId !== jobId ||
-		object.customMetadata?.model !== IMAGE_MODEL
+		object.customMetadata?.model !== model
 	) {
 		// Do not overwrite an unexpected existing object or spend to replace it.
 		throw new GenerationError(
@@ -37,7 +48,7 @@ function storedResult(object: R2Object, jobId: string): ImageResult {
 		resultMimeType: "image/jpeg",
 		resultBytes: object.size,
 		resultEtag: object.etag,
-		resultModel: IMAGE_MODEL,
+		resultModel: model,
 	};
 }
 
@@ -46,7 +57,7 @@ async function processJob(
 	attempts: number,
 	dependencies: ConsumerDependencies,
 ) {
-	const { jobs, bucket, generate, enabled } = dependencies;
+	const { jobs, bucket, getGenerator, enabled } = dependencies;
 	const token = crypto.randomUUID();
 	const job = await jobs.claim(jobId, token);
 	if (!job) {
@@ -58,8 +69,14 @@ async function processJob(
 		return { delaySeconds: Math.ceil(LEASE_MS / 1000) };
 	}
 
-	let stage = "R2 lookup failed.";
+	let stage = "Image model validation failed.";
 	try {
+		const parsedModel = ImageGenerationModelSchema.safeParse(job.model);
+		if (!parsedModel.success) {
+			throw new GenerationError("Unsupported image generation model.", true);
+		}
+		const model = parsedModel.data;
+		stage = "R2 lookup failed.";
 		const key = imageKey(jobId);
 		let object = await bucket.head(key);
 		if (!object) {
@@ -73,18 +90,19 @@ async function processJob(
 				return;
 			}
 			stage = "Image provider request failed.";
-			const bytes = await generate(job.prompt);
+			const generator = getGenerator(model);
+			const bytes = await generator.generate(prepareImagePrompt(job.prompt));
 			stage = "R2 image storage failed.";
 			object = await bucket.put(key, bytes, {
 				httpMetadata: { contentType: "image/jpeg" },
-				customMetadata: { jobId, model: IMAGE_MODEL },
+				customMetadata: { jobId, model },
 				// An uncertain previous PUT must never be overwritten on retry.
 				onlyIf: { etagDoesNotMatch: "*" },
 			});
 			if (!object) object = await bucket.head(key);
 			if (!object) throw new Error("R2 did not confirm storage");
 		}
-		const result = storedResult(object, jobId);
+		const result = storedResult(object, jobId, model);
 		stage =
 			"D1 result persistence failed; stored image can be recovered on retry.";
 		await jobs.complete(jobId, token, result);

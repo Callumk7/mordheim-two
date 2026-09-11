@@ -2,19 +2,28 @@ import { and, eq } from "drizzle-orm";
 import type { Database } from "@/db/index.server";
 import { type Clock, systemClock } from "@/db/operations/clock";
 import { imageGenerationJobs } from "@/db/schema";
-import type { ImageGenerationMessage } from "@/db/validation/image-generation";
+import type {
+	ImageGenerationMessage,
+	ImageGenerationModel,
+} from "@/db/validation/image-generation";
 
 type ImageGenerationAssociation =
 	| { warriorId: string; eventId?: never }
 	| { eventId: string; warriorId?: never };
 
+interface ImageGenerationOptions {
+	prompt: string;
+	model: ImageGenerationModel;
+	association?: ImageGenerationAssociation;
+}
+
 export async function enqueueImageGeneration(
 	db: Pick<Database, "insert" | "update" | "select">,
 	queue: Pick<Queue<ImageGenerationMessage>, "send">,
-	prompt: string,
-	association?: ImageGenerationAssociation,
+	options: ImageGenerationOptions,
 	clock: Clock = systemClock,
 ) {
+	const { prompt, model, association } = options;
 	const jobId = crypto.randomUUID();
 	if (association) {
 		const associationColumn = association.warriorId
@@ -23,7 +32,7 @@ export async function enqueueImageGeneration(
 		const associationId = association.warriorId ?? association.eventId;
 		const inserted = await db
 			.insert(imageGenerationJobs)
-			.values({ id: jobId, prompt, ...association })
+			.values({ id: jobId, prompt, model, ...association })
 			.onConflictDoNothing({ target: associationColumn })
 			.returning({ id: imageGenerationJobs.id })
 			.get();
@@ -43,7 +52,7 @@ export async function enqueueImageGeneration(
 			return existing;
 		}
 	} else {
-		await db.insert(imageGenerationJobs).values({ id: jobId, prompt });
+		await db.insert(imageGenerationJobs).values({ id: jobId, prompt, model });
 	}
 
 	try {

@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import { drizzle } from "drizzle-orm/d1";
-import { createJobStore } from "./jobs";
+import { createJobStore } from "./persistence/job-store";
 
 export const jobId = "d5da15a1-f26a-4f14-a350-3ba77d6ea6ad";
 export const jpegBase64 =
@@ -33,6 +33,7 @@ export function setupDatabase(now?: () => number) {
 		"0016_slimy_mathemanic.sql",
 		"0017_glorious_the_hunter.sql",
 		"0018_numerous_mercury.sql",
+		"0019_mean_nextwave.sql",
 	]) {
 		sqlite.exec(
 			readFileSync(
