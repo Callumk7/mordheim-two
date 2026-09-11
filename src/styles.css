@@ -7,14 +7,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@font-face {
-  font-family: 'Schoensperger';
-  src: url('../fonts/Schoensperger.otf') format('opentype');
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
-
 * {
   box-sizing: border-box;
 }
