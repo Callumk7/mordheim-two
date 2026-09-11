@@ -48,6 +48,13 @@ function WarbandsIndexPage() {
 	const combatStats = useCombatStats(dbClient);
 	const warbands = useWarbands(dbClient);
 
+	async function updateGold(warbandId: string, gold: number) {
+		const transaction = updateWarbandTransaction(collections, warbandId, {
+			gold,
+		});
+		await transaction.isPersisted.promise;
+	}
+
 	return (
 		<IndexPage>
 			<IndexPageHeader
@@ -62,14 +69,7 @@ function WarbandsIndexPage() {
 				<WarbandsTable
 					combatStats={combatStats}
 					onAddWarrior={setRecruitingWarband}
-					onUpdateGold={async (warbandId, gold) => {
-						const transaction = updateWarbandTransaction(
-							collections,
-							warbandId,
-							{ gold },
-						);
-						await transaction.isPersisted.promise;
-					}}
+					onUpdateGold={updateGold}
 					warbands={warbands}
 				/>
 			) : (
