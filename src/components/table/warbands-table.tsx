@@ -1,5 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
-import { ChevronRight, Trash2, Users } from "lucide-react";
+import { ChevronRight, Eye, Trash2, Users } from "lucide-react";
 import { useMemo } from "react";
 import { CombatStatValue } from "@/components/shared/stat-display";
 import type { Warband } from "@/db/validation/warband";
@@ -9,8 +9,8 @@ import {
 	getWarbandCombatStats,
 	getWarriorCombatStats,
 } from "@/db-collections/projections";
-import { Button } from "../ui/button";
-import { TableActionLink, TableActions } from "../ui/table";
+import { Button, LinkButton } from "../ui/button";
+import { TableActions } from "../ui/table";
 import { createDataTableColumnHelper, DataTable } from "./data-table";
 
 type WarbandWithWarriors = Warband & { warriors: Warrior[] };
@@ -75,12 +75,15 @@ function WarbandWarriors({
 									<CombatStatValue stat="knockdownsTaken" stats={stats} />{" "}
 									knockdowns
 								</span>
-								<TableActionLink
+								<LinkButton
+									aria-label={`View warrior ${warrior.name}`}
 									params={{ warriorId: warrior.id }}
+									size="icon-xs"
 									to="/warriors/$warriorId"
+									variant="ghost"
 								>
-									View
-								</TableActionLink>
+									<Eye aria-hidden="true" />
+								</LinkButton>
 							</div>
 						);
 					})}
