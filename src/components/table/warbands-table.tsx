@@ -78,12 +78,11 @@ function WarbandWarriors({
 								<LinkButton
 									aria-label={`View warrior ${warrior.name}`}
 									params={{ warriorId: warrior.id }}
-									size="xs"
+									size="icon-xs"
 									to="/warriors/$warriorId"
 									variant="ghost"
 								>
-									<Eye aria-hidden="true" data-icon="inline-start" />
-									View
+									<Eye aria-hidden="true" />
 								</LinkButton>
 							</div>
 						);
