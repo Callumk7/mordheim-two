@@ -157,6 +157,22 @@ describe("projector data", () => {
 		expect(data.ticker.join(" ")).toContain("rating 120, 3 wins");
 	});
 
+	it("includes manual corrections in spotlight stats", () => {
+		const corrected = input([event("Injury")]);
+		corrected.warriors = corrected.warriors.map((row) =>
+			row.id === "attacker" ? { ...row, knockedDowns: -2 } : row,
+		);
+		const attacker = projectProjectorData(corrected).warriors.find(
+			(row) => row.id === "attacker",
+		);
+
+		expect(attacker?.combat).toMatchObject({
+			knockdownsGiven: -1,
+			isDead: false,
+			adjustments: { knockdownsGiven: -2 },
+		});
+	});
+
 	it("excludes voided events and handles an empty campaign", () => {
 		const voided = {
 			...event("Injury"),

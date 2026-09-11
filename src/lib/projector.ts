@@ -132,7 +132,7 @@ export function projectProjectorData(input: ProjectorInput): ProjectorData {
 	const warbandById = new Map(
 		input.warbands.map((warband) => [warband.id, warband]),
 	);
-	const combat = projectCombatStats(input.events);
+	const combat = projectCombatStats(input.events, input.warriors);
 
 	const standings = [...input.warbands].sort(
 		(a, b) =>

@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import { IndexPage, IndexPageHeader } from "@/components/index-page";
 import {
+	AdjustedBadge,
 	CombatLeaderboard,
 	ReservedStatSection,
 	StatTile,
@@ -59,10 +60,17 @@ function StatsIndexPage() {
 		warbandById,
 		warriorById,
 		totals,
+		totalAdjustments,
 		hasCombat,
 		leadingWarbands,
 	} = useStatsDashboard(dbClient);
 
+	const hasAdjustedOutcomes = Object.values(totalAdjustments).some(
+		(adjustment) => adjustment !== 0,
+	);
+	const hasAdjustedWarbandLeader = leadingWarbands.some((row) =>
+		Object.values(row.adjustments ?? {}).some((adjustment) => adjustment !== 0),
+	);
 	const outcomeData = [
 		{
 			outcome: "knockdownsGiven",
@@ -87,10 +95,10 @@ function StatsIndexPage() {
 				<IndexPageHeader
 					action={
 						<span className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground">
-							Live event projection
+							Live combat projection
 						</span>
 					}
-					description="Campaign combat standings calculated from active combat events."
+					description="Campaign combat standings combine active events with manual warrior corrections."
 					title="Statistics"
 				/>
 
@@ -102,9 +110,21 @@ function StatsIndexPage() {
 						Campaign totals
 					</h2>
 					<div className="grid gap-4 sm:grid-cols-3">
-						<StatTile label="Knockdowns" value={totals.knockdowns} />
-						<StatTile label="Injuries" value={totals.injuries} />
-						<StatTile label="Deaths" value={totals.deaths} />
+						<StatTile
+							adjustment={totalAdjustments.knockdowns}
+							label="Knockdowns"
+							value={totals.knockdowns}
+						/>
+						<StatTile
+							adjustment={totalAdjustments.injuries}
+							label="Injuries"
+							value={totals.injuries}
+						/>
+						<StatTile
+							adjustment={totalAdjustments.deaths}
+							label="Deaths"
+							value={totals.deaths}
+						/>
 					</div>
 				</section>
 
@@ -114,7 +134,12 @@ function StatsIndexPage() {
 				>
 					<Card className="min-w-0">
 						<CardHeader>
-							<h2 className="font-mordheim text-2xl">Combat outcomes</h2>
+							<h2 className="flex items-center gap-2 font-mordheim text-2xl">
+								Combat outcomes
+								{hasAdjustedOutcomes ? (
+									<AdjustedBadge accessibleLabel="Chart includes manual corrections" />
+								) : null}
+							</h2>
 							<CardDescription>
 								Share of recorded knockdowns, injuries, and deaths across the
 								campaign.
@@ -155,7 +180,12 @@ function StatsIndexPage() {
 					</Card>
 					<Card className="min-w-0">
 						<CardHeader>
-							<h2 className="font-mordheim text-2xl">Leading warbands</h2>
+							<h2 className="flex items-center gap-2 font-mordheim text-2xl">
+								Leading warbands
+								{hasAdjustedWarbandLeader ? (
+									<AdjustedBadge accessibleLabel="Chart includes manual corrections" />
+								) : null}
+							</h2>
 							<CardDescription>
 								Combat given by the top eight active warbands, in leaderboard
 								order. Full names and counts appear in the standings below.

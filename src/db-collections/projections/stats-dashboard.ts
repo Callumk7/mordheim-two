@@ -16,14 +16,33 @@ export function projectStatsDashboard({
 }: StatsDashboardProjectionInput) {
 	const warbandRows = buildCombatLeaderboard(warbands, combatStats.warbands);
 	const warriorRows = buildCombatLeaderboard(warriors, combatStats.warriors);
-	// Sum event-derived stats, not roster rows: missing entities must not erase history.
-	const totals = Array.from(combatStats.warbands.values()).reduce(
-		(total, stats) => ({
-			knockdowns: total.knockdowns + stats.knockdownsGiven,
-			injuries: total.injuries + stats.injuriesGiven,
-			deaths: total.deaths + stats.deathsGiven,
+	// Sum projected warband stats so missing roster entities do not erase event
+	// history and each warrior correction is counted exactly once.
+	const { totals, totalAdjustments } = Array.from(
+		combatStats.warbands.values(),
+	).reduce(
+		(result, stats) => ({
+			totals: {
+				knockdowns: result.totals.knockdowns + stats.knockdownsGiven,
+				injuries: result.totals.injuries + stats.injuriesGiven,
+				deaths: result.totals.deaths + stats.deathsGiven,
+			},
+			totalAdjustments: {
+				knockdowns:
+					result.totalAdjustments.knockdowns +
+					(stats.adjustments?.knockdownsGiven ?? 0),
+				injuries:
+					result.totalAdjustments.injuries +
+					(stats.adjustments?.injuriesGiven ?? 0),
+				deaths:
+					result.totalAdjustments.deaths +
+					(stats.adjustments?.deathsGiven ?? 0),
+			},
 		}),
-		{ knockdowns: 0, injuries: 0, deaths: 0 },
+		{
+			totals: { knockdowns: 0, injuries: 0, deaths: 0 },
+			totalAdjustments: { knockdowns: 0, injuries: 0, deaths: 0 },
+		},
 	);
 
 	return {
@@ -32,10 +51,15 @@ export function projectStatsDashboard({
 		warbandById: new Map(warbands.map((warband) => [warband.id, warband])),
 		warriorById: new Map(warriors.map((warrior) => [warrior.id, warrior])),
 		totals,
-		hasCombat: totals.knockdowns + totals.injuries + totals.deaths > 0,
+		totalAdjustments,
+		hasCombat:
+			totals.knockdowns !== 0 || totals.injuries !== 0 || totals.deaths !== 0,
 		leadingWarbands: warbandRows
 			.filter(
-				(row) => row.knockdownsGiven + row.injuriesGiven + row.deathsGiven > 0,
+				(row) =>
+					row.knockdownsGiven !== 0 ||
+					row.injuriesGiven !== 0 ||
+					row.deathsGiven !== 0,
 			)
 			.slice(0, 8),
 	};

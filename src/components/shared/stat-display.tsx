@@ -15,14 +15,67 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import type { CombatLeaderboardRow } from "@/db-collections/projections/combat-leaderboard";
+import {
+	type CombatStatKey,
+	type CombatStats,
+	getCombatStatAdjustment,
+} from "@/db-collections/projections/combat-stats";
 
-export function StatTile({ label, value }: { label: string; value: number }) {
+export function AdjustedBadge({
+	accessibleLabel,
+	adjustment,
+}: {
+	accessibleLabel?: string;
+	adjustment?: number;
+}) {
+	if (adjustment === 0) return null;
+	const correction = adjustment ?? 1;
+	const signedAdjustment = correction > 0 ? `+${correction}` : `${correction}`;
+	const description = accessibleLabel ?? `Adjusted by ${signedAdjustment}`;
+	return (
+		<span
+			className="inline-flex rounded-full border border-primary/30 bg-primary/10 px-1.5 py-0.5 text-[0.625rem] font-semibold leading-none text-primary"
+			title={accessibleLabel ?? `Manual correction: ${signedAdjustment}`}
+		>
+			<span aria-hidden="true">Adjusted</span>
+			<span className="sr-only">{description}</span>
+		</span>
+	);
+}
+
+export function CombatStatValue({
+	className,
+	stat,
+	stats,
+}: {
+	className?: string;
+	stat: CombatStatKey;
+	stats: CombatStats;
+}) {
+	return (
+		<span className={className}>
+			{stats[stat]}{" "}
+			<AdjustedBadge adjustment={getCombatStatAdjustment(stats, stat)} />
+		</span>
+	);
+}
+
+export function StatTile({
+	adjustment = 0,
+	label,
+	value,
+}: {
+	adjustment?: number;
+	label: string;
+	value: number;
+}) {
 	return (
 		<Card size="sm">
 			<CardContent>
 				<p className="text-sm text-muted-foreground">{label}</p>
-				<p className="mt-2 font-mordheim text-4xl tabular-nums text-primary">
+				<p className="mt-2 flex items-baseline gap-2 font-mordheim text-4xl tabular-nums text-primary">
 					{value}
+					<AdjustedBadge adjustment={adjustment} />
 				</p>
 			</CardContent>
 		</Card>
@@ -81,19 +134,19 @@ export function CombatLeaderboard({
 										) : null}
 									</TableCell>
 									<TableCell className="text-right font-mono tabular-nums">
-										{row.knockdownsGiven}
+										<CombatStatValue stat="knockdownsGiven" stats={row} />
 									</TableCell>
 									<TableCell className="text-right font-mono tabular-nums">
-										{row.injuriesGiven}
+										<CombatStatValue stat="injuriesGiven" stats={row} />
 									</TableCell>
 									<TableCell className="text-right font-mono tabular-nums text-primary">
-										{row.deathsGiven}
+										<CombatStatValue stat="deathsGiven" stats={row} />
 									</TableCell>
 									<TableCell className="text-right font-mono tabular-nums">
-										{row.knockdownsTaken}
+										<CombatStatValue stat="knockdownsTaken" stats={row} />
 									</TableCell>
 									<TableCell className="text-right font-mono tabular-nums">
-										{row.injuriesTaken}
+										<CombatStatValue stat="injuriesTaken" stats={row} />
 									</TableCell>
 								</TableRow>
 							))}

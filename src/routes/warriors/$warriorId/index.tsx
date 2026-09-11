@@ -1,9 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { CombatStatValue } from "@/components/shared/stat-display";
 import { WarriorEquipment } from "@/components/warrior-equipment";
 import { WarriorPortrait } from "@/components/warrior-portrait";
 import { getCollections } from "@/db-collections";
 import { useWarriorMutations } from "@/db-collections/mutations/warriors";
 import {
+	type CombatStatKey,
+	type CombatStats,
 	getWarriorCombatStats,
 	projectCombatStats,
 } from "@/db-collections/projections";
@@ -29,7 +32,7 @@ function WarriorDetailPage() {
 		warriorId,
 	);
 	const combat = getWarriorCombatStats(
-		projectCombatStats(eventReferences),
+		projectCombatStats(eventReferences, warrior ? [warrior] : []),
 		warriorId,
 	);
 	const warband = warbands.find(
@@ -82,11 +85,31 @@ function WarriorDetailPage() {
 					<h2 className="font-serif text-2xl text-foreground">Combat stats</h2>
 					<dl className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
 						<Stat label="Status" value={combat.isDead ? "Dead" : "Alive"} />
-						<Stat label="Knockdowns given" value={combat.knockdownsGiven} />
-						<Stat label="Knockdowns taken" value={combat.knockdownsTaken} />
-						<Stat label="Injuries given" value={combat.injuriesGiven} />
-						<Stat label="Injuries taken" value={combat.injuriesTaken} />
-						<Stat label="Deaths given" value={combat.deathsGiven} />
+						<CombatStat
+							label="Knockdowns given"
+							stat="knockdownsGiven"
+							stats={combat}
+						/>
+						<CombatStat
+							label="Knockdowns taken"
+							stat="knockdownsTaken"
+							stats={combat}
+						/>
+						<CombatStat
+							label="Injuries given"
+							stat="injuriesGiven"
+							stats={combat}
+						/>
+						<CombatStat
+							label="Injuries taken"
+							stat="injuriesTaken"
+							stats={combat}
+						/>
+						<CombatStat
+							label="Deaths given"
+							stat="deathsGiven"
+							stats={combat}
+						/>
 					</dl>
 				</CardContent>
 			</Card>
@@ -94,11 +117,11 @@ function WarriorDetailPage() {
 			<Card className="mt-7">
 				<CardContent>
 					<h2 className="mb-2 font-serif text-2xl text-foreground">
-						Profile and manual non-combat baseline
+						Profile and manual corrections
 					</h2>
 					<p className="mb-6 text-sm text-muted-foreground">
-						Legacy injury and knockdown values are kept separately and do not
-						alter combat stats.
+						Signed corrections are added to combat totals calculated from
+						events.
 					</p>
 					<WarriorForm
 						initialValues={warrior}
@@ -110,6 +133,25 @@ function WarriorDetailPage() {
 					/>
 				</CardContent>
 			</Card>
+		</div>
+	);
+}
+
+function CombatStat({
+	label,
+	stat,
+	stats,
+}: {
+	label: string;
+	stat: CombatStatKey;
+	stats: CombatStats;
+}) {
+	return (
+		<div className="rounded-xl bg-muted/40 p-3">
+			<dt className="text-xs text-muted-foreground">{label}</dt>
+			<dd className="mt-1 font-mono text-foreground">
+				<CombatStatValue stat={stat} stats={stats} />
+			</dd>
 		</div>
 	);
 }

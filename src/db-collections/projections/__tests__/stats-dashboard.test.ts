@@ -71,6 +71,7 @@ describe("projectStatsDashboard", () => {
 			warbandById: new Map(),
 			warriorById: new Map(),
 			totals: { knockdowns: 0, injuries: 0, deaths: 0 },
+			totalAdjustments: { knockdowns: 0, injuries: 0, deaths: 0 },
 			hasCombat: false,
 			leadingWarbands: [],
 		});
@@ -143,6 +144,55 @@ describe("projectStatsDashboard", () => {
 		expect(dashboard.hasCombat).toBe(true);
 		expect(dashboard.leadingWarbands).toEqual([]);
 		expect(dashboard.warbandRows.map((row) => row.id)).toEqual(["defender"]);
+	});
+
+	it("keeps campaign and warband aggregates consistent with warrior corrections", () => {
+		const red = makeWarband("red");
+		const plusTwo = {
+			...makeWarrior("plus-two", red.id),
+			knocked: 2,
+			injuries: -2,
+			knockedDowns: 2,
+		};
+		const minusOne = {
+			...makeWarrior("minus-one", red.id),
+			knocked: -1,
+			injuries: 1,
+			knockedDowns: -1,
+		};
+		const combatStats = projectCombatStats([], [plusTwo, minusOne]);
+		const dashboard = projectStatsDashboard({
+			warbands: [red],
+			warriors: [plusTwo, minusOne],
+			combatStats,
+		});
+
+		expect(
+			dashboard.warriorRows.reduce(
+				(total, row) => total + row.knockdownsGiven,
+				0,
+			),
+		).toBe(1);
+		expect(dashboard.warbandRows[0]).toMatchObject({
+			knockdownsGiven: 1,
+			injuriesGiven: -1,
+			deathsGiven: 1,
+			adjustments: {
+				knockdownsGiven: 1,
+				injuriesGiven: -1,
+				deathsGiven: 1,
+			},
+		});
+		expect(dashboard.totals).toEqual({
+			knockdowns: 1,
+			injuries: -1,
+			deaths: 1,
+		});
+		expect(dashboard.totalAdjustments).toEqual({
+			knockdowns: 1,
+			injuries: -1,
+			deaths: 1,
+		});
 	});
 
 	it("reflects updated combat projections without retaining previous totals", () => {

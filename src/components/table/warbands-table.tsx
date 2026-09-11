@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { ChevronRight, Trash2, Users } from "lucide-react";
 import { useMemo } from "react";
+import { CombatStatValue } from "@/components/shared/stat-display";
 import type { Warband } from "@/db/validation/warband";
 import type { Warrior } from "@/db/validation/warrior";
 import {
@@ -67,10 +68,12 @@ function WarbandWarriors({
 									</p>
 								</div>
 								<span className="hidden text-xs text-muted-foreground sm:block">
-									{stats.injuriesTaken} injuries
+									<CombatStatValue stat="injuriesTaken" stats={stats} />{" "}
+									injuries
 								</span>
 								<span className="hidden text-xs text-muted-foreground sm:block">
-									{stats.knockdownsTaken} knockdowns
+									<CombatStatValue stat="knockdownsTaken" stats={stats} />{" "}
+									knockdowns
 								</span>
 								<TableActionLink
 									params={{ warriorId: warrior.id }}
@@ -159,6 +162,12 @@ export function WarbandsTable({
 						id: "deathsGiven",
 						header: "Deaths given",
 						meta: { align: "end" },
+						cell: ({ row }) => (
+							<CombatStatValue
+								stat="deathsGiven"
+								stats={getWarbandCombatStats(combatStats, row.original.id)}
+							/>
+						),
 					},
 				),
 				columnHelper.accessor("rating", {

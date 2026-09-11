@@ -10,9 +10,9 @@ export const WarriorFieldsSchema = z.object({
 	description: z.string().trim().nullable().optional(),
 	status: WarriorStatusSchema,
 	warbandId: z.string().min(1),
-	knocked: z.number().int().nonnegative(),
-	injuries: z.number().int().nonnegative(),
-	knockedDowns: z.number().int().nonnegative(),
+	knocked: z.number().int(),
+	injuries: z.number().int(),
+	knockedDowns: z.number().int(),
 });
 
 export const WarriorSchema = WarriorFieldsSchema.extend({

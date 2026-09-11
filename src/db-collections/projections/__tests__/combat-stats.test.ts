@@ -105,6 +105,65 @@ describe("projectCombatStats", () => {
 			injuriesGiven: 0,
 			injuriesTaken: 0,
 			deathsGiven: 0,
+			adjustments: {
+				knockdownsGiven: 0,
+				knockdownsTaken: 0,
+				injuriesGiven: 0,
+				injuriesTaken: 0,
+				deathsGiven: 0,
+			},
+		});
+	});
+
+	it("adds positive and negative warrior corrections without changing event-based death", () => {
+		const projection = projectCombatStats(
+			[
+				event("death-1", "Death"),
+				event("death-2", "Death"),
+				event("death-3", "Death"),
+			],
+			[
+				{
+					id: "attacker",
+					warbandId: "old-attackers",
+					knocked: 1,
+					injuries: -2,
+					knockedDowns: 2,
+				},
+				{
+					id: "defender",
+					warbandId: "old-defenders",
+					knocked: 0,
+					injuries: 0,
+					knockedDowns: 0,
+				},
+			],
+		);
+
+		expect(getWarriorCombatStats(projection, "attacker")).toMatchObject({
+			knockdownsGiven: 5,
+			injuriesGiven: 1,
+			deathsGiven: 4,
+			adjustments: {
+				knockdownsGiven: 2,
+				injuriesGiven: -2,
+				deathsGiven: 1,
+			},
+		});
+		expect(getWarriorCombatStats(projection, "defender")).toMatchObject({
+			knockdownsTaken: 3,
+			injuriesTaken: 3,
+			isDead: true,
+		});
+		expect(getWarbandCombatStats(projection, "old-attackers")).toMatchObject({
+			knockdownsGiven: 5,
+			injuriesGiven: 1,
+			deathsGiven: 4,
+			adjustments: {
+				knockdownsGiven: 2,
+				injuriesGiven: -2,
+				deathsGiven: 1,
+			},
 		});
 	});
 });
