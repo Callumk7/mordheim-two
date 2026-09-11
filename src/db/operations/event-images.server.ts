@@ -12,9 +12,9 @@ import {
 	warriors,
 } from "@/db/schema";
 import {
-	GEMINI_IMAGE_MODEL,
 	ImageGenerationInputSchema,
 	type ImageGenerationMessage,
+	OPENAI_IMAGE_MODEL,
 } from "@/db/validation/image-generation";
 
 export function queryEventImage(db: Pick<Database, "select">, eventId: string) {
@@ -173,7 +173,7 @@ export async function submitEventImage(
 		queue,
 		{
 			prompt,
-			model: GEMINI_IMAGE_MODEL,
+			model: OPENAI_IMAGE_MODEL,
 			association: { eventId },
 		},
 		clock,

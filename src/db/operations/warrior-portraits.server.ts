@@ -4,9 +4,9 @@ import { type Clock, systemClock } from "@/db/operations/clock";
 import { enqueueImageGeneration } from "@/db/operations/image-generation.server";
 import { imageGenerationJobs, warbands, warriors } from "@/db/schema";
 import {
-	GEMINI_IMAGE_MODEL,
 	ImageGenerationInputSchema,
 	type ImageGenerationMessage,
+	OPENAI_IMAGE_MODEL,
 } from "@/db/validation/image-generation";
 
 export function queryWarriorPortrait(
@@ -84,7 +84,7 @@ export async function submitWarriorPortrait(
 		queue,
 		{
 			prompt: built.prompt,
-			model: GEMINI_IMAGE_MODEL,
+			model: OPENAI_IMAGE_MODEL,
 			association: { warriorId },
 		},
 		clock,
