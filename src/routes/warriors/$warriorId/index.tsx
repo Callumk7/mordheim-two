@@ -1,5 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { CombatStatValue } from "@/components/shared/stat-display";
+import { LinkButton } from "@/components/ui/button";
 import { WarriorEquipment } from "@/components/warrior-equipment";
 import { WarriorPortrait } from "@/components/warrior-portrait";
 import { getCollections } from "@/db-collections";
@@ -44,19 +45,17 @@ function WarriorDetailPage() {
 	return (
 		<div className="mx-auto max-w-3xl">
 			<div className="flex items-center justify-between gap-4">
-				<Link
-					className="text-sm text-muted-foreground hover:text-primary/80"
-					to="/warriors"
-				>
+				<LinkButton size="sm" to="/warriors" variant="outline">
 					← Warriors
-				</Link>
-				<Link
-					className="text-sm text-destructive/80 hover:text-destructive"
+				</LinkButton>
+				<LinkButton
 					params={{ warriorId }}
+					size="sm"
 					to="/warriors/$warriorId/delete"
+					variant="destructive"
 				>
 					Delete warrior
-				</Link>
+				</LinkButton>
 			</div>
 
 			<header className="mt-7 border-b border-border pb-6">

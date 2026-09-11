@@ -18,7 +18,7 @@ import {
 	AdjustedBadge,
 	CombatLeaderboard,
 } from "@/components/shared/stat-display";
-import { Button } from "@/components/ui/button";
+import { Button, LinkButton } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
 	Dialog,
@@ -72,23 +72,20 @@ function WarbandDetailPage() {
 	return (
 		<div className="grid gap-10">
 			<div className="flex items-center justify-between gap-4">
-				<Link
-					className="text-sm text-muted-foreground hover:text-primary"
-					to="/warbands"
-				>
+				<LinkButton size="sm" to="/warbands" variant="outline">
 					← Warbands
-				</Link>
-				<Link
-					className="text-sm text-destructive/80 hover:text-destructive"
+				</LinkButton>
+				<LinkButton
 					params={{ warbandId }}
+					size="sm"
 					to="/warbands/$warbandId/delete"
+					variant="destructive"
 				>
 					Delete warband
-				</Link>
+				</LinkButton>
 			</div>
 
 			<section className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-				<div className="absolute inset-x-0 top-0 h-1 bg-primary" />
 				<div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
 					<div>
 						<p className="text-xs font-semibold tracking-[0.28em] text-primary uppercase">
