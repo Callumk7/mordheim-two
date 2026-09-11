@@ -20,10 +20,10 @@ function makeWarband(id: string): Warband {
 		id,
 		name: id,
 		faction: "Mercenaries",
-		captain: `${id}-captain`,
+		bio: null,
+		gold: 0,
 		rating: 100,
 		wins: 0,
-		status: "Ready",
 		createdAt: now,
 		updatedAt: now,
 	};

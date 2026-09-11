@@ -15,7 +15,7 @@ function setup() {
 	const connection = setupDatabase();
 	connections.push(connection);
 	connection.sqlite.exec(`
-		INSERT INTO warbands (id, name, faction, captain) VALUES ('band', 'The Crows', 'Reikland', 'Otto');
+		INSERT INTO warbands (id, name, faction, bio) VALUES ('band', 'The Crows', 'Reikland', 'Veteran treasure hunters');
 		INSERT INTO warriors (id, name, class, description, warband_id) VALUES
 		('warrior', 'Klaus', 'Marksman', 'Scarred face, green hood', 'band'),
 		('other', 'Hans', 'Swordsman', NULL, 'band');
@@ -35,7 +35,7 @@ const context = {
 	description: "Scarred face",
 	warbandName: "The Crows",
 	faction: "Reikland",
-	captain: "Otto",
+	warbandBio: "Veteran treasure hunters",
 };
 
 describe("warrior portrait prompts", () => {

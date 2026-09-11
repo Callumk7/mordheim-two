@@ -2,6 +2,7 @@ import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
 	Activity,
+	Coins,
 	HeartPulse,
 	type LucideIcon,
 	Pencil,
@@ -84,23 +85,17 @@ function WarbandDetailPage() {
 				<div className="absolute inset-x-0 top-0 h-1 bg-primary" />
 				<div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
 					<div>
-						<div className="flex flex-wrap items-center gap-3">
-							<p className="text-xs font-semibold tracking-[0.28em] text-primary uppercase">
-								{warband.faction}
-							</p>
-							<span className="rounded-full border border-border bg-muted/50 px-2.5 py-1 text-xs text-muted-foreground">
-								{warband.status}
-							</span>
-						</div>
+						<p className="text-xs font-semibold tracking-[0.28em] text-primary uppercase">
+							{warband.faction}
+						</p>
 						<h1 className="mt-3 font-mordheim text-5xl text-foreground sm:text-6xl">
 							{warband.name}
 						</h1>
-						<p className="mt-3 text-muted-foreground">
-							Led by{" "}
-							<span className="font-medium text-foreground">
-								{warband.captain}
-							</span>
-						</p>
+						{warband.bio ? (
+							<p className="mt-3 max-w-3xl whitespace-pre-line text-muted-foreground">
+								{warband.bio}
+							</p>
+						) : null}
 					</div>
 					<div className="flex items-end gap-6">
 						<div className="text-right">
@@ -120,7 +115,8 @@ function WarbandDetailPage() {
 						</Button>
 					</div>
 				</div>
-				<div className="grid border-t border-border bg-muted/20 sm:grid-cols-2 lg:grid-cols-4">
+				<div className="grid border-t border-border bg-muted/20 sm:grid-cols-2 lg:grid-cols-5">
+					<HeroStat icon={Coins} label="Gold crowns" value={warband.gold} />
 					<HeroStat
 						icon={Trophy}
 						label="Wins"

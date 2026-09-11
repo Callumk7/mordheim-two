@@ -138,19 +138,16 @@ export function WarbandsTable({
 						),
 					},
 				),
-				columnHelper.accessor("captain", {
-					header: "Captain",
+				columnHelper.accessor("gold", {
+					header: "Gold",
+					meta: { align: "end" },
 					cell: ({ row }) => (
-						<span className="text-muted-foreground">
-							{row.original.captain}
-						</span>
+						<span className="font-mono text-primary">{row.original.gold}</span>
 					),
 				}),
-				columnHelper.accessor("status", {
-					header: "Status",
-					cell: ({ row }) => (
-						<span className="text-muted-foreground">{row.original.status}</span>
-					),
+				columnHelper.accessor("wins", {
+					header: "Wins",
+					meta: { align: "end" },
 				}),
 				columnHelper.accessor(
 					(warband) =>

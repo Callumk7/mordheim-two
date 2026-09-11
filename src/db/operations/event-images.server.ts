@@ -32,7 +32,7 @@ type WarriorContext = {
 	description: string | null;
 	warbandName: string;
 	faction: string;
-	captain: string;
+	warbandBio: string | null;
 	equipment: Array<{
 		name: string;
 		type: string;
@@ -61,7 +61,8 @@ function describeWarrior(role: string, warrior: WarriorContext) {
 	return `${role} warrior: ${clip(warrior.name, 120)}
 Class: ${clip(warrior.class, 120)}
 Appearance and character: ${clip(warrior.description, 600)}
-Warband: ${clip(warrior.warbandName, 120)} (${clip(warrior.faction, 120)}), led by ${clip(warrior.captain, 120)}
+Warband: ${clip(warrior.warbandName, 120)} (${clip(warrior.faction, 120)})
+Warband background: ${clip(warrior.warbandBio, 600)}
 Equipment: ${clip(equipmentList, 600)}`;
 }
 
@@ -97,7 +98,7 @@ async function loadWarriorContext(db: Database, warriorId: string) {
 			description: warriors.description,
 			warbandName: warbands.name,
 			faction: warbands.faction,
-			captain: warbands.captain,
+			warbandBio: warbands.bio,
 		})
 		.from(warriors)
 		.innerJoin(warbands, eq(warriors.warbandId, warbands.id))

@@ -13,10 +13,10 @@ function warband(id: string): Warband {
 		id,
 		name: id === "red" ? "Red Reavers" : "Blue Blades",
 		faction: "Mercenaries",
-		captain: "Captain",
+		bio: null,
+		gold: 0,
 		rating: 100,
 		wins: 0,
-		status: "Ready",
 		createdAt: timestamp,
 		updatedAt: timestamp,
 	};

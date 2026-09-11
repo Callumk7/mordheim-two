@@ -12,7 +12,6 @@ import {
 import { EQUIPMENT_TYPES } from "./validation/equipment";
 import { EVENT_OUTCOMES } from "./validation/event";
 import { MATCH_RESULTS, MATCH_STATUSES } from "./validation/match";
-import { WARBAND_STATUSES } from "./validation/warband";
 import { WARRIOR_STATUSES } from "./validation/warrior";
 
 export const imageGenerationJobs = sqliteTable("image_generation_jobs", {
@@ -54,12 +53,10 @@ export const warbands = sqliteTable("warbands", {
 	id: text("id").primaryKey(),
 	name: text("name").notNull(),
 	faction: text("faction").notNull(),
-	captain: text("captain").notNull(),
+	bio: text("bio"),
+	gold: integer("gold").notNull().default(0),
 	rating: integer("rating").notNull().default(0),
 	wins: integer("wins").notNull().default(0),
-	status: text("status", { enum: WARBAND_STATUSES })
-		.notNull()
-		.default("Recruiting"),
 	createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 	updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });

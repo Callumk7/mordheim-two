@@ -36,10 +36,10 @@ function warband(id: string, name: string): Warband {
 		id,
 		name,
 		faction: "Mercenaries",
-		captain: `${name} captain`,
+		bio: null,
+		gold: 0,
 		rating: 100,
 		wins: 0,
-		status: "Ready",
 		createdAt: timestamp,
 		updatedAt: timestamp,
 	};
