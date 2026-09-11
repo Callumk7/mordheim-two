@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { Trash2 } from "lucide-react";
 import { useMemo } from "react";
+import { CombatStatValue } from "@/components/shared/stat-display";
 import type { Warrior } from "@/db/validation/warrior";
 import {
 	type CombatStatsProjection,
@@ -57,21 +58,39 @@ export function WarriorsTable({
 					id: "injuriesGiven",
 					header: "Injuries given",
 					meta: { align: "end" },
+					cell: ({ row }) => (
+						<CombatStatValue stat="injuriesGiven" stats={row.original.combat} />
+					),
 				}),
 				columnHelper.accessor((row) => row.combat.injuriesTaken, {
 					id: "injuriesTaken",
 					header: "Injuries taken",
 					meta: { align: "end" },
+					cell: ({ row }) => (
+						<CombatStatValue stat="injuriesTaken" stats={row.original.combat} />
+					),
 				}),
 				columnHelper.accessor((row) => row.combat.knockdownsGiven, {
 					id: "knockdownsGiven",
 					header: "KDs given",
 					meta: { align: "end" },
+					cell: ({ row }) => (
+						<CombatStatValue
+							stat="knockdownsGiven"
+							stats={row.original.combat}
+						/>
+					),
 				}),
 				columnHelper.accessor((row) => row.combat.knockdownsTaken, {
 					id: "knockdownsTaken",
 					header: "KDs taken",
 					meta: { align: "end" },
+					cell: ({ row }) => (
+						<CombatStatValue
+							stat="knockdownsTaken"
+							stats={row.original.combat}
+						/>
+					),
 				}),
 				columnHelper.display({
 					id: "actions",

@@ -14,7 +14,21 @@ const validWarrior = {
 	knockedDowns: 0,
 };
 
-describe("warrior description", () => {
+describe("warrior validation", () => {
+	it("accepts signed integer combat corrections and rejects fractional values", () => {
+		expect(
+			WarriorSchema.parse({
+				...validWarrior,
+				knocked: -2,
+				injuries: 3,
+				knockedDowns: -1,
+			}),
+		).toMatchObject({ knocked: -2, injuries: 3, knockedDowns: -1 });
+		expect(
+			WarriorSchema.safeParse({ ...validWarrior, injuries: 0.5 }).success,
+		).toBe(false);
+	});
+
 	it("persists as a nullable text column for existing rows", () => {
 		const description = getTableConfig(warriors).columns.find(
 			(column) => column.name === "description",

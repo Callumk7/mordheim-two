@@ -48,7 +48,7 @@ export function projectWarbandDashboard({
 	const warbandById = new Map(warbands.map((warband) => [warband.id, warband]));
 	const warriorById = new Map(warriors.map((warrior) => [warrior.id, warrior]));
 	const matchById = new Map(matches.map((match) => [match.id, match]));
-	const combatStats = projectCombatStats(events);
+	const combatStats = projectCombatStats(events, warriors);
 	const roster = warriors.filter((warrior) => warrior.warbandId === warbandId);
 	const deadIds = new Set(
 		roster

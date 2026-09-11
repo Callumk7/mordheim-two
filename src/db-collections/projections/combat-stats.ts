@@ -1,5 +1,15 @@
 import type { Event } from "@/db/validation/event";
 import { isEffectiveEvent } from "@/db/validation/event";
+import type { Warrior } from "@/db/validation/warrior";
+
+export type CombatStatKey =
+	| "knockdownsGiven"
+	| "knockdownsTaken"
+	| "injuriesGiven"
+	| "injuriesTaken"
+	| "deathsGiven";
+
+export type CombatStatAdjustments = Record<CombatStatKey, number>;
 
 export interface CombatStats {
 	knockdownsGiven: number;
@@ -7,6 +17,8 @@ export interface CombatStats {
 	injuriesGiven: number;
 	injuriesTaken: number;
 	deathsGiven: number;
+	/** Net manual correction applied to each displayed total. */
+	adjustments?: CombatStatAdjustments;
 }
 
 export interface WarriorCombatStats extends CombatStats {
@@ -18,12 +30,21 @@ export interface CombatStatsProjection {
 	warriors: ReadonlyMap<string, WarriorCombatStats>;
 }
 
+export const emptyCombatStatAdjustments = (): CombatStatAdjustments => ({
+	knockdownsGiven: 0,
+	knockdownsTaken: 0,
+	injuriesGiven: 0,
+	injuriesTaken: 0,
+	deathsGiven: 0,
+});
+
 const emptyStats = (): CombatStats => ({
 	knockdownsGiven: 0,
 	knockdownsTaken: 0,
 	injuriesGiven: 0,
 	injuriesTaken: 0,
 	deathsGiven: 0,
+	adjustments: emptyCombatStatAdjustments(),
 });
 
 const emptyWarriorStats = (): WarriorCombatStats => ({
@@ -32,10 +53,12 @@ const emptyWarriorStats = (): WarriorCombatStats => ({
 });
 
 /**
- * Projects combat totals exclusively from event facts. Warband attribution is
- * deliberately taken from each event so later roster transfers do not rewrite
- * history. Unresolved events are still knockdowns; outcomes only affect injury
- * and death totals. Voided events have no effect.
+ * Projects event facts, then applies the signed corrections stored on warriors.
+ * The legacy field semantics are preserved as offensive achievements:
+ * `knocked` (opponents knocked out) corrects deaths given, `injuries` corrects
+ * injuries given, and `knockedDowns` corrects knockdowns given. Event
+ * attribution remains historical; corrections belong to a warrior's current
+ * warband. Corrections never affect `isDead`.
  */
 export function projectCombatStats(
 	events: readonly Pick<
@@ -48,9 +71,13 @@ export function projectCombatStats(
 		| "resolvedAt"
 		| "voidedAt"
 	>[],
+	warriors: readonly Pick<
+		Warrior,
+		"id" | "warbandId" | "knocked" | "injuries" | "knockedDowns"
+	>[] = [],
 ): CombatStatsProjection {
 	const warbands = new Map<string, CombatStats>();
-	const warriors = new Map<string, WarriorCombatStats>();
+	const warriorStatsById = new Map<string, WarriorCombatStats>();
 
 	for (const event of events) {
 		if (event.voidedAt !== null) continue;
@@ -66,12 +93,12 @@ export function projectCombatStats(
 			emptyStats,
 		);
 		const attacker = getOrCreate(
-			warriors,
+			warriorStatsById,
 			event.attackerWarriorId,
 			emptyWarriorStats,
 		);
 		const defender = getOrCreate(
-			warriors,
+			warriorStatsById,
 			event.defenderWarriorId,
 			emptyWarriorStats,
 		);
@@ -95,7 +122,38 @@ export function projectCombatStats(
 		}
 	}
 
-	return { warbands, warriors };
+	for (const warrior of warriors) {
+		const warriorStats = getOrCreate(
+			warriorStatsById,
+			warrior.id,
+			emptyWarriorStats,
+		);
+		const warbandStats = getOrCreate(warbands, warrior.warbandId, emptyStats);
+		applyCorrection(warriorStats, "deathsGiven", warrior.knocked);
+		applyCorrection(warbandStats, "deathsGiven", warrior.knocked);
+		applyCorrection(warriorStats, "injuriesGiven", warrior.injuries);
+		applyCorrection(warbandStats, "injuriesGiven", warrior.injuries);
+		applyCorrection(warriorStats, "knockdownsGiven", warrior.knockedDowns);
+		applyCorrection(warbandStats, "knockdownsGiven", warrior.knockedDowns);
+	}
+
+	return { warbands, warriors: warriorStatsById };
+}
+
+function applyCorrection(
+	stats: CombatStats,
+	key: CombatStatKey,
+	correction: number,
+) {
+	stats[key] += correction;
+	if (stats.adjustments) stats.adjustments[key] += correction;
+}
+
+export function getCombatStatAdjustment(
+	stats: CombatStats,
+	key: CombatStatKey,
+): number {
+	return stats.adjustments?.[key] ?? 0;
 }
 
 function getOrCreate<K, V>(map: Map<K, V>, key: K, create: () => V): V {

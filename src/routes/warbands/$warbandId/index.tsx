@@ -14,7 +14,10 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { CreateWarriorDialog } from "@/components/shared/create-warrior-dialog";
-import { CombatLeaderboard } from "@/components/shared/stat-display";
+import {
+	AdjustedBadge,
+	CombatLeaderboard,
+} from "@/components/shared/stat-display";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -31,7 +34,10 @@ import {
 	createWarriorTransaction,
 	updateWarriorTransaction,
 } from "@/db-collections/mutations/warriors";
-import { getWarbandCombatStats } from "@/db-collections/projections";
+import {
+	getCombatStatAdjustment,
+	getWarbandCombatStats,
+} from "@/db-collections/projections";
 import { useWarbandDashboard } from "@/db-collections/queries";
 
 export const Route = createFileRoute("/warbands/$warbandId/")({
@@ -169,29 +175,43 @@ function WarbandDetailPage() {
 
 			<section aria-labelledby="combat-heading">
 				<SectionHeading
-					description="A live summary projected from active event records."
+					description="A live summary of active event records and manual warrior corrections."
 					eyebrow="Battle scars"
 					id="combat-heading"
 					title="Combat record"
 				/>
 				<div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
 					<MetricCard
+						adjustment={getCombatStatAdjustment(
+							warbandCombat,
+							"knockdownsGiven",
+						)}
 						label="Knockdowns given"
 						value={warbandCombat.knockdownsGiven}
 					/>
 					<MetricCard
+						adjustment={getCombatStatAdjustment(
+							warbandCombat,
+							"knockdownsTaken",
+						)}
 						label="Knockdowns taken"
 						value={warbandCombat.knockdownsTaken}
 					/>
 					<MetricCard
+						adjustment={getCombatStatAdjustment(warbandCombat, "injuriesGiven")}
 						label="Injuries given"
 						value={warbandCombat.injuriesGiven}
 					/>
 					<MetricCard
+						adjustment={getCombatStatAdjustment(warbandCombat, "injuriesTaken")}
 						label="Injuries taken"
 						value={warbandCombat.injuriesTaken}
 					/>
-					<MetricCard label="Deaths given" value={warbandCombat.deathsGiven} />
+					<MetricCard
+						adjustment={getCombatStatAdjustment(warbandCombat, "deathsGiven")}
+						label="Deaths given"
+						value={warbandCombat.deathsGiven}
+					/>
 				</div>
 			</section>
 
@@ -480,10 +500,12 @@ function HeroStat({
 }
 
 function MetricCard({
+	adjustment = 0,
 	label,
 	suffix = "",
 	value,
 }: {
+	adjustment?: number;
 	label: string;
 	suffix?: string;
 	value: number;
@@ -494,9 +516,10 @@ function MetricCard({
 				<p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
 					{label}
 				</p>
-				<p className="mt-2 font-mordheim text-4xl tabular-nums text-primary">
+				<p className="mt-2 flex items-baseline gap-2 font-mordheim text-4xl tabular-nums text-primary">
 					{value}
 					{suffix}
+					<AdjustedBadge adjustment={adjustment} />
 				</p>
 			</CardContent>
 		</Card>

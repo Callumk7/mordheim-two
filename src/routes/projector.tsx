@@ -15,6 +15,7 @@ import {
 	Zap,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { CombatStatValue } from "@/components/shared/stat-display";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import "@/projector.css";
@@ -563,15 +564,15 @@ function WarriorSpotlight({
 
 function CombatStats({ warrior }: { warrior: ProjectorWarrior }) {
 	const stats = [
-		["Knockdowns given", warrior.combat.knockdownsGiven],
-		["Knockdowns taken", warrior.combat.knockdownsTaken],
-		["Injuries given", warrior.combat.injuriesGiven],
-		["Injuries taken", warrior.combat.injuriesTaken],
-		["Deaths given", warrior.combat.deathsGiven],
+		["Knockdowns given", "knockdownsGiven"],
+		["Knockdowns taken", "knockdownsTaken"],
+		["Injuries given", "injuriesGiven"],
+		["Injuries taken", "injuriesTaken"],
+		["Deaths given", "deathsGiven"],
 	] as const;
 	return (
 		<dl className="mt-[clamp(1rem,4vh,3rem)] grid grid-cols-2 gap-3 xl:grid-cols-5">
-			{stats.map(([label, value]) => (
+			{stats.map(([label, stat]) => (
 				<div
 					className="rounded-xl border border-border bg-card/80 p-[clamp(0.7rem,1.4vw,1.3rem)]"
 					key={label}
@@ -580,7 +581,7 @@ function CombatStats({ warrior }: { warrior: ProjectorWarrior }) {
 						{label}
 					</dt>
 					<dd className="mt-1 font-mono text-[clamp(1.7rem,3vw,3rem)] font-bold">
-						{value}
+						<CombatStatValue stat={stat} stats={warrior.combat} />
 					</dd>
 				</div>
 			))}

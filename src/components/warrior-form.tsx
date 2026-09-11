@@ -177,9 +177,9 @@ export function WarriorForm({
 					</Select>
 				</Field>
 				<NumberField
+					description="Signed correction added to the event-calculated total."
 					isRequired
-					label="Manual knockdowns taken"
-					minValue={0}
+					label="Deaths given adjustment"
 					name="knocked"
 					onChange={(knocked) =>
 						setValues((current) => ({ ...current, knocked }))
@@ -187,9 +187,9 @@ export function WarriorForm({
 					value={values.knocked}
 				/>
 				<NumberField
+					description="Signed correction added to the event-calculated total."
 					isRequired
-					label="Manual injuries taken"
-					minValue={0}
+					label="Injuries given adjustment"
 					name="injuries"
 					onChange={(injuries) =>
 						setValues((current) => ({ ...current, injuries }))
@@ -197,9 +197,9 @@ export function WarriorForm({
 					value={values.injuries}
 				/>
 				<NumberField
+					description="Signed correction added to the event-calculated total."
 					isRequired
-					label="Manual knockdowns given"
-					minValue={0}
+					label="Knockdowns given adjustment"
 					name="knockedDowns"
 					onChange={(knockedDowns) =>
 						setValues((current) => ({ ...current, knockedDowns }))
