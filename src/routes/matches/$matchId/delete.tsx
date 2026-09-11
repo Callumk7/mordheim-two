@@ -1,6 +1,7 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { getCollections } from "@/db-collections";
 import { deleteMatchTransaction } from "@/db-collections/mutations/matches";
 
@@ -72,10 +73,9 @@ function DeleteMatchPage() {
 				) : null}
 
 				<div className="mt-7 flex flex-wrap gap-3">
-					<button
-						className="rounded-lg bg-destructive px-5 py-2.5 font-semibold text-destructive-foreground transition hover:bg-destructive/90 disabled:cursor-not-allowed disabled:opacity-50"
-						disabled={isDeleting || !match || eventRows.length > 0}
-						onClick={async () => {
+					<Button
+						isDisabled={isDeleting || !match || eventRows.length > 0}
+						onPress={async () => {
 							setError(undefined);
 							setIsDeleting(true);
 							try {
@@ -98,13 +98,14 @@ function DeleteMatchPage() {
 							}
 						}}
 						type="button"
+						variant="destructive"
 					>
 						{eventRows.length > 0
 							? "Event history prevents deletion"
 							: isDeleting
 								? "Deleting…"
 								: "Delete match"}
-					</button>
+					</Button>
 					<Link
 						className="rounded-lg border border-input px-5 py-2.5 font-semibold text-foreground hover:border-ring hover:text-foreground"
 						params={{ matchId }}
