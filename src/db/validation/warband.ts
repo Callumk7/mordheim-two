@@ -1,16 +1,12 @@
 import { z } from "zod";
 
-export const WARBAND_STATUSES = ["Ready", "Recovering", "Recruiting"] as const;
-
-export const WarbandStatusSchema = z.enum(WARBAND_STATUSES);
-
 export const WarbandFieldsSchema = z.object({
 	name: z.string().trim().min(1),
 	faction: z.string().trim().min(1),
-	captain: z.string().trim().min(1),
+	bio: z.string().trim().nullish(),
 	rating: z.number().int().nonnegative(),
+	gold: z.number().int().nonnegative(),
 	wins: z.number().int().nonnegative(),
-	status: WarbandStatusSchema,
 });
 
 export const WarbandSchema = WarbandFieldsSchema.extend({

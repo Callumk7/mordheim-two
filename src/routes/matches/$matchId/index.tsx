@@ -312,9 +312,7 @@ function ParticipantCard({
 						<Trophy aria-label="Match winner" className="size-4 text-primary" />
 					) : null}
 				</CardTitle>
-				<CardDescription>
-					{warband.faction} · Captain {warband.captain}
-				</CardDescription>
+				<CardDescription>{warband.faction}</CardDescription>
 				<CardAction>
 					<LinkButton
 						aria-label={`View warband ${warband.name}`}

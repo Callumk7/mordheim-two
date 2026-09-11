@@ -24,10 +24,10 @@ function warband(
 		id,
 		name,
 		faction: `${name} faction`,
-		captain: `${name} captain`,
+		bio: null,
+		gold: 0,
 		rating,
 		wins,
-		status: "Ready",
 		createdAt: timestamp,
 		updatedAt: timestamp,
 	};

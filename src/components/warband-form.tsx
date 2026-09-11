@@ -8,18 +8,12 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { NumberField } from "@/components/ui/number-field";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
-import { WARBAND_STATUSES, type Warband } from "@/db/validation/warband";
+import { Textarea } from "@/components/ui/textarea";
+import type { Warband } from "@/db/validation/warband";
 
 export type WarbandFormValues = Pick<
 	Warband,
-	"name" | "faction" | "captain" | "rating" | "wins" | "status"
+	"name" | "faction" | "bio" | "gold" | "rating" | "wins"
 >;
 
 export function WarbandForm({
@@ -34,14 +28,14 @@ export function WarbandForm({
 	const [values, setValues] = useState<WarbandFormValues>(() => ({
 		name: initialValues.name,
 		faction: initialValues.faction,
-		captain: initialValues.captain,
+		bio: initialValues.bio,
+		gold: initialValues.gold,
 		rating: initialValues.rating,
 		wins: initialValues.wins,
-		status: initialValues.status,
 	}));
 	const [error, setError] = useState<string>();
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const statusId = useId();
+	const bioId = useId();
 
 	return (
 		<form
@@ -76,41 +70,29 @@ export function WarbandForm({
 					}
 					value={values.faction}
 				/>
-				<TextField
-					label="Captain"
-					name="captain"
-					onChange={(captain) =>
-						setValues((current) => ({ ...current, captain }))
-					}
-					value={values.captain}
-				/>
-				<Field>
-					<FieldLabel htmlFor={statusId}>Status</FieldLabel>
-					<Select
-						className="w-full"
-						name="status"
-						onChange={(key) => {
-							if (key !== null) {
-								setValues((current) => ({
-									...current,
-									status: String(key) as Warband["status"],
-								}));
-							}
-						}}
-						value={values.status}
-					>
-						<SelectTrigger id={statusId}>
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent>
-							{WARBAND_STATUSES.map((status) => (
-								<SelectItem id={status} key={status}>
-									{status}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
+				<Field className="md:col-span-2">
+					<FieldLabel htmlFor={bioId}>Bio</FieldLabel>
+					<Textarea
+						id={bioId}
+						name="bio"
+						onChange={(event) =>
+							setValues((current) => ({
+								...current,
+								bio: event.target.value,
+							}))
+						}
+						placeholder="History, character, and distinguishing details…"
+						value={values.bio ?? ""}
+					/>
 				</Field>
+				<NumberField
+					isRequired
+					label="Gold crowns"
+					minValue={0}
+					name="gold"
+					onChange={(gold) => setValues((current) => ({ ...current, gold }))}
+					value={values.gold}
+				/>
 				<NumberField
 					isRequired
 					label="Rating"
@@ -136,10 +118,7 @@ export function WarbandForm({
 			<div>
 				<Button
 					isDisabled={
-						isSubmitting ||
-						!values.name.trim() ||
-						!values.faction.trim() ||
-						!values.captain.trim()
+						isSubmitting || !values.name.trim() || !values.faction.trim()
 					}
 					type="submit"
 				>

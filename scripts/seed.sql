@@ -1,11 +1,11 @@
-INSERT OR IGNORE INTO warbands (id, name, faction, captain, rating, wins, status)
+INSERT OR IGNORE INTO warbands (id, name, faction, bio, gold, rating, wins)
 VALUES
-  ('reikland-reavers', 'Reikland Reavers', 'Mercenaries', 'Otto Falk', 186, 7, 'Ready'),
-  ('sisters-of-sigmar', 'The Silver Hammers', 'Sisters of Sigmar', 'Bertha Bestraufrung', 221, 10, 'Ready'),
-  ('night-runners', 'Night Runners', 'Skaven', 'Skritch', 154, 5, 'Recruiting'),
-  ('the-unquiet', 'The Unquiet', 'Undead', 'Count Vashenko', 208, 8, 'Recovering'),
-  ('witch-hunters', 'Ash and Iron', 'Witch Hunters', 'Gregor Stahl', 173, 6, 'Ready'),
-  ('possessed', 'Children of the Pit', 'The Possessed', 'Marius the Changed', 197, 7, 'Recovering');
+  ('reikland-reavers', 'Reikland Reavers', 'Mercenaries', 'Disciplined veterans from Reikland who prize steady aim and mutual loyalty.', 86, 186, 7),
+  ('sisters-of-sigmar', 'The Silver Hammers', 'Sisters of Sigmar', 'Devout sisters who scour the ruins to deny wyrdstone to the corrupt.', 121, 221, 10),
+  ('night-runners', 'Night Runners', 'Skaven', 'A swift and treacherous pack hunting warpstone beneath Mordheim.', 54, 154, 5),
+  ('the-unquiet', 'The Unquiet', 'Undead', 'Restless dead bound to Count Vashenko''s will and hunger.', 108, 208, 8),
+  ('witch-hunters', 'Ash and Iron', 'Witch Hunters', 'Zealous hunters who bring fire and judgment to the City of the Damned.', 73, 173, 6),
+  ('possessed', 'Children of the Pit', 'The Possessed', 'Twisted devotees seeking dark favor among Mordheim''s ruins.', 97, 197, 7);
 
 INSERT OR IGNORE INTO warriors (id, name, class, status, warband_id)
 VALUES

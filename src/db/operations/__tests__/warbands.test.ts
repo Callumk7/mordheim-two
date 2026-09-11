@@ -44,12 +44,13 @@ describe("warband operations on local D1", () => {
 		]);
 		await operations.updateWarband(
 			db,
-			{ id: "a", changes: { captain: "Klaus" } },
+			{ id: "a", changes: { bio: "Veteran treasure hunters", gold: 42 } },
 			clock,
 		);
 		expect(await operations.listWarbands(db)).toContainEqual({
 			...warband(),
-			captain: "Klaus",
+			bio: "Veteran treasure hunters",
+			gold: 42,
 			updatedAt,
 		});
 		await operations.deleteWarband(db, { id: "a" });

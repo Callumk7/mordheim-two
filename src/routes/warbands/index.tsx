@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { WarbandForm, type WarbandFormValues } from "#/components/warband-form";
 import { CreateWarriorDialog } from "@/components/shared/create-warrior-dialog";
 import { WarbandsTable } from "@/components/table/warbands-table";
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { WarbandForm, type WarbandFormValues } from "@/components/warband-form";
 import type { Warband } from "@/db/validation/warband";
 import { getCollections } from "@/db-collections";
 import { createWarbandTransaction } from "@/db-collections/mutations/warbands";
@@ -29,10 +29,10 @@ export const Route = createFileRoute("/warbands/")({
 const initialValues: WarbandFormValues = {
 	name: "",
 	faction: "Mercenaries",
-	captain: "",
+	bio: "",
+	gold: 500,
 	rating: 100,
 	wins: 0,
-	status: "Recruiting",
 };
 
 function WarbandsIndexPage() {

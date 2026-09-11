@@ -472,7 +472,7 @@ function Standings({ data, page }: { data: ProjectorData; page: number }) {
 						<span>Faction</span>
 						<span className="text-right">Rating</span>
 						<span className="text-right">Wins</span>
-						<span className="text-right">Status</span>
+						<span className="text-right">Gold</span>
 					</div>
 					{data.standings
 						.slice(start, start + pageSize)
@@ -501,9 +501,9 @@ function Standings({ data, page }: { data: ProjectorData; page: number }) {
 								<strong className="text-right font-mono text-[clamp(1.2rem,2vw,2rem)]">
 									{warband.wins}
 								</strong>
-								<span className="text-right text-sm font-bold uppercase tracking-wide text-primary">
-									{warband.status}
-								</span>
+								<strong className="text-right font-mono text-[clamp(1.2rem,2vw,2rem)] text-primary">
+									{warband.gold}
+								</strong>
 							</div>
 						))}
 				</div>

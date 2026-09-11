@@ -20,10 +20,10 @@ export const warband = (id = "a") =>
 		id,
 		name: id,
 		faction: "Reikland",
-		captain: "Otto",
+		bio: "Veteran mercenaries",
+		gold: 0,
 		rating: 0,
 		wins: 0,
-		status: "Ready",
 		...timestamps,
 	});
 export const warrior = (id = "wa", warbandId = "a") =>

@@ -12,10 +12,10 @@ export function useWarbands(dbClient: DbClient) {
 					id: warband.id,
 					name: warband.name,
 					faction: warband.faction,
-					captain: warband.captain,
+					bio: warband.bio,
+					gold: warband.gold,
 					rating: warband.rating,
 					wins: warband.wins,
-					status: warband.status,
 					createdAt: warband.createdAt,
 					updatedAt: warband.updatedAt,
 					warriors: toArray(

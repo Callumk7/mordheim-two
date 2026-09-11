@@ -80,10 +80,10 @@ function warband(id: string, name = id): Warband {
 		id,
 		name,
 		faction: "Mercenaries",
-		captain: `${id} captain`,
+		bio: null,
+		gold: 0,
 		rating: 100,
 		wins: 0,
-		status: "Ready",
 		createdAt: timestamp,
 		updatedAt: timestamp,
 	};

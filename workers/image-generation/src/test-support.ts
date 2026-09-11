@@ -32,6 +32,7 @@ export function setupDatabase(now?: () => number) {
 		"0015_equipment_source_catalogue.sql",
 		"0016_slimy_mathemanic.sql",
 		"0017_glorious_the_hunter.sql",
+		"0018_numerous_mercury.sql",
 	]) {
 		sqlite.exec(
 			readFileSync(
