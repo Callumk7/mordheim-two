@@ -1,9 +1,14 @@
-import type { ReactElement } from "react";
+// @vitest-environment happy-dom
+
+import { act, type ReactElement } from "react";
+import { createRoot } from "react-dom/client";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { TableCellNumberField } from "@/components/ui/table-cell-field";
 import type { Warband } from "@/db/validation/warband";
 import { WarbandsTable } from "../warbands-table";
+
+Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 
 const testState = vi.hoisted(() => ({
 	dataTableProps: undefined as Record<string, unknown> | undefined,
@@ -22,7 +27,16 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 vi.mock("@/components/ui/number-field", () => ({
 	NumberField: (props: Record<string, unknown>) => {
 		testState.numberFieldProps = props;
-		return null;
+		return (
+			<button
+				aria-label={props["aria-label"] as string}
+				disabled={props.isDisabled as boolean}
+				onClick={() =>
+					void (props.onChange as (value: number) => Promise<void>)(300)
+				}
+				type="button"
+			/>
+		);
 	},
 }));
 
@@ -115,5 +129,67 @@ describe("WarbandsTable gold editing", () => {
 		await commitOnBlur(300);
 		expect(onUpdateGold).toHaveBeenCalledOnce();
 		expect(onUpdateGold).toHaveBeenCalledWith("warband-2", 300);
+	});
+
+	it("blocks another gold update while the first update is pending", async () => {
+		let resolveUpdate: (() => void) | undefined;
+		const update = new Promise<void>((resolve) => {
+			resolveUpdate = resolve;
+		});
+		const onUpdateGold = vi.fn(() => update);
+
+		renderToStaticMarkup(
+			<WarbandsTable
+				combatStats={{} as never}
+				onAddWarrior={vi.fn()}
+				onUpdateGold={onUpdateGold}
+				warbands={warbands}
+			/>,
+		);
+
+		const columns = testState.dataTableProps?.columns as Array<{
+			accessorKey?: string;
+			id?: string;
+			cell?: (context: {
+				row: { original: (typeof warbands)[number] };
+			}) => ReactElement;
+		}>;
+		const goldColumn = columns.find(
+			(column) => column.id === "gold" || column.accessorKey === "gold",
+		);
+		const goldField = goldColumn?.cell?.({ row: { original: warbands[1] } });
+		const container = document.createElement("div");
+		const root = createRoot(container);
+
+		await act(async () => {
+			root.render(goldField);
+		});
+		const field = container.querySelector("button");
+		expect(field?.disabled).toBe(false);
+
+		await act(async () => {
+			field?.click();
+		});
+		expect(onUpdateGold).toHaveBeenCalledOnce();
+		expect(field?.disabled).toBe(true);
+
+		await act(async () => {
+			field?.click();
+		});
+		expect(onUpdateGold).toHaveBeenCalledOnce();
+
+		await act(async () => {
+			resolveUpdate?.();
+		});
+		expect(field?.disabled).toBe(false);
+
+		await act(async () => {
+			field?.click();
+		});
+		expect(onUpdateGold).toHaveBeenCalledTimes(2);
+
+		await act(async () => {
+			root.unmount();
+		});
 	});
 });
