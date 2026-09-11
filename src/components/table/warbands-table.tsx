@@ -11,6 +11,7 @@ import {
 } from "@/db-collections/projections";
 import { Button } from "../ui/button";
 import { TableActionLink, TableActions } from "../ui/table";
+import { TableCellNumberField } from "../ui/table-cell-field";
 import { createDataTableColumnHelper, DataTable } from "./data-table";
 
 type WarbandWithWarriors = Warband & { warriors: Warrior[] };
@@ -21,6 +22,7 @@ interface WarbandsTableProps {
 	combatStats: CombatStatsProjection;
 	warbands: WarbandWithWarriors[];
 	onAddWarrior: (warband: Warband) => void;
+	onUpdateGold: (warbandId: string, gold: number) => Promise<void>;
 }
 
 function WarbandWarriors({
@@ -97,6 +99,7 @@ function WarbandWarriors({
 export function WarbandsTable({
 	combatStats,
 	onAddWarrior,
+	onUpdateGold,
 	warbands,
 }: WarbandsTableProps) {
 	const navigate = useNavigate({ from: "/warbands" });
@@ -145,7 +148,13 @@ export function WarbandsTable({
 					header: "Gold",
 					meta: { align: "end" },
 					cell: ({ row }) => (
-						<span className="font-mono text-primary">{row.original.gold}</span>
+						<TableCellNumberField
+							aria-label={`Gold for ${row.original.name}`}
+							minValue={0}
+							onCommit={(gold) => onUpdateGold(row.original.id, gold)}
+							step={1}
+							value={row.original.gold}
+						/>
 					),
 				}),
 				columnHelper.accessor("wins", {
@@ -201,7 +210,7 @@ export function WarbandsTable({
 					),
 				}),
 			]),
-		[combatStats, navigate],
+		[combatStats, navigate, onUpdateGold],
 	);
 
 	return (

@@ -12,7 +12,10 @@ import {
 import { WarbandForm, type WarbandFormValues } from "@/components/warband-form";
 import type { Warband } from "@/db/validation/warband";
 import { getCollections } from "@/db-collections";
-import { createWarbandTransaction } from "@/db-collections/mutations/warbands";
+import {
+	createWarbandTransaction,
+	updateWarbandTransaction,
+} from "@/db-collections/mutations/warbands";
 import { createWarriorTransaction } from "@/db-collections/mutations/warriors";
 import { useCombatStats } from "@/db-collections/queries";
 import { useWarbands } from "@/db-collections/queries/warbands";
@@ -59,6 +62,14 @@ function WarbandsIndexPage() {
 				<WarbandsTable
 					combatStats={combatStats}
 					onAddWarrior={setRecruitingWarband}
+					onUpdateGold={async (warbandId, gold) => {
+						const transaction = updateWarbandTransaction(
+							collections,
+							warbandId,
+							{ gold },
+						);
+						await transaction.isPersisted.promise;
+					}}
 					warbands={warbands}
 				/>
 			) : (
