@@ -4,6 +4,8 @@ import { Pencil, Plus, Trophy, Users } from "lucide-react";
 import { useState } from "react";
 import { EventForm } from "@/components/event-form";
 import { formatStatus, MatchForm } from "@/components/match-form";
+import { MatchCompletionDialog } from "@/components/shared/match-completion-dialog";
+import { MatchStatusActions } from "@/components/shared/match-status-actions";
 import { MatchEventsTable } from "@/components/table/match-events-table";
 import { Button, LinkButton } from "@/components/ui/button";
 import {
@@ -42,6 +44,7 @@ export const Route = createFileRoute("/matches/$matchId/")({
 });
 
 function MatchDetailPage() {
+	const [isCompletionOpen, setIsCompletionOpen] = useState(false);
 	const [isEditMatchOpen, setIsEditMatchOpen] = useState(false);
 	const [isNewEventOpen, setIsNewEventOpen] = useState(false);
 	const { matchId } = Route.useParams();
@@ -65,6 +68,35 @@ function MatchDetailPage() {
 	const matchCombatStats = projectCombatStats(eventRows);
 	const attackerWarbandId = staffedParticipantWarbands[0]?.id ?? "";
 	const defenderWarbandId = staffedParticipantWarbands[1]?.id ?? "";
+	const initialEventValues = {
+		matchId,
+		attackerWarbandId,
+		attackerWarriorId:
+			warriorRows.find((warrior) => warrior.warbandId === attackerWarbandId)
+				?.id ?? "",
+		defenderWarbandId,
+		defenderWarriorId:
+			warriorRows.find((warrior) => warrior.warbandId === defenderWarbandId)
+				?.id ?? "",
+		notes: null,
+	};
+	const addEvent = async (
+		values: Parameters<typeof createEventTransaction>[1],
+	) => {
+		const transaction = createEventTransaction(collections, values);
+		await transaction.isPersisted.promise;
+	};
+	const setEventOutcome = async (
+		eventId: string,
+		outcome: Parameters<typeof setEventOutcomeTransaction>[2],
+	) => {
+		const transaction = setEventOutcomeTransaction(
+			collections,
+			eventId,
+			outcome,
+		);
+		await transaction.isPersisted.promise;
+	};
 
 	return (
 		<div className="grid gap-8">
@@ -108,9 +140,27 @@ function MatchDetailPage() {
 					</p>
 				</div>
 				<div className="flex flex-wrap gap-2">
+					<MatchStatusActions
+						onOpenCompletion={() => setIsCompletionOpen(true)}
+						onStatusChange={async (status) => {
+							const transaction = updateMatchTransaction(
+								dbClient,
+								collections,
+								{
+									id: matchId,
+									changes: { status },
+									additions: [],
+									removals: [],
+								},
+							);
+							await transaction.isPersisted.promise;
+						}}
+						status={match.status}
+					/>
 					<Button
 						isDisabled={!canAddEvent}
 						onPress={() => setIsNewEventOpen(true)}
+						variant="outline"
 					>
 						<Plus aria-hidden="true" data-icon="inline-start" />
 						Add event
@@ -151,17 +201,7 @@ function MatchDetailPage() {
 						Add event
 					</Button>
 				</div>
-				<MatchEventsTable
-					events={eventRows}
-					onSetOutcome={async (eventId, outcome) => {
-						const transaction = setEventOutcomeTransaction(
-							collections,
-							eventId,
-							outcome,
-						);
-						await transaction.isPersisted.promise;
-					}}
-				/>
+				<MatchEventsTable events={eventRows} onSetOutcome={setEventOutcome} />
 			</section>
 
 			<section aria-labelledby="participants-heading" className="grid gap-4">
@@ -204,6 +244,20 @@ function MatchDetailPage() {
 				)}
 			</section>
 
+			<MatchCompletionDialog
+				canAddEvent={staffedParticipantWarbands.length >= 2}
+				events={eventRows}
+				initialEventValues={initialEventValues}
+				isOpen={isCompletionOpen}
+				match={match}
+				onAddEvent={addEvent}
+				onOpenChange={setIsCompletionOpen}
+				onSetOutcome={setEventOutcome}
+				participants={participantRows}
+				warbands={participantWarbands}
+				warriors={warriorRows}
+			/>
+
 			<Dialog
 				className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl"
 				isOpen={isNewEventOpen}
@@ -216,26 +270,12 @@ function MatchDetailPage() {
 					</DialogDescription>
 				</DialogHeader>
 				<EventForm
-					initialValues={{
-						matchId,
-						attackerWarbandId,
-						attackerWarriorId:
-							warriorRows.find(
-								(warrior) => warrior.warbandId === attackerWarbandId,
-							)?.id ?? "",
-						defenderWarbandId,
-						defenderWarriorId:
-							warriorRows.find(
-								(warrior) => warrior.warbandId === defenderWarbandId,
-							)?.id ?? "",
-						notes: null,
-					}}
+					initialValues={initialEventValues}
 					isMatchLocked
 					key={`${matchId}:${String(isNewEventOpen)}`}
 					matches={[match]}
 					onSubmit={async (values) => {
-						const transaction = createEventTransaction(collections, values);
-						await transaction.isPersisted.promise;
+						await addEvent(values);
 						setIsNewEventOpen(false);
 					}}
 					participants={participantRows}
