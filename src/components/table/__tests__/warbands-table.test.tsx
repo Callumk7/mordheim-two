@@ -104,6 +104,7 @@ describe("WarbandsTable gold editing", () => {
 
 		renderToStaticMarkup(goldField as ReactElement);
 		expect(testState.numberFieldProps?.commitBehavior).toBe("validate");
+		expect(testState.numberFieldProps?.isDisabled).toBe(false);
 
 		const commitOnBlur = testState.numberFieldProps?.onChange as (
 			value: number,
