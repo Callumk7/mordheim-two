@@ -17,7 +17,10 @@ import {
 } from "@/db/operations/warrior-portraits.server";
 import { createWarrior, deleteWarrior } from "@/db/operations/warriors.server";
 import { imageGenerationJobs } from "@/db/schema";
-import { GEMINI_IMAGE_MODEL } from "@/db/validation/image-generation";
+import {
+	GEMINI_IMAGE_MODEL,
+	OPENAI_IMAGE_MODEL,
+} from "@/db/validation/image-generation";
 import {
 	assignment,
 	clock,
@@ -129,7 +132,7 @@ describe("image job operations on local D1", () => {
 		expect(await listQueueJobs(db)).toContainEqual(
 			expect.objectContaining({
 				warriorId: "wa",
-				model: GEMINI_IMAGE_MODEL,
+				model: OPENAI_IMAGE_MODEL,
 				updatedAt,
 			}),
 		);
@@ -171,7 +174,7 @@ describe("image job operations on local D1", () => {
 		expect(await listQueueJobs(db)).toContainEqual(
 			expect.objectContaining({
 				eventId: "event",
-				model: GEMINI_IMAGE_MODEL,
+				model: OPENAI_IMAGE_MODEL,
 				prompt: expect.stringMatching(
 					/The marksman lunged.*Attacking warrior: wa.*rusty-sword.*Defending warrior: wb/s,
 				),
