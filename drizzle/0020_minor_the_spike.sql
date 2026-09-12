@@ -1,0 +1,2 @@
+ALTER TABLE `image_generation_jobs` ADD `match_id` text REFERENCES matches(id) ON DELETE SET NULL;--> statement-breakpoint
+CREATE UNIQUE INDEX `image_generation_jobs_match_id_unique` ON `image_generation_jobs` (`match_id`);

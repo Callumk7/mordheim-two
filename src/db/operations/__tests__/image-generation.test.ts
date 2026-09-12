@@ -8,6 +8,12 @@ import {
 import { createEvent, resolveEvent } from "@/db/operations/events.server";
 import { queryGeneratedImages } from "@/db/operations/generated-images.server";
 import { enqueueImageGeneration } from "@/db/operations/image-generation.server";
+import {
+	buildMatchImagePrompt,
+	queryMatchImage,
+	submitCompletedMatchImage,
+} from "@/db/operations/match-images.server";
+import { updateMatch } from "@/db/operations/matches.server";
 import { listQueueJobs } from "@/db/operations/queue-jobs.server";
 import { createWarband } from "@/db/operations/warbands.server";
 import { createWarriorEquipment } from "@/db/operations/warrior-equipment.server";
@@ -180,6 +186,105 @@ describe("image job operations on local D1", () => {
 				),
 			}),
 		);
+	});
+
+	it("queues one final-state image for a completed victory", async () => {
+		const { db } = connection;
+		await seedMatch(db);
+		await createEvent(db, {
+			...event(),
+			notes: "wa drove wb from the shattered market square.",
+		});
+		await resolveEvent(db, { id: "event", outcome: "Injury" }, clock);
+		await updateMatch(
+			db,
+			{
+				id: "match",
+				changes: {
+					status: "Completed",
+					result: "Victory",
+					winnerWarbandId: "a",
+				},
+			},
+			clock,
+		);
+		const queue = { send: vi.fn().mockResolvedValue(undefined) };
+
+		const first = await submitCompletedMatchImage(db, queue, "match", clock);
+		const second = await submitCompletedMatchImage(db, queue, "match", clock);
+
+		expect(first).toHaveProperty("job.status", "queued");
+		expect(second).toHaveProperty("job.jobId", first.job?.jobId);
+		expect(queue.send).toHaveBeenCalledTimes(1);
+		expect(await queryMatchImage(db, "match")).toEqual(
+			expect.objectContaining({ status: "queued" }),
+		);
+		expect(await listQueueJobs(db)).toContainEqual(
+			expect.objectContaining({
+				matchId: "match",
+				warriorId: null,
+				eventId: null,
+				model: OPENAI_IMAGE_MODEL,
+				prompt: expect.stringMatching(
+					/a is the victorious winner.*b is defeated.*"warbands".*"name": "a".*"name": "b".*wa drove wb.*"attacker".*"name": "wa".*"defender".*"name": "wb"/s,
+				),
+			}),
+		);
+	});
+
+	it("does not queue match images without a completed victory and winner", async () => {
+		const { db } = connection;
+		await seedMatch(db);
+		const queue = { send: vi.fn().mockResolvedValue(undefined) };
+
+		expect(await submitCompletedMatchImage(db, queue, "match", clock)).toEqual({
+			job: null,
+		});
+		await updateMatch(
+			db,
+			{ id: "match", changes: { status: "Completed", result: "Draw" } },
+			clock,
+		);
+		expect(await submitCompletedMatchImage(db, queue, "match", clock)).toEqual({
+			job: null,
+		});
+		await updateMatch(
+			db,
+			{
+				id: "match",
+				changes: {
+					status: "InProgress",
+					result: "Victory",
+					winnerWarbandId: "a",
+				},
+			},
+			clock,
+		);
+		expect(await submitCompletedMatchImage(db, queue, "match", clock)).toEqual({
+			job: null,
+		});
+		expect(queue.send).not.toHaveBeenCalled();
+	});
+
+	it("deterministically keeps final-match prompts within provider limits", () => {
+		const prompt = buildMatchImagePrompt({
+			match: { name: "Final", scenario: "Skirmish" },
+			winnerWarbandId: "a",
+			warbands: [warband("a"), warband("b")],
+			warriors: [warrior("wa", "a"), warrior("wb", "b")],
+			events: Array.from({ length: 30 }, (_, index) => ({
+				...event(`event-${String(index).padStart(2, "0")}`),
+				createdAt: `2026-09-${String(index + 1).padStart(2, "0")}T00:00:00.000Z`,
+				notes: `${index}-${"x".repeat(1000)}`,
+				outcome: "Injury",
+				voidedAt: null,
+			})),
+		});
+
+		expect(prompt.length).toBeLessThanOrEqual(4000);
+		expect(prompt).toContain("event-29");
+		expect(prompt).not.toContain("event-00");
+		expect(prompt).toMatch(/"omittedOlder": [1-9]/);
 	});
 
 	it("does not queue event images for unresolved or recovery events", async () => {

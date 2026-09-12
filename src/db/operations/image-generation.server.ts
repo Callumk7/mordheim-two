@@ -8,8 +8,9 @@ import type {
 } from "@/db/validation/image-generation";
 
 type ImageGenerationAssociation =
-	| { warriorId: string; eventId?: never }
-	| { eventId: string; warriorId?: never };
+	| { warriorId: string; eventId?: never; matchId?: never }
+	| { eventId: string; warriorId?: never; matchId?: never }
+	| { matchId: string; warriorId?: never; eventId?: never };
 
 interface ImageGenerationOptions {
 	prompt: string;
@@ -28,8 +29,14 @@ export async function enqueueImageGeneration(
 	if (association) {
 		const associationColumn = association.warriorId
 			? imageGenerationJobs.warriorId
-			: imageGenerationJobs.eventId;
-		const associationId = association.warriorId ?? association.eventId;
+			: association.eventId
+				? imageGenerationJobs.eventId
+				: imageGenerationJobs.matchId;
+		const associationId =
+			association.warriorId ?? association.eventId ?? association.matchId;
+		if (associationId === undefined) {
+			throw new Error("An image association ID is required.");
+		}
 		const inserted = await db
 			.insert(imageGenerationJobs)
 			.values({ id: jobId, prompt, model, ...association })

@@ -30,6 +30,9 @@ export const imageGenerationJobs = sqliteTable("image_generation_jobs", {
 	eventId: text("event_id")
 		.references((): AnySQLiteColumn => events.id, { onDelete: "set null" })
 		.unique(),
+	matchId: text("match_id")
+		.references((): AnySQLiteColumn => matches.id, { onDelete: "set null" })
+		.unique(),
 	status: text("status", {
 		enum: [
 			"pending",
