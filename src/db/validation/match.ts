@@ -61,4 +61,29 @@ export const MatchParticipantsUpdateInputSchema = z.object({
 
 export const MatchDeleteInputSchema = z.object({ id: z.string().min(1) });
 
+export const MatchImageInputSchema = z.object({
+	matchId: z.string().min(1),
+});
+
+/**
+ * Whether a match update could change whether the match is a completed victory,
+ * and so whether its illustration should be submitted.
+ *
+ * The UI completes a match in two steps: the status flips to "Completed" first,
+ * then the completion dialog records the result and winner. Optimistic updates
+ * send only the fields that actually changed, so the second step carries no
+ * status at all. Keying off "status became Completed" therefore misses the only
+ * step that can produce a winner. Any outcome-bearing field is the trigger, and
+ * the stored match decides whether a job is actually submitted.
+ */
+export function affectsMatchOutcome(
+	changes: z.output<typeof MatchUpdateSchema>,
+) {
+	return (
+		changes.status !== undefined ||
+		changes.result !== undefined ||
+		changes.winnerWarbandId !== undefined
+	);
+}
+
 export type Match = z.output<typeof MatchSchema>;

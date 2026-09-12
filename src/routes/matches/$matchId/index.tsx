@@ -1,10 +1,11 @@
 import { safeRandomUUID } from "@tanstack/react-db";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { Pencil, Plus, Trophy, Users } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "#/components/ui/badge";
 import { EventForm } from "@/components/event-form";
 import { formatStatus, MatchForm } from "@/components/match-form";
+import { MatchImage } from "@/components/match-image";
 import { MatchCompletionDialog } from "@/components/shared/match-completion-dialog";
 import { MatchStatusActions } from "@/components/shared/match-status-actions";
 import { MatchEventsTable } from "@/components/table/match-events-table";
@@ -39,8 +40,11 @@ import {
 } from "@/db-collections/projections";
 import { useMatchWorkspace } from "@/db-collections/queries";
 import { buildUpdateMatchCommand } from "@/lib/match-commands";
+import { getMatchImagery } from "@/server/match-images";
 
 export const Route = createFileRoute("/matches/$matchId/")({
+	loader: ({ params }) =>
+		getMatchImagery({ data: { matchId: params.matchId } }),
 	component: MatchDetailPage,
 });
 
@@ -49,6 +53,8 @@ function MatchDetailPage() {
 	const [isEditMatchOpen, setIsEditMatchOpen] = useState(false);
 	const [isNewEventOpen, setIsNewEventOpen] = useState(false);
 	const { matchId } = Route.useParams();
+	const imagery = Route.useLoaderData();
+	const router = useRouter();
 	const { dbClient } = Route.useRouteContext();
 	const collections = getCollections(dbClient);
 	const {
@@ -97,6 +103,8 @@ function MatchDetailPage() {
 			outcome,
 		);
 		await transaction.isPersisted.promise;
+		// Resolution submits an event illustration server-side; reload its status.
+		await router.invalidate();
 	};
 	const updateMatch = async (
 		changes: Parameters<typeof updateMatchTransaction>[2]["changes"],
@@ -108,6 +116,8 @@ function MatchDetailPage() {
 			removals: [],
 		});
 		await transaction.isPersisted.promise;
+		// Completing a match submits its illustration server-side; reload the status.
+		await router.invalidate();
 	};
 
 	return (
@@ -194,7 +204,11 @@ function MatchDetailPage() {
 						Add event
 					</Button>
 				</div>
-				<MatchEventsTable events={eventRows} onSetOutcome={setEventOutcome} />
+				<MatchEventsTable
+					events={eventRows}
+					imageJobs={imagery.events}
+					onSetOutcome={setEventOutcome}
+				/>
 			</section>
 
 			<section aria-labelledby="participants-heading" className="grid gap-4">
@@ -237,9 +251,16 @@ function MatchDetailPage() {
 				)}
 			</section>
 
+			<MatchImage
+				imagery={imagery}
+				match={match}
+				winnerName={winnerWarband?.name ?? "The winning warband"}
+			/>
+
 			<MatchCompletionDialog
 				canAddEvent={staffedParticipantWarbands.length >= 2}
 				events={eventRows}
+				eventImageJobs={imagery.events}
 				initialEventValues={initialEventValues}
 				isOpen={isCompletionOpen}
 				match={match}
