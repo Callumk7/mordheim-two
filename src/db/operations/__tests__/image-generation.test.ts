@@ -7,7 +7,10 @@ import {
 } from "@/db/operations/event-images.server";
 import { createEvent, resolveEvent } from "@/db/operations/events.server";
 import { queryGeneratedImages } from "@/db/operations/generated-images.server";
-import { enqueueImageGeneration } from "@/db/operations/image-generation.server";
+import {
+	enqueueImageGeneration,
+	retryImageGeneration,
+} from "@/db/operations/image-generation.server";
 import {
 	buildMatchImagePrompt,
 	queryMatchImage,
@@ -27,6 +30,7 @@ import {
 	GEMINI_IMAGE_MODEL,
 	OPENAI_IMAGE_MODEL,
 } from "@/db/validation/image-generation";
+import { affectsMatchOutcome } from "@/db/validation/match";
 import {
 	assignment,
 	clock,
@@ -264,6 +268,117 @@ describe("image job operations on local D1", () => {
 			job: null,
 		});
 		expect(queue.send).not.toHaveBeenCalled();
+	});
+
+	it("submits the match image when the winner arrives after the status", async () => {
+		// The completion dialog saves the winner in a second update that carries no
+		// status change, so submission must follow the stored match, not the delta.
+		const { db } = connection;
+		await seedMatch(db);
+		const queue = { send: vi.fn().mockResolvedValue(undefined) };
+
+		const statusChange = { status: "Completed" } as const;
+		await updateMatch(db, { id: "match", changes: statusChange }, clock);
+		expect(affectsMatchOutcome(statusChange)).toBe(true);
+		expect(await submitCompletedMatchImage(db, queue, "match", clock)).toEqual({
+			job: null,
+		});
+
+		const resultChange = {
+			result: "Victory",
+			winnerWarbandId: "a",
+		} as const;
+		expect(affectsMatchOutcome(resultChange)).toBe(true);
+		await updateMatch(db, { id: "match", changes: resultChange }, clock);
+
+		expect(
+			await submitCompletedMatchImage(db, queue, "match", clock),
+		).toHaveProperty("job.status", "queued");
+		expect(queue.send).toHaveBeenCalledTimes(1);
+		expect(await queryMatchImage(db, "match")).toEqual(
+			expect.objectContaining({ status: "queued" }),
+		);
+	});
+
+	it("ignores match updates that cannot change the outcome", () => {
+		expect(affectsMatchOutcome({})).toBe(false);
+		expect(affectsMatchOutcome({ name: "Renamed", scenario: "Skirmish" })).toBe(
+			false,
+		);
+		expect(affectsMatchOutcome({ winnerWarbandId: null })).toBe(true);
+	});
+
+	it("re-delivers stranded jobs instead of reporting them as submitted", async () => {
+		const { db } = connection;
+		await seedMatch(db);
+		await createEvent(db, { ...event(), notes: "wa felled wb." });
+		await resolveEvent(db, { id: "event", outcome: "Injury" }, clock);
+		await updateMatch(
+			db,
+			{
+				id: "match",
+				changes: {
+					status: "Completed",
+					result: "Victory",
+					winnerWarbandId: "a",
+				},
+			},
+			clock,
+		);
+		const failing = { send: vi.fn().mockRejectedValue(new Error("no queue")) };
+		const working = { send: vi.fn().mockResolvedValue(undefined) };
+
+		const strandedEvent = await submitEventImage(db, failing, "event", clock);
+		const strandedMatch = await submitCompletedMatchImage(
+			db,
+			failing,
+			"match",
+			clock,
+		);
+		expect(strandedEvent).toHaveProperty("job.status", "enqueue_failed");
+		expect(strandedMatch).toHaveProperty("job.status", "enqueue_failed");
+
+		expect(await submitEventImage(db, working, "event", clock)).toEqual({
+			job: { jobId: strandedEvent.job?.jobId, status: "queued" },
+		});
+		expect(
+			await submitCompletedMatchImage(db, working, "match", clock),
+		).toEqual({ job: { jobId: strandedMatch.job?.jobId, status: "queued" } });
+
+		// Retried in place: no duplicate rows, and the prompts are the stored ones.
+		expect(working.send).toHaveBeenCalledTimes(2);
+		expect(await listQueueJobs(db)).toHaveLength(2);
+		expect(await queryEventImage(db, "event")).toEqual({
+			jobId: strandedEvent.job?.jobId,
+			status: "queued",
+			error: null,
+		});
+		expect(await queryMatchImage(db, "match")).toEqual({
+			jobId: strandedMatch.job?.jobId,
+			status: "queued",
+			error: null,
+		});
+	});
+
+	it("never re-delivers a job the consumer already owns", async () => {
+		const { db } = connection;
+		const queue = { send: vi.fn().mockResolvedValue(undefined) };
+		const { jobId } = await enqueueImageGeneration(
+			db,
+			queue,
+			{ prompt: "A ruined city", model: GEMINI_IMAGE_MODEL },
+			clock,
+		);
+		await db
+			.update(imageGenerationJobs)
+			.set({ status: "processing" })
+			.where(eq(imageGenerationJobs.id, jobId));
+
+		await retryImageGeneration(db, queue, jobId, clock);
+
+		expect(await listQueueJobs(db)).toContainEqual(
+			expect.objectContaining({ id: jobId, status: "processing" }),
+		);
 	});
 
 	it("deterministically keeps final-match prompts within provider limits", () => {

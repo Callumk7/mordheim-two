@@ -1,7 +1,10 @@
 import { eq } from "drizzle-orm";
 import type { Database } from "@/db/index.server";
 import { type Clock, systemClock } from "@/db/operations/clock";
-import { enqueueImageGeneration } from "@/db/operations/image-generation.server";
+import {
+	enqueueImageGeneration,
+	retryImageGeneration,
+} from "@/db/operations/image-generation.server";
 import {
 	equipment,
 	events,
@@ -128,7 +131,16 @@ export async function submitEventImage(
 	clock: Clock = systemClock,
 ) {
 	const existing = await queryEventImage(db, eventId);
-	if (existing) return { job: existing } as const;
+	if (existing) {
+		// A job stranded before queue delivery still holds its prompt. Re-deliver it
+		// instead of treating the row as proof that generation was already requested.
+		if (existing.status === "enqueue_failed") {
+			return {
+				job: await retryImageGeneration(db, queue, existing.jobId, clock),
+			} as const;
+		}
+		return { job: existing } as const;
+	}
 
 	const event = await db
 		.select({
