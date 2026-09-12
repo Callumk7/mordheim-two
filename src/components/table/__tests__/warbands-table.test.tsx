@@ -92,6 +92,7 @@ describe("WarbandsTable gold editing", () => {
 				combatStats={{} as never}
 				onAddWarrior={vi.fn()}
 				onUpdateGold={onUpdateGold}
+				onUpdateRating={vi.fn()}
 				warbands={warbands}
 			/>,
 		);
@@ -143,6 +144,7 @@ describe("WarbandsTable gold editing", () => {
 				combatStats={{} as never}
 				onAddWarrior={vi.fn()}
 				onUpdateGold={onUpdateGold}
+				onUpdateRating={vi.fn()}
 				warbands={warbands}
 			/>,
 		);
@@ -187,6 +189,128 @@ describe("WarbandsTable gold editing", () => {
 			field?.click();
 		});
 		expect(onUpdateGold).toHaveBeenCalledTimes(2);
+
+		await act(async () => {
+			root.unmount();
+		});
+	});
+});
+
+describe("WarbandsTable rating editing", () => {
+	beforeEach(() => {
+		testState.dataTableProps = undefined;
+		testState.numberFieldProps = undefined;
+	});
+
+	it("commits changed rating on blur for only the edited warband and ignores an unchanged value", async () => {
+		const onUpdateRating = vi.fn(async () => undefined);
+
+		renderToStaticMarkup(
+			<WarbandsTable
+				combatStats={{} as never}
+				onAddWarrior={vi.fn()}
+				onUpdateGold={vi.fn()}
+				onUpdateRating={onUpdateRating}
+				warbands={warbands}
+			/>,
+		);
+
+		const columns = testState.dataTableProps?.columns as Array<{
+			accessorKey?: string;
+			id?: string;
+			cell?: (context: {
+				row: { original: (typeof warbands)[number] };
+			}) => ReactElement;
+		}>;
+		const ratingColumn = columns.find(
+			(column) => column.id === "rating" || column.accessorKey === "rating",
+		);
+		const ratingField = ratingColumn?.cell?.({
+			row: { original: warbands[1] },
+		});
+
+		expect(ratingField?.type).toBe(TableCellNumberField);
+		expect(ratingField?.props).toMatchObject({
+			"aria-label": "Rating for Sisters of Sigmar",
+			minValue: 0,
+			step: 1,
+			value: 120,
+		});
+
+		renderToStaticMarkup(ratingField as ReactElement);
+		expect(testState.numberFieldProps?.commitBehavior).toBe("validate");
+		expect(testState.numberFieldProps?.isDisabled).toBe(false);
+
+		const commitOnBlur = testState.numberFieldProps?.onChange as (
+			value: number,
+		) => Promise<void>;
+		await commitOnBlur(120);
+		expect(onUpdateRating).not.toHaveBeenCalled();
+
+		await commitOnBlur(300);
+		expect(onUpdateRating).toHaveBeenCalledOnce();
+		expect(onUpdateRating).toHaveBeenCalledWith("warband-2", 300);
+	});
+
+	it("blocks another rating update while the first update is pending", async () => {
+		let resolveUpdate: (() => void) | undefined;
+		const update = new Promise<void>((resolve) => {
+			resolveUpdate = resolve;
+		});
+		const onUpdateRating = vi.fn(() => update);
+
+		renderToStaticMarkup(
+			<WarbandsTable
+				combatStats={{} as never}
+				onAddWarrior={vi.fn()}
+				onUpdateGold={vi.fn()}
+				onUpdateRating={onUpdateRating}
+				warbands={warbands}
+			/>,
+		);
+
+		const columns = testState.dataTableProps?.columns as Array<{
+			accessorKey?: string;
+			id?: string;
+			cell?: (context: {
+				row: { original: (typeof warbands)[number] };
+			}) => ReactElement;
+		}>;
+		const ratingColumn = columns.find(
+			(column) => column.id === "rating" || column.accessorKey === "rating",
+		);
+		const ratingField = ratingColumn?.cell?.({
+			row: { original: warbands[1] },
+		});
+		const container = document.createElement("div");
+		const root = createRoot(container);
+
+		await act(async () => {
+			root.render(ratingField);
+		});
+		const field = container.querySelector("button");
+		expect(field?.disabled).toBe(false);
+
+		await act(async () => {
+			field?.click();
+		});
+		expect(onUpdateRating).toHaveBeenCalledOnce();
+		expect(field?.disabled).toBe(true);
+
+		await act(async () => {
+			field?.click();
+		});
+		expect(onUpdateRating).toHaveBeenCalledOnce();
+
+		await act(async () => {
+			resolveUpdate?.();
+		});
+		expect(field?.disabled).toBe(false);
+
+		await act(async () => {
+			field?.click();
+		});
+		expect(onUpdateRating).toHaveBeenCalledTimes(2);
 
 		await act(async () => {
 			root.unmount();

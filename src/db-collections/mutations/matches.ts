@@ -33,6 +33,33 @@ export function createMatchTransaction(
 	return transaction;
 }
 
+function persistConfirmedMatchWrites(
+	collections: AppCollections,
+	input: {
+		id: string;
+		changes: Partial<
+			Pick<Match, "name" | "scenario" | "status" | "result" | "winnerWarbandId">
+		>;
+		additions: WarbandMatch[];
+		removals: WarbandMatch[];
+	},
+) {
+	if (Object.keys(input.changes).length > 0) {
+		collections.matches.utils.writeUpdate({
+			id: input.id,
+			...input.changes,
+		});
+	}
+	if (input.removals.length > 0) {
+		collections.warbandMatches.utils.writeDelete(
+			input.removals.map((participant) => participant.id),
+		);
+	}
+	if (input.additions.length > 0) {
+		collections.warbandMatches.utils.writeInsert(input.additions);
+	}
+}
+
 export function updateMatchTransaction(
 	dbClient: DbClient,
 	collections: AppCollections,
@@ -45,6 +72,12 @@ export function updateMatchTransaction(
 		removals: WarbandMatch[];
 	},
 ) {
+	if (input.additions.length === 0 && input.removals.length === 0) {
+		return collections.matches.update(input.id, (draft) => {
+			Object.assign(draft, input.changes);
+		});
+	}
+
 	const transaction = dbClient.createTransaction({
 		mutationFn: async () => {
 			await updateMatchWithParticipants({
@@ -55,10 +88,7 @@ export function updateMatchTransaction(
 					removals: input.removals.map((participant) => participant.id),
 				},
 			});
-			await Promise.all([
-				collections.matches.utils.refetch(),
-				collections.warbandMatches.utils.refetch(),
-			]);
+			persistConfirmedMatchWrites(collections, input);
 		},
 	});
 

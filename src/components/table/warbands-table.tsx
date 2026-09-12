@@ -23,6 +23,7 @@ interface WarbandsTableProps {
 	warbands: WarbandWithWarriors[];
 	onAddWarrior: (warband: Warband) => void;
 	onUpdateGold: (warbandId: string, gold: number) => Promise<void>;
+	onUpdateRating: (warbandId: string, rating: number) => Promise<void>;
 }
 
 function WarbandWarriors({
@@ -103,6 +104,7 @@ export function WarbandsTable({
 	combatStats,
 	onAddWarrior,
 	onUpdateGold,
+	onUpdateRating,
 	warbands,
 }: WarbandsTableProps) {
 	const navigate = useNavigate({ from: "/warbands" });
@@ -183,9 +185,13 @@ export function WarbandsTable({
 					header: "Rating",
 					meta: { align: "end" },
 					cell: ({ row }) => (
-						<span className="font-mono text-primary">
-							{row.original.rating}
-						</span>
+						<TableCellNumberField
+							aria-label={`Rating for ${row.original.name}`}
+							minValue={0}
+							onCommit={(rating) => onUpdateRating(row.original.id, rating)}
+							step={1}
+							value={row.original.rating}
+						/>
 					),
 				}),
 				columnHelper.display({
@@ -213,7 +219,7 @@ export function WarbandsTable({
 					),
 				}),
 			]),
-		[combatStats, navigate, onUpdateGold],
+		[combatStats, navigate, onUpdateGold, onUpdateRating],
 	);
 
 	return (
