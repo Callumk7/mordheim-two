@@ -95,18 +95,28 @@ function button(label: string) {
 	);
 }
 
+const initialEventValues = {
+	matchId: "match-1",
+	attackerWarbandId: "warband-a",
+	attackerWarriorId: "warrior-a",
+	defenderWarbandId: "warband-b",
+	defenderWarriorId: "warrior-b",
+	notes: null,
+};
+
+const participants = [
+	{ warbandId: "warband-a" } as never,
+	{ warbandId: "warband-b" } as never,
+];
+const warbands = [
+	{ id: "warband-a", name: "Reikland Reavers" } as never,
+	{ id: "warband-b", name: "Sisters of Sigmar" } as never,
+];
+
 describe("MatchCompletionDialog", () => {
 	it("shows match events, resolves injury/death outcomes, and adds a final event", async () => {
 		const onAddEvent = vi.fn(async () => undefined);
 		const onSetOutcome = vi.fn(async () => undefined);
-		const initialEventValues = {
-			matchId: "match-1",
-			attackerWarbandId: "warband-a",
-			attackerWarriorId: "warrior-a",
-			defenderWarbandId: "warband-b",
-			defenderWarriorId: "warrior-b",
-			notes: null,
-		};
 
 		await act(async () => {
 			root.render(
@@ -120,12 +130,20 @@ describe("MatchCompletionDialog", () => {
 					]}
 					initialEventValues={initialEventValues}
 					isOpen
-					match={{ id: "match-1", name: "The Last Stand" } as never}
+					match={
+						{
+							id: "match-1",
+							name: "The Last Stand",
+							result: "Pending",
+							winnerWarbandId: null,
+						} as never
+					}
 					onAddEvent={onAddEvent}
 					onOpenChange={vi.fn()}
+					onSaveResult={vi.fn(async () => undefined)}
 					onSetOutcome={onSetOutcome}
-					participants={[]}
-					warbands={[]}
+					participants={participants}
+					warbands={warbands}
 					warriors={[]}
 				/>,
 			);
@@ -134,6 +152,7 @@ describe("MatchCompletionDialog", () => {
 		expect(container.getAttribute("role")).toBeNull();
 		expect(container.textContent).toContain("Complete The Last Stand");
 		expect(container.textContent).toContain("Heinrich");
+		expect(container.textContent).toContain("Winning warband");
 
 		await act(async () => button("Injury for Heinrich")?.click());
 		await act(async () => button("Death for Heinrich")?.click());
@@ -145,5 +164,83 @@ describe("MatchCompletionDialog", () => {
 		await act(async () => button("Save final event")?.click());
 		expect(onAddEvent).toHaveBeenCalledWith(initialEventValues);
 		expect(button("Save final event")).toBeUndefined();
+	});
+
+	it("saves a selected winner with the completed match result", async () => {
+		const onSaveResult = vi.fn(async () => undefined);
+		const onOpenChange = vi.fn();
+
+		await act(async () => {
+			root.render(
+				<MatchCompletionDialog
+					canAddEvent
+					events={[]}
+					initialEventValues={initialEventValues}
+					isOpen
+					match={
+						{
+							id: "match-1",
+							name: "The Last Stand",
+							result: "Victory",
+							winnerWarbandId: "warband-a",
+						} as never
+					}
+					onAddEvent={vi.fn(async () => undefined)}
+					onOpenChange={onOpenChange}
+					onSaveResult={onSaveResult}
+					onSetOutcome={vi.fn(async () => undefined)}
+					participants={participants}
+					warbands={warbands}
+					warriors={[]}
+				/>,
+			);
+		});
+
+		expect(button("Save result")).toBeDefined();
+		await act(async () => button("Save result")?.click());
+		expect(onSaveResult).toHaveBeenCalledWith({
+			status: "Completed",
+			result: "Victory",
+			winnerWarbandId: "warband-a",
+		});
+		expect(onOpenChange).toHaveBeenCalledWith(false);
+	});
+
+	it("saves a draw without a winning warband", async () => {
+		const onSaveResult = vi.fn(async () => undefined);
+
+		await act(async () => {
+			root.render(
+				<MatchCompletionDialog
+					canAddEvent
+					events={[]}
+					initialEventValues={initialEventValues}
+					isOpen
+					match={
+						{
+							id: "match-1",
+							name: "The Last Stand",
+							result: "Draw",
+							winnerWarbandId: null,
+						} as never
+					}
+					onAddEvent={vi.fn(async () => undefined)}
+					onOpenChange={vi.fn()}
+					onSaveResult={onSaveResult}
+					onSetOutcome={vi.fn(async () => undefined)}
+					participants={participants}
+					warbands={warbands}
+					warriors={[]}
+				/>,
+			);
+		});
+
+		expect(container.textContent).not.toContain("Winning warband");
+		await act(async () => button("Save result")?.click());
+		expect(onSaveResult).toHaveBeenCalledWith({
+			status: "Completed",
+			result: "Draw",
+			winnerWarbandId: null,
+		});
 	});
 });

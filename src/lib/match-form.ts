@@ -44,13 +44,25 @@ export function changeMatchParticipantSelection(
 	return participantWarbandIds.filter((id) => id !== warbandId);
 }
 
-export function canSubmitMatch(values: MatchFormValues) {
-	if (!values.name.trim() || !values.scenario.trim()) return false;
-	if (values.result === "Victory") {
+export function isMatchResultConsistent(
+	result: Match["result"],
+	winnerWarbandId: string | null,
+	participantWarbandIds: readonly string[],
+) {
+	if (result === "Victory") {
 		return (
-			values.winnerWarbandId !== null &&
-			values.participantWarbandIds.includes(values.winnerWarbandId)
+			winnerWarbandId !== null &&
+			participantWarbandIds.includes(winnerWarbandId)
 		);
 	}
-	return values.winnerWarbandId === null;
+	return winnerWarbandId === null;
+}
+
+export function canSubmitMatch(values: MatchFormValues) {
+	if (!values.name.trim() || !values.scenario.trim()) return false;
+	return isMatchResultConsistent(
+		values.result,
+		values.winnerWarbandId,
+		values.participantWarbandIds,
+	);
 }

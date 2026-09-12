@@ -26,7 +26,7 @@ export const matchesCollectionOptions = collectionOptions("matches", (client) =>
 				),
 			);
 		},
-		onUpdate: async ({ transaction }) => {
+		onUpdate: async ({ collection, transaction }) => {
 			await Promise.all(
 				transaction.mutations.map((mutation) =>
 					updateMatch({
@@ -37,6 +37,13 @@ export const matchesCollectionOptions = collectionOptions("matches", (client) =>
 					}),
 				),
 			);
+			collection.utils.writeUpdate(
+				transaction.mutations.map((mutation) => ({
+					id: mutation.original.id,
+					...mutation.changes,
+				})),
+			);
+			return { refetch: false };
 		},
 		onDelete: async ({ transaction }) => {
 			await Promise.all(

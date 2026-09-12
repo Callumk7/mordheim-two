@@ -245,6 +245,7 @@ function MatchDetailPage() {
 				match={match}
 				onAddEvent={addEvent}
 				onOpenChange={setIsCompletionOpen}
+				onSaveResult={(changes) => updateMatch(changes)}
 				onSetOutcome={setEventOutcome}
 				participants={participantRows}
 				warbands={participantWarbands}

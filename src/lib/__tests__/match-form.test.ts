@@ -3,6 +3,7 @@ import {
 	canSubmitMatch,
 	changeMatchParticipantSelection,
 	isMatchParticipantLocked,
+	isMatchResultConsistent,
 	type MatchFormValues,
 } from "../match-form";
 
@@ -116,5 +117,15 @@ describe("match submit eligibility", () => {
 				winnerWarbandId: "alpha",
 			}),
 		).toBe(false);
+	});
+
+	it("requires a participating winner only for a victory", () => {
+		expect(isMatchResultConsistent("Victory", "alpha", ["alpha", "beta"])).toBe(
+			true,
+		);
+		expect(isMatchResultConsistent("Victory", null, ["alpha", "beta"])).toBe(
+			false,
+		);
+		expect(isMatchResultConsistent("Draw", null, ["alpha", "beta"])).toBe(true);
 	});
 });

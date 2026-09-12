@@ -55,6 +55,13 @@ function WarbandsIndexPage() {
 		await transaction.isPersisted.promise;
 	}
 
+	async function updateRating(warbandId: string, rating: number) {
+		const transaction = updateWarbandTransaction(collections, warbandId, {
+			rating,
+		});
+		await transaction.isPersisted.promise;
+	}
+
 	return (
 		<IndexPage>
 			<IndexPageHeader
@@ -70,6 +77,7 @@ function WarbandsIndexPage() {
 					combatStats={combatStats}
 					onAddWarrior={setRecruitingWarband}
 					onUpdateGold={updateGold}
+					onUpdateRating={updateRating}
 					warbands={warbands}
 				/>
 			) : (
