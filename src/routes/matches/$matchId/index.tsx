@@ -23,7 +23,6 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import type { Match } from "@/db/validation/match";
 import type { Warrior } from "@/db/validation/warrior";
 import { getCollections } from "@/db-collections";
 import {
@@ -247,10 +246,6 @@ function MatchDetailPage() {
 				onAddEvent={addEvent}
 				onOpenChange={setIsCompletionOpen}
 				onSetOutcome={setEventOutcome}
-				onSetResult={(changes: {
-					result: Match["result"];
-					winnerWarbandId: string | null;
-				}) => updateMatch(changes)}
 				participants={participantRows}
 				warbands={participantWarbands}
 				warriors={warriorRows}
