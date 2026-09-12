@@ -1,4 +1,5 @@
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
+import { Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import {
 	EVENT_OUTCOMES,
@@ -6,7 +7,8 @@ import {
 	EventOutcomeSchema,
 } from "@/db/validation/event";
 import type { MatchEventRow } from "@/db-collections/projections";
-import { TableActionLink, TableActions } from "../ui/table";
+import { Button } from "../ui/button";
+import { TableActions } from "../ui/table";
 import { TableCellSelect } from "../ui/table-cell-field";
 import { createDataTableColumnHelper, DataTable } from "./data-table";
 
@@ -14,6 +16,7 @@ const columnHelper = createDataTableColumnHelper<MatchEventRow>();
 
 function createColumns(
 	onSetOutcome: (eventId: string, outcome: EventOutcome) => Promise<void>,
+	onVoidEvent: (eventId: string) => void,
 ) {
 	return columnHelper.columns([
 		columnHelper.accessor("createdAt", {
@@ -34,16 +37,12 @@ function createColumns(
 				header: "Attacker",
 				meta: { isRowHeader: true },
 				cell: ({ row }) => (
-					<Link
-						className="font-semibold text-foreground hover:text-primary"
-						params={{ eventId: row.original.id }}
-						to="/events/$eventId"
-					>
+					<span className="font-semibold text-foreground">
 						{row.original.attackerWarriorName}
 						<span className="block text-xs font-normal text-muted-foreground">
 							{row.original.attackerName}
 						</span>
-					</Link>
+					</span>
 				),
 			},
 		),
@@ -100,25 +99,19 @@ function createColumns(
 			meta: { align: "end" },
 			enableGlobalFilter: false,
 			enableSorting: false,
-			cell: ({ row }) => (
-				<TableActions>
-					<TableActionLink
-						params={{ eventId: row.original.id }}
-						to="/events/$eventId"
-					>
-						View
-					</TableActionLink>
-					{row.original.voidedAt === null ? (
-						<TableActionLink
-							params={{ eventId: row.original.id }}
-							to="/events/$eventId/delete"
+			cell: ({ row }) =>
+				row.original.voidedAt === null ? (
+					<TableActions>
+						<Button
+							aria-label={`Void event for ${row.original.attackerWarriorName} against ${row.original.defenderWarriorName}`}
+							onPress={() => onVoidEvent(row.original.id)}
+							size="icon-xs"
 							variant="destructive"
 						>
-							Void
-						</TableActionLink>
-					) : null}
-				</TableActions>
-			),
+							<Trash2 aria-hidden="true" />
+						</Button>
+					</TableActions>
+				) : null,
 		}),
 	]);
 }
@@ -130,7 +123,17 @@ export function MatchEventsTable({
 	events: readonly MatchEventRow[];
 	onSetOutcome: (eventId: string, outcome: EventOutcome) => Promise<void>;
 }) {
-	const columns = useMemo(() => createColumns(onSetOutcome), [onSetOutcome]);
+	const navigate = useNavigate({ from: "/matches/$matchId/" });
+	const columns = useMemo(
+		() =>
+			createColumns(onSetOutcome, (eventId) =>
+				navigate({
+					to: "/events/$eventId/delete",
+					params: { eventId },
+				}),
+			),
+		[navigate, onSetOutcome],
+	);
 	const rows = useMemo(() => [...events], [events]);
 
 	return (
@@ -141,6 +144,12 @@ export function MatchEventsTable({
 			emptyMessage="No events have been recorded for this match."
 			initialSorting={[{ id: "createdAt", desc: true }]}
 			itemLabel={{ singular: "event", plural: "events" }}
+			onRowAction={(event) =>
+				navigate({
+					to: "/events/$eventId",
+					params: { eventId: event.id },
+				})
+			}
 			searchPlaceholder="Search match events…"
 			tableClassName="min-w-210"
 		/>
