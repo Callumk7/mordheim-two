@@ -162,7 +162,7 @@ export function DataTable<TData extends RowData & { id: string }>({
 	const globalFilter = table.state.globalFilter ?? "";
 
 	return (
-		<div className="space-y-4">
+		<div className="min-w-0 space-y-4">
 			<DataTableToolbar
 				filteredCount={rows.length}
 				itemLabel={itemLabel}

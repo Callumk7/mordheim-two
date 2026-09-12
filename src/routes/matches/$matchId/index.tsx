@@ -2,6 +2,7 @@ import { safeRandomUUID } from "@tanstack/react-db";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Pencil, Plus, Trophy, Users } from "lucide-react";
 import { useState } from "react";
+import { Badge } from "#/components/ui/badge";
 import { EventForm } from "@/components/event-form";
 import { formatStatus, MatchForm } from "@/components/match-form";
 import { MatchCompletionDialog } from "@/components/shared/match-completion-dialog";
@@ -97,41 +98,45 @@ function MatchDetailPage() {
 		);
 		await transaction.isPersisted.promise;
 	};
+	const updateMatch = async (
+		changes: Parameters<typeof updateMatchTransaction>[2]["changes"],
+	) => {
+		const transaction = updateMatchTransaction(dbClient, collections, {
+			id: matchId,
+			changes,
+			additions: [],
+			removals: [],
+		});
+		await transaction.isPersisted.promise;
+	};
 
 	return (
 		<div className="grid gap-8">
 			<div className="flex items-center justify-between gap-4">
-				<Link
-					className="text-sm text-muted-foreground hover:text-primary/80"
-					to="/matches"
-				>
+				<LinkButton size="sm" to="/matches" variant="outline">
 					← Matches
-				</Link>
-				<Link
-					className="text-sm text-destructive/80 hover:text-destructive"
+				</LinkButton>
+				<LinkButton
 					params={{ matchId }}
+					size="sm"
 					to="/matches/$matchId/delete"
+					variant="destructive"
 				>
 					Delete match
-				</Link>
+				</LinkButton>
 			</div>
 
 			<header className="flex flex-col justify-between gap-6 border-b border-border pb-7 md:flex-row md:items-end">
 				<div>
 					<div className="flex flex-wrap items-center gap-3">
-						<p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
-							{match.scenario}
-						</p>
-						<span className="rounded-full border border-border bg-muted/40 px-2.5 py-1 text-xs font-medium text-muted-foreground">
-							{formatStatus(match.status)}
-						</span>
-						<span className="rounded-full border border-border bg-muted/40 px-2.5 py-1 text-xs font-medium text-muted-foreground">
+						<Badge variant="outline">{formatStatus(match.status)}</Badge>
+						<Badge variant="outline">
 							{match.result === "Victory"
 								? `${winnerWarband?.name ?? "Unknown warband"} won`
 								: match.result}
-						</span>
+						</Badge>
 					</div>
-					<h1 className="mt-2 font-mordheim text-4xl text-foreground sm:text-5xl">
+					<h1 className="mt-5 font-mordheim text-4xl text-foreground sm:text-5xl">
 						{match.name}
 					</h1>
 					<p className="mt-2 text-muted-foreground">
@@ -142,19 +147,7 @@ function MatchDetailPage() {
 				<div className="flex flex-wrap gap-2">
 					<MatchStatusActions
 						onOpenCompletion={() => setIsCompletionOpen(true)}
-						onStatusChange={async (status) => {
-							const transaction = updateMatchTransaction(
-								dbClient,
-								collections,
-								{
-									id: matchId,
-									changes: { status },
-									additions: [],
-									removals: [],
-								},
-							);
-							await transaction.isPersisted.promise;
-						}}
+						onStatusChange={(status) => updateMatch({ status })}
 						status={match.status}
 					/>
 					<Button

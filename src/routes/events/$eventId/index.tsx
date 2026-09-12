@@ -1,8 +1,9 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { EventForm } from "@/components/event-form";
 import { EventImage } from "@/components/event-image";
 import { EventOutcomeForm } from "@/components/event-outcome-form";
+import { LinkButton } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getCollections } from "@/db-collections";
 import {
@@ -67,20 +68,18 @@ function EventDetailPage() {
 	return (
 		<div className="mx-auto max-w-3xl">
 			<div className="flex items-center justify-between gap-4">
-				<Link
-					className="text-sm text-muted-foreground hover:text-primary/80"
-					to="/events"
-				>
+				<LinkButton size="sm" to="/events" variant="outline">
 					← Events
-				</Link>
+				</LinkButton>
 				{event.voidedAt === null ? (
-					<Link
-						className="text-sm text-destructive/80 hover:text-destructive"
+					<LinkButton
 						params={{ eventId }}
+						size="sm"
 						to="/events/$eventId/delete"
+						variant="destructive"
 					>
 						Void event
-					</Link>
+					</LinkButton>
 				) : null}
 			</div>
 
