@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { Trash2 } from "lucide-react";
 import { useMemo } from "react";
+import type { GeneratedImageJob } from "@/components/shared/generated-image-status";
 import {
 	EVENT_OUTCOMES,
 	type EventOutcome,
@@ -14,9 +15,39 @@ import { createDataTableColumnHelper, DataTable } from "./data-table";
 
 const columnHelper = createDataTableColumnHelper<MatchEventRow>();
 
+export type MatchEventImageJobs = Readonly<
+	Record<string, GeneratedImageJob | undefined>
+>;
+
+const ILLUSTRATED_OUTCOMES: readonly EventOutcome[] = ["Injury", "Death"];
+
+/** Mirrors submitEventImage: only these events ever get an illustration. */
+function isIllustratable(event: MatchEventRow) {
+	return (
+		event.voidedAt === null &&
+		event.outcome !== null &&
+		ILLUSTRATED_OUTCOMES.includes(event.outcome)
+	);
+}
+
+function describeImageJob(job: GeneratedImageJob | undefined) {
+	if (!job) return "Not submitted";
+	switch (job.status) {
+		case "completed":
+			return "Ready";
+		case "enqueue_failed":
+			return "Not queued";
+		case "failed":
+			return "Failed";
+		default:
+			return job.status;
+	}
+}
+
 function createColumns(
 	onSetOutcome: (eventId: string, outcome: EventOutcome) => Promise<void>,
 	onVoidEvent: (eventId: string) => void,
+	imageJobs: MatchEventImageJobs,
 ) {
 	return columnHelper.columns([
 		columnHelper.accessor("createdAt", {
@@ -84,6 +115,31 @@ function createColumns(
 					/>
 				),
 		}),
+		columnHelper.accessor(
+			(event) =>
+				isIllustratable(event) ? describeImageJob(imageJobs[event.id]) : "",
+			{
+				id: "illustration",
+				header: "Illustration",
+				cell: ({ row }) => {
+					if (!isIllustratable(row.original)) {
+						return <span className="text-muted-foreground">—</span>;
+					}
+					const job = imageJobs[row.original.id];
+					return (
+						<span
+							className={
+								job?.status === "completed"
+									? "whitespace-nowrap font-medium text-foreground"
+									: "whitespace-nowrap text-muted-foreground"
+							}
+						>
+							{describeImageJob(job)}
+						</span>
+					);
+				},
+			},
+		),
 		columnHelper.accessor((event) => event.notes ?? "", {
 			id: "notes",
 			header: "Notes",
@@ -116,23 +172,30 @@ function createColumns(
 	]);
 }
 
+const NO_IMAGE_JOBS: MatchEventImageJobs = {};
+
 export function MatchEventsTable({
 	events,
+	imageJobs = NO_IMAGE_JOBS,
 	onSetOutcome,
 }: {
 	events: readonly MatchEventRow[];
+	imageJobs?: MatchEventImageJobs;
 	onSetOutcome: (eventId: string, outcome: EventOutcome) => Promise<void>;
 }) {
 	const navigate = useNavigate({ from: "/matches/$matchId/" });
 	const columns = useMemo(
 		() =>
-			createColumns(onSetOutcome, (eventId) =>
-				navigate({
-					to: "/events/$eventId/delete",
-					params: { eventId },
-				}),
+			createColumns(
+				onSetOutcome,
+				(eventId) =>
+					navigate({
+						to: "/events/$eventId/delete",
+						params: { eventId },
+					}),
+				imageJobs,
 			),
-		[navigate, onSetOutcome],
+		[imageJobs, navigate, onSetOutcome],
 	);
 	const rows = useMemo(() => [...events], [events]);
 
@@ -151,7 +214,7 @@ export function MatchEventsTable({
 				})
 			}
 			searchPlaceholder="Search match events…"
-			tableClassName="min-w-210"
+			tableClassName="min-w-240"
 		/>
 	);
 }
