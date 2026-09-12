@@ -85,33 +85,33 @@ export function buildMatchImagePrompt(context: {
 		const warrior = warriorById.get(warriorId);
 		return warrior
 			? {
-					id: warrior.id,
+					id: clip(warrior.id, 120),
 					name: clip(warrior.name, 100),
 					class: clip(warrior.class, 100),
 					description: clip(warrior.description, 180),
 					status: warrior.status,
-					warbandId: warrior.warbandId,
+					warbandId: clip(warrior.warbandId, 120),
 					knocked: warrior.knocked,
 					injuries: warrior.injuries,
 					knockedDowns: warrior.knockedDowns,
 				}
-			: { id: warriorId, unavailable: true };
+			: { id: clip(warriorId, 120), unavailable: true };
 	};
 	const orderedEvents = [...context.events].sort(
 		(a, b) =>
 			b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id),
 	);
 	const eventSnapshots = orderedEvents.map((event) => ({
-		id: event.id,
+		id: clip(event.id, 120),
 		notes: clip(event.notes, 240),
 		outcome: event.outcome ?? "Unresolved",
 		voided: event.voidedAt !== null,
 		attacker: {
-			warbandId: event.attackerWarbandId,
+			warbandId: clip(event.attackerWarbandId, 120),
 			warrior: warriorSnapshot(event.attackerWarriorId),
 		},
 		defender: {
-			warbandId: event.defenderWarbandId,
+			warbandId: clip(event.defenderWarbandId, 120),
 			warrior: warriorSnapshot(event.defenderWarriorId),
 		},
 	}));
@@ -131,14 +131,14 @@ export function buildMatchImagePrompt(context: {
 			status: "Completed",
 			result: "Victory",
 		},
-		winnerWarbandId: winner.id,
+		winnerWarbandId: clip(winner.id, 120),
 		warbandSelection: {
 			total: orderedWarbands.length,
 			included: selectedWarbands.length,
 			omitted: orderedWarbands.length - selectedWarbands.length,
 		},
 		warbands: selectedWarbands.map((warband) => ({
-			id: warband.id,
+			id: clip(warband.id, 120),
 			name: clip(warband.name, 100),
 			faction: clip(warband.faction, 100),
 			bio: clip(warband.bio, 220),

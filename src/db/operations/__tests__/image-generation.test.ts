@@ -287,6 +287,23 @@ describe("image job operations on local D1", () => {
 		expect(prompt).toMatch(/"omittedOlder": [1-9]/);
 	});
 
+	it("bounds opaque identifiers in final-match prompts", () => {
+		const winnerId = "winner-".repeat(400);
+		const loserId = "loser-".repeat(400);
+
+		const prompt = buildMatchImagePrompt({
+			match: { name: "Final", scenario: "Skirmish" },
+			winnerWarbandId: winnerId,
+			warbands: [warband(winnerId), warband(loserId)],
+			warriors: [],
+			events: [],
+		});
+
+		expect(prompt.length).toBeLessThanOrEqual(4000);
+		expect(prompt).not.toContain(winnerId);
+		expect(prompt).not.toContain(loserId);
+	});
+
 	it("does not queue event images for unresolved or recovery events", async () => {
 		const { db } = connection;
 		await seedMatch(db);
