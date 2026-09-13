@@ -4,6 +4,7 @@ import { type Database, getDb } from "@/db/index.server";
 import { submitCompletedMatchImage } from "@/db/operations/match-images.server";
 import * as operations from "@/db/operations/matches.server";
 import {
+	affectsMatchOutcome,
 	MatchDeleteInputSchema,
 	MatchParticipantsUpdateInputSchema,
 	MatchSchema,
@@ -46,7 +47,7 @@ export const updateMatch = createServerFn({ method: "POST" })
 	.handler(async ({ data }) => {
 		const db = getDb();
 		await operations.updateMatch(db, data);
-		if (data.changes.status === "Completed") {
+		if (affectsMatchOutcome(data.changes)) {
 			await submitMatchImageAfterCompletion(db, data.id);
 		}
 	});
@@ -56,7 +57,7 @@ export const updateMatchWithParticipants = createServerFn({ method: "POST" })
 	.handler(async ({ data }) => {
 		const db = getDb();
 		await operations.updateMatchWithParticipants(db, data);
-		if (data.changes.status === "Completed") {
+		if (affectsMatchOutcome(data.changes)) {
 			await submitMatchImageAfterCompletion(db, data.id);
 		}
 	});

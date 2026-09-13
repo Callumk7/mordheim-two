@@ -1,7 +1,10 @@
 import { Plus } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { EventForm, type EventFormValues } from "@/components/event-form";
-import { MatchEventsTable } from "@/components/table/match-events-table";
+import {
+	type MatchEventImageJobs,
+	MatchEventsTable,
+} from "@/components/table/match-events-table";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -37,6 +40,7 @@ const COMPLETION_RESULTS = MATCH_RESULTS.filter(
 
 export function MatchCompletionDialog({
 	canAddEvent,
+	eventImageJobs,
 	events,
 	initialEventValues,
 	isOpen,
@@ -50,6 +54,7 @@ export function MatchCompletionDialog({
 	warriors,
 }: {
 	canAddEvent: boolean;
+	eventImageJobs?: MatchEventImageJobs;
 	events: readonly MatchEventRow[];
 	initialEventValues: EventFormValues;
 	isOpen: boolean;
@@ -229,7 +234,11 @@ export function MatchCompletionDialog({
 						</section>
 					) : null}
 
-					<MatchEventsTable events={events} onSetOutcome={onSetOutcome} />
+					<MatchEventsTable
+						events={events}
+						imageJobs={eventImageJobs}
+						onSetOutcome={onSetOutcome}
+					/>
 				</div>
 			</div>
 

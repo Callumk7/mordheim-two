@@ -1,7 +1,10 @@
 import { asc, eq, inArray } from "drizzle-orm";
 import type { Database } from "@/db/index.server";
 import { type Clock, systemClock } from "@/db/operations/clock";
-import { enqueueImageGeneration } from "@/db/operations/image-generation.server";
+import {
+	enqueueImageGeneration,
+	retryImageGeneration,
+} from "@/db/operations/image-generation.server";
 import {
 	events,
 	imageGenerationJobs,
@@ -187,6 +190,27 @@ export function queryMatchImage(db: Pick<Database, "select">, matchId: string) {
 		.get();
 }
 
+/**
+ * Image jobs for every event in a match, so the match view can report generation
+ * progress without a per-row request.
+ */
+export function queryMatchEventImages(
+	db: Pick<Database, "select">,
+	matchId: string,
+) {
+	return db
+		.select({
+			eventId: events.id,
+			jobId: imageGenerationJobs.id,
+			status: imageGenerationJobs.status,
+			error: imageGenerationJobs.error,
+		})
+		.from(imageGenerationJobs)
+		.innerJoin(events, eq(imageGenerationJobs.eventId, events.id))
+		.where(eq(events.matchId, matchId))
+		.all();
+}
+
 export async function submitCompletedMatchImage(
 	db: Database,
 	queue: Pick<Queue<ImageGenerationMessage>, "send">,
@@ -194,7 +218,16 @@ export async function submitCompletedMatchImage(
 	clock: Clock = systemClock,
 ) {
 	const existing = await queryMatchImage(db, matchId);
-	if (existing) return { job: existing } as const;
+	if (existing) {
+		// A job stranded before queue delivery still holds its prompt. Re-deliver it
+		// instead of treating the row as proof that generation was already requested.
+		if (existing.status === "enqueue_failed") {
+			return {
+				job: await retryImageGeneration(db, queue, existing.jobId, clock),
+			} as const;
+		}
+		return { job: existing } as const;
+	}
 
 	const match = await db
 		.select()

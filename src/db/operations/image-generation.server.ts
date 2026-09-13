@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import type { Database } from "@/db/index.server";
 import { type Clock, systemClock } from "@/db/operations/clock";
 import { imageGenerationJobs } from "@/db/schema";
@@ -16,6 +16,67 @@ interface ImageGenerationOptions {
 	prompt: string;
 	model: ImageGenerationModel;
 	association?: ImageGenerationAssociation;
+}
+
+type DeliveryDatabase = Pick<Database, "update">;
+
+// "pending" and "enqueue_failed" are the only producer-owned states. Restricting
+// every delivery write to them means a delivery racing the consumer can never
+// overwrite "consumed", "processing", "completed" or "failed".
+const PRODUCER_OWNED_STATUSES = ["pending", "enqueue_failed"] as const;
+
+async function deliverImageGeneration(
+	db: DeliveryDatabase,
+	queue: Pick<Queue<ImageGenerationMessage>, "send">,
+	jobId: string,
+	clock: Clock,
+) {
+	try {
+		// Keep the prompt in D1; the consumer loads it using this ID.
+		await queue.send({ jobId });
+	} catch {
+		await db
+			.update(imageGenerationJobs)
+			.set({
+				status: "enqueue_failed",
+				error: "Queue submission failed; delivery may be uncertain.",
+				updatedAt: clock(),
+			})
+			.where(
+				and(
+					eq(imageGenerationJobs.id, jobId),
+					inArray(imageGenerationJobs.status, PRODUCER_OWNED_STATUSES),
+				),
+			);
+		return { jobId, status: "enqueue_failed" as const };
+	}
+
+	// Deliberately outside the catch: a D1 failure here does not mean send failed.
+	// Delivery can race this update; never overwrite a consumer's job state.
+	await db
+		.update(imageGenerationJobs)
+		.set({ status: "queued", error: null, updatedAt: clock() })
+		.where(
+			and(
+				eq(imageGenerationJobs.id, jobId),
+				inArray(imageGenerationJobs.status, PRODUCER_OWNED_STATUSES),
+			),
+		);
+	return { jobId, status: "queued" as const };
+}
+
+/**
+ * Re-delivers an existing job whose prompt is already durable in D1. Only jobs
+ * left in "enqueue_failed" are retryable: every later state belongs to the
+ * consumer, and re-sending those would duplicate paid generation work.
+ */
+export function retryImageGeneration(
+	db: DeliveryDatabase,
+	queue: Pick<Queue<ImageGenerationMessage>, "send">,
+	jobId: string,
+	clock: Clock = systemClock,
+) {
+	return deliverImageGeneration(db, queue, jobId, clock);
 }
 
 export async function enqueueImageGeneration(
@@ -56,42 +117,16 @@ export async function enqueueImageGeneration(
 				throw new Error(
 					"Image association changed. Refresh before trying again.",
 				);
+			// A job that never reached the queue is not a duplicate request. Deliver
+			// the prompt already stored against it rather than stranding the job.
+			if (existing.status === "enqueue_failed") {
+				return deliverImageGeneration(db, queue, existing.jobId, clock);
+			}
 			return existing;
 		}
 	} else {
 		await db.insert(imageGenerationJobs).values({ id: jobId, prompt, model });
 	}
 
-	try {
-		// Keep the prompt in D1; the consumer loads it using this ID.
-		await queue.send({ jobId });
-	} catch {
-		await db
-			.update(imageGenerationJobs)
-			.set({
-				status: "enqueue_failed",
-				error: "Queue submission failed; delivery may be uncertain.",
-				updatedAt: clock(),
-			})
-			.where(
-				and(
-					eq(imageGenerationJobs.id, jobId),
-					eq(imageGenerationJobs.status, "pending"),
-				),
-			);
-		return { jobId, status: "enqueue_failed" as const };
-	}
-
-	// Deliberately outside the catch: a D1 failure here does not mean send failed.
-	// Delivery can race this update; never overwrite a consumer's job state.
-	await db
-		.update(imageGenerationJobs)
-		.set({ status: "queued", updatedAt: clock() })
-		.where(
-			and(
-				eq(imageGenerationJobs.id, jobId),
-				eq(imageGenerationJobs.status, "pending"),
-			),
-		);
-	return { jobId, status: "queued" as const };
+	return deliverImageGeneration(db, queue, jobId, clock);
 }
