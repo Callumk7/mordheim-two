@@ -1,7 +1,10 @@
 import { useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { GeneratedImageStatus } from "@/components/shared/generated-image-status";
+import {
+	type GeneratedImageJob,
+	GeneratedImageStatus,
+} from "@/components/shared/generated-image-status";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -22,8 +25,10 @@ export function WarriorPortrait({
 	const submit = useServerFn(createWarriorPortrait);
 	const [submitting, setSubmitting] = useState(false);
 	const [message, setMessage] = useState<string | null>(null);
-	const [submitted, setSubmitted] = useState(false);
-	const job = portrait.job;
+	const [submittedJob, setSubmittedJob] = useState<GeneratedImageJob | null>(
+		null,
+	);
+	const job = portrait.job ?? submittedJob;
 	return (
 		<Card className="mt-7">
 			<CardContent className="space-y-4">
@@ -42,21 +47,21 @@ export function WarriorPortrait({
 							Uses saved profile details. Save changes before generating.
 						</p>
 						<Button
-							isDisabled={submitting || submitted}
+							isDisabled={submitting}
 							onPress={async () => {
 								setSubmitting(true);
-								setSubmitted(true);
 								setMessage(null);
 								try {
 									const result = await submit({ data: { warriorId } });
-									setMessage(
-										result.error ??
-											`Portrait job: ${result.job.status}. Refresh this page to check for your portrait.`,
-									);
+									if (result.error) {
+										setMessage(result.error);
+										return;
+									}
+									setSubmittedJob({ ...result.job, error: null });
 									await router.invalidate({ sync: true });
 								} catch {
 									setMessage(
-										"Could not confirm portrait submission. Refresh this page before trying again; a job may already exist.",
+										"Could not confirm portrait submission. Wait a moment before trying again; a job may already exist.",
 									);
 								} finally {
 									setSubmitting(false);
@@ -67,7 +72,7 @@ export function WarriorPortrait({
 						</Button>
 					</>
 				)}
-				{message && !job && <output className="block">{message}</output>}
+				{message && !job && <p role="alert">{message}</p>}
 			</CardContent>
 		</Card>
 	);

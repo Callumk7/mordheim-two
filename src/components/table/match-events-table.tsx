@@ -1,7 +1,8 @@
 import { useNavigate } from "@tanstack/react-router";
-import { Trash2 } from "lucide-react";
+import { LoaderCircle, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import type { GeneratedImageJob } from "@/components/shared/generated-image-status";
+import { isActiveImageJobStatus } from "@/components/shared/use-image-generation-polling";
 import {
 	EVENT_OUTCOMES,
 	type EventOutcome,
@@ -35,12 +36,20 @@ function describeImageJob(job: GeneratedImageJob | undefined) {
 	switch (job.status) {
 		case "completed":
 			return "Ready";
+		case "pending":
+			return "Waiting to generate";
+		case "queued":
+			return "Queued";
+		case "processing":
+			return "Generating";
 		case "enqueue_failed":
-			return "Not queued";
+			return "Could not queue";
 		case "failed":
-			return "Failed";
+			return "Generation failed";
+		case "consumed":
+			return "Image unavailable";
 		default:
-			return job.status;
+			return "Status unavailable";
 	}
 }
 
@@ -142,14 +151,26 @@ function createColumns(
 						return <span className="text-muted-foreground">—</span>;
 					}
 					const job = imageJobs[row.original.id];
+					const isActive = job ? isActiveImageJobStatus(job.status) : false;
+					const isFailure =
+						job !== undefined &&
+						["failed", "enqueue_failed", "consumed"].includes(job.status);
 					return (
 						<span
+							aria-live={isActive ? "polite" : undefined}
 							className={
 								job?.status === "completed"
 									? "whitespace-nowrap font-medium text-foreground"
-									: "whitespace-nowrap text-muted-foreground"
+									: "inline-flex items-center gap-1.5 whitespace-nowrap text-muted-foreground"
 							}
+							role={isActive ? "status" : isFailure ? "alert" : undefined}
 						>
+							{isActive ? (
+								<LoaderCircle
+									aria-hidden="true"
+									className="size-3.5 animate-spin"
+								/>
+							) : null}
 							{describeImageJob(job)}
 						</span>
 					);

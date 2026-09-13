@@ -3,6 +3,7 @@
 import type { ReactElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { GeneratedImageJob } from "@/components/shared/generated-image-status";
 import { Button } from "@/components/ui/button";
 import type { MatchEventRow } from "@/db-collections/projections";
 import { MatchEventsTable } from "../match-events-table";
@@ -52,6 +53,14 @@ const event: MatchEventRow = {
 	createdAt: "2026-01-01T00:00:00.000Z",
 	updatedAt: "2026-01-01T00:00:00.000Z",
 };
+
+function getColumn(id: string) {
+	const columns = testState.dataTableProps?.columns as Array<{
+		id?: string;
+		cell?: (context: { row: { original: MatchEventRow } }) => ReactElement;
+	}>;
+	return columns.find((column) => column.id === id);
+}
 
 describe("MatchEventsTable actions", () => {
 	beforeEach(() => {
@@ -103,5 +112,40 @@ describe("MatchEventsTable actions", () => {
 			to: "/events/$eventId/delete",
 			params: { eventId: "event-1" },
 		});
+	});
+
+	it.each([
+		["pending", "Waiting to generate", "status"],
+		["queued", "Queued", "status"],
+		["processing", "Generating", "status"],
+		["failed", "Generation failed", "alert"],
+		["enqueue_failed", "Could not queue", "alert"],
+		["consumed", "Image unavailable", "alert"],
+	])("shows accessible illustration status for %s", (status, label, role) => {
+		const illustratedEvent: MatchEventRow = {
+			...event,
+			outcome: "Injury",
+			resolvedAt: "2026-01-01T00:01:00.000Z",
+		};
+		renderToStaticMarkup(
+			<MatchEventsTable
+				events={[illustratedEvent]}
+				imageJobs={{
+					[event.id]: {
+						jobId: "image-1",
+						status: status as GeneratedImageJob["status"],
+						error: null,
+					},
+				}}
+				onSetOutcome={vi.fn()}
+			/>,
+		);
+
+		const cell = getColumn("illustration")?.cell?.({
+			row: { original: illustratedEvent },
+		});
+		const markup = renderToStaticMarkup(cell);
+		expect(markup).toContain(`role="${role}"`);
+		expect(markup).toContain(label);
 	});
 });
