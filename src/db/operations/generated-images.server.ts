@@ -2,6 +2,8 @@ import { and, desc, eq, isNotNull, or } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import { imageGenerationJobs as jobs } from "@/db/schema";
 
+export const PROJECTOR_IMAGE_LIMIT = 30;
+
 export function queryGeneratedImages(db: Pick<DrizzleD1Database, "select">) {
 	return db
 		.select({ id: jobs.id, prompt: jobs.prompt, completedAt: jobs.completedAt })
@@ -33,6 +35,7 @@ export function queryProjectorImages(db: Pick<DrizzleD1Database, "select">) {
 			),
 		)
 		.orderBy(desc(jobs.completedAt), desc(jobs.id))
+		.limit(PROJECTOR_IMAGE_LIMIT)
 		.all();
 }
 

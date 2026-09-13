@@ -7,6 +7,7 @@ import {
 } from "@/db/operations/event-images.server";
 import { createEvent, resolveEvent } from "@/db/operations/events.server";
 import {
+	PROJECTOR_IMAGE_LIMIT,
 	queryGeneratedImages,
 	queryProjectorImages,
 } from "@/db/operations/generated-images.server";
@@ -502,5 +503,6 @@ describe("image job operations on local D1", () => {
 		expect((await queryGeneratedImages(db)).map((row) => row.id)).toEqual(
 			expectedIds,
 		);
+		expect(PROJECTOR_IMAGE_LIMIT).toBe(30);
 	});
 });
