@@ -44,10 +44,26 @@ function describeImageJob(job: GeneratedImageJob | undefined) {
 	}
 }
 
+/**
+ * A warrior can only die once (events_effective_death_defender_unique), so do
+ * not offer an outcome the server is bound to reject. Deaths recorded in other
+ * matches are not in this table's scope, which is why resolveEvent still guards
+ * the rule and reports it.
+ */
+function outcomesFor(
+	event: MatchEventRow,
+	deadWarriorIds: ReadonlySet<string>,
+) {
+	return deadWarriorIds.has(event.defenderWarriorId)
+		? EVENT_OUTCOMES.filter((outcome) => outcome !== "Death")
+		: EVENT_OUTCOMES;
+}
+
 function createColumns(
 	onSetOutcome: (eventId: string, outcome: EventOutcome) => Promise<void>,
 	onVoidEvent: (eventId: string) => void,
 	imageJobs: MatchEventImageJobs,
+	deadWarriorIds: ReadonlySet<string>,
 ) {
 	return columnHelper.columns([
 		columnHelper.accessor("createdAt", {
@@ -109,7 +125,7 @@ function createColumns(
 						onCommit={(outcome) =>
 							onSetOutcome(row.original.id, EventOutcomeSchema.parse(outcome))
 						}
-						options={EVENT_OUTCOMES}
+						options={outcomesFor(row.original, deadWarriorIds)}
 						placeholder="Pick outcome"
 						value=""
 					/>
@@ -173,12 +189,15 @@ function createColumns(
 }
 
 const NO_IMAGE_JOBS: MatchEventImageJobs = {};
+const NO_DEAD_WARRIORS: ReadonlySet<string> = new Set();
 
 export function MatchEventsTable({
+	deadWarriorIds = NO_DEAD_WARRIORS,
 	events,
 	imageJobs = NO_IMAGE_JOBS,
 	onSetOutcome,
 }: {
+	deadWarriorIds?: ReadonlySet<string>;
 	events: readonly MatchEventRow[];
 	imageJobs?: MatchEventImageJobs;
 	onSetOutcome: (eventId: string, outcome: EventOutcome) => Promise<void>;
@@ -194,8 +213,9 @@ export function MatchEventsTable({
 						params: { eventId },
 					}),
 				imageJobs,
+				deadWarriorIds,
 			),
-		[imageJobs, navigate, onSetOutcome],
+		[deadWarriorIds, imageJobs, navigate, onSetOutcome],
 	);
 	const rows = useMemo(() => [...events], [events]);
 

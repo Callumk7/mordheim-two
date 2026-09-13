@@ -40,6 +40,7 @@ const COMPLETION_RESULTS = MATCH_RESULTS.filter(
 
 export function MatchCompletionDialog({
 	canAddEvent,
+	deadWarriorIds,
 	eventImageJobs,
 	events,
 	initialEventValues,
@@ -54,6 +55,7 @@ export function MatchCompletionDialog({
 	warriors,
 }: {
 	canAddEvent: boolean;
+	deadWarriorIds?: ReadonlySet<string>;
 	eventImageJobs?: MatchEventImageJobs;
 	events: readonly MatchEventRow[];
 	initialEventValues: EventFormValues;
@@ -235,6 +237,7 @@ export function MatchCompletionDialog({
 					) : null}
 
 					<MatchEventsTable
+						deadWarriorIds={deadWarriorIds}
 						events={events}
 						imageJobs={eventImageJobs}
 						onSetOutcome={onSetOutcome}

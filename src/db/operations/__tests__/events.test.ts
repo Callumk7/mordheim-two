@@ -153,9 +153,11 @@ describe("event operations on local D1", () => {
 		await operations.createEvent(db, event());
 		await operations.createEvent(db, event("second"));
 		await operations.resolveEvent(db, { id: "event", outcome: "Death" }, clock);
+		// The raw D1 constraint failure is unreadable in the UI, so the rule has to
+		// report itself rather than letting the SQL error escape.
 		await expect(
 			operations.resolveEvent(db, { id: "second", outcome: "Death" }, clock),
-		).rejects.toThrow();
+		).rejects.toThrow(operations.ALREADY_DEAD_MESSAGE);
 		expect(await operations.listEvents(db)).toContainEqual(event("second"));
 		await operations.voidEvent(db, { id: "event", reason: "Corrected" }, clock);
 		await operations.resolveEvent(
@@ -166,6 +168,27 @@ describe("event operations on local D1", () => {
 		expect(await operations.listEvents(db)).toContainEqual({
 			...event("second"),
 			outcome: "Death",
+			resolvedAt: updatedAt,
+			isProcessed: true,
+			updatedAt,
+		});
+	});
+
+	it("still resolves non-fatal outcomes against an already dead warrior", async () => {
+		const { db } = connection;
+		await operations.createEvent(db, event());
+		await operations.createEvent(db, event("second"));
+		await operations.resolveEvent(db, { id: "event", outcome: "Death" }, clock);
+
+		await operations.resolveEvent(
+			db,
+			{ id: "second", outcome: "Injury" },
+			clock,
+		);
+
+		expect(await operations.listEvents(db)).toContainEqual({
+			...event("second"),
+			outcome: "Injury",
 			resolvedAt: updatedAt,
 			isProcessed: true,
 			updatedAt,

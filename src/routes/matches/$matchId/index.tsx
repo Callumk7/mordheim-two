@@ -38,7 +38,7 @@ import {
 	type MatchParticipantWarband,
 	projectCombatStats,
 } from "@/db-collections/projections";
-import { useMatchWorkspace } from "@/db-collections/queries";
+import { useCombatStats, useMatchWorkspace } from "@/db-collections/queries";
 import { buildUpdateMatchCommand } from "@/lib/match-commands";
 import { getMatchImagery } from "@/server/match-images";
 
@@ -69,8 +69,17 @@ function MatchDetailPage() {
 		warriors: warriorRows,
 		winnerWarband,
 	} = useMatchWorkspace(dbClient, matchId);
+	// Projected over every event, so a warrior killed in an earlier match is
+	// still recognised as dead here.
+	const campaignCombatStats = useCombatStats(dbClient);
 
 	if (!match) return null;
+
+	const deadWarriorIds = new Set(
+		[...campaignCombatStats.warriors]
+			.filter(([, stats]) => stats.isDead)
+			.map(([warriorId]) => warriorId),
+	);
 
 	const matchCombatStats = projectCombatStats(eventRows);
 	const attackerWarbandId = staffedParticipantWarbands[0]?.id ?? "";
@@ -205,6 +214,7 @@ function MatchDetailPage() {
 					</Button>
 				</div>
 				<MatchEventsTable
+					deadWarriorIds={deadWarriorIds}
 					events={eventRows}
 					imageJobs={imagery.events}
 					onSetOutcome={setEventOutcome}
@@ -259,6 +269,7 @@ function MatchDetailPage() {
 
 			<MatchCompletionDialog
 				canAddEvent={staffedParticipantWarbands.length >= 2}
+				deadWarriorIds={deadWarriorIds}
 				events={eventRows}
 				eventImageJobs={imagery.events}
 				initialEventValues={initialEventValues}
