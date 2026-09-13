@@ -20,6 +20,14 @@ function mockFetch(body: unknown, status = 200) {
 	return fetch;
 }
 
+function refine(
+	prompt: string,
+	instructions = IMAGE_PROMPT_REFINEMENT_INSTRUCTIONS,
+	apiKey: string | undefined = "test-only-key",
+) {
+	return createGeminiPromptRefiner(apiKey)(prompt, instructions);
+}
+
 function textResponse(text: string) {
 	return {
 		candidates: [
@@ -38,9 +46,7 @@ describe("Gemini text prompt refiner (real SDK, mocked network)", () => {
 	it("sends the snapshot with refinement instructions and returns trimmed text", async () => {
 		const fetch = mockFetch(textResponse("  refined portrait  "));
 		const timeout = vi.spyOn(AbortSignal, "timeout");
-		expect(
-			await createGeminiPromptRefiner("test-only-key")("labeled snapshot"),
-		).toBe("refined portrait");
+		expect(await refine("labeled snapshot")).toBe("refined portrait");
 		expect(fetch).toHaveBeenCalledOnce();
 		const calls: unknown[][] = fetch.mock.calls;
 		const [url, init] = calls[0] ?? [];
@@ -56,11 +62,22 @@ describe("Gemini text prompt refiner (real SDK, mocked network)", () => {
 		});
 		expect(timeout).toHaveBeenCalledWith(REFINEMENT_TIMEOUT_MS);
 	});
+	it("uses configured refinement instructions instead of the default brief", async () => {
+		const fetch = mockFetch(textResponse("custom refined"));
+		expect(await refine("labeled snapshot", "Paint like a woodcut.")).toBe(
+			"custom refined",
+		);
+		const calls: unknown[][] = fetch.mock.calls;
+		const [, init] = calls[0] ?? [];
+		expect(
+			JSON.parse(String((init as { body?: unknown } | undefined)?.body)),
+		).toMatchObject({
+			systemInstruction: { parts: [{ text: "Paint like a woodcut." }] },
+		});
+	});
 	it("permanently fails empty refiner output", async () => {
 		mockFetch(textResponse("   "));
-		await expect(
-			createGeminiPromptRefiner("test-only-key")("labeled snapshot"),
-		).rejects.toMatchObject({
+		await expect(refine("labeled snapshot")).rejects.toMatchObject({
 			message: "Prompt refiner did not return a prompt.",
 			permanent: true,
 		});
@@ -78,9 +95,7 @@ describe("Gemini text prompt refiner (real SDK, mocked network)", () => {
 			},
 			status,
 		);
-		await expect(
-			createGeminiPromptRefiner("test-only-key")("portrait"),
-		).rejects.toMatchObject({
+		await expect(refine("portrait")).rejects.toMatchObject({
 			message: `Prompt refinement HTTP ${status}.`,
 			permanent: true,
 		});
@@ -91,9 +106,7 @@ describe("Gemini text prompt refiner (real SDK, mocked network)", () => {
 			.fn()
 			.mockRejectedValue(new DOMException("private details", "TimeoutError"));
 		vi.stubGlobal("fetch", fetch);
-		await expect(
-			createGeminiPromptRefiner("test-only-key")("portrait"),
-		).rejects.toMatchObject({
+		await expect(refine("portrait")).rejects.toMatchObject({
 			message: "Prompt refinement request failed or timed out.",
 			permanent: true,
 		});
@@ -101,7 +114,10 @@ describe("Gemini text prompt refiner (real SDK, mocked network)", () => {
 	});
 	it("permanently fails when GEMINI_API_KEY is missing", async () => {
 		await expect(
-			createGeminiPromptRefiner(undefined)("portrait"),
+			createGeminiPromptRefiner(undefined)(
+				"portrait",
+				IMAGE_PROMPT_REFINEMENT_INSTRUCTIONS,
+			),
 		).rejects.toMatchObject({
 			message: "Consumer GEMINI_API_KEY is not configured.",
 			permanent: true,

@@ -2,9 +2,17 @@ import { describe, expect, it, vi } from "vitest";
 import type { Database } from "@/db/index.server";
 import { enqueueImageGeneration } from "@/db/operations/image-generation.server";
 import {
+	getImageGenerationInstructions,
+	updateImageGenerationInstructions,
+} from "@/db/operations/image-generation-settings.server";
+import {
+	DEFAULT_IMAGE_GENERATION_INSTRUCTIONS,
 	GEMINI_IMAGE_MODEL,
+	IMAGE_GENERATION_INSTRUCTIONS_MAX_LENGTH,
 	ImageGenerationInputSchema,
+	ImageGenerationInstructionsInputSchema,
 	OPENAI_IMAGE_MODEL,
+	resolveImageGenerationInstructions,
 } from "@/db/validation/image-generation";
 
 // These unit tests inject DB and queue doubles; no Workers runtime is needed.
@@ -25,6 +33,64 @@ const geminiJob = {
 	prompt: "A portrait",
 	model: GEMINI_IMAGE_MODEL,
 } as const;
+
+describe("image generation instructions", () => {
+	it("rejects empty, whitespace, and over-limit instructions", () => {
+		for (const instructions of [
+			"",
+			"   ",
+			"x".repeat(IMAGE_GENERATION_INSTRUCTIONS_MAX_LENGTH + 1),
+		]) {
+			expect(
+				ImageGenerationInstructionsInputSchema.safeParse({ instructions })
+					.success,
+			).toBe(false);
+		}
+		expect(
+			ImageGenerationInstructionsInputSchema.parse({
+				instructions: "  Paint like a woodcut.  ",
+			}),
+		).toEqual({ instructions: "Paint like a woodcut." });
+	});
+
+	it("falls back to the default John Blanche brief when unset", () => {
+		expect(resolveImageGenerationInstructions(undefined)).toBe(
+			DEFAULT_IMAGE_GENERATION_INSTRUCTIONS,
+		);
+		expect(resolveImageGenerationInstructions("   ")).toBe(
+			DEFAULT_IMAGE_GENERATION_INSTRUCTIONS,
+		);
+		expect(resolveImageGenerationInstructions("Custom brief")).toBe(
+			"Custom brief",
+		);
+		expect(DEFAULT_IMAGE_GENERATION_INSTRUCTIONS).toContain(
+			"John Blanche's style",
+		);
+	});
+
+	it("surfaces D1 failures from read and write operations", async () => {
+		const get = vi.fn().mockRejectedValue(new Error("D1 unavailable"));
+		const values = vi.fn().mockReturnValue({
+			onConflictDoUpdate: vi
+				.fn()
+				.mockRejectedValue(new Error("D1 unavailable")),
+		});
+		const db = {
+			select: vi.fn().mockReturnValue({
+				from: vi.fn().mockReturnValue({
+					where: vi.fn().mockReturnValue({ get }),
+				}),
+			}),
+			insert: vi.fn().mockReturnValue({ values }),
+		} as unknown as Database;
+		await expect(getImageGenerationInstructions(db)).rejects.toThrow(
+			"D1 unavailable",
+		);
+		await expect(
+			updateImageGenerationInstructions(db, "Paint like a woodcut."),
+		).rejects.toThrow("D1 unavailable");
+	});
+});
 
 describe("image generation producer", () => {
 	it("trims prompts, defaults the model, and validates explicit models", () => {

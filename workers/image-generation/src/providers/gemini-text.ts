@@ -1,7 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { GEMINI_TEXT_MODEL, REFINEMENT_TIMEOUT_MS } from "../generation/config";
 import { GenerationError, sanitizeRefinementError } from "../generation/errors";
-import { IMAGE_PROMPT_REFINEMENT_INSTRUCTIONS } from "../generation/prompt";
 import type { PromptRefiner } from "../generation/types";
 
 export function createGeminiPromptRefiner(
@@ -16,13 +15,13 @@ export function createGeminiPromptRefiner(
 		};
 	}
 	const client = new GoogleGenAI({ apiKey });
-	return async (prompt) => {
+	return async (prompt, instructions) => {
 		try {
 			const response = await client.models.generateContent({
 				model: GEMINI_TEXT_MODEL,
 				contents: prompt,
 				config: {
-					systemInstruction: IMAGE_PROMPT_REFINEMENT_INSTRUCTIONS,
+					systemInstruction: instructions,
 					abortSignal: AbortSignal.timeout(REFINEMENT_TIMEOUT_MS),
 					httpOptions: {
 						timeout: REFINEMENT_TIMEOUT_MS,

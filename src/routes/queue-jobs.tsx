@@ -54,6 +54,9 @@ function QueueJobsPage() {
 					<LinkButton to="/queue" variant="outline">
 						Send a job
 					</LinkButton>
+					<LinkButton to="/settings" variant="outline">
+						Image instructions
+					</LinkButton>
 					<Button
 						isDisabled={isLoading}
 						onPress={() => void router.invalidate()}

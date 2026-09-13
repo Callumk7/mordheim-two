@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+	DEFAULT_IMAGE_GENERATION_INSTRUCTIONS,
 	GEMINI_IMAGE_MODEL,
+	IMAGE_GENERATION_INSTRUCTIONS_SETTING_KEY,
 	OPENAI_IMAGE_MODEL,
 } from "@/db/validation/image-generation";
 import { GenerationError } from "../generation/errors";
@@ -92,6 +94,7 @@ describe("image generation consumer", () => {
 		await consumeImageGenerationBatch(batch(delivery), dependencies);
 		expect(dependencies.refinePrompt).toHaveBeenCalledExactlyOnceWith(
 			"private portrait prompt",
+			DEFAULT_IMAGE_GENERATION_INSTRUCTIONS,
 		);
 		expect(dependencies.generate).toHaveBeenCalledExactlyOnceWith(
 			"refined:private portrait prompt",
@@ -125,6 +128,28 @@ describe("image generation consumer", () => {
 		);
 		expect(delivery.retry).not.toHaveBeenCalled();
 		expect(console.error).not.toHaveBeenCalled();
+	});
+	it("falls back to the default brief when saved instructions are blank", async () => {
+		const { sqlite, dependencies } = setup();
+		sqlite
+			.prepare("INSERT INTO app_settings (key, value) VALUES (?, ?)")
+			.run(IMAGE_GENERATION_INSTRUCTIONS_SETTING_KEY, "   ");
+		await consumeImageGenerationBatch(batch(message()), dependencies);
+		expect(dependencies.refinePrompt).toHaveBeenCalledExactlyOnceWith(
+			"private portrait prompt",
+			DEFAULT_IMAGE_GENERATION_INSTRUCTIONS,
+		);
+	});
+	it("refines with saved base instructions instead of the default brief", async () => {
+		const { sqlite, dependencies } = setup();
+		sqlite
+			.prepare("INSERT INTO app_settings (key, value) VALUES (?, ?)")
+			.run(IMAGE_GENERATION_INSTRUCTIONS_SETTING_KEY, "Paint like a woodcut.");
+		await consumeImageGenerationBatch(batch(message()), dependencies);
+		expect(dependencies.refinePrompt).toHaveBeenCalledExactlyOnceWith(
+			"private portrait prompt",
+			"Paint like a woodcut.",
+		);
 	});
 	it("dispatches and persists the model selected by the job", async () => {
 		const { dependencies, jobs, bucket, sqlite } = setup();

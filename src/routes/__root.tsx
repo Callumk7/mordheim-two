@@ -146,6 +146,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 								>
 									Events
 								</Link>
+								<Link
+									activeProps={{ className: "bg-accent text-primary" }}
+									className="rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
+									to="/settings"
+								>
+									Settings
+								</Link>
 							</nav>
 						</div>
 					</header>
