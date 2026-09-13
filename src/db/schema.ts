@@ -23,6 +23,7 @@ export const imageGenerationJobs = sqliteTable(
 	{
 		id: text("id").primaryKey(),
 		prompt: text("prompt").notNull(),
+		refinedPrompt: text("refined_prompt"),
 		model: text("model", { enum: IMAGE_GENERATION_MODELS })
 			.notNull()
 			.default(GEMINI_IMAGE_MODEL),

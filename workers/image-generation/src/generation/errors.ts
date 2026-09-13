@@ -8,7 +8,10 @@ export class GenerationError extends Error {
 	}
 }
 
-export function sanitizeProviderError(error: unknown) {
+export function sanitizeProviderError(
+	error: unknown,
+	stage = "Image provider",
+) {
 	if (error instanceof GenerationError) return error;
 	if (
 		typeof error === "object" &&
@@ -24,7 +27,12 @@ export function sanitizeProviderError(error: unknown) {
 			status >= 400 &&
 			status < 500 &&
 			![401, 403, 408, 409, 429].includes(status);
-		return new GenerationError(`Image provider HTTP ${status}.`, permanent);
+		return new GenerationError(`${stage} HTTP ${status}.`, permanent);
 	}
-	return new GenerationError("Image provider request failed or timed out.");
+	return new GenerationError(`${stage} request failed or timed out.`);
+}
+
+export function sanitizeRefinementError(error: unknown) {
+	const sanitized = sanitizeProviderError(error, "Prompt refinement");
+	return new GenerationError(sanitized.message, true);
 }

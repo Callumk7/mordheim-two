@@ -1,0 +1,1 @@
+ALTER TABLE `image_generation_jobs` ADD `refined_prompt` text;

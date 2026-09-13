@@ -35,6 +35,8 @@ export function setupDatabase(now?: () => number) {
 		"0018_numerous_mercury.sql",
 		"0019_mean_nextwave.sql",
 		"0020_minor_the_spike.sql",
+		"0021_pretty_logan.sql",
+		"0022_premium_iron_lad.sql",
 	]) {
 		sqlite.exec(
 			readFileSync(

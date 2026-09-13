@@ -50,6 +50,9 @@ describe("image job atomic lease", () => {
 		await expect(jobs.complete(jobId, "old", result)).rejects.toThrow(
 			"lease lost",
 		);
+		await expect(
+			jobs.recordRefinedPrompt(jobId, "old", "refined"),
+		).rejects.toThrow("lease lost");
 		await expect(jobs.fail(jobId, "old", "error")).rejects.toThrow(
 			"lease lost",
 		);
@@ -94,6 +97,13 @@ describe("image job atomic lease", () => {
 	});
 	it("does not claim missing records", async () => {
 		expect(await setup().jobs.claim(jobId, "owner")).toBeUndefined();
+	});
+	it("records a refined prompt only while the lease is owned", async () => {
+		const { jobs, insert } = setup();
+		insert();
+		await jobs.claim(jobId, "owner");
+		await jobs.recordRefinedPrompt(jobId, "owner", "refined brief");
+		expect((await jobs.load(jobId))?.refinedPrompt).toBe("refined brief");
 	});
 	it.each([
 		"processing",
