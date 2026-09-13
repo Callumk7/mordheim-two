@@ -17,12 +17,14 @@ The flag is a deliberate opt-in safety switch, **not** an authorization system. 
 
 ## Request and storage contract
 
-`workers/image-generation/src/gemini.ts` uses installed `@google/genai` 2.21.0 directly:
+Before any paid image call, the consumer refines the durable D1 `prompt` snapshot with Gemini Flash text (`gemini-3.5-flash` in `workers/image-generation/src/providers/gemini-text.ts`). John Blanche styling lives in that refiner's system instruction. The image generator receives **exactly** the refiner output; nothing is appended afterward. The original snapshot stays in `prompt`; the refined brief is stored in `refined_prompt` before the image request and shown on `/queue-jobs`. **Every job needs `GEMINI_API_KEY`**, including OpenAI image jobs. Refinement failures are permanent: the job is marked `failed` with a sanitized stage-specific reason (`Prompt refinement HTTP …` / timeout / empty output) and is not retried. There is no fallback to the raw prompt.
+
+`workers/image-generation/src/providers/gemini.ts` uses installed `@google/genai` 2.21.0 directly:
 
 ```ts
 client.interactions.create({
   model: "gemini-3.1-flash-image",
-  input: `${prompt}\n\nCreate the image in the style of John Blanche.`,
+  input: refinedPrompt,
   stream: false,
   store: false,
   response_format: {
@@ -31,7 +33,7 @@ client.interactions.create({
 }, { maxRetries: 0, timeout: 120_000, signal: AbortSignal.timeout(120_000) })
 ```
 
-Every new provider request appends `Create the image in the style of John Blanche.` to the submitted prompt. D1 and the gallery retain the original user prompt; existing stored images are not regenerated.
+D1 and the gallery retain the original snapshot prompt; existing stored images are not regenerated.
 
 The response format is checked against the SDK's narrow `Interactions.ImageResponseFormat` type (imported from `@google/genai`), which currently permits JPEG MIME only; the enclosing response-format union also allows arbitrary dictionaries and is insufficient to validate image options.
 
@@ -47,7 +49,7 @@ R2 key: `image-generation/<jobId>.jpg`. The consumer writes `image/jpeg` HTTP me
 2. Consumer atomically claims `pending`, `queued`, `enqueue_failed`, or expired `processing` using one conditional D1 UPDATE with a random ownership token and lease. Only one concurrent claimant obtains the prompt. Completion/failure/release updates require that token.
 3. Lease duration is **16 minutes**, longer than Queues' **15-minute maximum invocation wall time**. An old invocation cannot still write after a new claim is eligible. Keep this invariant if runtime/config limits change; the concurrency cap alone is not duplicate protection.
 4. Live lease conflicts call `retry({ delaySeconds: 960 })`, **not** the default 30-second retry. This leaves enough time for any current lease to expire before another delivery consumes a retry, including a crashed owner. No lease conflict is acknowledged. A conflict on the final delivery can still land in the DLQ while D1 remains processing: never mark another live owner's work failed just to exhaust a duplicate.
-5. Under ownership, R2 HEAD is checked **before** any paid request. If an object exists (including an uncertain prior PUT or an R2-success/D1-failure crash), persist completion without generating again. Otherwise generate, conditionally store R2, then persist completion. Only then acknowledge.
+5. Under ownership, R2 HEAD is checked **before** any paid request. If an object exists (including an uncertain prior PUT or an R2-success/D1-failure crash), persist completion without refining or generating again. Otherwise refine the snapshot, persist `refined_prompt`, generate, conditionally store R2, then persist completion. Only then acknowledge.
 6. `completed` duplicates acknowledge without touching the provider or R2. Historical `consumed` rows remain receipt-only; `failed` rows also remain terminal. Neither is automatically regenerated, including on manually replayed messages. No backfill/reconciliation scan is added.
 
 **This is not exactly-once paid generation.** A crash, timeout, or R2 failure after Google accepted/completed generation but before R2 durably stores the bytes can lose the response. A later delivery may incur another charge. D1 leases prevent concurrent normal calls, not this external side-effect window. There is no assumed provider idempotency key. Queue delivery retries are capped, but an operator resubmission is a new paid job.
@@ -55,7 +57,7 @@ R2 key: `image-generation/<jobId>.jpg`. The consumer writes `image/jpeg` HTTP me
 ## Failure policy and DLQ
 
 - Retryable: network/timeout; provider HTTP 401/403 (configuration may be repaired), 408/409/429, 5xx; missing key; D1 and R2 failures. Persist sanitized error/release ownership where possible and **retry, never ack** the failing delivery. Releasing a known finished attempt leaves `processing` with an expired lease for the next attempt.
-- Permanent: other provider 4xx, non-completed/no-image response, invalid JPEG, invalid existing object metadata. Persist `failed` and **ack only after that D1 write succeeds**. These failures do not go to the DLQ. Disabled generation follows the same durable-failure/ack policy.
+- Permanent: prompt-refinement failures (timeout, HTTP, empty output, missing Gemini key); other provider 4xx, non-completed/no-image response, invalid JPEG, invalid existing object metadata. Persist `failed` and **ack only after that D1 write succeeds**. These failures do not go to the DLQ. Disabled generation follows the same durable-failure/ack policy.
 - Invalid payloads and missing D1 jobs retry into the existing DLQ, never invent a job.
 - The consumer uses batch size **1**, concurrency **3**, three retries (four deliveries total), default retry delay **30 seconds**, DLQ `mordheim-image-generation-dlq`. Keep `MAX_DELIVERY_ATTEMPTS = 4` aligned with Wrangler `max_retries = 3`.
 - On final retryable failure, write `failed` and an exhaustion error where D1/ownership permits, **then still retry** to route the delivery to the DLQ. A final pre-claim failure gets a best-effort conditional exhaustion update that replaces any earlier error with a sanitized exhaustion message. Never overwrite completed, historical, or live-owned work. If D1 is unavailable or the invocation crashes, status can remain stale; the DLQ is operational evidence, not an automatic D1 projection.
@@ -68,10 +70,11 @@ Only generic failure metadata plus message ID/attempt count are logged. Do not e
 
 - `src/server/image-generation.ts`: existing producer and pending-only race guards.
 - `src/db/schema.ts`, `drizzle/0012_tense_echo.sql`: additive nullable lease/result columns; unconstrained TEXT status adds processing/completed/failed at the TypeScript layer. Existing rows are unchanged.
+- `drizzle/0022_premium_iron_lad.sql`: nullable `refined_prompt` for the consumer-written image brief.
 - `workers/image-generation/src/{index,consumer,jobs,gemini}.ts`: worker binding composition, delivery policy, atomic D1 state, provider adapter.
 - `workers/image-generation/wrangler.jsonc`: consumer R2 binding/flag and queue configuration.
 - `wrangler.jsonc`: app R2 binding to the same `mordheim-generated-images` bucket; no public bucket access or generation flag is added.
-- `/queue`, `/queue-jobs`: enqueue feedback and D1 status/result metadata, with links to the gallery.
+- `/queue`, `/queue-jobs`: enqueue feedback and D1 status/result metadata (including `refined_prompt`), with links to the gallery.
 - `/generated-images`: latest 100 completed D1 jobs, ordered by completion time then ID descending, with prompts, UTC completion times, lazy-loaded JPEGs, accessible enlargement dialogs and manual refresh. Missing images have a retry-through-refresh placeholder; queued/failed/historical consumed jobs are omitted. No bucket listing, orphan recovery, polling, upload, delete or regenerate controls.
 - `src/server/generated-images.server.ts`, `src/server/generated-images.ts`, `/api/generated-images/$jobId`: completed-job query and unprotected image streaming. GET resolves the job's deterministic result key in D1, returns 404 for missing/noncompleted jobs or missing objects, and sanitized 503 for D1/R2 failures (502 for non-JPEG metadata). Responses use `no-store`; arbitrary bucket keys are not accepted.
 
@@ -79,7 +82,7 @@ Only generic failure metadata plus message ID/attempt count are logged. Do not e
 
 ## Event illustrations (injury/death spike)
 
-Resolving an event as **Injury** or **Death** now automatically submits one image-generation job. Recovery and unresolved events do not submit. The producer snapshots the event notes, match/scenario, both warriors' names/classes/descriptions, both warbands' names/factions/captains, and assigned equipment names/types/special rules into the prompt. Long free-text fields and equipment summaries are deterministically bounded with a visible `[truncated]` marker so the final prompt remains within the existing 4,000-character contract. The consumer and R2 key scheme are unchanged, and the Gemini adapter still appends the shared John Blanche style instruction.
+Resolving an event as **Injury** or **Death** now automatically submits one image-generation job. Recovery and unresolved events do not submit. The producer snapshots the event notes, match/scenario, both warriors' names/classes/descriptions, both warbands' names/factions/captains, and assigned equipment names/types/special rules into the prompt. Long free-text fields and equipment summaries are deterministically bounded with a visible `[truncated]` marker so the final prompt remains within the existing 4,000-character contract. The consumer and R2 key scheme are unchanged. John Blanche styling is applied during prompt refinement, not appended after it.
 
 Migration `0017_glorious_the_hunter.sql` adds nullable `event_id` with a unique index and `ON DELETE SET NULL`. Apply it before deploying the app. This gives one job per event and makes repeated submissions idempotent, including failed or uncertain jobs. Voiding an event does not delete its job or generated image.
 
@@ -89,7 +92,7 @@ Event resolution is persisted first and remains authoritative. Queue send failur
 
 ## Warrior portraits (one-job spike)
 
-`/warriors/<warriorId>` now offers **Generate portrait** when no linked job exists. Save profile changes first: the server snapshots the saved warrior name, class and description, plus the parent warband's name, faction and captain. Campaign statistics and equipment are excluded. The prompt requests a single head-and-shoulders Mordheim portrait with gothic, weathered illustration details; the existing Gemini adapter appends the John Blanche style instruction. Missing descriptions are allowed. Assembled prompts over 4,000 characters are rejected with instructions to shorten saved details, never silently truncated.
+`/warriors/<warriorId>` now offers **Generate portrait** when no linked job exists. Save profile changes first: the server snapshots the saved warrior name, class and description, plus the parent warband's name, faction and captain. Campaign statistics and equipment are excluded. The prompt requests a single head-and-shoulders Mordheim portrait with gothic, weathered illustration details; the consumer refiner applies John Blanche styling. Missing descriptions are allowed. Assembled prompts over 4,000 characters are rejected with instructions to shorten saved details, never silently truncated.
 
 Migration `0016_slimy_mathemanic.sql` adds nullable `warrior_id` with a unique index and `ON DELETE SET NULL`. **Apply this migration before deploying the updated app, with operator approval.** Generic jobs remain unlinked. No consumer deployment, binding changes or new R2 key scheme are needed. Deleting a warrior or its warband detaches jobs; it does not delete images or remove jobs from the gallery.
 

@@ -54,6 +54,8 @@ export function createJobStore(db: DrizzleD1Database, now = Date.now) {
 				.where(and(eq(jobs.id, id), eligible()))
 				.returning()
 				.get(),
+		recordRefinedPrompt: (id: string, token: string, refinedPrompt: string) =>
+			updateOwned(id, token, { refinedPrompt }),
 		complete: (id: string, token: string, result: ImageResult) =>
 			updateOwned(id, token, {
 				...result,

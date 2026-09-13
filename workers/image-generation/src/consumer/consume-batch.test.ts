@@ -63,6 +63,7 @@ function setup(status = "queued") {
 		),
 	};
 	const generate = vi.fn(async () => jpegBytes);
+	const refinePrompt = vi.fn(async (prompt: string) => `refined:${prompt}`);
 	const generator = {
 		model: GEMINI_IMAGE_MODEL,
 		generate,
@@ -72,6 +73,7 @@ function setup(status = "queued") {
 		bucket,
 		enabled: true,
 		getGenerator: vi.fn(() => generator),
+		refinePrompt,
 		generate,
 	};
 	return { ...connection, dependencies, bucket, getStored: () => stored };
@@ -88,8 +90,11 @@ describe("image generation consumer", () => {
 		const delivery = message();
 		const complete = vi.spyOn(jobs, "complete");
 		await consumeImageGenerationBatch(batch(delivery), dependencies);
+		expect(dependencies.refinePrompt).toHaveBeenCalledExactlyOnceWith(
+			"private portrait prompt",
+		);
 		expect(dependencies.generate).toHaveBeenCalledExactlyOnceWith(
-			"private portrait prompt\n\nCreate the image in the style of John Blanche.",
+			"refined:private portrait prompt",
 		);
 		expect(bucket.put).toHaveBeenCalledExactlyOnceWith(
 			`image-generation/${jobId}.jpg`,
@@ -102,6 +107,7 @@ describe("image generation consumer", () => {
 		);
 		expect(await jobs.load(jobId)).toMatchObject({
 			status: "completed",
+			refinedPrompt: "refined:private portrait prompt",
 			resultKey: imageKey(jobId),
 			resultBytes: jpegBytes.length,
 			resultMimeType: "image/jpeg",
@@ -215,6 +221,7 @@ describe("image generation consumer", () => {
 		expect(delivery.ack).toHaveBeenCalledOnce();
 		expect((await jobs.load(jobId))?.status).toBe(status);
 		expect(dependencies.generate).not.toHaveBeenCalled();
+		expect(dependencies.refinePrompt).not.toHaveBeenCalled();
 		expect(bucket.head).not.toHaveBeenCalled();
 	});
 	it("disabled generation durably fails and acks without paid calls; enable does not replay it", async () => {
@@ -227,9 +234,45 @@ describe("image generation consumer", () => {
 			error: expect.stringContaining("disabled"),
 		});
 		expect(delivery.ack).toHaveBeenCalledOnce();
+		expect(dependencies.refinePrompt).not.toHaveBeenCalled();
 		dependencies.enabled = true;
 		await consumeImageGenerationBatch(batch(message()), dependencies);
 		expect(dependencies.generate).not.toHaveBeenCalled();
+		expect(dependencies.refinePrompt).not.toHaveBeenCalled();
+	});
+	it("fails the job when prompt refinement fails and never calls the image generator", async () => {
+		const { dependencies, jobs } = setup();
+		dependencies.refinePrompt.mockRejectedValue(
+			new GenerationError("Prompt refinement HTTP 429.", true),
+		);
+		const delivery = message();
+		await consumeImageGenerationBatch(batch(delivery), dependencies);
+		expect(await jobs.load(jobId)).toMatchObject({
+			status: "failed",
+			error: "Prompt refinement HTTP 429.",
+			refinedPrompt: null,
+		});
+		expect(dependencies.generate).not.toHaveBeenCalled();
+		expect(delivery.ack).toHaveBeenCalledOnce();
+		expect(delivery.retry).not.toHaveBeenCalled();
+	});
+	it("sanitizes raw refiner exceptions without hanging in processing", async () => {
+		const { dependencies, jobs } = setup();
+		dependencies.refinePrompt.mockRejectedValue(
+			new Error("raw private provider response"),
+		);
+		const delivery = message();
+		await consumeImageGenerationBatch(batch(delivery), dependencies);
+		expect(await jobs.load(jobId)).toMatchObject({
+			status: "failed",
+			error: "Prompt refinement failed.",
+			refinedPrompt: null,
+		});
+		expect(dependencies.generate).not.toHaveBeenCalled();
+		expect(delivery.ack).toHaveBeenCalledOnce();
+		expect(JSON.stringify(vi.mocked(console.error).mock.calls)).not.toMatch(
+			/private|raw private/,
+		);
 	});
 	it.each([
 		"provider",
@@ -290,6 +333,7 @@ describe("image generation consumer", () => {
 		await consumeImageGenerationBatch(batch(message()), dependencies);
 		expect((await jobs.load(jobId))?.status).toBe("completed");
 		expect(dependencies.generate).not.toHaveBeenCalled();
+		expect(dependencies.refinePrompt).not.toHaveBeenCalled();
 	});
 	it("permanent provider/no-image failure is persisted before ack", async () => {
 		const { dependencies, jobs } = setup();

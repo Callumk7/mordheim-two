@@ -32,7 +32,7 @@ export function buildWarriorPortraitPrompt(context: {
 	faction: string;
 	warbandBio: string | null;
 }) {
-	// The Gemini adapter appends the shared John Blanche style instruction.
+	// The consumer refines this labeled snapshot into the image prompt, including John Blanche styling.
 	const prompt = `
 Warrior name: ${context.name}
 Warrior class: ${context.class}

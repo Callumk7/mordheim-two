@@ -5,8 +5,7 @@ import {
 } from "@/db/validation/image-generation";
 import { MAX_IMAGE_BYTES } from "../generation/config";
 import { GenerationError } from "../generation/errors";
-import { prepareImagePrompt } from "../generation/prompt";
-import type { GetImageGenerator } from "../generation/types";
+import type { GetImageGenerator, PromptRefiner } from "../generation/types";
 import {
 	type ImageResult,
 	type JobStore,
@@ -20,6 +19,7 @@ export interface ConsumerDependencies {
 	bucket: ImageBucket;
 	enabled: boolean;
 	getGenerator: GetImageGenerator;
+	refinePrompt: PromptRefiner;
 }
 
 export const imageKey = (jobId: string) => `image-generation/${jobId}.jpg`;
@@ -57,7 +57,7 @@ async function processJob(
 	attempts: number,
 	dependencies: ConsumerDependencies,
 ) {
-	const { jobs, bucket, getGenerator, enabled } = dependencies;
+	const { jobs, bucket, getGenerator, refinePrompt, enabled } = dependencies;
 	const token = crypto.randomUUID();
 	const job = await jobs.claim(jobId, token);
 	if (!job) {
@@ -89,9 +89,20 @@ async function processJob(
 				);
 				return;
 			}
+			stage = "Prompt refinement failed.";
+			let refinedPrompt: string;
+			try {
+				refinedPrompt = await refinePrompt(job.prompt);
+			} catch (error) {
+				throw error instanceof GenerationError
+					? new GenerationError(error.message, true)
+					: new GenerationError("Prompt refinement failed.", true);
+			}
+			stage = "D1 refined-prompt persistence failed.";
+			await jobs.recordRefinedPrompt(jobId, token, refinedPrompt);
 			stage = "Image provider request failed.";
 			const generator = getGenerator(model);
-			const bytes = await generator.generate(prepareImagePrompt(job.prompt));
+			const bytes = await generator.generate(refinedPrompt);
 			stage = "R2 image storage failed.";
 			object = await bucket.put(key, bytes, {
 				httpMetadata: { contentType: "image/jpeg" },

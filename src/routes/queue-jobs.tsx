@@ -67,6 +67,7 @@ function QueueJobsPage() {
 					<TableHeader>
 						<TableHead isRowHeader>Job ID</TableHead>
 						<TableHead>Prompt</TableHead>
+						<TableHead>Refined prompt</TableHead>
 						<TableHead>Model</TableHead>
 						<TableHead>Status</TableHead>
 						<TableHead>Error</TableHead>
@@ -83,6 +84,9 @@ function QueueJobsPage() {
 								</TableCell>
 								<TableCell className="min-w-64 max-w-md break-words whitespace-pre-wrap">
 									{job.prompt}
+								</TableCell>
+								<TableCell className="min-w-64 max-w-md break-words whitespace-pre-wrap">
+									{job.refinedPrompt ?? "—"}
 								</TableCell>
 								<TableCell>{job.model}</TableCell>
 								<TableCell>{job.status}</TableCell>
