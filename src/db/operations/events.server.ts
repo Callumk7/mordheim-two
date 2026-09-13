@@ -108,7 +108,7 @@ export async function updateEvent(
 }
 
 export const ALREADY_DEAD_MESSAGE =
-	"This warrior is already dead. A warrior can only be killed once, so record an injury instead or void the earlier death.";
+	"This warrior is already dead. Record an injury, or void the earlier death first.";
 
 /**
  * `events_effective_death_defender_unique` (migration 0009) allows a warrior at
