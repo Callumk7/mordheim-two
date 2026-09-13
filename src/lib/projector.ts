@@ -44,6 +44,24 @@ export type ProjectorHighlight = {
 	resolvedAt: string | null;
 };
 
+export type ProjectorImageJob = {
+	jobId: string;
+	warriorId: string | null;
+	eventId: string | null;
+	matchId: string | null;
+	completedAt: string | null;
+};
+
+export type ProjectorImage = {
+	jobId: string;
+	type: "warrior" | "event" | "match";
+	eyebrow: string;
+	title: string;
+	description: string;
+	alt: string;
+	completedAt: string | null;
+};
+
 export type ProjectorData = {
 	standings: Warband[];
 	warriors: ProjectorWarrior[];
@@ -53,6 +71,7 @@ export type ProjectorData = {
 		recent: ProjectorMatch[];
 	};
 	highlights: ProjectorHighlight[];
+	images: ProjectorImage[];
 	ticker: string[];
 };
 
@@ -128,7 +147,10 @@ export function findBreakingAlerts(
 	return { alerts, seen: nextSeen };
 }
 
-export function projectProjectorData(input: ProjectorInput): ProjectorData {
+export function projectProjectorData(
+	input: ProjectorInput,
+	imageJobs: readonly ProjectorImageJob[] = [],
+): ProjectorData {
 	const warbandById = new Map(
 		input.warbands.map((warband) => [warband.id, warband]),
 	);
@@ -197,8 +219,102 @@ export function projectProjectorData(input: ProjectorInput): ProjectorData {
 		warriors,
 		matches,
 		highlights,
+		images: projectProjectorImages(input, imageJobs, projectedMatches),
 		ticker: buildTicker(standings, matches.live, highlights),
 	};
+}
+
+export function projectProjectorImages(
+	input: ProjectorInput,
+	jobs: readonly ProjectorImageJob[],
+	projectedMatches?: readonly ProjectorMatch[],
+) {
+	const warriorById = new Map(
+		input.warriors.map((warrior) => [warrior.id, warrior]),
+	);
+	const highlightById = new Map(
+		projectProjectorHighlights(input).map((highlight) => [
+			highlight.id,
+			highlight,
+		]),
+	);
+	const warbandById = new Map(
+		input.warbands.map((warband) => [warband.id, warband]),
+	);
+	const participantNamesByMatch = new Map<string, string[]>();
+	for (const participant of input.participants) {
+		const name = warbandById.get(participant.warbandId)?.name;
+		if (!name) continue;
+		const names = participantNamesByMatch.get(participant.matchId) ?? [];
+		names.push(name);
+		participantNamesByMatch.set(participant.matchId, names);
+	}
+	const matchesForImages =
+		projectedMatches ??
+		input.matches.map(
+			(match): ProjectorMatch => ({
+				...match,
+				participantNames: (participantNamesByMatch.get(match.id) ?? []).sort(
+					(a, b) => a.localeCompare(b),
+				),
+				winnerName:
+					match.winnerWarbandId === null
+						? null
+						: (warbandById.get(match.winnerWarbandId)?.name ??
+							"Unknown warband"),
+			}),
+		);
+	const matchById = new Map(matchesForImages.map((match) => [match.id, match]));
+
+	return jobs.flatMap((job): ProjectorImage[] => {
+		if (job.matchId !== null) {
+			const match = matchById.get(job.matchId);
+			if (!match) return [];
+			const winner = match.winnerName;
+			return [
+				{
+					jobId: job.jobId,
+					type: "match",
+					eyebrow: "Match illustration",
+					title: match.name,
+					description: `${match.participantNames.join(" vs ") || "Participants pending"} · ${match.scenario}${winner ? ` · ${winner} victorious` : ""}`,
+					alt: `Illustration of ${match.name}`,
+					completedAt: job.completedAt,
+				},
+			];
+		}
+		if (job.eventId !== null) {
+			const highlight = highlightById.get(job.eventId);
+			if (!highlight) return [];
+			return [
+				{
+					jobId: job.jobId,
+					type: "event",
+					eyebrow: `${highlight.phase} illustration`,
+					title: `${highlight.attackerName} → ${highlight.defenderName}`,
+					description: highlight.matchName,
+					alt: `${highlight.attackerName} inflicting ${highlight.phase.toLowerCase()} on ${highlight.defenderName}`,
+					completedAt: job.completedAt,
+				},
+			];
+		}
+		if (job.warriorId !== null) {
+			const warrior = warriorById.get(job.warriorId);
+			if (!warrior) return [];
+			return [
+				{
+					jobId: job.jobId,
+					type: "warrior",
+					eyebrow: "Warrior portrait",
+					title: warrior.name,
+					description: `${warrior.class} · ${warbandById.get(warrior.warbandId)?.name ?? "Unknown warband"}`,
+					alt: `Portrait of ${warrior.name}`,
+					completedAt: job.completedAt,
+				},
+			];
+		}
+		return [];
+	});
 }
 
 function projectProjectorHighlights(input: ProjectorInput) {

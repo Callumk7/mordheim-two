@@ -1,0 +1,1 @@
+CREATE INDEX `image_generation_jobs_status_completed_at_idx` ON `image_generation_jobs` (`status`,`completed_at`);

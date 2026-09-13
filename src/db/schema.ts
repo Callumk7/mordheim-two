@@ -18,46 +18,55 @@ import {
 import { MATCH_RESULTS, MATCH_STATUSES } from "./validation/match";
 import { WARRIOR_STATUSES } from "./validation/warrior";
 
-export const imageGenerationJobs = sqliteTable("image_generation_jobs", {
-	id: text("id").primaryKey(),
-	prompt: text("prompt").notNull(),
-	model: text("model", { enum: IMAGE_GENERATION_MODELS })
-		.notNull()
-		.default(GEMINI_IMAGE_MODEL),
-	warriorId: text("warrior_id")
-		.references((): AnySQLiteColumn => warriors.id, { onDelete: "set null" })
-		.unique(),
-	eventId: text("event_id")
-		.references((): AnySQLiteColumn => events.id, { onDelete: "set null" })
-		.unique(),
-	matchId: text("match_id")
-		.references((): AnySQLiteColumn => matches.id, { onDelete: "set null" })
-		.unique(),
-	status: text("status", {
-		enum: [
-			"pending",
-			"queued",
-			"enqueue_failed",
-			"consumed",
-			"processing",
-			"completed",
-			"failed",
-		],
-	})
-		.notNull()
-		.default("pending"),
-	error: text("error"),
-	leaseToken: text("lease_token"),
-	leaseExpiresAt: integer("lease_expires_at"),
-	resultKey: text("result_key"),
-	resultMimeType: text("result_mime_type"),
-	resultBytes: integer("result_bytes"),
-	resultEtag: text("result_etag"),
-	resultModel: text("result_model"),
-	completedAt: text("completed_at"),
-	createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
-	updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
-});
+export const imageGenerationJobs = sqliteTable(
+	"image_generation_jobs",
+	{
+		id: text("id").primaryKey(),
+		prompt: text("prompt").notNull(),
+		model: text("model", { enum: IMAGE_GENERATION_MODELS })
+			.notNull()
+			.default(GEMINI_IMAGE_MODEL),
+		warriorId: text("warrior_id")
+			.references((): AnySQLiteColumn => warriors.id, { onDelete: "set null" })
+			.unique(),
+		eventId: text("event_id")
+			.references((): AnySQLiteColumn => events.id, { onDelete: "set null" })
+			.unique(),
+		matchId: text("match_id")
+			.references((): AnySQLiteColumn => matches.id, { onDelete: "set null" })
+			.unique(),
+		status: text("status", {
+			enum: [
+				"pending",
+				"queued",
+				"enqueue_failed",
+				"consumed",
+				"processing",
+				"completed",
+				"failed",
+			],
+		})
+			.notNull()
+			.default("pending"),
+		error: text("error"),
+		leaseToken: text("lease_token"),
+		leaseExpiresAt: integer("lease_expires_at"),
+		resultKey: text("result_key"),
+		resultMimeType: text("result_mime_type"),
+		resultBytes: integer("result_bytes"),
+		resultEtag: text("result_etag"),
+		resultModel: text("result_model"),
+		completedAt: text("completed_at"),
+		createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+		updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+	},
+	(table) => [
+		index("image_generation_jobs_status_completed_at_idx").on(
+			table.status,
+			table.completedAt,
+		),
+	],
+);
 
 export const warbands = sqliteTable("warbands", {
 	id: text("id").primaryKey(),
