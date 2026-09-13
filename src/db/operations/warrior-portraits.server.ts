@@ -73,7 +73,7 @@ export async function submitWarriorPortrait(
 		.get();
 	if (!context)
 		return {
-			error: "Warrior or parent warband no longer exists.",
+			error: "Warrior or parent warband no longer exists. Refresh this page.",
 		} as const;
 	const existing = await queryWarriorPortrait(db, warriorId);
 	if (existing) return { job: existing };
