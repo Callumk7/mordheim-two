@@ -8,6 +8,10 @@ import { formatStatus, MatchForm } from "@/components/match-form";
 import { MatchImage } from "@/components/match-image";
 import { MatchCompletionDialog } from "@/components/shared/match-completion-dialog";
 import { MatchStatusActions } from "@/components/shared/match-status-actions";
+import {
+	isActiveImageJobStatus,
+	useImageGenerationPolling,
+} from "@/components/shared/use-image-generation-polling";
 import { MatchEventsTable } from "@/components/table/match-events-table";
 import { Button, LinkButton } from "@/components/ui/button";
 import {
@@ -72,6 +76,13 @@ function MatchDetailPage() {
 	// Projected over every event, so a warrior killed in an earlier match is
 	// still recognised as dead here.
 	const campaignCombatStats = useCombatStats(dbClient);
+	const hasActiveImageJob =
+		"error" in imagery
+			? false
+			: [imagery.match, ...Object.values(imagery.events)].some(
+					(job) => job !== null && isActiveImageJobStatus(job.status),
+				);
+	useImageGenerationPolling(hasActiveImageJob);
 
 	if (!match) return null;
 

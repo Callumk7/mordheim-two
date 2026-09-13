@@ -36,7 +36,7 @@ export const createWarriorPortrait = createServerFn({ method: "POST" })
 		} catch {
 			return {
 				error:
-					"Could not confirm portrait submission. Refresh this page before trying again; a job may already exist.",
+					"Could not confirm portrait submission. Wait a moment before trying again; a job may already exist.",
 			} as const;
 		}
 	});
