@@ -336,6 +336,7 @@ function MatchDetailPage() {
 							command,
 						);
 						await transaction.isPersisted.promise;
+						await router.invalidate();
 						setIsEditMatchOpen(false);
 					}}
 					submitLabel="Save changes"
