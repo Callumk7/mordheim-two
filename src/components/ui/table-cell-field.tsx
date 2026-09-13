@@ -14,6 +14,20 @@ import {
 const tableCellControlClassName =
 	"-mx-1 h-8 w-[calc(100%+0.5rem)] rounded-sm border-transparent bg-transparent px-1 py-0 text-sm shadow-none hover:border-input hover:bg-input/20 focus-visible:border-ring focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-ring/50 disabled:bg-transparent";
 
+// A rejected commit reverts the control to its previous value, so the reason has
+// to be readable in the cell. Width-capped and wrapping, because a server
+// message is written for a person, not for a table column.
+const tableCellErrorClassName =
+	"mt-1 block max-w-64 whitespace-normal text-xs leading-snug font-normal text-destructive";
+
+function TableCellError({ id, message }: { id: string; message: string }) {
+	return (
+		<span className={tableCellErrorClassName} id={id} role="alert">
+			{message}
+		</span>
+	);
+}
+
 type TableCellInputProps = Omit<
 	ComponentProps<typeof Input>,
 	| "aria-describedby"
@@ -111,11 +125,7 @@ function TableCellInput({
 				value={draft}
 				{...props}
 			/>
-			{error ? (
-				<span className="sr-only" id={errorId} role="alert">
-					{error}
-				</span>
-			) : null}
+			{error ? <TableCellError id={errorId} message={error} /> : null}
 		</>
 	);
 }
@@ -156,7 +166,7 @@ function TableCellNumberField({
 			aria-busy={isSaving || undefined}
 			className="gap-0"
 			commitBehavior="validate"
-			errorClassName="sr-only"
+			errorClassName={tableCellErrorClassName}
 			errorMessage={error}
 			groupClassName={cn(tableCellControlClassName, "px-0", className)}
 			inputClassName="px-1 text-right"
@@ -274,11 +284,7 @@ function TableCellSelect({
 					))}
 				</SelectContent>
 			</Select>
-			{error ? (
-				<span className="sr-only" id={errorId} role="alert">
-					{error}
-				</span>
-			) : null}
+			{error ? <TableCellError id={errorId} message={error} /> : null}
 		</>
 	);
 }

@@ -1,4 +1,4 @@
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, isNull, ne } from "drizzle-orm";
 import type { z } from "zod";
 import type { Database } from "@/db/index.server";
 import { type Clock, systemClock } from "@/db/operations/clock";
@@ -107,29 +107,86 @@ export async function updateEvent(
 	}
 }
 
+export const ALREADY_DEAD_MESSAGE =
+	"This warrior is already dead. Record an injury, or void the earlier death first.";
+
+/**
+ * `events_effective_death_defender_unique` (migration 0009) allows a warrior at
+ * most one effective death. Without this check D1 rejects the resolution with a
+ * raw constraint failure, which reaches the user as an unreadable SQL dump.
+ */
+async function hasEffectiveDeath(
+	db: Database,
+	defenderWarriorId: string,
+	excludingEventId: string,
+) {
+	const existing = await db
+		.select({ id: events.id })
+		.from(events)
+		.where(
+			and(
+				eq(events.defenderWarriorId, defenderWarriorId),
+				eq(events.outcome, "Death"),
+				isNotNull(events.resolvedAt),
+				isNull(events.voidedAt),
+				ne(events.id, excludingEventId),
+			),
+		)
+		.get();
+	return existing !== undefined;
+}
+
+function isEffectiveDeathConflict(cause: unknown) {
+	const message = cause instanceof Error ? cause.message : String(cause);
+	return message.includes("events_effective_death_defender_unique");
+}
+
 export async function resolveEvent(
 	db: Database,
 	data: z.output<typeof EventResolutionInputSchema>,
 	clock: Clock = systemClock,
 ) {
 	const now = clock();
-	const updated = await db
-		.update(events)
-		.set({
-			outcome: data.outcome,
-			resolvedAt: now,
-			isProcessed: true,
-			updatedAt: now,
-		})
-		.where(
-			and(
-				eq(events.id, data.id),
-				isNull(events.outcome),
-				isNull(events.resolvedAt),
-				isNull(events.voidedAt),
-			),
-		)
-		.returning({ id: events.id });
+	if (data.outcome === "Death") {
+		const event = await db
+			.select({ defenderWarriorId: events.defenderWarriorId })
+			.from(events)
+			.where(eq(events.id, data.id))
+			.get();
+		// A missing event falls through to the update below, so it keeps reporting
+		// the same thing it does for every other outcome.
+		if (
+			event &&
+			(await hasEffectiveDeath(db, event.defenderWarriorId, data.id))
+		) {
+			throw new Error(ALREADY_DEAD_MESSAGE);
+		}
+	}
+
+	let updated: { id: string }[];
+	try {
+		updated = await db
+			.update(events)
+			.set({
+				outcome: data.outcome,
+				resolvedAt: now,
+				isProcessed: true,
+				updatedAt: now,
+			})
+			.where(
+				and(
+					eq(events.id, data.id),
+					isNull(events.outcome),
+					isNull(events.resolvedAt),
+					isNull(events.voidedAt),
+				),
+			)
+			.returning({ id: events.id });
+	} catch (cause) {
+		// A concurrent death can still land between the check above and this write.
+		if (isEffectiveDeathConflict(cause)) throw new Error(ALREADY_DEAD_MESSAGE);
+		throw cause;
+	}
 	if (updated.length === 0) {
 		throw new Error("This event has already been resolved or voided.");
 	}
