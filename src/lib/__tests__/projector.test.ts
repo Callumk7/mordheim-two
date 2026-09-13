@@ -157,6 +157,76 @@ describe("projector data", () => {
 		expect(data.ticker.join(" ")).toContain("rating 120, 3 wins");
 	});
 
+	it("builds dedicated frames for portrait, event, and match images", () => {
+		const campaign = input([event("Death")]);
+		const data = projectProjectorData(campaign, [
+			{
+				jobId: "portrait-job",
+				warriorId: "attacker",
+				eventId: null,
+				matchId: null,
+				completedAt: timestamp,
+			},
+			{
+				jobId: "event-job",
+				warriorId: null,
+				eventId: "event",
+				matchId: null,
+				completedAt: timestamp,
+			},
+			{
+				jobId: "match-job",
+				warriorId: null,
+				eventId: null,
+				matchId: "match",
+				completedAt: timestamp,
+			},
+		]);
+
+		expect(data.images).toEqual([
+			expect.objectContaining({
+				jobId: "portrait-job",
+				type: "warrior",
+				title: "Aldred",
+				alt: "Portrait of Aldred",
+			}),
+			expect.objectContaining({
+				jobId: "event-job",
+				type: "event",
+				title: "Aldred → Berta",
+				alt: "Aldred inflicting death on Berta",
+			}),
+			expect.objectContaining({
+				jobId: "match-job",
+				type: "match",
+				title: "The Crossing",
+				description: "Blue vs Red · Street Fight",
+				alt: "Illustration of The Crossing",
+			}),
+		]);
+	});
+
+	it("omits generic and orphaned image jobs from campaign frames", () => {
+		const data = projectProjectorData(input(), [
+			{
+				jobId: "generic",
+				warriorId: null,
+				eventId: null,
+				matchId: null,
+				completedAt: timestamp,
+			},
+			{
+				jobId: "orphaned",
+				warriorId: null,
+				eventId: null,
+				matchId: "missing",
+				completedAt: timestamp,
+			},
+		]);
+
+		expect(data.images).toEqual([]);
+	});
+
 	it("includes manual corrections in spotlight stats", () => {
 		const corrected = input([event("Injury")]);
 		corrected.warriors = corrected.warriors.map((row) =>

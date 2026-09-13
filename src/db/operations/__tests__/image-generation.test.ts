@@ -6,7 +6,10 @@ import {
 	submitEventImage,
 } from "@/db/operations/event-images.server";
 import { createEvent, resolveEvent } from "@/db/operations/events.server";
-import { queryGeneratedImages } from "@/db/operations/generated-images.server";
+import {
+	queryGeneratedImages,
+	queryProjectorImages,
+} from "@/db/operations/generated-images.server";
 import {
 	enqueueImageGeneration,
 	retryImageGeneration,
@@ -432,6 +435,53 @@ describe("image job operations on local D1", () => {
 			job: null,
 		});
 		expect(queue.send).not.toHaveBeenCalled();
+	});
+
+	it("lists every completed associated image type for the projector", async () => {
+		const { db } = connection;
+		await seedMatch(db);
+		await createEvent(db, event());
+		await db.insert(imageGenerationJobs).values([
+			{
+				id: "portrait-job",
+				prompt: "Portrait",
+				status: "completed",
+				warriorId: "wa",
+				completedAt: "2026-09-10T12:00:01.000Z",
+			},
+			{
+				id: "event-job",
+				prompt: "Event",
+				status: "completed",
+				eventId: "event",
+				completedAt: "2026-09-10T12:00:02.000Z",
+			},
+			{
+				id: "match-job",
+				prompt: "Match",
+				status: "completed",
+				matchId: "match",
+				completedAt: "2026-09-10T12:00:03.000Z",
+			},
+			{
+				id: "generic-job",
+				prompt: "Generic",
+				status: "completed",
+				completedAt: "2026-09-10T12:00:04.000Z",
+			},
+			{
+				id: "pending-portrait",
+				prompt: "Pending",
+				status: "pending",
+				warriorId: "wb",
+			},
+		]);
+
+		expect(await queryProjectorImages(db)).toEqual([
+			expect.objectContaining({ jobId: "match-job", matchId: "match" }),
+			expect.objectContaining({ jobId: "event-job", eventId: "event" }),
+			expect.objectContaining({ jobId: "portrait-job", warriorId: "wa" }),
+		]);
 	});
 
 	it("bounds and orders diagnostic and completed-image listings", async () => {

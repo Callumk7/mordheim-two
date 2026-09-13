@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import {
 	Activity,
 	AlertTriangle,
+	ImageOff,
 	Maximize,
 	Pause,
 	Play,
@@ -32,6 +33,7 @@ import {
 	parseRotationSeconds,
 	projectProjectorData,
 } from "@/lib/projector";
+import { getProjectorImages } from "@/server/projector-images";
 import { getWarriorPortrait } from "@/server/warrior-portraits";
 
 const POLL_INTERVAL_MS = 5_000;
@@ -41,6 +43,7 @@ const SEGMENTS = [
 	"Warrior spotlight",
 	"Match center",
 	"Highlights",
+	"Campaign imagery",
 ] as const;
 
 export const Route = createFileRoute("/projector")({
@@ -51,14 +54,15 @@ export const Route = createFileRoute("/projector")({
 	loader: async ({ context }) => {
 		const { events, matches, warbandMatches, warbands, warriors } =
 			getCollections(context.dbClient);
-		await Promise.all([
+		const [, , , , , images] = await Promise.all([
 			events.preload(),
 			matches.preload(),
 			warbandMatches.preload(),
 			warbands.preload(),
 			warriors.preload(),
+			getProjectorImages(),
 		]);
-		return null;
+		return { images };
 	},
 	component: ProjectorPage,
 });
@@ -66,12 +70,16 @@ export const Route = createFileRoute("/projector")({
 function ProjectorPage() {
 	const { dbClient } = Route.useRouteContext();
 	const { rotation } = Route.useSearch();
+	const { images: initialImages } = Route.useLoaderData();
 	const collections = useMemo(() => getCollections(dbClient), [dbClient]);
+	const loadProjectorImages = useServerFn(getProjectorImages);
 	const initialInput = useMemo(
 		() => readCollections(collections),
 		[collections],
 	);
-	const [data, setData] = useState(() => projectProjectorData(initialInput));
+	const [data, setData] = useState(() =>
+		projectProjectorData(initialInput, initialImages),
+	);
 	const [isStale, setIsStale] = useState(false);
 	const [paused, setPaused] = useState(false);
 	const [fullscreenError, setFullscreenError] = useState("");
@@ -95,15 +103,18 @@ function ProjectorPage() {
 					collections.warbandMatches.utils.refetch({ throwOnError: true }),
 					collections.warbands.utils.refetch({ throwOnError: true }),
 					collections.warriors.utils.refetch({ throwOnError: true }),
+					loadProjectorImages(),
 				]);
 				if (results.some((result) => result.status === "rejected")) {
 					throw new Error("Projector collection poll failed.");
 				}
 				if (stopped) return;
+				const imageResult = results[5];
+				if (imageResult.status !== "fulfilled") return;
 				const nextInput = readCollections(collections);
 				const breaking = findBreakingAlerts(nextInput, seenAlerts.current);
 				seenAlerts.current = breaking.seen;
-				setData(projectProjectorData(nextInput));
+				setData(projectProjectorData(nextInput, imageResult.value));
 				setIsStale(false);
 				if (breaking.alerts.length > 0) {
 					setAlerts((current) => [...current, ...breaking.alerts]);
@@ -119,7 +130,7 @@ function ProjectorPage() {
 			stopped = true;
 			window.clearInterval(interval);
 		};
-	}, [collections]);
+	}, [collections, loadProjectorImages]);
 
 	useEffect(() => {
 		if (activeAlert || paused) return;
@@ -426,8 +437,10 @@ function Segment({
 			return <WarriorSpotlight data={data} index={spotlightIndex} />;
 		case 2:
 			return <MatchCenter data={data} page={spotlightIndex} />;
-		default:
+		case 3:
 			return <Highlights highlights={data.highlights} />;
+		default:
+			return <CampaignImagery data={data} index={spotlightIndex} />;
 	}
 }
 
@@ -682,6 +695,75 @@ function Highlights({ highlights }: { highlights: ProjectorHighlight[] }) {
 			)}
 		</div>
 	);
+}
+
+function CampaignImagery({
+	data,
+	index,
+}: {
+	data: ProjectorData;
+	index: number;
+}) {
+	const image =
+		data.images.length > 0
+			? data.images[index % data.images.length]
+			: undefined;
+	return (
+		<div className="flex h-full flex-col">
+			<SegmentHeading eyebrow="From the image desk" title="Campaign imagery" />
+			{image ? (
+				<ProjectorImageFrame image={image} key={image.jobId} />
+			) : (
+				<EmptyState message="No completed campaign illustrations are available." />
+			)}
+		</div>
+	);
+}
+
+function ProjectorImageFrame({
+	image,
+}: {
+	image: ProjectorData["images"][number];
+}) {
+	const [imageFailed, setImageFailed] = useState(false);
+	return (
+		<article className="grid min-h-0 flex-1 gap-[clamp(1rem,3vw,3rem)] md:grid-cols-[minmax(14rem,0.9fr)_1fr]">
+			{imageFailed ? (
+				<div className="flex aspect-square max-h-[55vh] items-center justify-center border border-border bg-muted/50 text-muted-foreground">
+					<ImageOff className="size-[clamp(4rem,10vw,9rem)]" strokeWidth={1} />
+				</div>
+			) : (
+				<img
+					alt={image.alt}
+					className="aspect-square max-h-[55vh] w-full border border-border bg-muted object-contain shadow-[8px_8px_0_#03205a]"
+					onError={() => setImageFailed(true)}
+					src={`/api/generated-images/${encodeURIComponent(image.jobId)}`}
+				/>
+			)}
+			<div className="flex min-w-0 flex-col justify-center border-l-4 border-primary pl-[clamp(1rem,3vw,3rem)]">
+				<p className="text-xs font-black uppercase tracking-[0.24em] text-primary">
+					{image.eyebrow}
+				</p>
+				<h2 className="mt-3 font-mordheim text-[clamp(2.5rem,6vw,6rem)] uppercase italic leading-[0.9]">
+					{image.title}
+				</h2>
+				<p className="mt-6 text-[clamp(1rem,1.7vw,1.5rem)] text-muted-foreground">
+					{image.description}
+				</p>
+				<p className="mt-8 text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
+					Frame {imageKindLabel(image.type)} · {image.type} image
+				</p>
+			</div>
+		</article>
+	);
+}
+
+function imageKindLabel(type: ProjectorData["images"][number]["type"]) {
+	return type === "warrior"
+		? "Portrait"
+		: type === "event"
+			? "Action"
+			: "Result";
 }
 
 function HighlightCard({ highlight }: { highlight: ProjectorHighlight }) {

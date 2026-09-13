@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, isNotNull, or } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import { imageGenerationJobs as jobs } from "@/db/schema";
 
@@ -9,6 +9,30 @@ export function queryGeneratedImages(db: Pick<DrizzleD1Database, "select">) {
 		.where(eq(jobs.status, "completed"))
 		.orderBy(desc(jobs.completedAt), desc(jobs.id))
 		.limit(100)
+		.all();
+}
+
+export function queryProjectorImages(db: Pick<DrizzleD1Database, "select">) {
+	return db
+		.select({
+			jobId: jobs.id,
+			warriorId: jobs.warriorId,
+			eventId: jobs.eventId,
+			matchId: jobs.matchId,
+			completedAt: jobs.completedAt,
+		})
+		.from(jobs)
+		.where(
+			and(
+				eq(jobs.status, "completed"),
+				or(
+					isNotNull(jobs.warriorId),
+					isNotNull(jobs.eventId),
+					isNotNull(jobs.matchId),
+				),
+			),
+		)
+		.orderBy(desc(jobs.completedAt), desc(jobs.id))
 		.all();
 }
 
