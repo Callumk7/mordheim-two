@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { TextField } from "react-aria-components";
+import { campaignTypography } from "@/components/shared/typography";
 import { Button, LinkButton } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import {
@@ -62,7 +63,7 @@ function QueuePage() {
 	return (
 		<section className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-6">
 			<header className="space-y-2">
-				<h1 className="text-3xl">Queue playground</h1>
+				<h1 className={campaignTypography.pageTitle}>Queue playground</h1>
 				<div className="flex flex-wrap gap-2">
 					<LinkButton to="/queue-jobs" variant="outline">
 						View D1 jobs
@@ -74,7 +75,7 @@ function QueuePage() {
 						Image instructions
 					</LinkButton>
 				</div>
-				<p className="text-sm text-muted-foreground">
+				<p className={campaignTypography.supportingBody}>
 					Save an image prompt in D1 and send its job ID to the image generation
 					queue. Choose the image model for this job; when explicitly enabled,
 					the consumer generates a square JPEG and saves it to private R2
@@ -134,7 +135,7 @@ function QueuePage() {
 				</Button>
 				<output className="block break-words text-sm">{message}</output>
 			</form>
-			<p className="text-sm text-muted-foreground">
+			<p className={campaignTypography.supportingBody}>
 				On the deployed app, check the Cloudflare dashboard for the
 				mordheim-image-generation queue’s message writes and backlog, and D1 for
 				the job record. Completed means the image and result metadata are

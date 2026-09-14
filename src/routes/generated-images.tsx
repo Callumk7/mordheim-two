@@ -4,6 +4,7 @@ import {
 	useRouterState,
 } from "@tanstack/react-router";
 import { useState } from "react";
+import { campaignTypography } from "@/components/shared/typography";
 import { Button, LinkButton } from "@/components/ui/button";
 import { Dialog, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { listGeneratedImages } from "@/server/generated-images";
@@ -70,8 +71,8 @@ function GeneratedImagesPage() {
 		<section className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-6">
 			<header className="flex flex-wrap items-start justify-between gap-4">
 				<div className="space-y-2">
-					<h1 className="text-3xl">Generated images</h1>
-					<p className="text-sm text-muted-foreground">
+					<h1 className={campaignTypography.pageTitle}>Generated images</h1>
+					<p className={campaignTypography.supportingBody}>
 						Latest 100 completed D1 jobs, newest completion first. Select an
 						image to enlarge it. Refresh to check for new results.
 					</p>

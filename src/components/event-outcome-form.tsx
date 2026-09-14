@@ -1,4 +1,5 @@
 import { useEffect, useId, useState } from "react";
+import { campaignTypography } from "@/components/shared/typography";
 import { Button } from "@/components/ui/button";
 import {
 	Field,
@@ -45,7 +46,7 @@ export function EventOutcomeForm({
 			<div className="flex flex-wrap items-start justify-between gap-3">
 				<div>
 					<h2
-						className="font-serif text-2xl text-foreground"
+						className={`${campaignTypography.sectionTitle} text-foreground`}
 						id="event-outcome-heading"
 					>
 						Outcome

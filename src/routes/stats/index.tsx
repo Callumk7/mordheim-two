@@ -15,6 +15,7 @@ import {
 	ReservedStatSection,
 	StatTile,
 } from "@/components/shared/stat-display";
+import { campaignTypography } from "@/components/shared/typography";
 import {
 	Card,
 	CardContent,
@@ -104,7 +105,7 @@ function StatsIndexPage() {
 
 				<section aria-labelledby="campaign-totals-heading">
 					<h2
-						className="mb-4 font-mordheim text-2xl text-foreground"
+						className={`${campaignTypography.sectionTitle} mb-4 text-foreground`}
 						id="campaign-totals-heading"
 					>
 						Campaign totals
@@ -134,7 +135,9 @@ function StatsIndexPage() {
 				>
 					<Card className="min-w-0">
 						<CardHeader>
-							<h2 className="flex items-center gap-2 font-mordheim text-2xl">
+							<h2
+								className={`${campaignTypography.sectionTitle} flex items-center gap-2`}
+							>
 								Combat outcomes
 								{hasAdjustedOutcomes ? (
 									<AdjustedBadge accessibleLabel="Chart includes manual corrections" />
@@ -180,7 +183,9 @@ function StatsIndexPage() {
 					</Card>
 					<Card className="min-w-0">
 						<CardHeader>
-							<h2 className="flex items-center gap-2 font-mordheim text-2xl">
+							<h2
+								className={`${campaignTypography.sectionTitle} flex items-center gap-2`}
+							>
 								Leading warbands
 								{hasAdjustedWarbandLeader ? (
 									<AdjustedBadge accessibleLabel="Chart includes manual corrections" />

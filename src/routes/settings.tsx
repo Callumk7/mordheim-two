@@ -1,5 +1,6 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { ImageGenerationSettingsForm } from "@/components/image-generation-settings-form";
+import { campaignTypography } from "@/components/shared/typography";
 import { Button, LinkButton } from "@/components/ui/button";
 import {
 	getImageGenerationInstructions,
@@ -29,7 +30,7 @@ function SettingsPage() {
 	return (
 		<section className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6">
 			<header className="space-y-2">
-				<h1 className="text-3xl">Settings</h1>
+				<h1 className={campaignTypography.pageTitle}>Settings</h1>
 				<div className="flex flex-wrap gap-2">
 					<LinkButton to="/queue" variant="outline">
 						Queue playground
@@ -41,7 +42,7 @@ function SettingsPage() {
 						View generated images
 					</LinkButton>
 				</div>
-				<p className="text-sm text-muted-foreground">
+				<p className={campaignTypography.supportingBody}>
 					Configure the base instructions applied when the image-generation
 					consumer refines a job prompt. Saved values replace the default John
 					Blanche brief for later jobs. This page currently has no application

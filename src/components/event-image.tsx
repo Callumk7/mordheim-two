@@ -1,4 +1,5 @@
 import { GeneratedImageStatus } from "@/components/shared/generated-image-status";
+import { campaignTypography } from "@/components/shared/typography";
 import { Card, CardContent } from "@/components/ui/card";
 import type { EventOutcome } from "@/db/validation/event";
 import type { getEventImage } from "@/server/event-images";
@@ -18,7 +19,7 @@ export function EventImage({
 	return (
 		<Card className="mt-7">
 			<CardContent className="space-y-4">
-				<h2 className="font-serif text-2xl text-foreground">
+				<h2 className={`${campaignTypography.sectionTitle} text-foreground`}>
 					Event illustration
 				</h2>
 				{image.error ? (

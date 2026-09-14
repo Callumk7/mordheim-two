@@ -3,6 +3,7 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { EventForm } from "@/components/event-form";
 import { EventImage } from "@/components/event-image";
 import { EventOutcomeForm } from "@/components/event-outcome-form";
+import { campaignTypography } from "@/components/shared/typography";
 import { LinkButton } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getCollections } from "@/db-collections";
@@ -84,13 +85,11 @@ function EventDetailPage() {
 			</div>
 
 			<header className="mt-7 border-b border-border pb-6">
-				<p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
-					Knock down
-				</p>
-				<h1 className="mt-2 font-serif text-4xl font-semibold text-foreground">
+				<p className={campaignTypography.eyebrow}>Knock down</p>
+				<h1 className={`${campaignTypography.pageTitle} mt-2 text-foreground`}>
 					{match?.name ?? "Match event"}
 				</h1>
-				<p className="mt-2 text-muted-foreground">
+				<p className={`${campaignTypography.supportingBody} mt-2`}>
 					Edit this event’s combat record.
 				</p>
 			</header>

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { campaignTypography } from "@/components/shared/typography";
 import {
 	Card,
 	CardContent,
@@ -101,7 +102,9 @@ export function CombatLeaderboard({
 		<Card>
 			<CardHeader className="border-b border-border">
 				<CardTitle>
-					<h2 className="font-mordheim text-2xl text-foreground">{title}</h2>
+					<h2 className={`${campaignTypography.sectionTitle} text-foreground`}>
+						{title}
+					</h2>
 				</CardTitle>
 				<CardDescription>{description}</CardDescription>
 			</CardHeader>
@@ -177,16 +180,16 @@ export function ReservedStatSection({
 			aria-labelledby={`${label}-title`}
 			className="min-h-56 rounded-2xl border border-dashed border-input bg-card/40 p-6"
 		>
-			<p className="text-xs font-semibold tracking-widest text-primary uppercase">
-				Reserved · {label}
-			</p>
+			<p className={campaignTypography.eyebrow}>Reserved · {label}</p>
 			<h2
-				className="mt-4 font-mordheim text-2xl text-foreground"
+				className={`${campaignTypography.sectionTitle} mt-4 text-foreground`}
 				id={`${label}-title`}
 			>
 				{title}
 			</h2>
-			<p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+			<p
+				className={`${campaignTypography.supportingBody} mt-2 max-w-md leading-6`}
+			>
 				{description}
 			</p>
 		</section>
