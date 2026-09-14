@@ -15,5 +15,6 @@ describe("CatalogueItem", () => {
 		expect(markup).toContain("Sword");
 		expect(markup).toContain("Special rules");
 		expect(markup).toContain("rounded-2xl");
+		expect(markup).toContain("focus-visible:-outline-offset-2");
 	});
 });

@@ -83,6 +83,7 @@ export function StatTile({
 				<dd className="mt-0.5 truncate font-mono tabular-nums text-foreground">
 					{value}
 					{suffix}
+					<AdjustedBadge adjustment={adjustment} />
 				</dd>
 			</div>
 		);

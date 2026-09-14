@@ -37,12 +37,13 @@ describe("StatTile", () => {
 
 	it("renders the compact muted tile used inside existing cards", () => {
 		const markup = renderToStaticMarkup(
-			<StatTile label="KDs given" value={4} variant="compact" />,
+			<StatTile adjustment={2} label="KDs given" value={4} variant="compact" />,
 		);
 		expect(markup).toContain("<dt");
 		expect(markup).toContain("<dd");
 		expect(markup).toContain("font-mono");
 		expect(markup).toContain("bg-muted/40");
+		expect(markup).toContain("Adjusted by +2");
 		expect(markup).not.toContain('data-slot="card"');
 		expect(markup).not.toContain("font-mordheim");
 	});
