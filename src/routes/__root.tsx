@@ -32,11 +32,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				title: "Mordheim Campaign Ledger",
 			},
 		],
-		styles: [
-			{
-				children: `@font-face{font-family:'Schoensperger';src:url('${schoenspergerFontUrl}') format('opentype');font-style:normal;font-weight:400;font-display:block}`,
-			},
-		],
 		links: [
 			{
 				rel: "preload",
@@ -44,8 +39,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				as: "font",
 				type: "font/otf",
 				crossOrigin: "anonymous",
-				fetchPriority: "high",
-				blocking: "render",
 			},
 			{
 				rel: "stylesheet",

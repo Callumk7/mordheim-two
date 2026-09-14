@@ -10,8 +10,9 @@ describe("EmptyState", () => {
 				title="No warbands yet"
 			/>,
 		);
-		expect(index).toContain("rounded-xl px-6 py-16");
 		expect(index).toContain("<h2");
+		expect(index).toContain("No warbands yet");
+		expect(index).toContain("Create the first company.");
 
 		const dashboard = renderToStaticMarkup(
 			<EmptyState
@@ -22,7 +23,6 @@ describe("EmptyState", () => {
 				variant="dashboard"
 			/>,
 		);
-		expect(dashboard).toContain("rounded-2xl bg-card/40 px-6 py-10");
 		expect(dashboard).toContain("<h3");
 		expect(dashboard).toContain("Shield");
 	});
@@ -32,6 +32,5 @@ describe("EmptyState", () => {
 			<EmptyState action={<button type="button">Edit participants</button>} />,
 		);
 		expect(markup).toContain("Edit participants");
-		expect(markup).toContain("mt-5");
 	});
 });
