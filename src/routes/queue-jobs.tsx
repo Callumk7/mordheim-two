@@ -4,7 +4,7 @@ import {
 	useRouterState,
 } from "@tanstack/react-router";
 import { Page, PageError, PagePending } from "@/components/shared/page";
-import { campaignTypography } from "@/components/shared/typography";
+import { Typography } from "@/components/shared/typography";
 import { Button, LinkButton } from "@/components/ui/button";
 import {
 	Table,
@@ -44,12 +44,12 @@ function QueueJobsPage() {
 		<Page className="flex flex-col gap-6" width="wide">
 			<header className="flex flex-wrap items-start justify-between gap-4">
 				<div className="space-y-2">
-					<h1 className={campaignTypography.pageTitle}>Queue jobs</h1>
-					<p className={campaignTypography.supportingBody}>
+					<Typography variant="pageTitle">Queue jobs</Typography>
+					<Typography variant="supportingBody">
 						Latest 100 D1 jobs, newest first. Completed means a JPEG is stored
 						in private R2. Consumed is a historical receipt, not a generated
 						image. This is not the live queue backlog.
-					</p>
+					</Typography>
 				</div>
 				<div className="flex flex-wrap gap-2">
 					<LinkButton to="/generated-images" variant="outline">

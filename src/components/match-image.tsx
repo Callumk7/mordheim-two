@@ -2,7 +2,7 @@ import {
 	type GeneratedImageJob,
 	GeneratedImageStatus,
 } from "@/components/shared/generated-image-status";
-import { campaignTypography } from "@/components/shared/typography";
+import { Typography } from "@/components/shared/typography";
 import { isActiveImageJobStatus } from "@/components/shared/use-image-generation-polling";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Match } from "@/db/validation/match";
@@ -33,9 +33,9 @@ export function MatchImage({
 	return (
 		<Card>
 			<CardContent className="space-y-4">
-				<h2 className={`${campaignTypography.sectionTitle} text-foreground`}>
+				<Typography variant="sectionTitle" className="text-foreground">
 					Match illustration
-				</h2>
+				</Typography>
 				{jobs.length > 1 ? <ImageGroupStatus jobs={jobs} /> : null}
 				{"error" in imagery ? (
 					<p role="alert">{imagery.error}</p>

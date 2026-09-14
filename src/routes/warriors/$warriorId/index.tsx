@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CombatStatValue } from "@/components/shared/stat-display";
-import { campaignTypography } from "@/components/shared/typography";
+import { Typography } from "@/components/shared/typography";
 import { LinkButton } from "@/components/ui/button";
 import { WarriorEquipment } from "@/components/warrior-equipment";
 import { WarriorPortrait } from "@/components/warrior-portrait";
@@ -60,15 +60,15 @@ function WarriorDetailPage() {
 			</div>
 
 			<header className="mt-7 border-b border-border pb-6">
-				<p className={campaignTypography.eyebrow}>
+				<Typography variant="eyebrow">
 					{warband?.name ?? "Unknown warband"} · {warrior.class}
-				</p>
-				<h1 className={`${campaignTypography.pageTitle} mt-2 text-foreground`}>
+				</Typography>
+				<Typography variant="pageTitle" className="mt-2 text-foreground">
 					{warrior.name}
-				</h1>
-				<p className={`${campaignTypography.supportingBody} mt-2`}>
+				</Typography>
+				<Typography variant="supportingBody" className="mt-2">
 					Edit this warrior’s campaign record.
-				</p>
+				</Typography>
 			</header>
 
 			<WarriorPortrait
@@ -82,9 +82,9 @@ function WarriorDetailPage() {
 
 			<Card className="mt-7">
 				<CardContent>
-					<h2 className={`${campaignTypography.sectionTitle} text-foreground`}>
+					<Typography variant="sectionTitle" className="text-foreground">
 						Combat stats
-					</h2>
+					</Typography>
 					<dl className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
 						<Stat label="Status" value={combat.isDead ? "Dead" : "Alive"} />
 						<CombatStat
@@ -118,15 +118,13 @@ function WarriorDetailPage() {
 
 			<Card className="mt-7">
 				<CardContent>
-					<h2
-						className={`${campaignTypography.sectionTitle} mb-2 text-foreground`}
-					>
+					<Typography variant="sectionTitle" className="mb-2 text-foreground">
 						Profile and manual corrections
-					</h2>
-					<p className={`${campaignTypography.supportingBody} mb-6`}>
+					</Typography>
+					<Typography variant="supportingBody" className="mb-6">
 						Signed corrections are added to combat totals calculated from
 						events.
-					</p>
+					</Typography>
 					<WarriorForm
 						initialValues={warrior}
 						isWarbandLocked={eventReferences.length > 0}

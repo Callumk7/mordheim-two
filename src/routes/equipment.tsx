@@ -7,7 +7,7 @@ import {
 	IndexPageHeader,
 } from "@/components/shared/index-page";
 import { Page, PageError, PagePending } from "@/components/shared/page";
-import { campaignTypography } from "@/components/shared/typography";
+import { Typography } from "@/components/shared/typography";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/equipment")({
 	pendingComponent: () => <PagePending>Loading equipment…</PagePending>,
 	errorComponent: () => (
 		<PageError>
-			<h1 className={campaignTypography.pageTitle}>Unable to load equipment</h1>
+			<Typography variant="pageTitle">Unable to load equipment</Typography>
 			<p className="mt-2 text-muted-foreground">
 				Check the database connection and migrations, then reload this page.
 			</p>
@@ -180,11 +180,9 @@ function EquipmentPage() {
 												)}
 											{item.sourceText && (
 												<div>
-													<h2
-														className={`${campaignTypography.sectionTitle} mb-2`}
-													>
+													<Typography variant="sectionTitle" className="mb-2">
 														Full source text
-													</h2>
+													</Typography>
 													<p className="whitespace-pre-wrap break-words leading-relaxed">
 														{item.sourceText}
 													</p>

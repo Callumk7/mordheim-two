@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-router";
 import { useState } from "react";
 import { Page, PageError, PagePending } from "@/components/shared/page";
-import { campaignTypography } from "@/components/shared/typography";
+import { Typography } from "@/components/shared/typography";
 import { Button, LinkButton } from "@/components/ui/button";
 import { Dialog, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { listGeneratedImages } from "@/server/generated-images";
@@ -74,11 +74,11 @@ function GeneratedImagesPage() {
 		<Page className="flex flex-col gap-6" width="wide">
 			<header className="flex flex-wrap items-start justify-between gap-4">
 				<div className="space-y-2">
-					<h1 className={campaignTypography.pageTitle}>Generated images</h1>
-					<p className={campaignTypography.supportingBody}>
+					<Typography variant="pageTitle">Generated images</Typography>
+					<Typography variant="supportingBody">
 						Latest 100 completed D1 jobs, newest completion first. Select an
 						image to enlarge it. Refresh to check for new results.
-					</p>
+					</Typography>
 				</div>
 				<div className="flex flex-wrap gap-2">
 					<LinkButton to="/queue" variant="outline">

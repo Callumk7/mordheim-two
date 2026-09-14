@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { campaignTypography } from "@/components/shared/typography";
+import { Typography } from "@/components/shared/typography";
 import { Button } from "@/components/ui/button";
 import { useWarriorMutations } from "@/db-collections/mutations/warriors";
 import { useWarriorDeletion } from "@/db-collections/queries";
@@ -31,17 +31,15 @@ function DeleteWarriorPage() {
 			</Link>
 
 			<section className="mt-7 rounded-xl border border-destructive/50 bg-destructive/10 p-7">
-				<p className={campaignTypography.destructiveEyebrow}>
-					Destructive action
-				</p>
-				<h1 className={`${campaignTypography.pageTitle} mt-3 text-foreground`}>
+				<Typography variant="destructiveEyebrow">Destructive action</Typography>
+				<Typography variant="pageTitle" className="mt-3 text-foreground">
 					Delete {warrior?.name ?? "warrior"}?
-				</h1>
-				<p className={`${campaignTypography.supportingBody} mt-3 max-w-xl`}>
+				</Typography>
+				<Typography variant="supportingBody" className="mt-3 max-w-xl">
 					{eventIds.length > 0
 						? "This warrior cannot be deleted because their event history is retained."
 						: "This permanently removes the warrior. This action cannot be undone."}
-				</p>
+				</Typography>
 
 				{error ? (
 					<p className="mt-5 rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">

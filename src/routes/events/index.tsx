@@ -8,7 +8,7 @@ import {
 	IndexPage,
 	IndexPageHeader,
 } from "@/components/shared/index-page";
-import { campaignTypography } from "@/components/shared/typography";
+import { Typography } from "@/components/shared/typography";
 import { EventsTable } from "@/components/table/events-table";
 import { Button } from "@/components/ui/button";
 import {
@@ -127,14 +127,12 @@ function EventsIndexPage() {
 					/>
 				) : (
 					<section className="rounded-xl border border-dashed border-input px-6 py-10 text-center">
-						<h2
-							className={`${campaignTypography.sectionTitle} text-foreground`}
-						>
+						<Typography variant="sectionTitle" className="text-foreground">
 							A match with two staffed warbands is required
-						</h2>
-						<p className={`${campaignTypography.supportingBody} mt-2`}>
+						</Typography>
+						<Typography variant="supportingBody" className="mt-2">
 							Add participating warbands and warriors before recording an event.
-						</p>
+						</Typography>
 					</section>
 				)}
 			</Dialog>

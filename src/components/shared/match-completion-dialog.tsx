@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { EventForm, type EventFormValues } from "@/components/event-form";
-import { campaignTypography } from "@/components/shared/typography";
+import { Typography } from "@/components/shared/typography";
 import {
 	type MatchEventImageJobs,
 	MatchEventsTable,
@@ -125,12 +125,13 @@ export function MatchCompletionDialog({
 			<div className="grid gap-6">
 				<section aria-labelledby="match-result-heading" className="grid gap-4">
 					<div>
-						<h2
-							className={`${campaignTypography.sectionTitle} text-foreground`}
+						<Typography
+							variant="sectionTitle"
+							className="text-foreground"
 							id="match-result-heading"
 						>
 							Match result
-						</h2>
+						</Typography>
 						<p className="mt-1 text-sm text-muted-foreground">
 							Mark the match as a victory for one participating warband, or
 							record a draw.
@@ -197,11 +198,9 @@ export function MatchCompletionDialog({
 				<div className="grid gap-4">
 					<div className="flex flex-wrap items-end justify-between gap-3">
 						<div>
-							<h2
-								className={`${campaignTypography.sectionTitle} text-foreground`}
-							>
+							<Typography variant="sectionTitle" className="text-foreground">
 								Match events
-							</h2>
+							</Typography>
 							<p className="mt-1 text-sm text-muted-foreground">
 								Resolved outcomes remain historical records and cannot be
 								changed.

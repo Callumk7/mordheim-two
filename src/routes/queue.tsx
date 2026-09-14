@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { TextField } from "react-aria-components";
 import { Page } from "@/components/shared/page";
-import { campaignTypography } from "@/components/shared/typography";
+import { Typography } from "@/components/shared/typography";
 import { Button, LinkButton } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import {
@@ -64,7 +64,7 @@ function QueuePage() {
 	return (
 		<Page className="flex flex-col gap-6" width="form">
 			<header className="space-y-2">
-				<h1 className={campaignTypography.pageTitle}>Queue playground</h1>
+				<Typography variant="pageTitle">Queue playground</Typography>
 				<div className="flex flex-wrap gap-2">
 					<LinkButton to="/queue-jobs" variant="outline">
 						View D1 jobs
@@ -76,13 +76,13 @@ function QueuePage() {
 						Image instructions
 					</LinkButton>
 				</div>
-				<p className={campaignTypography.supportingBody}>
+				<Typography variant="supportingBody">
 					Save an image prompt in D1 and send its job ID to the image generation
 					queue. Choose the image model for this job; when explicitly enabled,
 					the consumer generates a square JPEG and saves it to private R2
 					storage. Disabled jobs are marked failed, not held for later
 					generation.
-				</p>
+				</Typography>
 			</header>
 			<form
 				className="space-y-4 rounded-xl border border-border bg-card p-6"
@@ -136,7 +136,7 @@ function QueuePage() {
 				</Button>
 				<output className="block break-words text-sm">{message}</output>
 			</form>
-			<p className={campaignTypography.supportingBody}>
+			<Typography variant="supportingBody">
 				On the deployed app, check the Cloudflare dashboard for the
 				mordheim-image-generation queue’s message writes and backlog, and D1 for
 				the job record. Completed means the image and result metadata are
@@ -145,7 +145,7 @@ function QueuePage() {
 				in development. This endpoint has no application authentication; protect
 				the app and submission RPC with Access/authorization before enabling
 				generation.
-			</p>
+			</Typography>
 		</Page>
 	);
 }

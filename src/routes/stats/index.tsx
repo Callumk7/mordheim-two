@@ -16,7 +16,7 @@ import {
 	ReservedStatSection,
 	StatTile,
 } from "@/components/shared/stat-display";
-import { campaignTypography } from "@/components/shared/typography";
+import { Typography } from "@/components/shared/typography";
 import {
 	Card,
 	CardContent,
@@ -114,12 +114,13 @@ function StatsIndexPage() {
 				/>
 
 				<section aria-labelledby="campaign-totals-heading">
-					<h2
-						className={`${campaignTypography.sectionTitle} mb-4 text-foreground`}
+					<Typography
+						variant="sectionTitle"
+						className="mb-4 text-foreground"
 						id="campaign-totals-heading"
 					>
 						Campaign totals
-					</h2>
+					</Typography>
 					<div className="grid gap-4 sm:grid-cols-3">
 						<StatTile
 							adjustment={totalAdjustments.knockdowns}
@@ -145,14 +146,15 @@ function StatsIndexPage() {
 				>
 					<Card className="min-w-0">
 						<CardHeader>
-							<h2
-								className={`${campaignTypography.sectionTitle} flex items-center gap-2`}
+							<Typography
+								variant="sectionTitle"
+								className="flex items-center gap-2"
 							>
 								Combat outcomes
 								{hasAdjustedOutcomes ? (
 									<AdjustedBadge accessibleLabel="Chart includes manual corrections" />
 								) : null}
-							</h2>
+							</Typography>
 							<CardDescription>
 								Share of recorded knockdowns, injuries, and deaths across the
 								campaign.
@@ -193,14 +195,15 @@ function StatsIndexPage() {
 					</Card>
 					<Card className="min-w-0">
 						<CardHeader>
-							<h2
-								className={`${campaignTypography.sectionTitle} flex items-center gap-2`}
+							<Typography
+								variant="sectionTitle"
+								className="flex items-center gap-2"
 							>
 								Leading warbands
 								{hasAdjustedWarbandLeader ? (
 									<AdjustedBadge accessibleLabel="Chart includes manual corrections" />
 								) : null}
-							</h2>
+							</Typography>
 							<CardDescription>
 								Combat given by the top eight active warbands, in leaderboard
 								order. Full names and counts appear in the standings below.

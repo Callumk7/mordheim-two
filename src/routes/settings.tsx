@@ -1,7 +1,7 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { ImageGenerationSettingsForm } from "@/components/image-generation-settings-form";
 import { Page, PageError, PagePending } from "@/components/shared/page";
-import { campaignTypography } from "@/components/shared/typography";
+import { Typography } from "@/components/shared/typography";
 import { Button, LinkButton } from "@/components/ui/button";
 import {
 	getImageGenerationInstructions,
@@ -33,7 +33,7 @@ function SettingsPage() {
 	return (
 		<Page className="flex flex-col gap-6" width="narrow">
 			<header className="space-y-2">
-				<h1 className={campaignTypography.pageTitle}>Settings</h1>
+				<Typography variant="pageTitle">Settings</Typography>
 				<div className="flex flex-wrap gap-2">
 					<LinkButton to="/queue" variant="outline">
 						Queue playground
@@ -45,12 +45,12 @@ function SettingsPage() {
 						View generated images
 					</LinkButton>
 				</div>
-				<p className={campaignTypography.supportingBody}>
+				<Typography variant="supportingBody">
 					Configure the base instructions applied when the image-generation
 					consumer refines a job prompt. Saved values replace the default John
 					Blanche brief for later jobs. This page currently has no application
 					authentication.
-				</p>
+				</Typography>
 			</header>
 			<ImageGenerationSettingsForm
 				key={`${settings.isCustom}:${settings.instructions}`}

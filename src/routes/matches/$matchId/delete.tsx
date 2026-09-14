@@ -1,7 +1,7 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { campaignTypography } from "@/components/shared/typography";
+import { Typography } from "@/components/shared/typography";
 import { Button } from "@/components/ui/button";
 import { getCollections } from "@/db-collections";
 import { deleteMatchTransaction } from "@/db-collections/mutations/matches";
@@ -55,17 +55,15 @@ function DeleteMatchPage() {
 			</Link>
 
 			<section className="mt-7 rounded-xl border border-destructive/50 bg-destructive/10 p-7">
-				<p className={campaignTypography.destructiveEyebrow}>
-					Destructive action
-				</p>
-				<h1 className={`${campaignTypography.pageTitle} mt-3 text-foreground`}>
+				<Typography variant="destructiveEyebrow">Destructive action</Typography>
+				<Typography variant="pageTitle" className="mt-3 text-foreground">
 					Delete {match?.name ?? "match"}?
-				</h1>
-				<p className={`${campaignTypography.supportingBody} mt-3 max-w-xl`}>
+				</Typography>
+				<Typography variant="supportingBody" className="mt-3 max-w-xl">
 					{eventRows.length > 0
 						? "This match cannot be deleted because its event history is retained."
 						: `This permanently removes the match and ${participantRows.length} participant link${participantRows.length === 1 ? "" : "s"}. Warbands and warriors are kept.`}
-				</p>
+				</Typography>
 
 				{error ? (
 					<p className="mt-5 rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">

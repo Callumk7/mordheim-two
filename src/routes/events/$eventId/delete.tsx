@@ -1,7 +1,7 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { campaignTypography } from "@/components/shared/typography";
+import { Typography } from "@/components/shared/typography";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
@@ -39,16 +39,16 @@ function VoidEventPage() {
 				← Cancel
 			</Link>
 			<section className="mt-7 rounded-xl border border-destructive/50 bg-destructive/10 p-7">
-				<p className={campaignTypography.destructiveEyebrow}>
+				<Typography variant="destructiveEyebrow">
 					Historical correction
-				</p>
-				<h1 className={`${campaignTypography.pageTitle} mt-3 text-foreground`}>
+				</Typography>
+				<Typography variant="pageTitle" className="mt-3 text-foreground">
 					Void this event?
-				</h1>
-				<p className={`${campaignTypography.supportingBody} mt-3 max-w-xl`}>
+				</Typography>
+				<Typography variant="supportingBody" className="mt-3 max-w-xl">
 					The event remains in history but no longer contributes to combat
 					stats. Create a new event afterward if a replacement is needed.
-				</p>
+				</Typography>
 				<Field className="mt-6">
 					<FieldLabel>Reason</FieldLabel>
 					<Textarea

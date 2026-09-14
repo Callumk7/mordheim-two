@@ -1,7 +1,7 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { Plus, Trash2 } from "lucide-react";
 import { useId, useState } from "react";
-import { campaignTypography } from "@/components/shared/typography";
+import { Typography } from "@/components/shared/typography";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -46,9 +46,9 @@ export function WarriorEquipment({
 	return (
 		<Card className="mt-7">
 			<CardContent>
-				<h2 className={`${campaignTypography.sectionTitle} text-foreground`}>
+				<Typography variant="sectionTitle" className="text-foreground">
 					Equipment
-				</h2>
+				</Typography>
 				<p className="mt-1 text-sm text-muted-foreground">
 					Assign any catalogue item. The same item can be assigned more than
 					once.
