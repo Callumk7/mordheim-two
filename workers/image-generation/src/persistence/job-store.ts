@@ -1,6 +1,10 @@
 import { and, eq, inArray, lte, or } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
-import { imageGenerationJobs as jobs } from "@/db/schema";
+import { appSettings, imageGenerationJobs as jobs } from "@/db/schema";
+import {
+	IMAGE_GENERATION_INSTRUCTIONS_SETTING_KEY,
+	resolveImageGenerationInstructions,
+} from "@/db/validation/image-generation";
 
 // Longer than Queues' 15-minute invocation wall-time ceiling: an expired owner
 // cannot still be running when another delivery claims its job.
@@ -42,6 +46,14 @@ export function createJobStore(db: DrizzleD1Database, now = Date.now) {
 	}
 	return {
 		load: (id: string) => db.select().from(jobs).where(eq(jobs.id, id)).get(),
+		loadImageGenerationInstructions: async () => {
+			const row = await db
+				.select({ value: appSettings.value })
+				.from(appSettings)
+				.where(eq(appSettings.key, IMAGE_GENERATION_INSTRUCTIONS_SETTING_KEY))
+				.get();
+			return resolveImageGenerationInstructions(row?.value);
+		},
 		claim: (id: string, token: string) =>
 			db
 				.update(jobs)

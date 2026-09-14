@@ -83,6 +83,9 @@ function GeneratedImagesPage() {
 					<LinkButton to="/queue-jobs" variant="outline">
 						View D1 jobs
 					</LinkButton>
+					<LinkButton to="/settings" variant="outline">
+						Image instructions
+					</LinkButton>
 					<Button
 						isDisabled={isLoading}
 						onPress={() => {

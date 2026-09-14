@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import { drizzle } from "drizzle-orm/d1";
 import { createJobStore } from "./persistence/job-store";
@@ -13,37 +13,11 @@ export const jpegBytes = Uint8Array.from(atob(jpegBase64), (character) =>
 export function setupDatabase(now?: () => number) {
 	const sqlite = new DatabaseSync(":memory:");
 	sqlite.exec("PRAGMA foreign_keys = ON");
-	for (const migration of [
-		"0000_rich_blackheart.sql",
-		"0001_optimal_chat.sql",
-		"0002_flowery_mariko_yashida.sql",
-		"0003_sticky_prowler.sql",
-		"0004_charming_gressill.sql",
-		"0005_lovely_pestilence.sql",
-		"0006_left_krista_starr.sql",
-		"0007_certain_steve_rogers.sql",
-		"0008_greedy_cassandra_nova.sql",
-		"0009_stormy_overlord.sql",
-		"0010_windy_karma.sql",
-		"0011_image_generation_jobs.sql",
-		"0012_tense_echo.sql",
-		"0013_last_charles_xavier.sql",
-		"0014_cool_callisto.sql",
-		"0015_equipment_source_catalogue.sql",
-		"0016_slimy_mathemanic.sql",
-		"0017_glorious_the_hunter.sql",
-		"0018_numerous_mercury.sql",
-		"0019_mean_nextwave.sql",
-		"0020_minor_the_spike.sql",
-		"0021_pretty_logan.sql",
-		"0022_premium_iron_lad.sql",
-	]) {
-		sqlite.exec(
-			readFileSync(
-				new URL(`../../../drizzle/${migration}`, import.meta.url),
-				"utf8",
-			),
-		);
+	const drizzleDirectory = new URL("../../../drizzle/", import.meta.url);
+	for (const migration of readdirSync(drizzleDirectory)
+		.filter((name) => name.endsWith(".sql"))
+		.sort()) {
+		sqlite.exec(readFileSync(new URL(migration, drizzleDirectory), "utf8"));
 	}
 	// Test-only D1 adapter: execute actual Drizzle SQL and migrations in SQLite.
 	const binding = {

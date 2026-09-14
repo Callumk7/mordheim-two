@@ -89,10 +89,12 @@ async function processJob(
 				);
 				return;
 			}
+			stage = "Image generation settings lookup failed.";
+			const instructions = await jobs.loadImageGenerationInstructions();
 			stage = "Prompt refinement failed.";
 			let refinedPrompt: string;
 			try {
-				refinedPrompt = await refinePrompt(job.prompt);
+				refinedPrompt = await refinePrompt(job.prompt, instructions);
 			} catch (error) {
 				throw error instanceof GenerationError
 					? new GenerationError(error.message, true)

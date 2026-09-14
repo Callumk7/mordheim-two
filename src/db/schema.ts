@@ -18,6 +18,12 @@ import {
 import { MATCH_RESULTS, MATCH_STATUSES } from "./validation/match";
 import { WARRIOR_STATUSES } from "./validation/warrior";
 
+export const appSettings = sqliteTable("app_settings", {
+	key: text("key").primaryKey(),
+	value: text("value").notNull(),
+	updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
 export const imageGenerationJobs = sqliteTable(
 	"image_generation_jobs",
 	{

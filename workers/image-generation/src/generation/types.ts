@@ -7,4 +7,7 @@ export interface ImageGenerator {
 
 export type GetImageGenerator = (model: ImageGenerationModel) => ImageGenerator;
 
-export type PromptRefiner = (prompt: string) => Promise<string>;
+export type PromptRefiner = (
+	prompt: string,
+	instructions: string,
+) => Promise<string>;

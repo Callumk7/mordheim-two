@@ -70,6 +70,9 @@ function QueuePage() {
 					<LinkButton to="/generated-images" variant="outline">
 						View generated images
 					</LinkButton>
+					<LinkButton to="/settings" variant="outline">
+						Image instructions
+					</LinkButton>
 				</div>
 				<p className="text-sm text-muted-foreground">
 					Save an image prompt in D1 and send its job ID to the image generation
