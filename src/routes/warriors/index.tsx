@@ -2,6 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { WarriorsTable } from "#/components/table/warriors-table";
 import { WarriorForm, type WarriorFormValues } from "#/components/warrior-form";
+import {
+	IndexEmptyState,
+	IndexPage,
+	IndexPageHeader,
+} from "@/components/shared/index-page";
 import { campaignTypography } from "@/components/shared/typography";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,11 +17,6 @@ import {
 } from "@/components/ui/dialog";
 import { useWarriorMutations } from "@/db-collections/mutations/warriors";
 import { useCombatStats, useWarriorsIndex } from "@/db-collections/queries";
-import {
-	IndexEmptyState,
-	IndexPage,
-	IndexPageHeader,
-} from "../../components/index-page";
 
 export const Route = createFileRoute("/warriors/")({
 	component: WarriorsIndexPage,

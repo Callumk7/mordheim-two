@@ -1,12 +1,12 @@
 import { safeRandomUUID, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { MatchForm, type MatchFormValues } from "@/components/match-form";
 import {
 	IndexEmptyState,
 	IndexPage,
 	IndexPageHeader,
-} from "@/components/index-page";
-import { MatchForm, type MatchFormValues } from "@/components/match-form";
+} from "@/components/shared/index-page";
 import { MatchesTable } from "@/components/table/matches-table";
 import { Button } from "@/components/ui/button";
 import {

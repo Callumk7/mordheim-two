@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { TextField } from "react-aria-components";
+import { Page } from "@/components/shared/page";
 import { campaignTypography } from "@/components/shared/typography";
 import { Button, LinkButton } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
@@ -61,7 +62,7 @@ function QueuePage() {
 	}
 
 	return (
-		<section className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-6">
+		<Page className="flex flex-col gap-6" width="form">
 			<header className="space-y-2">
 				<h1 className={campaignTypography.pageTitle}>Queue playground</h1>
 				<div className="flex flex-wrap gap-2">
@@ -145,6 +146,6 @@ function QueuePage() {
 				the app and submission RPC with Access/authorization before enabling
 				generation.
 			</p>
-		</section>
+		</Page>
 	);
 }

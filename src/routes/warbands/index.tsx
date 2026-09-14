@@ -1,6 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { CreateWarriorDialog } from "@/components/shared/create-warrior-dialog";
+import {
+	IndexEmptyState,
+	IndexPage,
+	IndexPageHeader,
+} from "@/components/shared/index-page";
 import { WarbandsTable } from "@/components/table/warbands-table";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,11 +24,6 @@ import {
 import { createWarriorTransaction } from "@/db-collections/mutations/warriors";
 import { useCombatStats } from "@/db-collections/queries";
 import { useWarbands } from "@/db-collections/queries/warbands";
-import {
-	IndexEmptyState,
-	IndexPage,
-	IndexPageHeader,
-} from "../../components/index-page";
 
 export const Route = createFileRoute("/warbands/")({
 	component: WarbandsIndexPage,

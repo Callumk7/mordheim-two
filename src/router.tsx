@@ -3,6 +3,7 @@ import {
 	Link,
 } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
+import { Page } from "@/components/shared/page";
 import { campaignTypography } from "@/components/shared/typography";
 import { getContext } from "./integrations/tanstack-query/root-provider";
 import { routeTree } from "./routeTree.gen";
@@ -26,7 +27,7 @@ export function getRouter() {
 
 function DefaultNotFound() {
 	return (
-		<main className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-8 sm:py-24">
+		<Page padding="loose">
 			<section className="rounded-xl border border-border bg-card px-6 py-14 text-center">
 				<p className={campaignTypography.eyebrow}>Not found</p>
 				<h1 className={`${campaignTypography.pageTitle} mt-3 text-foreground`}>
@@ -42,7 +43,7 @@ function DefaultNotFound() {
 					Return home →
 				</Link>
 			</section>
-		</main>
+		</Page>
 	);
 }
 

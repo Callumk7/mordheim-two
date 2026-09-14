@@ -7,7 +7,7 @@ import {
 	IndexEmptyState,
 	IndexPage,
 	IndexPageHeader,
-} from "@/components/index-page";
+} from "@/components/shared/index-page";
 import { campaignTypography } from "@/components/shared/typography";
 import { EventsTable } from "@/components/table/events-table";
 import { Button } from "@/components/ui/button";

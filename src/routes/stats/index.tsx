@@ -8,7 +8,8 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
-import { IndexPage, IndexPageHeader } from "@/components/index-page";
+import { IndexPage, IndexPageHeader } from "@/components/shared/index-page";
+import { Page, PageError, PagePending } from "@/components/shared/page";
 import {
 	AdjustedBadge,
 	CombatLeaderboard,
@@ -50,6 +51,15 @@ export const Route = createFileRoute("/stats/")({
 		]);
 		return null;
 	},
+	pendingComponent: () => <PagePending>Loading statistics…</PagePending>,
+	errorComponent: () => (
+		<PageError>
+			<h1 className="font-mordheim text-3xl">Unable to load statistics</h1>
+			<p className="mt-2 text-muted-foreground">
+				Check the database connection and migrations, then reload this page.
+			</p>
+		</PageError>
+	),
 	component: StatsIndexPage,
 });
 
@@ -91,7 +101,7 @@ function StatsIndexPage() {
 	];
 
 	return (
-		<main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-8">
+		<Page>
 			<IndexPage>
 				<IndexPageHeader
 					action={
@@ -296,6 +306,6 @@ function StatsIndexPage() {
 					/>
 				</div>
 			</IndexPage>
-		</main>
+		</Page>
 	);
 }

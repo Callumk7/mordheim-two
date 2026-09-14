@@ -11,7 +11,7 @@ Reviewed:
 - Every file-based route under `src/routes/` that renders UI
 - The root document shell in `src/routes/__root.tsx`
 - The default not-found screen in `src/router.tsx`
-- Shared layout-adjacent components that routes currently copy or wrap (`src/components/index-page.tsx`, `src/components/ui/card.tsx`, `src/components/ui/button.tsx`, `src/components/shared/stat-display.tsx`)
+- Shared layout-adjacent components that routes currently copy or wrap (`src/components/shared/page.tsx`, `src/components/shared/index-page.tsx`, `src/components/ui/card.tsx`, `src/components/ui/button.tsx`, `src/components/shared/stat-display.tsx`)
 
 Out of visual-unification scope, but inventoried:
 
@@ -41,21 +41,16 @@ These are the building blocks later issues should extend instead of inventing pa
 
 | Primitive | Location | What it already standardizes | Gap |
 | --- | --- | --- | --- |
-| Index page stack | `src/components/index-page.tsx` | `grid gap-8`, list header, dashed empty | Used only on collection indexes; not a page shell; lives outside `src/components/shared/` |
+| Page shell | `src/components/shared/page.tsx` | Campaign `<main>` width/padding (`max-w-6xl` / `py-10`), plus `narrow` (`max-w-3xl`), `form` (`max-w-2xl`), `wide` (`max-w-7xl`), and `loose` padding; `PagePending` / `PageError` | Nested detail/delete columns still use local `max-w-3xl` / `max-w-2xl` wrappers; projector stays on its own landmark |
+| Index page stack | `src/components/shared/index-page.tsx` | `grid gap-8`, list header, dashed empty | Used only on collection indexes; match detail and admin headers still local |
 | Card | `src/components/ui/card.tsx` | `rounded-2xl`, `ring-1 ring-foreground/10`, `--card-spacing` | Many routes rebuild cards with `rounded-xl border border-border` |
 | Button / LinkButton | `src/components/ui/button.tsx` | `rounded-4xl` variants and sizes | Home CTAs, delete cancels, nav, not-found links, and several keep/cancel links use custom `Link` classes |
 | Stat tile / leaderboard | `src/components/shared/stat-display.tsx` | Metric cards, leaderboard heading, reserved dashed section | Warband detail reimplements `MetricCard` and a local `EmptyState` |
 | Dialog | `src/components/ui/dialog.tsx` | Dialog chrome | Almost every create/edit dialog repeats `className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl"` |
 
-There is **no** shared page shell. Collection layouts copy the same `main` class string. Admin/diagnostic routes do not use it at all.
+Canonical list-page shell is `<Page>` (`mx-auto w-full max-w-6xl px-4 py-10 sm:px-8`). Collection layouts, equipment, stats, home (`padding="loose"`), and the default 404 use it. `/settings` uses `width="narrow"`, `/queue` uses `width="form"`, and `/queue-jobs` plus `/generated-images` use `width="wide"`.
 
-Canonical list-page shell today:
-
-```tsx
-<main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-8">
-```
-
-Copied in `warbands/route.tsx`, `warriors/route.tsx`, `matches/route.tsx`, `events/route.tsx`, `equipment.tsx`, and `stats/index.tsx`.
+**Product decision (MOR-54).** `/queue-jobs` and `/generated-images` keep `width="wide"` (`max-w-7xl`). The jobs table is `min-w-5xl` with many columns; the gallery is a 4-column grid at `xl`. Shrinking them to the campaign `max-w-6xl` would clip the table and change gallery density.
 
 ## Campaign typography scale (MOR-55)
 
@@ -79,18 +74,18 @@ The reusable class map is `campaignTypography` in `src/components/shared/typogra
 
 Group implementation work in this order. Each issue should land shared primitives first, then migrate the listed routes, then use the verification matrix at the end of this document.
 
-### Issue A — Page shell and list headers (P0)
+### Issue A — Page shell and list headers (P0) — shipped (MOR-54)
 
 **Problem.** Outer width, padding, and landmark choice diverge by route family. List pages that already look “correct” still duplicate the shell class. Diagnostic pages sit on a different grid.
 
-**Ship.**
+**Shipped.**
 
-- `Page` (or `AppMain`): `main` with `mx-auto w-full max-w-6xl px-4 py-10 sm:px-8`
-- Optional `width` variants: `narrow` (`max-w-3xl` / `max-w-2xl`) for detail/delete/settings forms
-- Move `IndexPage`, `IndexPageHeader`, and `IndexEmptyState` to `src/components/shared/` (or fold them into `Page`)
-- Default pending/error screens that use the same shell
+- `Page`: `main` with `mx-auto w-full max-w-6xl px-4 py-10 sm:px-8`
+- Width/padding variants: `narrow` (`max-w-3xl`), `form` (`max-w-2xl`), `wide` (`max-w-7xl`), `loose` (`py-16 sm:py-24`)
+- `IndexPage`, `IndexPageHeader`, and `IndexEmptyState` live in `src/components/shared/index-page.tsx`
+- `PagePending` / `PageError` wrap equipment, stats, and admin pending/error states
 
-**Migrate.** `/`, `/warbands`, `/warriors`, `/matches`, `/events`, `/equipment`, `/stats`, then `/settings`, `/queue`, `/queue-jobs`, `/generated-images`.
+**Migrated.** `/`, `/warbands`, `/warriors`, `/matches`, `/events`, `/equipment`, `/stats`, `/settings`, `/queue`, `/queue-jobs`, `/generated-images`, plus the default 404.
 
 **Do not migrate.** `/projector`.
 
@@ -157,23 +152,14 @@ Home currently uses `rounded-lg` while the design-system button is `rounded-4xl`
 
 These strings are duplicated today. Each row is a candidate for a shared component or a default on an existing primitive.
 
-### 1. Campaign page shell
+### 1. Campaign page shell — folded into `Page` (MOR-54)
 
-```txt
-mx-auto w-full max-w-6xl px-4 py-10 sm:px-8
-```
-
-Used as `<main>` on collection layouts, equipment, and stats.
-
-**Variants to fold in:**
+`Page` now owns the campaign `<main>` class. Remaining local width wrappers are inner columns, not competing landmarks:
 
 | Pattern | Where | Difference |
 | --- | --- | --- |
-| `max-w-6xl px-4 py-16 sm:px-8 sm:py-24` | Home, default 404 | Taller marketing/empty vertical padding |
-| `max-w-3xl` inner column, no extra main | Warrior and event details | Nested inside collection `main`, then narrowed again |
-| `max-w-2xl` inner column | All delete/void pages | Nested inside collection `main` |
-| `max-w-2xl\|3xl\|7xl … p-6` on `<section>` | Settings, queue, queue-jobs, generated-images | Different landmark, padding, and max width |
-| `p-8` or `p-6` pending/error | Equipment, settings, queue-jobs, generated-images | Uncentered, no max-width |
+| `max-w-3xl` inner column, no extra main | Warrior and event details | Nested inside collection `Page`, then narrowed again |
+| `max-w-2xl` inner column | All delete/void pages | Nested inside collection `Page` |
 
 ### 2. List header
 
@@ -251,15 +237,9 @@ Warband hero uses yet another surface: `rounded-2xl border border-border bg-card
 
 `className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl"` on every create/edit dialog except match completion (`sm:max-w-4xl`) and generated-image lightbox (`sm:max-w-3xl`).
 
-### 11. Pending and error
+### 11. Pending and error — folded into `PagePending` / `PageError` (MOR-54)
 
-| Pattern | Routes |
-| --- | --- |
-| `<p className="p-6">Loading …</p>` | settings, queue-jobs, generated-images |
-| `<main className="p-8"><output>Loading equipment…</output></main>` | equipment |
-| None | collection indexes, details, home, stats, queue, projector |
-| `section.space-y-4.p-6` + Try again | settings, queue-jobs, generated-images |
-| Equipment-specific `main.p-8` + `font-mordheim text-3xl` | equipment only |
+Equipment, stats, settings, queue-jobs, and generated-images pending/error states use the campaign `Page` shell. Collection indexes, details, home, queue, and projector still have no dedicated pending/error route components.
 
 ---
 
@@ -286,7 +266,7 @@ Verification notes describe what should still be true after a later migration. �
 
 #### `src/router.tsx` — default not-found
 
-Uses home padding (`py-16 sm:py-24`) plus the entity not-found card (`rounded-xl … py-14`, `font-serif text-3xl`, text `Link`). Entity not-found screens omit the extra vertical padding because they already sit in a collection `main`.
+Uses home padding (`Page padding="loose"`) plus the entity not-found card (`rounded-xl … py-14`, `font-serif text-3xl`, text `Link`). Entity not-found screens omit the extra vertical padding because they already sit in a collection `Page`.
 
 **Verify.** Unknown URLs still render the centered not-found card and “Return home →”.
 
@@ -296,14 +276,14 @@ Uses home padding (`py-16 sm:py-24`) plus the entity not-found card (`rounded-xl
 
 | Axis | Finding |
 | --- | --- |
-| Layout | Own `<main>` with campaign max-width but **marketing padding** (`py-16 sm:py-24`). Content capped at `max-w-3xl`. |
+| Layout | `<Page padding="loose">` with campaign max-width and **marketing padding** (`py-16 sm:py-24`). Content capped at `max-w-3xl`. |
 | Surface | No cards. CTAs are raw `Link`s styled as buttons (`rounded-lg`, not `rounded-4xl`). |
 | Spacing | `mt-5` / `mt-6` / `mt-9` stack. |
 | Alignment | Left-aligned; no page header component. |
 | Responsive | Title `text-5xl sm:text-7xl`; CTA row `flex-wrap gap-3`. |
 | Typography | Only screen using display-size `font-mordheim`. Body is `text-lg leading-8`. |
 
-**Consolidation.** Shell → Issue A `Page` with a `loose` padding variant. CTAs → Issue F `LinkButton`.
+**Consolidation.** Shell uses `Page` with `padding="loose"`. CTAs → Issue F `LinkButton`.
 
 **Verify.** Headline, supporting copy, and four browse links remain; primary vs outline pairing stays (warbands/warriors filled, matches/events outline).
 
@@ -313,13 +293,13 @@ Uses home padding (`py-16 sm:py-24`) plus the entity not-found card (`rounded-xl
 
 #### `/warbands` layout (`src/routes/warbands/route.tsx`)
 
-Canonical campaign `<main>`. Index, detail, and delete all inherit it. **Keep this as the Issue A reference implementation.**
+Canonical `<Page>`. Index, detail, and delete all inherit it.
 
 #### `/warbands/` index (`src/routes/warbands/index.tsx`)
 
 Uses `IndexPage` + `IndexPageHeader` + `IndexEmptyState`. Table vs empty. Create dialog uses the repeated max-height class.
 
-**Inconsistencies.** Import path is relative (`../../components/index-page`) unlike matches/events/equipment which use `@/components/index-page`. Visual result is the same.
+**Inconsistencies.** None on the list shell; all indexes import `IndexPage*` from `@/components/shared/index-page`.
 
 **Verify.** Header title “Warbands”, “New warband” on the right, empty dashed state, populated table, dialog scroll/width.
 
@@ -366,7 +346,7 @@ Canonical destructive confirm. Nested `max-w-2xl` inside the already padded coll
 
 #### `/warriors` layout (`src/routes/warriors/route.tsx`)
 
-Same campaign `<main>` as warbands.
+Same campaign `<Page>` as warbands.
 
 #### `/warriors/` index (`src/routes/warriors/index.tsx`)
 
@@ -403,14 +383,14 @@ Same destructive confirm as warband delete.
 
 | Axis | Finding |
 | --- | --- |
-| Layout | Owns its `<main>` (no `equipment/route.tsx`) and **also** wraps `IndexPage` — double shell, same visual width as collection pages. Pending/error use a different `<main className="p-8">` without max-width. |
+| Layout | Own `<Page>` (no `equipment/route.tsx`) wrapping `IndexPage`. Pending/error use `PagePending` / `PageError`. |
 | Surface | Catalogue rows are `<details>` with `rounded-xl border border-border bg-card`, not `Card`. |
 | Spacing | Filters `flex-col gap-4 sm:flex-row sm:items-end`. Accordion list `grid gap-3`. |
 | Alignment | Filter buttons sit at end of the search field on `sm+`. |
 | Responsive | Inner dl `sm:grid-cols-2 lg:grid-cols-4`. |
 | Typography | Header via `IndexPageHeader` (mordheim). Error title `font-mordheim text-3xl` (smaller than page titles). Accordion names `font-semibold` sans. Nested “Full source text” is an `h2` at `font-semibold` — not on the section-title scale. |
 
-**Verify.** Header + refresh, search/type filters, count output, empty (no data vs no matches), expanded item metadata, pending and error screens still occupy a readable page (ideally the shared shell).
+**Verify.** Header + refresh, search/type filters, count output, empty (no data vs no matches), expanded item metadata, pending and error screens use the shared shell.
 
 ---
 
@@ -418,7 +398,7 @@ Same destructive confirm as warband delete.
 
 #### `/matches` layout (`src/routes/matches/route.tsx`)
 
-Canonical campaign `<main>`.
+Canonical `<Page>`.
 
 #### `/matches/` index (`src/routes/matches/index.tsx`)
 
@@ -453,7 +433,7 @@ Same destructive confirm.
 
 | Axis | Finding |
 | --- | --- |
-| Layout | Own `<main>` duplicating the collection shell (no `stats/route.tsx`). Inner `IndexPage`. Totals `sm:grid-cols-3`. Charts `lg:grid-cols-2`. Reserved section sits in `md:grid-cols-2` **with one child**, so it never fills the row. |
+| Layout | Own `<Page>` wrapping `IndexPage` (no `stats/route.tsx`). Pending/error use `PagePending` / `PageError`. Totals `sm:grid-cols-3`. Charts `lg:grid-cols-2`. Reserved section sits in `md:grid-cols-2` **with one child**, so it never fills the row. |
 | Surface | Uses `Card`, `StatTile`, `CombatLeaderboard`, `ReservedStatSection` — closest to the target shared system. Header action is a pill (`rounded-full border … text-xs`) rather than a button. |
 | Spacing | `IndexPage` `gap-8`. Extra `mb-4` on campaign totals h2 (leaderboards put titles inside cards). |
 | Alignment | Chart empty copy is centered in `h-80`. |
@@ -468,7 +448,7 @@ Same destructive confirm.
 
 #### `/events` layout (`src/routes/events/route.tsx`)
 
-Canonical campaign `<main>`.
+Canonical `<Page>`.
 
 #### `/events/` index (`src/routes/events/index.tsx`)
 
@@ -498,29 +478,29 @@ Destructive panel with eyebrow “Historical correction”. Adds a reason `Field
 
 These four routes share a second visual language. They are the highest-contrast inconsistency versus the campaign pages.
 
-Common traits: no campaign `main`, `p-6` padding, `flex flex-col gap-6`, `h1.text-3xl` (sans, no mordheim), outline `LinkButton` clusters, duplicated pending/error.
+These four routes now use `Page` (Issue A) but still share a second header language: `flex flex-col gap-6`, `h1.text-3xl` (sans, no mordheim), outline `LinkButton` clusters. Pending/error use `PagePending` / `PageError`.
 
 #### `/settings` (`src/routes/settings.tsx`)
 
-`max-w-3xl`. Header links sit **above** the description. Pending: `p-6` paragraph. Error: uncentered `section`. Form is a child component, not wrapped in `Card` here.
+`Page width="narrow"` (`max-w-3xl`). Header links sit **above** the description. Pending/error use `PagePending` / `PageError`. Form is a child component, not wrapped in `Card` here.
 
 **Verify.** Title, three related links, description, instructions form, loading and D1 error retry.
 
 #### `/queue` (`src/routes/queue.tsx`)
 
-`max-w-2xl`. Same header cluster (jobs/images/settings). Form uses ad-hoc card (`rounded-xl border … p-6`), not `Card`. No pending/error route components.
+`Page width="form"` (`max-w-2xl`). Same header cluster (jobs/images/settings). Form uses ad-hoc card (`rounded-xl border … p-6`), not `Card`. No pending/error route components.
 
 **Verify.** Title, links, prompt/model/submit, status `output`, footer note.
 
 #### `/queue-jobs` (`src/routes/queue-jobs.tsx`)
 
-`max-w-7xl` — **wider than every campaign page**. Header is `items-start justify-between` with actions on the right (closer to `IndexPageHeader` than settings). Table wrapped in ad-hoc card. `Table` has `min-w-5xl` so the card must scroll horizontally on smaller viewports; there is no explicit `overflow-x-auto` on the wrapper.
+`Page width="wide"` (`max-w-7xl`) — **wider than campaign pages, by product decision**. Header is `items-start justify-between` with actions on the right (closer to `IndexPageHeader` than settings). Table wrapped in ad-hoc card. `Table` has `min-w-5xl` so the card must scroll horizontally on smaller viewports; there is no explicit `overflow-x-auto` on the wrapper.
 
 **Verify.** Title, related links, refresh, empty table, populated columns, pending, retry error.
 
 #### `/generated-images` (`src/routes/generated-images.tsx`)
 
-`max-w-7xl` like jobs. Empty is a solid card paragraph. Grid `sm:2 lg:3 xl:4`. Tiles are ad-hoc cards. Lightbox dialog `sm:max-w-3xl`.
+`Page width="wide"` (`max-w-7xl`) like jobs. Empty is a solid card paragraph. Grid `sm:2 lg:3 xl:4`. Tiles are ad-hoc cards. Lightbox dialog `sm:max-w-3xl`.
 
 **Verify.** Title, links, refresh, empty copy, grid, enlarge dialog, image error text.
 
@@ -555,7 +535,7 @@ Concrete replacements for follow-on PRs. Names are suggestions; match existing `
 
 | New or extended primitive | Replaces | First consumers |
 | --- | --- | --- |
-| `Page` | Repeated `main` class; admin `section` shells; equipment/stats local mains | All non-projector routes |
+| `Page` | **Shipped (MOR-54).** Campaign `<main>` plus width/padding variants | All non-projector routes |
 | `PageHeader` (extend `IndexPageHeader`) | Match detail header, admin headers, warrior/event headers | List pages, match detail, settings family |
 | `EntityToolbar` | Four detail toolbars | Warband, warrior, match, event details |
 | `NotFoundPanel` | Five not-found cards | Entity routes + `router.tsx` |
@@ -618,7 +598,7 @@ Legend: **S** shell/padding/width · **T** typography · **C** chrome (toolbar/e
 | `/projector` | | | | | Unchanged broadcast layout; app nav still hidden |
 | Unknown URL | | | | | Default not-found uses shared panel |
 
-When Issue A lands, `/queue-jobs` and `/generated-images` currently at `max-w-7xl` need an explicit product decision: stay wide (shell `width="wide"`) or shrink to `max-w-6xl`. Record that decision in the Issue A PR so this matrix stays testable.
+**Width decision (MOR-54).** `/queue-jobs` and `/generated-images` stay `width="wide"` (`max-w-7xl`). Do not shrink them to `max-w-6xl` when ticking **S**.
 
 ---
 

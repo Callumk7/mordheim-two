@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { Page } from "@/components/shared/page";
 import { getCollections } from "@/db-collections";
 
 export const Route = createFileRoute("/warbands")({
@@ -20,8 +21,8 @@ export const Route = createFileRoute("/warbands")({
 
 function WarbandsLayout() {
 	return (
-		<main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-8">
+		<Page>
 			<Outlet />
-		</main>
+		</Page>
 	);
 }

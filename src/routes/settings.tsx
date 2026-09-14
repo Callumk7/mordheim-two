@@ -1,5 +1,6 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { ImageGenerationSettingsForm } from "@/components/image-generation-settings-form";
+import { Page, PageError, PagePending } from "@/components/shared/page";
 import { campaignTypography } from "@/components/shared/typography";
 import { Button, LinkButton } from "@/components/ui/button";
 import {
@@ -9,7 +10,9 @@ import {
 
 export const Route = createFileRoute("/settings")({
 	loader: () => getImageGenerationInstructions(),
-	pendingComponent: () => <p className="p-6">Loading settings…</p>,
+	pendingComponent: () => (
+		<PagePending width="narrow">Loading settings…</PagePending>
+	),
 	errorComponent: SettingsError,
 	component: SettingsPage,
 });
@@ -17,10 +20,10 @@ export const Route = createFileRoute("/settings")({
 function SettingsError() {
 	const router = useRouter();
 	return (
-		<section className="space-y-4 p-6">
-			<p role="alert">Could not load image-generation settings from D1.</p>
+		<PageError className="space-y-4" width="narrow">
+			<p>Could not load image-generation settings from D1.</p>
 			<Button onPress={() => void router.invalidate()}>Try again</Button>
-		</section>
+		</PageError>
 	);
 }
 
@@ -28,7 +31,7 @@ function SettingsPage() {
 	const settings = Route.useLoaderData();
 
 	return (
-		<section className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6">
+		<Page className="flex flex-col gap-6" width="narrow">
 			<header className="space-y-2">
 				<h1 className={campaignTypography.pageTitle}>Settings</h1>
 				<div className="flex flex-wrap gap-2">
@@ -57,6 +60,6 @@ function SettingsPage() {
 					await updateImageGenerationInstructions({ data: { instructions } });
 				}}
 			/>
-		</section>
+		</Page>
 	);
 }
