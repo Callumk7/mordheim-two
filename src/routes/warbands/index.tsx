@@ -106,11 +106,7 @@ function WarbandsIndexPage() {
 				/>
 			) : null}
 
-			<Dialog
-				className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl"
-				isOpen={isNewWarbandOpen}
-				onOpenChange={setIsNewWarbandOpen}
-			>
+			<Dialog isOpen={isNewWarbandOpen} onOpenChange={setIsNewWarbandOpen}>
 				<DialogHeader>
 					<DialogTitle>New warband</DialogTitle>
 					<DialogDescription>

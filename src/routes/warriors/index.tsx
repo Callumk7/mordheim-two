@@ -69,11 +69,7 @@ function WarriorsIndexPage() {
 				/>
 			)}
 
-			<Dialog
-				className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl"
-				isOpen={isNewWarriorOpen}
-				onOpenChange={setIsNewWarriorOpen}
-			>
+			<Dialog isOpen={isNewWarriorOpen} onOpenChange={setIsNewWarriorOpen}>
 				<DialogHeader>
 					<DialogTitle>New warrior</DialogTitle>
 					<DialogDescription>

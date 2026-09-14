@@ -107,12 +107,12 @@ export function MatchCompletionDialog({
 
 	return (
 		<Dialog
-			className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-4xl"
 			isOpen={isOpen}
 			onOpenChange={(open) => {
 				if (!open) setIsAddingEvent(false);
 				onOpenChange(open);
 			}}
+			size="xl"
 		>
 			<DialogHeader>
 				<DialogTitle>Complete {match.name}</DialogTitle>

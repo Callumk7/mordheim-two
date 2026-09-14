@@ -1,3 +1,4 @@
+import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { Typography } from "@/components/shared/typography";
 import {
@@ -64,22 +65,62 @@ export function CombatStatValue({
 export function StatTile({
 	adjustment = 0,
 	label,
+	suffix,
 	value,
+	variant = "metric",
 }: {
 	adjustment?: number;
 	label: string;
-	value: number;
+	suffix?: ReactNode;
+	value: ReactNode;
+	/** `metric` is the campaign Card tile. `compact` is the muted inner tile used inside existing Cards. */
+	variant?: "metric" | "compact";
 }) {
+	if (variant === "compact") {
+		return (
+			<div className="rounded-xl border border-border bg-muted/40 px-3 py-2">
+				<dt className="text-xs text-muted-foreground">{label}</dt>
+				<dd className="mt-0.5 truncate font-mono tabular-nums text-foreground">
+					{value}
+					{suffix}
+				</dd>
+			</div>
+		);
+	}
+
 	return (
 		<Card size="sm">
 			<CardContent>
 				<p className="text-sm text-muted-foreground">{label}</p>
 				<p className="mt-2 flex items-baseline gap-2 font-mordheim text-4xl tabular-nums text-primary">
 					{value}
+					{suffix}
 					<AdjustedBadge adjustment={adjustment} />
 				</p>
 			</CardContent>
 		</Card>
+	);
+}
+
+export function HeroStat({
+	icon: Icon,
+	label,
+	value,
+}: {
+	icon: LucideIcon;
+	label: string;
+	value: number;
+}) {
+	return (
+		<div className="flex items-center gap-3 border-border p-5 sm:[&:not(:nth-child(odd))]:border-l lg:[&:not(:first-child)]:border-l">
+			<Icon aria-hidden="true" className="size-5 text-primary" />
+			<div>
+				<p className="font-mordheim text-2xl tabular-nums text-foreground">
+					{value}
+				</p>
+				<p className="text-xs text-muted-foreground">{label}</p>
+			</div>
+		</div>
 	);
 }
 

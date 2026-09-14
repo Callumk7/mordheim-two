@@ -4,7 +4,6 @@ import {
 	Activity,
 	Coins,
 	HeartPulse,
-	type LucideIcon,
 	Pencil,
 	Shield,
 	Skull,
@@ -14,9 +13,11 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { CreateWarriorDialog } from "@/components/shared/create-warrior-dialog";
+import { SectionHeading } from "@/components/shared/section-heading";
 import {
-	AdjustedBadge,
 	CombatLeaderboard,
+	HeroStat,
+	StatTile,
 } from "@/components/shared/stat-display";
 import { Typography } from "@/components/shared/typography";
 import { Button, LinkButton } from "@/components/ui/button";
@@ -86,7 +87,7 @@ function WarbandDetailPage() {
 				</LinkButton>
 			</div>
 
-			<section className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+			<Card className="relative gap-0 py-0">
 				<div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
 					<div>
 						<Typography variant="eyebrow">{warband.faction}</Typography>
@@ -143,7 +144,7 @@ function WarbandDetailPage() {
 						value={dashboard.graveyard.length}
 					/>
 				</div>
-			</section>
+			</Card>
 
 			<section aria-labelledby="record-heading">
 				<SectionHeading
@@ -153,11 +154,11 @@ function WarbandDetailPage() {
 					title="Match record"
 				/>
 				<div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-					<MetricCard label="Played" value={dashboard.matchStats.played} />
-					<MetricCard label="Wins" value={dashboard.matchStats.wins} />
-					<MetricCard label="Losses" value={dashboard.matchStats.losses} />
-					<MetricCard label="Draws" value={dashboard.matchStats.draws} />
-					<MetricCard
+					<StatTile label="Played" value={dashboard.matchStats.played} />
+					<StatTile label="Wins" value={dashboard.matchStats.wins} />
+					<StatTile label="Losses" value={dashboard.matchStats.losses} />
+					<StatTile label="Draws" value={dashboard.matchStats.draws} />
+					<StatTile
 						label="Win rate"
 						suffix="%"
 						value={dashboard.matchStats.winRate}
@@ -180,7 +181,7 @@ function WarbandDetailPage() {
 					title="Combat record"
 				/>
 				<div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-					<MetricCard
+					<StatTile
 						adjustment={getCombatStatAdjustment(
 							warbandCombat,
 							"knockdownsGiven",
@@ -188,7 +189,7 @@ function WarbandDetailPage() {
 						label="Knockdowns given"
 						value={warbandCombat.knockdownsGiven}
 					/>
-					<MetricCard
+					<StatTile
 						adjustment={getCombatStatAdjustment(
 							warbandCombat,
 							"knockdownsTaken",
@@ -196,17 +197,17 @@ function WarbandDetailPage() {
 						label="Knockdowns taken"
 						value={warbandCombat.knockdownsTaken}
 					/>
-					<MetricCard
+					<StatTile
 						adjustment={getCombatStatAdjustment(warbandCombat, "injuriesGiven")}
 						label="Injuries given"
 						value={warbandCombat.injuriesGiven}
 					/>
-					<MetricCard
+					<StatTile
 						adjustment={getCombatStatAdjustment(warbandCombat, "injuriesTaken")}
 						label="Injuries taken"
 						value={warbandCombat.injuriesTaken}
 					/>
-					<MetricCard
+					<StatTile
 						adjustment={getCombatStatAdjustment(warbandCombat, "deathsGiven")}
 						label="Deaths given"
 						value={warbandCombat.deathsGiven}
@@ -289,10 +290,7 @@ function WarbandDetailPage() {
 					<ul className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 						{dashboard.graveyard.map((warrior) => (
 							<li key={warrior.id}>
-								<Card
-									className="h-full border border-border bg-muted/20"
-									size="sm"
-								>
+								<Card className="h-full bg-muted/20" size="sm">
 									<CardContent>
 										<Skull
 											aria-hidden="true"
@@ -402,11 +400,7 @@ function WarbandDetailPage() {
 				)}
 			</section>
 
-			<Dialog
-				className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl"
-				isOpen={isEditWarbandOpen}
-				onOpenChange={setIsEditWarbandOpen}
-			>
+			<Dialog isOpen={isEditWarbandOpen} onOpenChange={setIsEditWarbandOpen}>
 				<DialogHeader>
 					<DialogTitle>Edit warband</DialogTitle>
 					<DialogDescription>
@@ -440,7 +434,6 @@ function WarbandDetailPage() {
 			/>
 
 			<Dialog
-				className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl"
 				isOpen={editingWarrior !== undefined}
 				onOpenChange={(isOpen) => {
 					if (!isOpen) setEditingWarriorId(null);
@@ -472,83 +465,6 @@ function WarbandDetailPage() {
 					/>
 				) : null}
 			</Dialog>
-		</div>
-	);
-}
-
-function HeroStat({
-	icon: Icon,
-	label,
-	value,
-}: {
-	icon: LucideIcon;
-	label: string;
-	value: number;
-}) {
-	return (
-		<div className="flex items-center gap-3 border-border p-5 sm:[&:not(:nth-child(odd))]:border-l lg:[&:not(:first-child)]:border-l">
-			<Icon aria-hidden="true" className="size-5 text-primary" />
-			<div>
-				<p className="font-mordheim text-2xl tabular-nums text-foreground">
-					{value}
-				</p>
-				<p className="text-xs text-muted-foreground">{label}</p>
-			</div>
-		</div>
-	);
-}
-
-function MetricCard({
-	adjustment = 0,
-	label,
-	suffix = "",
-	value,
-}: {
-	adjustment?: number;
-	label: string;
-	suffix?: string;
-	value: number;
-}) {
-	return (
-		<Card size="sm">
-			<CardContent>
-				<p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-					{label}
-				</p>
-				<p className="mt-2 flex items-baseline gap-2 font-mordheim text-4xl tabular-nums text-primary">
-					{value}
-					{suffix}
-					<AdjustedBadge adjustment={adjustment} />
-				</p>
-			</CardContent>
-		</Card>
-	);
-}
-
-function SectionHeading({
-	description,
-	eyebrow,
-	id,
-	title,
-}: {
-	description: string;
-	eyebrow: string;
-	id: string;
-	title: string;
-}) {
-	return (
-		<div>
-			<Typography variant="eyebrow">{eyebrow}</Typography>
-			<Typography
-				variant="sectionTitle"
-				className="mt-2 text-foreground"
-				id={id}
-			>
-				{title}
-			</Typography>
-			<Typography variant="supportingBody" className="mt-1">
-				{description}
-			</Typography>
 		</div>
 	);
 }

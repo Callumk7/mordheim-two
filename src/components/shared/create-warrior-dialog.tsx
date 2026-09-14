@@ -19,11 +19,7 @@ export function CreateWarriorDialog({
 	warband: Warband;
 }) {
 	return (
-		<Dialog
-			className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl"
-			isOpen={isOpen}
-			onOpenChange={onOpenChange}
-		>
+		<Dialog isOpen={isOpen} onOpenChange={onOpenChange}>
 			<DialogHeader>
 				<DialogTitle>Add warrior</DialogTitle>
 				<DialogDescription>
