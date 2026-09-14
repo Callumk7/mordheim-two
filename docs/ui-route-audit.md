@@ -42,7 +42,8 @@ These are the building blocks later issues should extend instead of inventing pa
 | Primitive | Location | What it already standardizes | Gap |
 | --- | --- | --- | --- |
 | Page shell | `src/components/shared/page.tsx` | Campaign `<main>` width/padding (`max-w-6xl` / `py-10`), plus `narrow` (`max-w-3xl`), `form` (`max-w-2xl`), `wide` (`max-w-7xl`), and `loose` padding; `PagePending` / `PageError` | Nested detail/delete columns still use local `max-w-3xl` / `max-w-2xl` wrappers; projector stays on its own landmark |
-| Index page stack | `src/components/shared/index-page.tsx` | `grid gap-8`, list header, dashed empty | Used only on collection indexes; match detail and admin headers still local |
+| Index page stack | `src/components/shared/index-page.tsx` | `grid gap-8`, list header | Used only on collection indexes; match detail and admin headers still local |
+| Entity chrome | `src/components/shared/entity-chrome.tsx`, `src/components/shared/empty-state.tsx` | Entity toolbar/header, not-found, destructive confirmation, and dashed-empty variants | Shared across entity routes; projector remains local |
 | Card | `src/components/ui/card.tsx` | `rounded-2xl`, `ring-1 ring-foreground/10`, `--card-spacing` | Many routes rebuild cards with `rounded-xl border border-border` |
 | Button / LinkButton | `src/components/ui/button.tsx` | `rounded-4xl` variants and sizes | Home CTAs, delete cancels, nav, not-found links, and several keep/cancel links use custom `Link` classes |
 | Stat tile / leaderboard | `src/components/shared/stat-display.tsx` | Metric cards, leaderboard heading, reserved dashed section | Warband detail reimplements `MetricCard` and a local `EmptyState` |
@@ -82,7 +83,7 @@ Group implementation work in this order. Each issue should land shared primitive
 
 - `Page`: `main` with `mx-auto w-full max-w-6xl px-4 py-10 sm:px-8`
 - Width/padding variants: `narrow` (`max-w-3xl`), `form` (`max-w-2xl`), `wide` (`max-w-7xl`), `loose` (`py-16 sm:py-24`)
-- `IndexPage`, `IndexPageHeader`, and `IndexEmptyState` live in `src/components/shared/index-page.tsx`
+- `IndexPage` and `IndexPageHeader` live in `src/components/shared/index-page.tsx`; `EmptyState` lives in `src/components/shared/empty-state.tsx`
 - `PagePending` / `PageError` wrap equipment, stats, and admin pending/error states
 
 **Migrated.** `/`, `/warbands`, `/warriors`, `/matches`, `/events`, `/equipment`, `/stats`, `/settings`, `/queue`, `/queue-jobs`, `/generated-images`, plus the default 404.
@@ -105,17 +106,11 @@ Group implementation work in this order. Each issue should land shared primitive
 
 Decide once whether Cormorant (`font-serif`) is for entity names in lists/cards only, or also for page titles. Today both uses exist.
 
-### Issue C — Entity chrome (P1)
+### Issue C — Entity chrome (P1) — shipped (MOR-53)
 
 **Problem.** Every entity family copies back/delete bars, not-found cards, empty states, and destructive confirmations with near-identical Tailwind.
 
-**Ship.**
-
-- `EntityToolbar` — back `LinkButton` + optional destructive action
-- `EntityHeader` — eyebrow, title, description, optional actions
-- `NotFoundPanel` — used by default 404 and `$entityId/route.tsx` not-found components
-- `EmptyState` — merge `IndexEmptyState`, warband-local `EmptyState`, match dashed empty, dialog dashed empties
-- `DestructiveConfirm` — delete/void panel including cancel `LinkButton`
+**Shipped.** `EntityToolbar`, `EntityHeader`, `NotFoundPanel`, `EmptyState`, and `DestructiveConfirm` now live under `src/components/shared/` and replace the corresponding campaign route chrome.
 
 **Migrate.** Warband, warrior, match, and event detail/delete/not-found routes. Also `src/router.tsx` default not-found.
 
@@ -297,7 +292,7 @@ Canonical `<Page>`. Index, detail, and delete all inherit it.
 
 #### `/warbands/` index (`src/routes/warbands/index.tsx`)
 
-Uses `IndexPage` + `IndexPageHeader` + `IndexEmptyState`. Table vs empty. Create dialog uses the repeated max-height class.
+Uses `IndexPage` + `IndexPageHeader` + shared `EmptyState`. Table vs empty. Create dialog uses the repeated max-height class.
 
 **Inconsistencies.** None on the list shell; all indexes import `IndexPage*` from `@/components/shared/index-page`.
 
@@ -350,7 +345,7 @@ Same campaign `<Page>` as warbands.
 
 #### `/warriors/` index (`src/routes/warriors/index.tsx`)
 
-Matches warbands index. Extra dashed empty **inside** the create dialog when no warbands exist (`py-10`, `font-serif text-2xl`) — different from `IndexEmptyState` (`py-16`, `font-mordheim`).
+Matches warbands index. The shared `EmptyState` uses a dialog variant inside the create dialog when no warbands exist.
 
 **Verify.** Header, table, empty, dialog, and “A warband is required” gated state.
 

@@ -1,8 +1,7 @@
 import { eq, useLiveQuery } from "@tanstack/react-db";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Typography } from "@/components/shared/typography";
-import { Button } from "@/components/ui/button";
+import { DestructiveConfirm } from "@/components/shared/entity-chrome";
 import { getCollections } from "@/db-collections";
 import { deleteWarbandTransaction } from "@/db-collections/mutations/warbands";
 
@@ -63,78 +62,49 @@ function DeleteWarbandPage() {
 	if (!warband && !isDeleting) return null;
 
 	return (
-		<div className="mx-auto max-w-2xl">
-			<Link
-				className="text-sm text-muted-foreground hover:text-primary/80"
-				params={{ warbandId }}
-				to="/warbands/$warbandId"
-			>
-				← Cancel
-			</Link>
-
-			<section className="mt-7 rounded-xl border border-destructive/50 bg-destructive/10 p-7">
-				<Typography variant="destructiveEyebrow">Destructive action</Typography>
-				<Typography variant="pageTitle" className="mt-3 text-foreground">
-					Delete {warband?.name ?? "warband"}?
-				</Typography>
-				<Typography variant="supportingBody" className="mt-3 max-w-xl">
-					{eventIds.length > 0
-						? "This warband cannot be deleted because its event history is retained."
-						: `This permanently removes the warband, ${warriorRows.length} warrior${warriorRows.length === 1 ? "" : "s"}, and ${participantRows.length} match link${participantRows.length === 1 ? "" : "s"}. Matches are kept.`}
-				</Typography>
-
-				{error ? (
-					<p className="mt-5 rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-						{error}
-					</p>
-				) : null}
-
-				<div className="mt-7 flex flex-wrap gap-3">
-					<Button
-						isDisabled={isDeleting || !warband || eventIds.length > 0}
-						onPress={async () => {
-							setError(undefined);
-							setIsDeleting(true);
-							try {
-								const transaction = deleteWarbandTransaction(
-									dbClient,
-									collections,
-									warbandId,
-									{
-										participantIds: participantRows.map((row) => row.id),
-										warriorIds: warriorRows.map((row) => row.id),
-										eventIds,
-									},
-								);
-								await transaction.isPersisted.promise;
-								await navigate({ to: "/warbands" });
-							} catch (cause) {
-								setError(
-									cause instanceof Error
-										? cause.message
-										: "Unable to delete warband.",
-								);
-								setIsDeleting(false);
-							}
-						}}
-						type="button"
-						variant="destructive"
-					>
-						{eventIds.length > 0
-							? "Event history prevents deletion"
-							: isDeleting
-								? "Deleting…"
-								: "Delete warband"}
-					</Button>
-					<Link
-						className="rounded-lg border border-input px-5 py-2.5 font-semibold text-foreground hover:border-ring hover:text-foreground"
-						params={{ warbandId }}
-						to="/warbands/$warbandId"
-					>
-						Keep warband
-					</Link>
-				</div>
-			</section>
-		</div>
+		<DestructiveConfirm
+			cancelLink={{ params: { warbandId }, to: "/warbands/$warbandId" }}
+			description={
+				eventIds.length > 0
+					? "This warband cannot be deleted because its event history is retained."
+					: `This permanently removes the warband, ${warriorRows.length} warrior${warriorRows.length === 1 ? "" : "s"}, and ${participantRows.length} match link${participantRows.length === 1 ? "" : "s"}. Matches are kept.`
+			}
+			error={error}
+			isDisabled={!warband || eventIds.length > 0}
+			isPending={isDeleting}
+			keepLabel="Keep warband"
+			onConfirm={async () => {
+				setError(undefined);
+				setIsDeleting(true);
+				try {
+					const transaction = deleteWarbandTransaction(
+						dbClient,
+						collections,
+						warbandId,
+						{
+							participantIds: participantRows.map((row) => row.id),
+							warriorIds: warriorRows.map((row) => row.id),
+							eventIds,
+						},
+					);
+					await transaction.isPersisted.promise;
+					await navigate({ to: "/warbands" });
+				} catch (cause) {
+					setError(
+						cause instanceof Error
+							? cause.message
+							: "Unable to delete warband.",
+					);
+					setIsDeleting(false);
+				}
+			}}
+			pendingLabel="Deleting…"
+			submitLabel={
+				eventIds.length > 0
+					? "Event history prevents deletion"
+					: "Delete warband"
+			}
+			title={<>Delete {warband?.name ?? "warband"}?</>}
+		/>
 	);
 }

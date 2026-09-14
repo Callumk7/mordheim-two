@@ -1,11 +1,8 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import {
-	IndexEmptyState,
-	IndexPage,
-	IndexPageHeader,
-} from "@/components/shared/index-page";
+import { EmptyState } from "@/components/shared/empty-state";
+import { IndexPage, IndexPageHeader } from "@/components/shared/index-page";
 import { Page, PageError, PagePending } from "@/components/shared/page";
 import { Typography } from "@/components/shared/typography";
 import { Button } from "@/components/ui/button";
@@ -117,7 +114,7 @@ function EquipmentPage() {
 							stated or not applicable; unknown prices are not free.
 						</output>
 						{visible.length === 0 ? (
-							<IndexEmptyState
+							<EmptyState
 								title={
 									data.length
 										? "No matching equipment"
