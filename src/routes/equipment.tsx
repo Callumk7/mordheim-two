@@ -6,6 +6,7 @@ import {
 	IndexPage,
 	IndexPageHeader,
 } from "@/components/index-page";
+import { campaignTypography } from "@/components/shared/typography";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/equipment")({
 	),
 	errorComponent: () => (
 		<main className="p-8" role="alert">
-			<h1 className="font-mordheim text-3xl">Unable to load equipment</h1>
+			<h1 className={campaignTypography.pageTitle}>Unable to load equipment</h1>
 			<p className="mt-2 text-muted-foreground">
 				Check the database connection and migrations, then reload this page.
 			</p>
@@ -182,7 +183,9 @@ function EquipmentPage() {
 												)}
 											{item.sourceText && (
 												<div>
-													<h2 className="mb-2 font-semibold">
+													<h2
+														className={`${campaignTypography.sectionTitle} mb-2`}
+													>
 														Full source text
 													</h2>
 													<p className="whitespace-pre-wrap break-words leading-relaxed">

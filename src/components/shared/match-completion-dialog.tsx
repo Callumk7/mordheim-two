@@ -1,6 +1,7 @@
 import { Plus } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { EventForm, type EventFormValues } from "@/components/event-form";
+import { campaignTypography } from "@/components/shared/typography";
 import {
 	type MatchEventImageJobs,
 	MatchEventsTable,
@@ -125,7 +126,7 @@ export function MatchCompletionDialog({
 				<section aria-labelledby="match-result-heading" className="grid gap-4">
 					<div>
 						<h2
-							className="font-serif text-2xl text-foreground"
+							className={`${campaignTypography.sectionTitle} text-foreground`}
 							id="match-result-heading"
 						>
 							Match result
@@ -196,7 +197,9 @@ export function MatchCompletionDialog({
 				<div className="grid gap-4">
 					<div className="flex flex-wrap items-end justify-between gap-3">
 						<div>
-							<h2 className="font-serif text-2xl text-foreground">
+							<h2
+								className={`${campaignTypography.sectionTitle} text-foreground`}
+							>
 								Match events
 							</h2>
 							<p className="mt-1 text-sm text-muted-foreground">

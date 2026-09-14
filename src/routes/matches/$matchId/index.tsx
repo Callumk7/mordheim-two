@@ -8,6 +8,7 @@ import { formatStatus, MatchForm } from "@/components/match-form";
 import { MatchImage } from "@/components/match-image";
 import { MatchCompletionDialog } from "@/components/shared/match-completion-dialog";
 import { MatchStatusActions } from "@/components/shared/match-status-actions";
+import { campaignTypography } from "@/components/shared/typography";
 import {
 	isActiveImageJobStatus,
 	useImageGenerationPolling,
@@ -166,10 +167,12 @@ function MatchDetailPage() {
 								: match.result}
 						</Badge>
 					</div>
-					<h1 className="mt-5 font-mordheim text-4xl text-foreground sm:text-5xl">
+					<h1
+						className={`${campaignTypography.pageTitle} mt-5 text-foreground`}
+					>
 						{match.name}
 					</h1>
-					<p className="mt-2 text-muted-foreground">
+					<p className={`${campaignTypography.supportingBody} mt-2`}>
 						Review the participating warbands and record events as the match
 						unfolds.
 					</p>
@@ -199,7 +202,7 @@ function MatchDetailPage() {
 				<div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
 					<div>
 						<h2
-							className="mt-1 font-serif text-3xl text-foreground"
+							className={`${campaignTypography.sectionTitle} mt-1 text-foreground`}
 							id="events-heading"
 						>
 							Match events
@@ -235,7 +238,7 @@ function MatchDetailPage() {
 			<section aria-labelledby="participants-heading" className="grid gap-4">
 				<div>
 					<h2
-						className="mt-1 font-serif text-3xl text-foreground"
+						className={`${campaignTypography.sectionTitle} mt-1 text-foreground`}
 						id="participants-heading"
 					>
 						Warbands and rosters
@@ -255,10 +258,12 @@ function MatchDetailPage() {
 					</div>
 				) : (
 					<section className="rounded-xl border border-dashed border-input px-6 py-12 text-center">
-						<h3 className="font-serif text-2xl text-foreground">
+						<h3
+							className={`${campaignTypography.sectionTitle} text-foreground`}
+						>
 							No participating warbands
 						</h3>
-						<p className="mt-2 text-muted-foreground">
+						<p className={`${campaignTypography.supportingBody} mt-2`}>
 							Edit the match to choose the warbands taking part.
 						</p>
 						<Button

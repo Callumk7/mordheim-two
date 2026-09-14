@@ -57,6 +57,22 @@ Canonical list-page shell today:
 
 Copied in `warbands/route.tsx`, `warriors/route.tsx`, `matches/route.tsx`, `events/route.tsx`, `equipment.tsx`, and `stats/index.tsx`.
 
+## Campaign typography scale (MOR-55)
+
+The reusable class map is `campaignTypography` in `src/components/shared/typography.ts`. Preserve semantic heading levels (`h1`, `h2`, or `h3`) independently of these visual roles.
+
+| Role | Classes |
+| --- | --- |
+| Display / home | `font-mordheim text-5xl sm:text-7xl` |
+| Page title | `font-mordheim text-4xl sm:text-5xl` |
+| Section title | `font-mordheim text-2xl` |
+| Eyebrow | `text-xs font-semibold uppercase tracking-[0.28em] text-primary` |
+| Destructive eyebrow | `text-xs font-semibold uppercase tracking-[0.28em] text-destructive` |
+| Muted / supporting body | `text-muted-foreground text-sm` |
+| Home display body | `text-lg leading-8` |
+
+**Typeface rule:** Cormorant (`font-serif`) is reserved for entity names in lists, cards, and other compact entity content. Campaign page titles and section titles use Schoensperger (`font-mordheim`). The home keeps its display heading and `text-lg leading-8` display-body role. The `/projector` broadcast surface remains a separate typography system.
+
 ---
 
 ## Recommended follow-on issues

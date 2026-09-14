@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { WarriorsTable } from "#/components/table/warriors-table";
 import { WarriorForm, type WarriorFormValues } from "#/components/warrior-form";
+import { campaignTypography } from "@/components/shared/typography";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -91,10 +92,12 @@ function WarriorsIndexPage() {
 					/>
 				) : (
 					<section className="rounded-xl border border-dashed border-input px-6 py-10 text-center">
-						<h2 className="font-serif text-2xl text-foreground">
+						<h2
+							className={`${campaignTypography.sectionTitle} text-foreground`}
+						>
 							A warband is required
 						</h2>
-						<p className="mt-2 text-muted-foreground">
+						<p className={`${campaignTypography.supportingBody} mt-2`}>
 							Create a warband before recruiting a warrior.
 						</p>
 					</section>

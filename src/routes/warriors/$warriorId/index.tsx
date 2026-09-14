@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CombatStatValue } from "@/components/shared/stat-display";
+import { campaignTypography } from "@/components/shared/typography";
 import { LinkButton } from "@/components/ui/button";
 import { WarriorEquipment } from "@/components/warrior-equipment";
 import { WarriorPortrait } from "@/components/warrior-portrait";
@@ -59,13 +60,13 @@ function WarriorDetailPage() {
 			</div>
 
 			<header className="mt-7 border-b border-border pb-6">
-				<p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary">
+				<p className={campaignTypography.eyebrow}>
 					{warband?.name ?? "Unknown warband"} · {warrior.class}
 				</p>
-				<h1 className="mt-2 font-serif text-4xl font-semibold text-foreground">
+				<h1 className={`${campaignTypography.pageTitle} mt-2 text-foreground`}>
 					{warrior.name}
 				</h1>
-				<p className="mt-2 text-muted-foreground">
+				<p className={`${campaignTypography.supportingBody} mt-2`}>
 					Edit this warrior’s campaign record.
 				</p>
 			</header>
@@ -81,7 +82,9 @@ function WarriorDetailPage() {
 
 			<Card className="mt-7">
 				<CardContent>
-					<h2 className="font-serif text-2xl text-foreground">Combat stats</h2>
+					<h2 className={`${campaignTypography.sectionTitle} text-foreground`}>
+						Combat stats
+					</h2>
 					<dl className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
 						<Stat label="Status" value={combat.isDead ? "Dead" : "Alive"} />
 						<CombatStat
@@ -115,10 +118,12 @@ function WarriorDetailPage() {
 
 			<Card className="mt-7">
 				<CardContent>
-					<h2 className="mb-2 font-serif text-2xl text-foreground">
+					<h2
+						className={`${campaignTypography.sectionTitle} mb-2 text-foreground`}
+					>
 						Profile and manual corrections
 					</h2>
-					<p className="mb-6 text-sm text-muted-foreground">
+					<p className={`${campaignTypography.supportingBody} mb-6`}>
 						Signed corrections are added to combat totals calculated from
 						events.
 					</p>
