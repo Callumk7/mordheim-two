@@ -4,14 +4,17 @@ import {
 	useRouterState,
 } from "@tanstack/react-router";
 import { useState } from "react";
-import { campaignTypography } from "@/components/shared/typography";
+import { Page, PageError, PagePending } from "@/components/shared/page";
+import { Typography } from "@/components/shared/typography";
 import { Button, LinkButton } from "@/components/ui/button";
 import { Dialog, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { listGeneratedImages } from "@/server/generated-images";
 
 export const Route = createFileRoute("/generated-images")({
 	loader: () => listGeneratedImages(),
-	pendingComponent: () => <p className="p-6">Loading generated images…</p>,
+	pendingComponent: () => (
+		<PagePending width="wide">Loading generated images…</PagePending>
+	),
 	errorComponent: GeneratedImagesError,
 	component: GeneratedImagesPage,
 });
@@ -19,10 +22,10 @@ export const Route = createFileRoute("/generated-images")({
 function GeneratedImagesError() {
 	const router = useRouter();
 	return (
-		<section className="space-y-4 p-6">
-			<p role="alert">Could not load generated images from D1.</p>
+		<PageError className="space-y-4" width="wide">
+			<p>Could not load generated images from D1.</p>
 			<Button onPress={() => void router.invalidate()}>Try again</Button>
-		</section>
+		</PageError>
 	);
 }
 
@@ -68,14 +71,14 @@ function GeneratedImagesPage() {
 	const [refreshKey, setRefreshKey] = useState(0);
 
 	return (
-		<section className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-6">
+		<Page className="flex flex-col gap-6" width="wide">
 			<header className="flex flex-wrap items-start justify-between gap-4">
 				<div className="space-y-2">
-					<h1 className={campaignTypography.pageTitle}>Generated images</h1>
-					<p className={campaignTypography.supportingBody}>
+					<Typography variant="pageTitle">Generated images</Typography>
+					<Typography variant="supportingBody">
 						Latest 100 completed D1 jobs, newest completion first. Select an
 						image to enlarge it. Refresh to check for new results.
-					</p>
+					</Typography>
 				</div>
 				<div className="flex flex-wrap gap-2">
 					<LinkButton to="/queue" variant="outline">
@@ -145,6 +148,6 @@ function GeneratedImagesPage() {
 				gallery and image endpoint have no authentication. Do not use private
 				prompts or images. Local storage is separate from deployed storage.
 			</p>
-		</section>
+		</Page>
 	);
 }

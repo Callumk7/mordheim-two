@@ -3,7 +3,8 @@ import {
 	Link,
 } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
-import { campaignTypography } from "@/components/shared/typography";
+import { Page } from "@/components/shared/page";
+import { Typography } from "@/components/shared/typography";
 import { getContext } from "./integrations/tanstack-query/root-provider";
 import { routeTree } from "./routeTree.gen";
 
@@ -26,15 +27,15 @@ export function getRouter() {
 
 function DefaultNotFound() {
 	return (
-		<main className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-8 sm:py-24">
+		<Page padding="loose">
 			<section className="rounded-xl border border-border bg-card px-6 py-14 text-center">
-				<p className={campaignTypography.eyebrow}>Not found</p>
-				<h1 className={`${campaignTypography.pageTitle} mt-3 text-foreground`}>
+				<Typography variant="eyebrow">Not found</Typography>
+				<Typography variant="pageTitle" className="mt-3 text-foreground">
 					Page not found
-				</h1>
-				<p className={`${campaignTypography.supportingBody} mt-2`}>
+				</Typography>
+				<Typography variant="supportingBody" className="mt-2">
 					The page you requested does not exist.
-				</p>
+				</Typography>
 				<Link
 					className="mt-6 inline-flex text-primary hover:text-primary/80"
 					to="/"
@@ -42,7 +43,7 @@ function DefaultNotFound() {
 					Return home →
 				</Link>
 			</section>
-		</main>
+		</Page>
 	);
 }
 

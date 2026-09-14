@@ -1,5 +1,5 @@
 import { useEffect, useId, useState } from "react";
-import { campaignTypography } from "@/components/shared/typography";
+import { Typography } from "@/components/shared/typography";
 import { Button } from "@/components/ui/button";
 import {
 	Field,
@@ -45,12 +45,13 @@ export function EventOutcomeForm({
 		<section aria-labelledby="event-outcome-heading" className="grid gap-5">
 			<div className="flex flex-wrap items-start justify-between gap-3">
 				<div>
-					<h2
-						className={`${campaignTypography.sectionTitle} text-foreground`}
+					<Typography
+						variant="sectionTitle"
+						className="text-foreground"
 						id="event-outcome-heading"
 					>
 						Outcome
-					</h2>
+					</Typography>
 					<p className="mt-1 text-sm text-muted-foreground">
 						Choose the result of this event.
 					</p>

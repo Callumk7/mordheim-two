@@ -1,21 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { campaignTypography } from "@/components/shared/typography";
+import { Page } from "@/components/shared/page";
+import { Typography } from "@/components/shared/typography";
 
 export const Route = createFileRoute("/")({ component: Home });
 
 function Home() {
 	return (
-		<main className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-8 sm:py-24">
+		<Page padding="loose">
 			<section className="max-w-3xl">
-				<h1 className={`${campaignTypography.display} mt-5 text-foreground`}>
+				<Typography variant="display" className="mt-5 text-foreground">
 					Keep order in the City of the Damned.
-				</h1>
-				<p
-					className={`${campaignTypography.displayBody} mt-6 max-w-2xl text-muted-foreground`}
+				</Typography>
+				<Typography
+					variant="displayBody"
+					className="mt-6 max-w-2xl text-muted-foreground"
 				>
 					Track warbands, matches, and the knock downs that shape each campaign
 					encounter.
-				</p>
+				</Typography>
 				<div className="mt-9 flex flex-wrap gap-3">
 					<Link
 						className="rounded-lg bg-primary px-5 py-3 font-semibold text-primary-foreground transition hover:bg-primary/90"
@@ -43,6 +45,6 @@ function Home() {
 					</Link>
 				</div>
 			</section>
-		</main>
+		</Page>
 	);
 }

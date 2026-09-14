@@ -8,7 +8,7 @@ import { formatStatus, MatchForm } from "@/components/match-form";
 import { MatchImage } from "@/components/match-image";
 import { MatchCompletionDialog } from "@/components/shared/match-completion-dialog";
 import { MatchStatusActions } from "@/components/shared/match-status-actions";
-import { campaignTypography } from "@/components/shared/typography";
+import { Typography } from "@/components/shared/typography";
 import {
 	isActiveImageJobStatus,
 	useImageGenerationPolling,
@@ -167,15 +167,13 @@ function MatchDetailPage() {
 								: match.result}
 						</Badge>
 					</div>
-					<h1
-						className={`${campaignTypography.pageTitle} mt-5 text-foreground`}
-					>
+					<Typography variant="pageTitle" className="mt-5 text-foreground">
 						{match.name}
-					</h1>
-					<p className={`${campaignTypography.supportingBody} mt-2`}>
+					</Typography>
+					<Typography variant="supportingBody" className="mt-2">
 						Review the participating warbands and record events as the match
 						unfolds.
-					</p>
+					</Typography>
 				</div>
 				<div className="flex flex-wrap gap-2">
 					<MatchStatusActions
@@ -201,12 +199,13 @@ function MatchDetailPage() {
 			<section aria-labelledby="events-heading" className="grid gap-4">
 				<div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
 					<div>
-						<h2
-							className={`${campaignTypography.sectionTitle} mt-1 text-foreground`}
+						<Typography
+							variant="sectionTitle"
+							className="mt-1 text-foreground"
 							id="events-heading"
 						>
 							Match events
-						</h2>
+						</Typography>
 						{canAddEvent ? (
 							<p className="mt-1 text-sm text-muted-foreground">
 								Newest events appear first.
@@ -237,12 +236,13 @@ function MatchDetailPage() {
 
 			<section aria-labelledby="participants-heading" className="grid gap-4">
 				<div>
-					<h2
-						className={`${campaignTypography.sectionTitle} mt-1 text-foreground`}
+					<Typography
+						variant="sectionTitle"
+						className="mt-1 text-foreground"
 						id="participants-heading"
 					>
 						Warbands and rosters
-					</h2>
+					</Typography>
 				</div>
 
 				{participantWarbands.length ? (
@@ -258,14 +258,16 @@ function MatchDetailPage() {
 					</div>
 				) : (
 					<section className="rounded-xl border border-dashed border-input px-6 py-12 text-center">
-						<h3
-							className={`${campaignTypography.sectionTitle} text-foreground`}
+						<Typography
+							as="h3"
+							variant="sectionTitle"
+							className="text-foreground"
 						>
 							No participating warbands
-						</h3>
-						<p className={`${campaignTypography.supportingBody} mt-2`}>
+						</Typography>
+						<Typography variant="supportingBody" className="mt-2">
 							Edit the match to choose the warbands taking part.
-						</p>
+						</Typography>
 						<Button
 							className="mt-5"
 							onPress={() => setIsEditMatchOpen(true)}

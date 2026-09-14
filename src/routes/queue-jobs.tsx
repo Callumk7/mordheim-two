@@ -3,7 +3,8 @@ import {
 	useRouter,
 	useRouterState,
 } from "@tanstack/react-router";
-import { campaignTypography } from "@/components/shared/typography";
+import { Page, PageError, PagePending } from "@/components/shared/page";
+import { Typography } from "@/components/shared/typography";
 import { Button, LinkButton } from "@/components/ui/button";
 import {
 	Table,
@@ -17,7 +18,9 @@ import { listQueueJobs } from "@/server/queue-jobs";
 
 export const Route = createFileRoute("/queue-jobs")({
 	loader: () => listQueueJobs(),
-	pendingComponent: () => <p className="p-6">Loading queue jobs…</p>,
+	pendingComponent: () => (
+		<PagePending width="wide">Loading queue jobs…</PagePending>
+	),
 	errorComponent: QueueJobsError,
 	component: QueueJobsPage,
 });
@@ -25,10 +28,10 @@ export const Route = createFileRoute("/queue-jobs")({
 function QueueJobsError() {
 	const router = useRouter();
 	return (
-		<section className="space-y-4 p-6">
-			<p role="alert">Could not load queue jobs from D1.</p>
+		<PageError className="space-y-4" width="wide">
+			<p>Could not load queue jobs from D1.</p>
 			<Button onPress={() => void router.invalidate()}>Try again</Button>
-		</section>
+		</PageError>
 	);
 }
 
@@ -38,15 +41,15 @@ function QueueJobsPage() {
 	const isLoading = useRouterState({ select: (state) => state.isLoading });
 
 	return (
-		<section className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-6">
+		<Page className="flex flex-col gap-6" width="wide">
 			<header className="flex flex-wrap items-start justify-between gap-4">
 				<div className="space-y-2">
-					<h1 className={campaignTypography.pageTitle}>Queue jobs</h1>
-					<p className={campaignTypography.supportingBody}>
+					<Typography variant="pageTitle">Queue jobs</Typography>
+					<Typography variant="supportingBody">
 						Latest 100 D1 jobs, newest first. Completed means a JPEG is stored
 						in private R2. Consumed is a historical receipt, not a generated
 						image. This is not the live queue backlog.
-					</p>
+					</Typography>
 				</div>
 				<div className="flex flex-wrap gap-2">
 					<LinkButton to="/generated-images" variant="outline">
@@ -124,6 +127,6 @@ function QueueJobsPage() {
 				prompts. R2 remains private, but generated images are accessible through
 				the unprotected gallery and app image endpoint.
 			</p>
-		</section>
+		</Page>
 	);
 }

@@ -5,8 +5,9 @@ import {
 	IndexEmptyState,
 	IndexPage,
 	IndexPageHeader,
-} from "@/components/index-page";
-import { campaignTypography } from "@/components/shared/typography";
+} from "@/components/shared/index-page";
+import { Page, PageError, PagePending } from "@/components/shared/page";
+import { Typography } from "@/components/shared/typography";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -17,18 +18,14 @@ export const Route = createFileRoute("/equipment")({
 	loader: async ({ context }) => {
 		await getCollections(context.dbClient).equipment.preload();
 	},
-	pendingComponent: () => (
-		<main className="p-8">
-			<output>Loading equipment…</output>
-		</main>
-	),
+	pendingComponent: () => <PagePending>Loading equipment…</PagePending>,
 	errorComponent: () => (
-		<main className="p-8" role="alert">
-			<h1 className={campaignTypography.pageTitle}>Unable to load equipment</h1>
+		<PageError>
+			<Typography variant="pageTitle">Unable to load equipment</Typography>
 			<p className="mt-2 text-muted-foreground">
 				Check the database connection and migrations, then reload this page.
 			</p>
-		</main>
+		</PageError>
 	),
 	component: EquipmentPage,
 });
@@ -66,7 +63,7 @@ function EquipmentPage() {
 	}
 
 	return (
-		<main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-8">
+		<Page>
 			<IndexPage>
 				<IndexPageHeader
 					title="Equipment"
@@ -183,11 +180,9 @@ function EquipmentPage() {
 												)}
 											{item.sourceText && (
 												<div>
-													<h2
-														className={`${campaignTypography.sectionTitle} mb-2`}
-													>
+													<Typography variant="sectionTitle" className="mb-2">
 														Full source text
-													</h2>
+													</Typography>
 													<p className="whitespace-pre-wrap break-words leading-relaxed">
 														{item.sourceText}
 													</p>
@@ -204,6 +199,6 @@ function EquipmentPage() {
 					</>
 				)}
 			</IndexPage>
-		</main>
+		</Page>
 	);
 }

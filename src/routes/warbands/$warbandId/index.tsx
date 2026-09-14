@@ -18,7 +18,7 @@ import {
 	AdjustedBadge,
 	CombatLeaderboard,
 } from "@/components/shared/stat-display";
-import { campaignTypography } from "@/components/shared/typography";
+import { Typography } from "@/components/shared/typography";
 import { Button, LinkButton } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -89,18 +89,17 @@ function WarbandDetailPage() {
 			<section className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
 				<div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
 					<div>
-						<p className={campaignTypography.eyebrow}>{warband.faction}</p>
-						<h1
-							className={`${campaignTypography.pageTitle} mt-3 text-foreground`}
-						>
+						<Typography variant="eyebrow">{warband.faction}</Typography>
+						<Typography variant="pageTitle" className="mt-3 text-foreground">
 							{warband.name}
-						</h1>
+						</Typography>
 						{warband.bio ? (
-							<p
-								className={`${campaignTypography.supportingBody} mt-3 max-w-3xl whitespace-pre-line`}
+							<Typography
+								variant="supportingBody"
+								className="mt-3 max-w-3xl whitespace-pre-line"
 							>
 								{warband.bio}
-							</p>
+							</Typography>
 						) : null}
 					</div>
 					<div className="flex items-end gap-6">
@@ -539,16 +538,17 @@ function SectionHeading({
 }) {
 	return (
 		<div>
-			<p className={campaignTypography.eyebrow}>{eyebrow}</p>
-			<h2
-				className={`${campaignTypography.sectionTitle} mt-2 text-foreground`}
+			<Typography variant="eyebrow">{eyebrow}</Typography>
+			<Typography
+				variant="sectionTitle"
+				className="mt-2 text-foreground"
 				id={id}
 			>
 				{title}
-			</h2>
-			<p className={`${campaignTypography.supportingBody} mt-1`}>
+			</Typography>
+			<Typography variant="supportingBody" className="mt-1">
 				{description}
-			</p>
+			</Typography>
 		</div>
 	);
 }
@@ -572,14 +572,16 @@ function EmptyState({
 				aria-hidden="true"
 				className="mx-auto size-6 text-muted-foreground"
 			/>
-			<h3 className={`${campaignTypography.sectionTitle} mt-3 text-foreground`}>
-				{title}
-			</h3>
-			<p
-				className={`${campaignTypography.supportingBody} mx-auto mt-1 max-w-md`}
+			<Typography
+				as="h3"
+				variant="sectionTitle"
+				className="mt-3 text-foreground"
 			>
+				{title}
+			</Typography>
+			<Typography variant="supportingBody" className="mx-auto mt-1 max-w-md">
 				{description}
-			</p>
+			</Typography>
 			{children ? <div className="mt-5">{children}</div> : null}
 		</div>
 	);

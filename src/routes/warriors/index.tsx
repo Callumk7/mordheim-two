@@ -2,7 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { WarriorsTable } from "#/components/table/warriors-table";
 import { WarriorForm, type WarriorFormValues } from "#/components/warrior-form";
-import { campaignTypography } from "@/components/shared/typography";
+import {
+	IndexEmptyState,
+	IndexPage,
+	IndexPageHeader,
+} from "@/components/shared/index-page";
+import { Typography } from "@/components/shared/typography";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -12,11 +17,6 @@ import {
 } from "@/components/ui/dialog";
 import { useWarriorMutations } from "@/db-collections/mutations/warriors";
 import { useCombatStats, useWarriorsIndex } from "@/db-collections/queries";
-import {
-	IndexEmptyState,
-	IndexPage,
-	IndexPageHeader,
-} from "../../components/index-page";
 
 export const Route = createFileRoute("/warriors/")({
 	component: WarriorsIndexPage,
@@ -92,14 +92,12 @@ function WarriorsIndexPage() {
 					/>
 				) : (
 					<section className="rounded-xl border border-dashed border-input px-6 py-10 text-center">
-						<h2
-							className={`${campaignTypography.sectionTitle} text-foreground`}
-						>
+						<Typography variant="sectionTitle" className="text-foreground">
 							A warband is required
-						</h2>
-						<p className={`${campaignTypography.supportingBody} mt-2`}>
+						</Typography>
+						<Typography variant="supportingBody" className="mt-2">
 							Create a warband before recruiting a warrior.
-						</p>
+						</Typography>
 					</section>
 				)}
 			</Dialog>

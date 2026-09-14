@@ -487,15 +487,17 @@ describe("image job operations on local D1", () => {
 
 	it("bounds and orders diagnostic and completed-image listings", async () => {
 		const { db } = connection;
-		for (let i = 0; i < 102; i++) {
-			await db.insert(imageGenerationJobs).values({
-				id: String(i).padStart(3, "0"),
-				prompt: "Prompt",
-				status: "completed",
-				createdAt: updatedAt,
-				completedAt: updatedAt,
-			});
-		}
+		const rows = Array.from({ length: 102 }, (_, i) => ({
+			id: String(i).padStart(3, "0"),
+			prompt: "Prompt",
+			status: "completed" as const,
+			createdAt: updatedAt,
+			completedAt: updatedAt,
+		}));
+		await db.batch([
+			db.insert(imageGenerationJobs).values(rows[0]),
+			...rows.slice(1).map((row) => db.insert(imageGenerationJobs).values(row)),
+		]);
 		const expectedIds = Array.from({ length: 100 }, (_, i) =>
 			String(101 - i).padStart(3, "0"),
 		);

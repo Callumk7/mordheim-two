@@ -8,14 +8,15 @@ import {
 	XAxis,
 	YAxis,
 } from "recharts";
-import { IndexPage, IndexPageHeader } from "@/components/index-page";
+import { IndexPage, IndexPageHeader } from "@/components/shared/index-page";
+import { Page, PageError, PagePending } from "@/components/shared/page";
 import {
 	AdjustedBadge,
 	CombatLeaderboard,
 	ReservedStatSection,
 	StatTile,
 } from "@/components/shared/stat-display";
-import { campaignTypography } from "@/components/shared/typography";
+import { Typography } from "@/components/shared/typography";
 import {
 	Card,
 	CardContent,
@@ -50,6 +51,15 @@ export const Route = createFileRoute("/stats/")({
 		]);
 		return null;
 	},
+	pendingComponent: () => <PagePending>Loading statistics…</PagePending>,
+	errorComponent: () => (
+		<PageError>
+			<h1 className="font-mordheim text-3xl">Unable to load statistics</h1>
+			<p className="mt-2 text-muted-foreground">
+				Check the database connection and migrations, then reload this page.
+			</p>
+		</PageError>
+	),
 	component: StatsIndexPage,
 });
 
@@ -91,7 +101,7 @@ function StatsIndexPage() {
 	];
 
 	return (
-		<main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-8">
+		<Page>
 			<IndexPage>
 				<IndexPageHeader
 					action={
@@ -104,12 +114,13 @@ function StatsIndexPage() {
 				/>
 
 				<section aria-labelledby="campaign-totals-heading">
-					<h2
-						className={`${campaignTypography.sectionTitle} mb-4 text-foreground`}
+					<Typography
+						variant="sectionTitle"
+						className="mb-4 text-foreground"
 						id="campaign-totals-heading"
 					>
 						Campaign totals
-					</h2>
+					</Typography>
 					<div className="grid gap-4 sm:grid-cols-3">
 						<StatTile
 							adjustment={totalAdjustments.knockdowns}
@@ -135,14 +146,15 @@ function StatsIndexPage() {
 				>
 					<Card className="min-w-0">
 						<CardHeader>
-							<h2
-								className={`${campaignTypography.sectionTitle} flex items-center gap-2`}
+							<Typography
+								variant="sectionTitle"
+								className="flex items-center gap-2"
 							>
 								Combat outcomes
 								{hasAdjustedOutcomes ? (
 									<AdjustedBadge accessibleLabel="Chart includes manual corrections" />
 								) : null}
-							</h2>
+							</Typography>
 							<CardDescription>
 								Share of recorded knockdowns, injuries, and deaths across the
 								campaign.
@@ -183,14 +195,15 @@ function StatsIndexPage() {
 					</Card>
 					<Card className="min-w-0">
 						<CardHeader>
-							<h2
-								className={`${campaignTypography.sectionTitle} flex items-center gap-2`}
+							<Typography
+								variant="sectionTitle"
+								className="flex items-center gap-2"
 							>
 								Leading warbands
 								{hasAdjustedWarbandLeader ? (
 									<AdjustedBadge accessibleLabel="Chart includes manual corrections" />
 								) : null}
-							</h2>
+							</Typography>
 							<CardDescription>
 								Combat given by the top eight active warbands, in leaderboard
 								order. Full names and counts appear in the standings below.
@@ -296,6 +309,6 @@ function StatsIndexPage() {
 					/>
 				</div>
 			</IndexPage>
-		</main>
+		</Page>
 	);
 }

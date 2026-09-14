@@ -5,7 +5,7 @@ import {
 	type GeneratedImageJob,
 	GeneratedImageStatus,
 } from "@/components/shared/generated-image-status";
-import { campaignTypography } from "@/components/shared/typography";
+import { Typography } from "@/components/shared/typography";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -33,9 +33,9 @@ export function WarriorPortrait({
 	return (
 		<Card className="mt-7">
 			<CardContent className="space-y-4">
-				<h2 className={`${campaignTypography.sectionTitle} text-foreground`}>
+				<Typography variant="sectionTitle" className="text-foreground">
 					Portrait
-				</h2>
+				</Typography>
 				{portrait.error ? (
 					<p role="alert">{portrait.error}</p>
 				) : job ? (
