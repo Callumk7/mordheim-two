@@ -73,7 +73,9 @@ function DeleteWarbandPage() {
 			</Link>
 
 			<section className="mt-7 rounded-xl border border-destructive/50 bg-destructive/10 p-7">
-				<p className={campaignTypography.eyebrow}>Destructive action</p>
+				<p className={campaignTypography.destructiveEyebrow}>
+					Destructive action
+				</p>
 				<h1 className={`${campaignTypography.pageTitle} mt-3 text-foreground`}>
 					Delete {warband?.name ?? "warband"}?
 				</h1>
