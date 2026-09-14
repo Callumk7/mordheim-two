@@ -56,7 +56,7 @@ function QueueJobsPage() {
 				isRefreshing={isLoading}
 				onRefresh={() => void router.invalidate()}
 			/>
-			<Card className="overflow-x-auto py-0">
+			<Card className="py-0">
 				<Table aria-label="Image generation jobs" className="min-w-5xl">
 					<TableHeader>
 						<TableHead isRowHeader>Job ID</TableHead>

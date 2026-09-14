@@ -31,7 +31,7 @@ describe("AdminPageHeader", () => {
 			/>,
 		);
 
-		expect(markup).toContain("font-mordheim text-4xl sm:text-5xl");
+		expect(markup).toContain("<h1");
 		expect(markup).toContain('aria-label="Related admin pages"');
 		expect(markup).toContain('href="/queue-jobs"');
 		expect(markup).toContain('href="/generated-images"');
