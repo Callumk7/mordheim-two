@@ -1,6 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Page } from "@/components/shared/page";
 import { Typography } from "@/components/shared/typography";
+import { LinkButton } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({ component: Home });
 
@@ -19,30 +20,14 @@ function Home() {
 					encounter.
 				</Typography>
 				<div className="mt-9 flex flex-wrap gap-3">
-					<Link
-						className="rounded-lg bg-primary px-5 py-3 font-semibold text-primary-foreground transition hover:bg-primary/90"
-						to="/warbands"
-					>
-						Browse warbands
-					</Link>
-					<Link
-						className="rounded-lg bg-primary px-5 py-3 font-semibold text-primary-foreground transition hover:bg-primary/90"
-						to="/warriors"
-					>
-						Browse warriors
-					</Link>
-					<Link
-						className="rounded-lg border border-input px-5 py-3 font-semibold text-foreground transition hover:border-ring hover:text-foreground"
-						to="/matches"
-					>
+					<LinkButton to="/warbands">Browse warbands</LinkButton>
+					<LinkButton to="/warriors">Browse warriors</LinkButton>
+					<LinkButton to="/matches" variant="outline">
 						Browse matches
-					</Link>
-					<Link
-						className="rounded-lg border border-input px-5 py-3 font-semibold text-foreground transition hover:border-ring hover:text-foreground"
-						to="/events"
-					>
+					</LinkButton>
+					<LinkButton to="/events" variant="outline">
 						Browse events
-					</Link>
+					</LinkButton>
 				</div>
 			</section>
 		</Page>
