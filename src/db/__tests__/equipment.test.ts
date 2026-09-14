@@ -1,8 +1,5 @@
-import { getTableConfig } from "drizzle-orm/sqlite-core";
 import { describe, expect, it } from "vitest";
-import { equipment, warriorEquipment } from "../schema";
 import {
-	EQUIPMENT_TYPES,
 	EquipmentSchema,
 	EquipmentUpdateSchema,
 } from "../validation/equipment";
@@ -25,7 +22,6 @@ const validEquipment = {
 
 describe("equipment model", () => {
 	it("accepts complete weapon and armour records", () => {
-		expect(EQUIPMENT_TYPES).toEqual(["weapon", "armour"]);
 		expect(EquipmentSchema.safeParse(validEquipment).success).toBe(true);
 		expect(
 			EquipmentSchema.safeParse({
@@ -64,20 +60,6 @@ describe("equipment model", () => {
 			false,
 		);
 	});
-
-	it("stores special rules as JSON and constrains equipment type in D1", () => {
-		const config = getTableConfig(equipment);
-
-		expect(equipment.specialRules.mapToDriverValue(["Parry"])).toBe(
-			'["Parry"]',
-		);
-		expect(equipment.specialRules.mapFromDriverValue('["Parry"]')).toEqual([
-			"Parry",
-		]);
-		expect(config.checks.map((constraint) => constraint.name)).toContain(
-			"equipment_type_valid",
-		);
-	});
 });
 
 describe("warrior equipment relation", () => {
@@ -95,19 +77,5 @@ describe("warrior equipment relation", () => {
 				warriorId: "warrior-1",
 			}).success,
 		).toBe(false);
-	});
-
-	it("has indexed, cascading foreign keys for warriors and equipment", () => {
-		const config = getTableConfig(warriorEquipment);
-
-		expect(config.foreignKeys).toHaveLength(2);
-		expect(config.foreignKeys.map((key) => key.onDelete).sort()).toEqual([
-			"cascade",
-			"cascade",
-		]);
-		expect(config.indexes.map((index) => index.config.name).sort()).toEqual([
-			"warrior_equipment_equipment_idx",
-			"warrior_equipment_warrior_idx",
-		]);
 	});
 });

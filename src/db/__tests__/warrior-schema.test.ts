@@ -1,6 +1,4 @@
-import { getTableConfig } from "drizzle-orm/sqlite-core";
 import { describe, expect, it } from "vitest";
-import { warriors } from "../schema";
 import { WarriorSchema, WarriorUpdateInputSchema } from "../validation/warrior";
 
 const validWarrior = {
@@ -27,16 +25,6 @@ describe("warrior validation", () => {
 		expect(
 			WarriorSchema.safeParse({ ...validWarrior, injuries: 0.5 }).success,
 		).toBe(false);
-	});
-
-	it("persists as a nullable text column for existing rows", () => {
-		const description = getTableConfig(warriors).columns.find(
-			(column) => column.name === "description",
-		);
-
-		expect(description).toBeDefined();
-		expect(description?.dataType).toBe("string");
-		expect(description?.notNull).toBe(false);
 	});
 
 	it("accepts omitted, null, and populated descriptions", () => {

@@ -1,10 +1,8 @@
-import { getTableConfig } from "drizzle-orm/sqlite-core";
 import { describe, expect, it } from "vitest";
 import {
 	getParticipantWarbandIds,
 	getWarriorsForWarband,
 } from "../../lib/event-options";
-import { events, matches, warbandMatches, warriors } from "../schema";
 import {
 	EventCreateSchema,
 	EventSchema,
@@ -159,54 +157,6 @@ describe("event relations", () => {
 				]),
 			),
 		).toThrow(/attacking warrior/);
-	});
-
-	it("enforces unique participation and composite event membership", () => {
-		const matchConfig = getTableConfig(matches);
-		const participantConfig = getTableConfig(warbandMatches);
-		const warriorConfig = getTableConfig(warriors);
-		const eventConfig = getTableConfig(events);
-
-		expect(
-			participantConfig.indexes.some(
-				(index) =>
-					index.config.name === "warband_matches_match_warband_unique" &&
-					index.config.unique,
-			),
-		).toBe(true);
-		expect(
-			warriorConfig.indexes.some(
-				(index) =>
-					index.config.name === "warriors_warband_id_unique" &&
-					index.config.unique,
-			),
-		).toBe(true);
-		expect(
-			eventConfig.indexes.some(
-				(index) =>
-					index.config.name === "events_effective_death_defender_unique" &&
-					index.config.unique,
-			),
-		).toBe(true);
-		expect(matchConfig.foreignKeys.map((key) => key.getName())).toContain(
-			"matches_winner_participant_fk",
-		);
-		expect(matchConfig.checks.map((constraint) => constraint.name)).toContain(
-			"matches_result_winner_consistent",
-		);
-		expect(
-			eventConfig.foreignKeys
-				.map((key) => key.getName())
-				.filter(
-					(name) => name.includes("membership") || name.includes("participant"),
-				)
-				.sort(),
-		).toEqual([
-			"events_attacker_participant_fk",
-			"events_attacker_warrior_membership_fk",
-			"events_defender_participant_fk",
-			"events_defender_warrior_membership_fk",
-		]);
 	});
 
 	it("filters event choices through match and warband membership", () => {

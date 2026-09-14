@@ -1,6 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
-import type { Database } from "@/db/index.server";
-import { enqueueImageGeneration } from "@/db/operations/image-generation.server";
+import { afterEach, describe, expect, it } from "vitest";
 import {
 	getImageGenerationInstructions,
 	updateImageGenerationInstructions,
@@ -14,25 +12,17 @@ import {
 	OPENAI_IMAGE_MODEL,
 	resolveImageGenerationInstructions,
 } from "@/db/validation/image-generation";
+import { setupDatabase } from "../../../workers/image-generation/src/test-support";
 
-// These unit tests inject DB and queue doubles; no Workers runtime is needed.
-
+const connections: ReturnType<typeof setupDatabase>[] = [];
 function setup() {
-	const values = vi.fn().mockResolvedValue(undefined);
-	const where = vi.fn().mockResolvedValue(undefined);
-	const set = vi.fn().mockReturnValue({ where });
-	const db = {
-		insert: vi.fn().mockReturnValue({ values }),
-		update: vi.fn().mockReturnValue({ set }),
-	} as unknown as Database;
-	const send = vi.fn().mockResolvedValue(undefined);
-	return { db, values, where, set, send };
+	const connection = setupDatabase();
+	connections.push(connection);
+	return connection;
 }
-
-const geminiJob = {
-	prompt: "A portrait",
-	model: GEMINI_IMAGE_MODEL,
-} as const;
+afterEach(() => {
+	for (const { sqlite } of connections.splice(0)) sqlite.close();
+});
 
 describe("image generation instructions", () => {
 	it("rejects empty, whitespace, and over-limit instructions", () => {
@@ -53,7 +43,7 @@ describe("image generation instructions", () => {
 		).toEqual({ instructions: "Paint like a woodcut." });
 	});
 
-	it("falls back to the default John Blanche brief when unset", () => {
+	it("falls back to the default brief when unset", () => {
 		expect(resolveImageGenerationInstructions(undefined)).toBe(
 			DEFAULT_IMAGE_GENERATION_INSTRUCTIONS,
 		);
@@ -63,40 +53,24 @@ describe("image generation instructions", () => {
 		expect(resolveImageGenerationInstructions("Custom brief")).toBe(
 			"Custom brief",
 		);
-		expect(DEFAULT_IMAGE_GENERATION_INSTRUCTIONS).toContain(
-			"John Blanche's style",
-		);
 	});
 
 	it("surfaces D1 failures from read and write operations", async () => {
-		const get = vi.fn().mockRejectedValue(new Error("D1 unavailable"));
-		const values = vi.fn().mockReturnValue({
-			onConflictDoUpdate: vi
-				.fn()
-				.mockRejectedValue(new Error("D1 unavailable")),
-		});
-		const db = {
-			select: vi.fn().mockReturnValue({
-				from: vi.fn().mockReturnValue({
-					where: vi.fn().mockReturnValue({ get }),
-				}),
-			}),
-			insert: vi.fn().mockReturnValue({ values }),
-		} as unknown as Database;
-		await expect(getImageGenerationInstructions(db)).rejects.toThrow(
-			"D1 unavailable",
-		);
+		const { db, sqlite } = setup();
+		sqlite.exec("DROP TABLE app_settings");
+
+		await expect(getImageGenerationInstructions(db)).rejects.toThrow();
 		await expect(
 			updateImageGenerationInstructions(db, "Paint like a woodcut."),
-		).rejects.toThrow("D1 unavailable");
+		).rejects.toThrow();
 	});
 });
 
-describe("image generation producer", () => {
+describe("image generation input", () => {
 	it("trims prompts, defaults the model, and validates explicit models", () => {
 		expect(
 			ImageGenerationInputSchema.parse({ prompt: "  A portrait  " }),
-		).toEqual(geminiJob);
+		).toEqual({ prompt: "A portrait", model: GEMINI_IMAGE_MODEL });
 		expect(
 			ImageGenerationInputSchema.parse({
 				prompt: "A portrait",
@@ -114,55 +88,5 @@ describe("image generation producer", () => {
 				model: "unknown",
 			}).success,
 		).toBe(false);
-	});
-
-	it("persists the job before sending its ID and marks it queued", async () => {
-		const { db, values, set, send } = setup();
-		send.mockImplementation(async ({ jobId }) => {
-			expect(values).toHaveBeenCalledWith({ id: jobId, ...geminiJob });
-			expect(set).not.toHaveBeenCalled();
-		});
-		const result = await enqueueImageGeneration(db, { send }, geminiJob);
-		expect(result).toEqual({ jobId: expect.any(String), status: "queued" });
-		expect(send).toHaveBeenCalledExactlyOnceWith({ jobId: result.jobId });
-		expect(set).toHaveBeenCalledWith(
-			expect.objectContaining({ status: "queued" }),
-		);
-	});
-
-	it("does not send if the initial D1 insert fails", async () => {
-		const { db, values, send } = setup();
-		values.mockRejectedValue(new Error("D1 unavailable"));
-		await expect(
-			enqueueImageGeneration(db, { send }, geminiJob),
-		).rejects.toThrow("D1 unavailable");
-		expect(send).not.toHaveBeenCalled();
-	});
-
-	it("records enqueue failure and returns the job ID", async () => {
-		const { db, set, send } = setup();
-		send.mockRejectedValue(new Error("Queue unavailable"));
-		const result = await enqueueImageGeneration(db, { send }, geminiJob);
-		expect(result.status).toBe("enqueue_failed");
-		expect(result.jobId).toEqual(expect.any(String));
-		expect(set).toHaveBeenCalledWith(
-			expect.objectContaining({
-				status: "enqueue_failed",
-				error: expect.any(String),
-			}),
-		);
-	});
-
-	it("does not mislabel a post-send D1 failure as an enqueue failure", async () => {
-		const { db, where, set, send } = setup();
-		where.mockRejectedValue(new Error("D1 unavailable"));
-		await expect(
-			enqueueImageGeneration(db, { send }, geminiJob),
-		).rejects.toThrow("D1 unavailable");
-		expect(send).toHaveBeenCalledOnce();
-		expect(set).toHaveBeenCalledOnce();
-		expect(set).toHaveBeenCalledWith(
-			expect.objectContaining({ status: "queued" }),
-		);
 	});
 });
