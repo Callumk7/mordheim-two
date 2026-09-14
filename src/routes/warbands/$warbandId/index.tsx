@@ -106,7 +106,6 @@ function WarbandDetailPage() {
 						</div>
 					}
 					className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end"
-					contentClassName="min-w-0"
 					description={warband.bio || undefined}
 					descriptionClassName="mt-3 max-w-3xl whitespace-pre-line"
 					eyebrow={warband.faction}
