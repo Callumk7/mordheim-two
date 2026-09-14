@@ -3,9 +3,10 @@ import {
 	useRouter,
 	useRouterState,
 } from "@tanstack/react-router";
+import { AdminPageHeader } from "@/components/shared/admin-page-header";
 import { Page, PageError, PagePending } from "@/components/shared/page";
-import { Typography } from "@/components/shared/typography";
-import { Button, LinkButton } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
 	Table,
 	TableBody,
@@ -42,34 +43,20 @@ function QueueJobsPage() {
 
 	return (
 		<Page className="flex flex-col gap-6" width="wide">
-			<header className="flex flex-wrap items-start justify-between gap-4">
-				<div className="space-y-2">
-					<Typography variant="pageTitle">Queue jobs</Typography>
-					<Typography variant="supportingBody">
+			<AdminPageHeader
+				currentPage="queue-jobs"
+				title="Queue jobs"
+				description={
+					<>
 						Latest 100 D1 jobs, newest first. Completed means a JPEG is stored
 						in private R2. Consumed is a historical receipt, not a generated
 						image. This is not the live queue backlog.
-					</Typography>
-				</div>
-				<div className="flex flex-wrap gap-2">
-					<LinkButton to="/generated-images" variant="outline">
-						View generated images
-					</LinkButton>
-					<LinkButton to="/queue" variant="outline">
-						Send a job
-					</LinkButton>
-					<LinkButton to="/settings" variant="outline">
-						Image instructions
-					</LinkButton>
-					<Button
-						isDisabled={isLoading}
-						onPress={() => void router.invalidate()}
-					>
-						{isLoading ? "Refreshing…" : "Refresh"}
-					</Button>
-				</div>
-			</header>
-			<div className="rounded-xl border border-border bg-card">
+					</>
+				}
+				isRefreshing={isLoading}
+				onRefresh={() => void router.invalidate()}
+			/>
+			<Card className="py-0">
 				<Table aria-label="Image generation jobs" className="min-w-5xl">
 					<TableHeader>
 						<TableHead isRowHeader>Job ID</TableHead>
@@ -120,7 +107,7 @@ function QueueJobsPage() {
 						)}
 					</TableBody>
 				</Table>
-			</div>
+			</Card>
 			<p className="text-sm text-muted-foreground">
 				Showing {jobs.length} records. Refresh to query D1 again. This
 				diagnostic page has no application authentication; do not submit private

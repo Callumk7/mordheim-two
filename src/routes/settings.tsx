@@ -1,8 +1,8 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { ImageGenerationSettingsForm } from "@/components/image-generation-settings-form";
+import { AdminPageHeader } from "@/components/shared/admin-page-header";
 import { Page, PageError, PagePending } from "@/components/shared/page";
-import { Typography } from "@/components/shared/typography";
-import { Button, LinkButton } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
 	getImageGenerationInstructions,
 	updateImageGenerationInstructions,
@@ -32,26 +32,18 @@ function SettingsPage() {
 
 	return (
 		<Page className="flex flex-col gap-6" width="narrow">
-			<header className="space-y-2">
-				<Typography variant="pageTitle">Settings</Typography>
-				<div className="flex flex-wrap gap-2">
-					<LinkButton to="/queue" variant="outline">
-						Queue playground
-					</LinkButton>
-					<LinkButton to="/queue-jobs" variant="outline">
-						View D1 jobs
-					</LinkButton>
-					<LinkButton to="/generated-images" variant="outline">
-						View generated images
-					</LinkButton>
-				</div>
-				<Typography variant="supportingBody">
-					Configure the base instructions applied when the image-generation
-					consumer refines a job prompt. Saved values replace the default John
-					Blanche brief for later jobs. This page currently has no application
-					authentication.
-				</Typography>
-			</header>
+			<AdminPageHeader
+				currentPage="settings"
+				title="Settings"
+				description={
+					<>
+						Configure the base instructions applied when the image-generation
+						consumer refines a job prompt. Saved values replace the default John
+						Blanche brief for later jobs. This page currently has no application
+						authentication.
+					</>
+				}
+			/>
 			<ImageGenerationSettingsForm
 				key={`${settings.isCustom}:${settings.instructions}`}
 				initialInstructions={settings.instructions}

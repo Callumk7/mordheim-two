@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { TextField } from "react-aria-components";
+import { AdminPageHeader } from "@/components/shared/admin-page-header";
 import { Page } from "@/components/shared/page";
 import { Typography } from "@/components/shared/typography";
-import { Button, LinkButton } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Field, FieldLabel } from "@/components/ui/field";
 import {
 	Select,
@@ -63,79 +65,75 @@ function QueuePage() {
 
 	return (
 		<Page className="flex flex-col gap-6" width="form">
-			<header className="space-y-2">
-				<Typography variant="pageTitle">Queue playground</Typography>
-				<div className="flex flex-wrap gap-2">
-					<LinkButton to="/queue-jobs" variant="outline">
-						View D1 jobs
-					</LinkButton>
-					<LinkButton to="/generated-images" variant="outline">
-						View generated images
-					</LinkButton>
-					<LinkButton to="/settings" variant="outline">
-						Image instructions
-					</LinkButton>
-				</div>
-				<Typography variant="supportingBody">
-					Save an image prompt in D1 and send its job ID to the image generation
-					queue. Choose the image model for this job; when explicitly enabled,
-					the consumer generates a square JPEG and saves it to private R2
-					storage. Disabled jobs are marked failed, not held for later
-					generation.
-				</Typography>
-			</header>
-			<form
-				className="space-y-4 rounded-xl border border-border bg-card p-6"
-				onSubmit={(event) => {
-					event.preventDefault();
-					void submit();
-				}}
-			>
-				<TextField
-					value={prompt}
-					onChange={setPrompt}
-					isRequired
-					isDisabled={isSubmitting}
-					maxLength={4000}
-				>
-					<Field>
-						<FieldLabel>Image prompt</FieldLabel>
-						<Textarea
-							name="prompt"
-							rows={5}
-							placeholder="A grim woodcut portrait of a Mordheim mercenary"
-						/>
-					</Field>
-				</TextField>
-				<Field>
-					<FieldLabel htmlFor="image-model">Image model</FieldLabel>
-					<Select
-						className="w-full"
-						isDisabled={isSubmitting}
-						onChange={(key) => {
-							const selected = IMAGE_GENERATION_MODELS.find(
-								(candidate) => candidate === key,
-							);
-							if (selected) setModel(selected);
+			<AdminPageHeader
+				currentPage="queue"
+				title="Queue playground"
+				description={
+					<>
+						Save an image prompt in D1 and send its job ID to the image
+						generation queue. Choose the image model for this job; when
+						explicitly enabled, the consumer generates a square JPEG and saves
+						it to private R2 storage. Disabled jobs are marked failed, not held
+						for later generation.
+					</>
+				}
+			/>
+			<Card>
+				<CardContent>
+					<form
+						className="space-y-4"
+						onSubmit={(event) => {
+							event.preventDefault();
+							void submit();
 						}}
-						value={model}
 					>
-						<SelectTrigger id="image-model">
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem id={GEMINI_IMAGE_MODEL}>
-								Gemini 3.1 Flash Image
-							</SelectItem>
-							<SelectItem id={OPENAI_IMAGE_MODEL}>GPT Image 2</SelectItem>
-						</SelectContent>
-					</Select>
-				</Field>
-				<Button type="submit" isDisabled={isSubmitting || !prompt.trim()}>
-					{isSubmitting ? "Sending…" : "Send to queue"}
-				</Button>
-				<output className="block break-words text-sm">{message}</output>
-			</form>
+						<TextField
+							value={prompt}
+							onChange={setPrompt}
+							isRequired
+							isDisabled={isSubmitting}
+							maxLength={4000}
+						>
+							<Field>
+								<FieldLabel>Image prompt</FieldLabel>
+								<Textarea
+									name="prompt"
+									rows={5}
+									placeholder="A grim woodcut portrait of a Mordheim mercenary"
+								/>
+							</Field>
+						</TextField>
+						<Field>
+							<FieldLabel htmlFor="image-model">Image model</FieldLabel>
+							<Select
+								className="w-full"
+								isDisabled={isSubmitting}
+								onChange={(key) => {
+									const selected = IMAGE_GENERATION_MODELS.find(
+										(candidate) => candidate === key,
+									);
+									if (selected) setModel(selected);
+								}}
+								value={model}
+							>
+								<SelectTrigger id="image-model">
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem id={GEMINI_IMAGE_MODEL}>
+										Gemini 3.1 Flash Image
+									</SelectItem>
+									<SelectItem id={OPENAI_IMAGE_MODEL}>GPT Image 2</SelectItem>
+								</SelectContent>
+							</Select>
+						</Field>
+						<Button type="submit" isDisabled={isSubmitting || !prompt.trim()}>
+							{isSubmitting ? "Sending…" : "Send to queue"}
+						</Button>
+						<output className="block break-words text-sm">{message}</output>
+					</form>
+				</CardContent>
+			</Card>
 			<Typography variant="supportingBody">
 				On the deployed app, check the Cloudflare dashboard for the
 				mordheim-image-generation queue’s message writes and backlog, and D1 for

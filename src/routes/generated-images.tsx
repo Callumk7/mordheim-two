@@ -4,9 +4,10 @@ import {
 	useRouterState,
 } from "@tanstack/react-router";
 import { useState } from "react";
+import { AdminPageHeader } from "@/components/shared/admin-page-header";
 import { Page, PageError, PagePending } from "@/components/shared/page";
-import { Typography } from "@/components/shared/typography";
-import { Button, LinkButton } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { listGeneratedImages } from "@/server/generated-images";
 
@@ -72,73 +73,64 @@ function GeneratedImagesPage() {
 
 	return (
 		<Page className="flex flex-col gap-6" width="wide">
-			<header className="flex flex-wrap items-start justify-between gap-4">
-				<div className="space-y-2">
-					<Typography variant="pageTitle">Generated images</Typography>
-					<Typography variant="supportingBody">
+			<AdminPageHeader
+				currentPage="generated-images"
+				title="Generated images"
+				description={
+					<>
 						Latest 100 completed D1 jobs, newest completion first. Select an
 						image to enlarge it. Refresh to check for new results.
-					</Typography>
-				</div>
-				<div className="flex flex-wrap gap-2">
-					<LinkButton to="/queue" variant="outline">
-						Send a job
-					</LinkButton>
-					<LinkButton to="/queue-jobs" variant="outline">
-						View D1 jobs
-					</LinkButton>
-					<LinkButton to="/settings" variant="outline">
-						Image instructions
-					</LinkButton>
-					<Button
-						isDisabled={isLoading}
-						onPress={() => {
-							setRefreshKey((key) => key + 1);
-							void router.invalidate();
-						}}
-					>
-						{isLoading ? "Refreshing…" : "Refresh"}
-					</Button>
-				</div>
-			</header>
+					</>
+				}
+				isRefreshing={isLoading}
+				onRefresh={() => {
+					setRefreshKey((key) => key + 1);
+					void router.invalidate();
+				}}
+			/>
 			{images.length === 0 ? (
-				<p className="rounded-xl border border-border bg-card p-6">
-					No completed images yet. Queued, failed and historical consumed jobs
-					are not shown here.
-				</p>
+				<Card>
+					<CardContent>
+						No completed images yet. Queued, failed and historical consumed jobs
+						are not shown here.
+					</CardContent>
+				</Card>
 			) : (
 				<ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 					{images.map((image) => (
-						<li
-							key={`${image.id}:${refreshKey}`}
-							className="min-w-0 space-y-3 rounded-xl border border-border bg-card p-4"
-						>
-							<DialogTrigger>
-								<Button
-									variant="ghost"
-									className="h-auto w-full rounded-xl p-0"
-									aria-label={`Enlarge image: ${image.prompt}`}
-								>
-									<GeneratedImage id={image.id} prompt={image.prompt} />
-								</Button>
-								<Dialog className="max-h-[90dvh] overflow-y-auto sm:max-w-3xl">
-									<DialogTitle className="pr-8">Generated image</DialogTitle>
-									<GeneratedImage
-										id={image.id}
-										prompt={image.prompt}
-										enlarged
-									/>
-									<p className="break-words whitespace-pre-wrap">
+						<li key={`${image.id}:${refreshKey}`} className="min-w-0">
+							<Card size="sm">
+								<CardContent className="space-y-3">
+									<DialogTrigger>
+										<Button
+											variant="ghost"
+											className="h-auto w-full rounded-xl p-0"
+											aria-label={`Enlarge image: ${image.prompt}`}
+										>
+											<GeneratedImage id={image.id} prompt={image.prompt} />
+										</Button>
+										<Dialog className="max-h-[90dvh] overflow-y-auto sm:max-w-3xl">
+											<DialogTitle className="pr-8">
+												Generated image
+											</DialogTitle>
+											<GeneratedImage
+												id={image.id}
+												prompt={image.prompt}
+												enlarged
+											/>
+											<p className="break-words whitespace-pre-wrap">
+												{image.prompt}
+											</p>
+										</Dialog>
+									</DialogTrigger>
+									<p className="text-sm break-words whitespace-pre-wrap">
 										{image.prompt}
 									</p>
-								</Dialog>
-							</DialogTrigger>
-							<p className="text-sm break-words whitespace-pre-wrap">
-								{image.prompt}
-							</p>
-							<p className="text-xs text-muted-foreground">
-								Completed (UTC): {image.completedAt ?? "Unknown"}
-							</p>
+									<p className="text-xs text-muted-foreground">
+										Completed (UTC): {image.completedAt ?? "Unknown"}
+									</p>
+								</CardContent>
+							</Card>
 						</li>
 					))}
 				</ul>
