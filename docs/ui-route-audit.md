@@ -576,17 +576,17 @@ Legend: **S** shell/padding/width · **T** typography · **C** chrome (toolbar/e
 | Route | S | T | C | R | Checks |
 | --- | --- | --- | --- | --- | --- |
 | `/` | ✓ | | | | Display title; four CTAs use shared buttons; loose vertical padding |
-| `/warbands` | ✓ | | | | `Page` + `PageHeader`; empty dashed; new dialog |
-| `/warbands/$id` | ✓ | | | | Toolbar; hero; five-up stats at lg; empties; leaderboard |
+| `/warbands` | ✓ | | ✓ | | `Page` + `PageHeader`; empty dashed; new dialog inherits form default |
+| `/warbands/$id` | ✓ | | ✓ | | Toolbar; `Card` hero; five-up `StatTile`s at lg; empties; leaderboard |
 | `/warbands/$id` unknown | ✓ | | | | Shared not-found panel |
 | `/warbands/$id/delete` | ✓ | | | | Shared destructive confirm |
 | `/warriors` | ✓ | | | | Same list pattern as warbands; gated dialog empty |
-| `/warriors/$id` | ✓ | | | | Title on the agreed scale; cards; stats tiles |
+| `/warriors/$id` | ✓ | | ✓ | | Title on the agreed scale; cards; compact `StatTile`s |
 | `/warriors/$id` unknown | ✓ | | | | Shared not-found |
 | `/warriors/$id/delete` | ✓ | | | | Shared destructive confirm |
-| `/equipment` | ✓ | | | | Same shell as lists; pending/error use `Page`; accordion surface |
+| `/equipment` | ✓ | | ✓ | | Same shell as lists; pending/error use `Page`; `CatalogueItem` accordion |
 | `/matches` | ✓ | | | | Same list pattern |
-| `/matches/$id` | ✓ | | | | Header actions wrap; events + rosters; empty participants |
+| `/matches/$id` | ✓ | | ✓ | | Header actions wrap; events + rosters; compact participant tiles |
 | `/matches/$id` unknown | ✓ | | | | Shared not-found |
 | `/matches/$id/delete` | ✓ | | | | Shared destructive confirm |
 | `/stats` | ✓ | | | | Same shell as lists; totals/charts/leaderboards; reserved panel width |
@@ -594,11 +594,11 @@ Legend: **S** shell/padding/width · **T** typography · **C** chrome (toolbar/e
 | `/events/$id` | ✓ | | | | Same detail chrome as warrior; void hidden when voided |
 | `/events/$id` unknown | ✓ | | | | Shared not-found |
 | `/events/$id/delete` | ✓ | | | | Destructive confirm + reason field |
-| `/settings` | ✓ | | | | Campaign shell + page title scale; related links; error retry |
-| `/queue` | ✓ | | | | Same header cluster; form on `Card` |
-| `/queue-jobs` | ✓ | | | | Same header; table scrolls; width decision documented |
-| `/generated-images` | ✓ | | | | Same header; empty; grid 1/2/3/4 cols; lightbox |
-| `/projector` | ✓ | | | | Unchanged broadcast layout; app nav still hidden |
+| `/settings` | ✓ | | ✓ | | Campaign shell + page title scale; related links; form on `Card` |
+| `/queue` | ✓ | | ✓ | | Same header cluster; form on `Card` |
+| `/queue-jobs` | ✓ | | ✓ | | Same header; table scrolls; width decision documented |
+| `/generated-images` | ✓ | | ✓ | | Same header; empty; grid 1/2/3/4 cols; lightbox `size="lg"` |
+| `/projector` | ✓ | | ✓ | | Unchanged broadcast layout; app nav still hidden |
 | Unknown URL | ✓ | | | | Default not-found uses shared panel |
 
 **Width decision (MOR-54).** `/queue-jobs` and `/generated-images` stay `width="wide"` (`max-w-7xl`). Do not shrink them to `max-w-6xl` when ticking **S**.
