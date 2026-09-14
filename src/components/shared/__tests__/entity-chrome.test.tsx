@@ -61,6 +61,22 @@ describe("DestructiveConfirm", () => {
 		expect(pending).toMatch(/<button[^>]*disabled[^>]*>Deleting…<\/button>/);
 		expect(pending).toContain("Unable to delete warband.");
 
+		const blocked = renderToStaticMarkup(
+			<DestructiveConfirm
+				cancelLink={{ to: "/warbands" }}
+				description="This cannot be undone."
+				isDisabled
+				keepLabel="Keep warband"
+				onConfirm={() => undefined}
+				pendingLabel="Deleting…"
+				submitLabel="Delete warband"
+				title="Delete warband?"
+			/>,
+		);
+		expect(blocked).toMatch(
+			/<button[^>]*disabled[^>]*>Delete warband<\/button>/,
+		);
+
 		const ready = renderToStaticMarkup(
 			<DestructiveConfirm
 				cancelLink={{ to: "/warbands" }}
