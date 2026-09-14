@@ -67,6 +67,7 @@ The reusable class map is `campaignTypography` in `src/components/shared/typogra
 | Page title | `font-mordheim text-4xl sm:text-5xl` |
 | Section title | `font-mordheim text-2xl` |
 | Eyebrow | `text-xs font-semibold uppercase tracking-[0.28em] text-primary` |
+| Destructive eyebrow | `text-xs font-semibold uppercase tracking-[0.28em] text-destructive` |
 | Muted / supporting body | `text-muted-foreground text-sm` |
 | Home display body | `text-lg leading-8` |
 
