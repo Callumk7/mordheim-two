@@ -2,12 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { WarriorsTable } from "#/components/table/warriors-table";
 import { WarriorForm, type WarriorFormValues } from "#/components/warrior-form";
-import {
-	IndexEmptyState,
-	IndexPage,
-	IndexPageHeader,
-} from "@/components/shared/index-page";
-import { Typography } from "@/components/shared/typography";
+import { EmptyState } from "@/components/shared/empty-state";
+import { IndexPage, IndexPageHeader } from "@/components/shared/index-page";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -58,7 +54,7 @@ function WarriorsIndexPage() {
 					warriors={warriors}
 				/>
 			) : (
-				<IndexEmptyState
+				<EmptyState
 					action={
 						<Button variant="link" onPress={() => setIsNewWarriorOpen(true)}>
 							Create a warrior →
@@ -91,14 +87,11 @@ function WarriorsIndexPage() {
 						warbands={warbands}
 					/>
 				) : (
-					<section className="rounded-xl border border-dashed border-input px-6 py-10 text-center">
-						<Typography variant="sectionTitle" className="text-foreground">
-							A warband is required
-						</Typography>
-						<Typography variant="supportingBody" className="mt-2">
-							Create a warband before recruiting a warrior.
-						</Typography>
-					</section>
+					<EmptyState
+						description="Create a warband before recruiting a warrior."
+						title="A warband is required"
+						variant="dialog"
+					/>
 				)}
 			</Dialog>
 		</IndexPage>

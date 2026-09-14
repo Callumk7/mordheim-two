@@ -1,7 +1,6 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Typography } from "@/components/shared/typography";
-import { Button } from "@/components/ui/button";
+import { DestructiveConfirm } from "@/components/shared/entity-chrome";
 import { useWarriorMutations } from "@/db-collections/mutations/warriors";
 import { useWarriorDeletion } from "@/db-collections/queries";
 
@@ -21,68 +20,39 @@ function DeleteWarriorPage() {
 	if (!warrior && !isDeleting) return null;
 
 	return (
-		<div className="mx-auto max-w-2xl">
-			<Link
-				className="text-sm text-muted-foreground hover:text-primary/80"
-				params={{ warriorId }}
-				to="/warriors/$warriorId"
-			>
-				← Cancel
-			</Link>
-
-			<section className="mt-7 rounded-xl border border-destructive/50 bg-destructive/10 p-7">
-				<Typography variant="destructiveEyebrow">Destructive action</Typography>
-				<Typography variant="pageTitle" className="mt-3 text-foreground">
-					Delete {warrior?.name ?? "warrior"}?
-				</Typography>
-				<Typography variant="supportingBody" className="mt-3 max-w-xl">
-					{eventIds.length > 0
-						? "This warrior cannot be deleted because their event history is retained."
-						: "This permanently removes the warrior. This action cannot be undone."}
-				</Typography>
-
-				{error ? (
-					<p className="mt-5 rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-						{error}
-					</p>
-				) : null}
-
-				<div className="mt-7 flex flex-wrap gap-3">
-					<Button
-						isDisabled={isDeleting || !warrior || eventIds.length > 0}
-						onPress={async () => {
-							setError(undefined);
-							setIsDeleting(true);
-							try {
-								await removeWarrior(warriorId, eventIds);
-								await navigate({ to: "/warriors" });
-							} catch (cause) {
-								setError(
-									cause instanceof Error
-										? cause.message
-										: "Unable to delete warrior.",
-								);
-								setIsDeleting(false);
-							}
-						}}
-						type="button"
-						variant="destructive"
-					>
-						{eventIds.length > 0
-							? "Event history prevents deletion"
-							: isDeleting
-								? "Deleting…"
-								: "Delete warrior"}
-					</Button>
-					<Link
-						className="rounded-lg border border-input px-5 py-2.5 font-semibold text-foreground hover:border-ring hover:text-foreground"
-						params={{ warriorId }}
-						to="/warriors/$warriorId"
-					>
-						Keep warrior
-					</Link>
-				</div>
-			</section>
-		</div>
+		<DestructiveConfirm
+			cancelLink={{ params: { warriorId }, to: "/warriors/$warriorId" }}
+			description={
+				eventIds.length > 0
+					? "This warrior cannot be deleted because their event history is retained."
+					: "This permanently removes the warrior. This action cannot be undone."
+			}
+			error={error}
+			isDisabled={!warrior || eventIds.length > 0}
+			isPending={isDeleting}
+			keepLabel="Keep warrior"
+			onConfirm={async () => {
+				setError(undefined);
+				setIsDeleting(true);
+				try {
+					await removeWarrior(warriorId, eventIds);
+					await navigate({ to: "/warriors" });
+				} catch (cause) {
+					setError(
+						cause instanceof Error
+							? cause.message
+							: "Unable to delete warrior.",
+					);
+					setIsDeleting(false);
+				}
+			}}
+			pendingLabel="Deleting…"
+			submitLabel={
+				eventIds.length > 0
+					? "Event history prevents deletion"
+					: "Delete warrior"
+			}
+			title={<>Delete {warrior?.name ?? "warrior"}?</>}
+		/>
 	);
 }

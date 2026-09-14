@@ -3,8 +3,7 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { EventForm } from "@/components/event-form";
 import { EventImage } from "@/components/event-image";
 import { EventOutcomeForm } from "@/components/event-outcome-form";
-import { Typography } from "@/components/shared/typography";
-import { LinkButton } from "@/components/ui/button";
+import { EntityHeader, EntityToolbar } from "@/components/shared/entity-chrome";
 import { Card, CardContent } from "@/components/ui/card";
 import { getCollections } from "@/db-collections";
 import {
@@ -68,31 +67,26 @@ function EventDetailPage() {
 
 	return (
 		<div className="mx-auto max-w-3xl">
-			<div className="flex items-center justify-between gap-4">
-				<LinkButton size="sm" to="/events" variant="outline">
-					← Events
-				</LinkButton>
-				{event.voidedAt === null ? (
-					<LinkButton
-						params={{ eventId }}
-						size="sm"
-						to="/events/$eventId/delete"
-						variant="destructive"
-					>
-						Void event
-					</LinkButton>
-				) : null}
-			</div>
+			<EntityToolbar
+				backLabel="← Events"
+				backLink={{ to: "/events" }}
+				destructiveLabel={event.voidedAt === null ? "Void event" : undefined}
+				destructiveLink={
+					event.voidedAt === null
+						? {
+								params: { eventId },
+								to: "/events/$eventId/delete",
+							}
+						: undefined
+				}
+			/>
 
-			<header className="mt-7 border-b border-border pb-6">
-				<Typography variant="eyebrow">Knock down</Typography>
-				<Typography variant="pageTitle" className="mt-2 text-foreground">
-					{match?.name ?? "Match event"}
-				</Typography>
-				<Typography variant="supportingBody" className="mt-2">
-					Edit this event’s combat record.
-				</Typography>
-			</header>
+			<EntityHeader
+				className="mt-7 border-b border-border pb-6"
+				description="Edit this event’s combat record."
+				eyebrow="Knock down"
+				title={match?.name ?? "Match event"}
+			/>
 
 			<Card className="mt-7">
 				<CardContent className="grid gap-8">
