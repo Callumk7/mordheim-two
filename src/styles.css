@@ -5,6 +5,14 @@
 @import "@fontsource-variable/inter";
 @import "@fontsource-variable/cormorant";
 
+@font-face {
+  font-family: "Schoensperger";
+  src: url("../fonts/Schoensperger.otf") format("opentype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 * {

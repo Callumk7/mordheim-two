@@ -32,11 +32,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				title: "Mordheim Campaign Ledger",
 			},
 		],
-		styles: [
-			{
-				children: `@font-face{font-family:'Schoensperger';src:url('${schoenspergerFontUrl}') format('opentype');font-style:normal;font-weight:400;font-display:block}`,
-			},
-		],
 		links: [
 			{
 				rel: "preload",
@@ -44,8 +39,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				as: "font",
 				type: "font/otf",
 				crossOrigin: "anonymous",
-				fetchPriority: "high",
-				blocking: "render",
 			},
 			{
 				rel: "stylesheet",
@@ -77,6 +70,35 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 	shellComponent: RootDocument,
 });
 
+type PrimaryNavTarget =
+	| "/"
+	| "/warbands"
+	| "/warriors"
+	| "/equipment"
+	| "/matches"
+	| "/stats"
+	| "/events"
+	| "/settings";
+
+function NavLink({
+	children,
+	to,
+}: {
+	children: React.ReactNode;
+	to: PrimaryNavTarget;
+}) {
+	return (
+		<Link
+			activeOptions={to === "/" ? { exact: true } : undefined}
+			activeProps={{ className: "bg-accent text-primary" }}
+			className="rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
+			to={to}
+		>
+			{children}
+		</Link>
+	);
+}
+
 function RootDocument({ children }: { children: React.ReactNode }) {
 	const isProjector = useRouterState({
 		select: (state) =>
@@ -96,63 +118,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 								aria-label="Primary navigation"
 								className="flex flex-wrap items-center gap-2 text-sm"
 							>
-								<Link
-									activeOptions={{ exact: true }}
-									activeProps={{ className: "bg-accent text-primary" }}
-									className="rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
-									to="/"
-								>
-									Home
-								</Link>
-								<Link
-									activeProps={{ className: "bg-accent text-primary" }}
-									className="rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
-									to="/warbands"
-								>
-									Warbands
-								</Link>
-								<Link
-									activeProps={{ className: "bg-accent text-primary" }}
-									className="rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
-									to="/warriors"
-								>
-									Warriors
-								</Link>
-								<Link
-									activeProps={{ className: "bg-accent text-primary" }}
-									className="rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
-									to="/equipment"
-								>
-									Equipment
-								</Link>
-								<Link
-									activeProps={{ className: "bg-accent text-primary" }}
-									className="rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
-									to="/matches"
-								>
-									Matches
-								</Link>
-								<Link
-									activeProps={{ className: "bg-accent text-primary" }}
-									className="rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
-									to="/stats"
-								>
-									Stats
-								</Link>
-								<Link
-									activeProps={{ className: "bg-accent text-primary" }}
-									className="rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
-									to="/events"
-								>
-									Events
-								</Link>
-								<Link
-									activeProps={{ className: "bg-accent text-primary" }}
-									className="rounded-md px-3 py-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
-									to="/settings"
-								>
-									Settings
-								</Link>
+								<NavLink to="/">Home</NavLink>
+								<NavLink to="/warbands">Warbands</NavLink>
+								<NavLink to="/warriors">Warriors</NavLink>
+								<NavLink to="/equipment">Equipment</NavLink>
+								<NavLink to="/matches">Matches</NavLink>
+								<NavLink to="/stats">Stats</NavLink>
+								<NavLink to="/events">Events</NavLink>
+								<NavLink to="/settings">Settings</NavLink>
 							</nav>
 						</div>
 					</header>

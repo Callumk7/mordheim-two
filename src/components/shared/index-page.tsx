@@ -32,27 +32,3 @@ export function IndexPageHeader({
 		</header>
 	);
 }
-
-export function IndexEmptyState({
-	action,
-	description,
-	title,
-}: {
-	action: ReactNode;
-	description: ReactNode;
-	title: ReactNode;
-}) {
-	return (
-		<section className="rounded-xl border border-dashed border-input px-6 py-16 text-center">
-			<Typography variant="sectionTitle" className="text-foreground">
-				{title}
-			</Typography>
-			<Typography variant="supportingBody" className="mt-2">
-				{description}
-			</Typography>
-			<div className="mt-5 [&>a]:inline-flex [&>a]:text-primary [&>a:hover]:text-primary/80">
-				{action}
-			</div>
-		</section>
-	);
-}

@@ -6,6 +6,8 @@ import { Badge } from "#/components/ui/badge";
 import { EventForm } from "@/components/event-form";
 import { formatStatus, MatchForm } from "@/components/match-form";
 import { MatchImage } from "@/components/match-image";
+import { EmptyState } from "@/components/shared/empty-state";
+import { EntityHeader, EntityToolbar } from "@/components/shared/entity-chrome";
 import { MatchCompletionDialog } from "@/components/shared/match-completion-dialog";
 import { MatchStatusActions } from "@/components/shared/match-status-actions";
 import { StatTile } from "@/components/shared/stat-display";
@@ -144,22 +146,41 @@ function MatchDetailPage() {
 
 	return (
 		<div className="grid gap-8">
-			<div className="flex items-center justify-between gap-4">
-				<LinkButton size="sm" to="/matches" variant="outline">
-					← Matches
-				</LinkButton>
-				<LinkButton
-					params={{ matchId }}
-					size="sm"
-					to="/matches/$matchId/delete"
-					variant="destructive"
-				>
-					Delete match
-				</LinkButton>
-			</div>
+			<EntityToolbar
+				backLabel="← Matches"
+				backLink={{ to: "/matches" }}
+				destructiveLabel="Delete match"
+				destructiveLink={{
+					params: { matchId },
+					to: "/matches/$matchId/delete",
+				}}
+			/>
 
-			<header className="flex flex-col justify-between gap-6 border-b border-border pb-7 md:flex-row md:items-end">
-				<div>
+			<EntityHeader
+				actions={
+					<div className="flex flex-wrap gap-2">
+						<MatchStatusActions
+							onOpenCompletion={() => setIsCompletionOpen(true)}
+							onStatusChange={(status) => updateMatch({ status })}
+							status={match.status}
+						/>
+						<Button
+							isDisabled={!canAddEvent}
+							onPress={() => setIsNewEventOpen(true)}
+							variant="outline"
+						>
+							<Plus aria-hidden="true" data-icon="inline-start" />
+							Add event
+						</Button>
+						<Button variant="outline" onPress={() => setIsEditMatchOpen(true)}>
+							<Pencil aria-hidden="true" data-icon="inline-start" />
+							Edit match
+						</Button>
+					</div>
+				}
+				className="flex flex-col justify-between gap-6 border-b border-border pb-7 md:flex-row md:items-end"
+				description="Review the participating warbands and record events as the match unfolds."
+				leading={
 					<div className="flex flex-wrap items-center gap-3">
 						<Badge variant="outline">{formatStatus(match.status)}</Badge>
 						<Badge variant="outline">
@@ -168,34 +189,10 @@ function MatchDetailPage() {
 								: match.result}
 						</Badge>
 					</div>
-					<Typography variant="pageTitle" className="mt-5 text-foreground">
-						{match.name}
-					</Typography>
-					<Typography variant="supportingBody" className="mt-2">
-						Review the participating warbands and record events as the match
-						unfolds.
-					</Typography>
-				</div>
-				<div className="flex flex-wrap gap-2">
-					<MatchStatusActions
-						onOpenCompletion={() => setIsCompletionOpen(true)}
-						onStatusChange={(status) => updateMatch({ status })}
-						status={match.status}
-					/>
-					<Button
-						isDisabled={!canAddEvent}
-						onPress={() => setIsNewEventOpen(true)}
-						variant="outline"
-					>
-						<Plus aria-hidden="true" data-icon="inline-start" />
-						Add event
-					</Button>
-					<Button variant="outline" onPress={() => setIsEditMatchOpen(true)}>
-						<Pencil aria-hidden="true" data-icon="inline-start" />
-						Edit match
-					</Button>
-				</div>
-			</header>
+				}
+				title={match.name}
+				titleClassName="mt-5"
+			/>
 
 			<section aria-labelledby="events-heading" className="grid gap-4">
 				<div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -258,25 +255,20 @@ function MatchDetailPage() {
 						))}
 					</div>
 				) : (
-					<section className="rounded-xl border border-dashed border-input px-6 py-12 text-center">
-						<Typography
-							as="h3"
-							variant="sectionTitle"
-							className="text-foreground"
-						>
-							No participating warbands
-						</Typography>
-						<Typography variant="supportingBody" className="mt-2">
-							Edit the match to choose the warbands taking part.
-						</Typography>
-						<Button
-							className="mt-5"
-							onPress={() => setIsEditMatchOpen(true)}
-							variant="outline"
-						>
-							Edit participants
-						</Button>
-					</section>
+					<EmptyState
+						action={
+							<Button
+								onPress={() => setIsEditMatchOpen(true)}
+								variant="outline"
+							>
+								Edit participants
+							</Button>
+						}
+						description="Edit the match to choose the warbands taking part."
+						title="No participating warbands"
+						titleAs="h3"
+						variant="participant"
+					/>
 				)}
 			</section>
 
@@ -438,9 +430,10 @@ function ParticipantCard({
 							))}
 						</div>
 					) : (
-						<p className="rounded-lg border border-dashed border-input px-4 py-6 text-center text-sm text-muted-foreground">
-							No warriors have joined this warband yet.
-						</p>
+						<EmptyState
+							description="No warriors have joined this warband yet."
+							variant="compact"
+						/>
 					)}
 				</div>
 			</CardContent>

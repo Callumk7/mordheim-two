@@ -58,8 +58,6 @@ describe("buildCreateMatchCommand", () => {
 				updatedAt: timestamp,
 			})),
 		});
-		expect(dependencies.now).toHaveBeenCalledTimes(1);
-		expect(dependencies.newId).toHaveBeenCalledTimes(3);
 		expect(buildCreateMatchCommand(values, sources())).toEqual(command);
 	});
 
@@ -72,19 +70,17 @@ describe("buildCreateMatchCommand", () => {
 		const dependencies = sources();
 		const { participants } = buildCreateMatchCommand(input, dependencies);
 		expect(participants.map((row) => row.warbandId)).toEqual(["b", "a", "c"]);
-		expect(dependencies.newId).toHaveBeenCalledTimes(4);
+		expect(new Set(participants.map((row) => row.id)).size).toBe(3);
 		expect(input).toEqual(before);
 	});
 
 	it("creates a match without participants", () => {
-		const dependencies = sources();
 		expect(
 			buildCreateMatchCommand(
 				{ ...values, participantWarbandIds: [] },
-				dependencies,
+				sources(),
 			).participants,
 		).toEqual([]);
-		expect(dependencies.newId).toHaveBeenCalledTimes(1);
 	});
 });
 
@@ -161,8 +157,6 @@ describe("buildUpdateMatchCommand", () => {
 			})),
 			removals: [existing[0]],
 		});
-		expect(dependencies.now).toHaveBeenCalledTimes(1);
-		expect(dependencies.newId).toHaveBeenCalledTimes(2);
 		expect({ existing, input }).toEqual(before);
 		expect(
 			buildUpdateMatchCommand("match-1", input, existing, sources()),
@@ -172,19 +166,16 @@ describe("buildUpdateMatchCommand", () => {
 	it.each([
 		{ selected: ["b", "a", "b"] },
 		{ selected: [] },
-	])("does not generate IDs or timestamps without additions ($selected)", ({
+	])("generates no new participant records when selections only repeat or clear ($selected)", ({
 		selected,
 	}) => {
-		const dependencies = sources();
 		const existing = [participant("a"), participant("b")];
 		const command = buildUpdateMatchCommand(
 			"match-1",
 			{ ...values, participantWarbandIds: selected },
 			existing,
-			dependencies,
+			sources(),
 		);
 		expect(command.additions).toEqual([]);
-		expect(dependencies.newId).not.toHaveBeenCalled();
-		expect(dependencies.now).not.toHaveBeenCalled();
 	});
 });

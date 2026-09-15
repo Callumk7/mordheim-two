@@ -67,7 +67,7 @@ function ImageGroupStatus({ jobs }: { jobs: readonly GeneratedImageJob[] }) {
 	);
 }
 
-export function getImageGroupStatus(jobs: readonly GeneratedImageJob[]) {
+function getImageGroupStatus(jobs: readonly GeneratedImageJob[]) {
 	const completed = jobs.filter((job) => job.status === "completed").length;
 	const active = jobs.filter((job) =>
 		isActiveImageJobStatus(job.status),

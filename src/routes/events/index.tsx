@@ -3,12 +3,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useEvents } from "#/db-collections/queries/events";
 import { EventForm } from "@/components/event-form";
-import {
-	IndexEmptyState,
-	IndexPage,
-	IndexPageHeader,
-} from "@/components/shared/index-page";
-import { Typography } from "@/components/shared/typography";
+import { EmptyState } from "@/components/shared/empty-state";
+import { IndexPage, IndexPageHeader } from "@/components/shared/index-page";
 import { EventsTable } from "@/components/table/events-table";
 import { Button } from "@/components/ui/button";
 import {
@@ -76,7 +72,7 @@ function EventsIndexPage() {
 			{eventRows.length ? (
 				<EventsTable events={eventRows} />
 			) : (
-				<IndexEmptyState
+				<EmptyState
 					action={
 						<Button variant="link" onPress={() => setIsNewEventOpen(true)}>
 							Create an event →
@@ -122,14 +118,11 @@ function EventsIndexPage() {
 						warriors={warriorRows}
 					/>
 				) : (
-					<section className="rounded-xl border border-dashed border-input px-6 py-10 text-center">
-						<Typography variant="sectionTitle" className="text-foreground">
-							A match with two staffed warbands is required
-						</Typography>
-						<Typography variant="supportingBody" className="mt-2">
-							Add participating warbands and warriors before recording an event.
-						</Typography>
-					</section>
+					<EmptyState
+						description="Add participating warbands and warriors before recording an event."
+						title="A match with two staffed warbands is required"
+						variant="dialog"
+					/>
 				)}
 			</Dialog>
 		</IndexPage>

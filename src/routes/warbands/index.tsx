@@ -1,11 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { CreateWarriorDialog } from "@/components/shared/create-warrior-dialog";
-import {
-	IndexEmptyState,
-	IndexPage,
-	IndexPageHeader,
-} from "@/components/shared/index-page";
+import { EmptyState } from "@/components/shared/empty-state";
+import { IndexPage, IndexPageHeader } from "@/components/shared/index-page";
 import { WarbandsTable } from "@/components/table/warbands-table";
 import { Button } from "@/components/ui/button";
 import {
@@ -81,7 +78,7 @@ function WarbandsIndexPage() {
 					warbands={warbands}
 				/>
 			) : (
-				<IndexEmptyState
+				<EmptyState
 					action={
 						<Button variant="link" onPress={() => setIsNewWarbandOpen(true)}>
 							Create a warband →

@@ -2,11 +2,8 @@ import { safeRandomUUID, useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { MatchForm, type MatchFormValues } from "@/components/match-form";
-import {
-	IndexEmptyState,
-	IndexPage,
-	IndexPageHeader,
-} from "@/components/shared/index-page";
+import { EmptyState } from "@/components/shared/empty-state";
+import { IndexPage, IndexPageHeader } from "@/components/shared/index-page";
 import { MatchesTable } from "@/components/table/matches-table";
 import { Button } from "@/components/ui/button";
 import {
@@ -61,7 +58,7 @@ function MatchesIndexPage() {
 			{matchRows.length ? (
 				<MatchesTable matches={matchRows} warbands={warbandRows} />
 			) : (
-				<IndexEmptyState
+				<EmptyState
 					action={
 						<Button variant="link" onPress={() => setIsNewMatchOpen(true)}>
 							Create a match →

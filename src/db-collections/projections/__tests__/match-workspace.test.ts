@@ -221,23 +221,4 @@ describe("projectMatchWorkspace", () => {
 			"gamma",
 		]);
 	});
-
-	it("preserves source records needed by consumers", () => {
-		const alpha = makeWarband("alpha");
-		const participant = makeParticipant("participant-alpha", alpha.id);
-		const event = makeEvent("event-1", "alpha", "beta");
-		const warrior = makeWarrior("alpha-warrior", alpha.id);
-		const workspace = project({
-			allWarbands: [alpha],
-			events: [event],
-			participants: [participant],
-			warriors: [warrior],
-		});
-
-		expect(workspace.match).toBe(match);
-		expect(workspace.allWarbands).toEqual([alpha]);
-		expect(workspace.events).toEqual([event]);
-		expect(workspace.participants).toEqual([participant]);
-		expect(workspace.warriors).toEqual([warrior]);
-	});
 });

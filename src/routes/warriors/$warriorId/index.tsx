@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { EntityHeader, EntityToolbar } from "@/components/shared/entity-chrome";
 import { CombatStatValue, StatTile } from "@/components/shared/stat-display";
 import { Typography } from "@/components/shared/typography";
-import { LinkButton } from "@/components/ui/button";
 import { WarriorEquipment } from "@/components/warrior-equipment";
 import { WarriorPortrait } from "@/components/warrior-portrait";
 import { getCollections } from "@/db-collections";
@@ -45,31 +45,26 @@ function WarriorDetailPage() {
 
 	return (
 		<div className="mx-auto max-w-3xl">
-			<div className="flex items-center justify-between gap-4">
-				<LinkButton size="sm" to="/warriors" variant="outline">
-					← Warriors
-				</LinkButton>
-				<LinkButton
-					params={{ warriorId }}
-					size="sm"
-					to="/warriors/$warriorId/delete"
-					variant="destructive"
-				>
-					Delete warrior
-				</LinkButton>
-			</div>
+			<EntityToolbar
+				backLabel="← Warriors"
+				backLink={{ to: "/warriors" }}
+				destructiveLabel="Delete warrior"
+				destructiveLink={{
+					params: { warriorId },
+					to: "/warriors/$warriorId/delete",
+				}}
+			/>
 
-			<header className="mt-7 border-b border-border pb-6">
-				<Typography variant="eyebrow">
-					{warband?.name ?? "Unknown warband"} · {warrior.class}
-				</Typography>
-				<Typography variant="pageTitle" className="mt-2 text-foreground">
-					{warrior.name}
-				</Typography>
-				<Typography variant="supportingBody" className="mt-2">
-					Edit this warrior’s campaign record.
-				</Typography>
-			</header>
+			<EntityHeader
+				className="mt-7 border-b border-border pb-6"
+				description="Edit this warrior’s campaign record."
+				eyebrow={
+					<>
+						{warband?.name ?? "Unknown warband"} · {warrior.class}
+					</>
+				}
+				title={warrior.name}
+			/>
 
 			<WarriorPortrait
 				key={warrior.id}

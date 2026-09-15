@@ -42,10 +42,11 @@ These are the building blocks later issues should extend instead of inventing pa
 | Primitive | Location | What it already standardizes | Gap |
 | --- | --- | --- | --- |
 | Page shell | `src/components/shared/page.tsx` | Campaign `<main>` width/padding (`max-w-6xl` / `py-10`), plus `narrow` (`max-w-3xl`), `form` (`max-w-2xl`), `wide` (`max-w-7xl`), and `loose` padding; `PagePending` / `PageError` | Nested detail/delete columns still use local `max-w-3xl` / `max-w-2xl` wrappers; projector stays on its own landmark |
-| Index page stack | `src/components/shared/index-page.tsx` | `grid gap-8`, list header, dashed empty | Used only on collection indexes; match detail and admin headers still local |
-| Card | `src/components/ui/card.tsx` | `rounded-2xl`, `ring-1 ring-foreground/10`, `--card-spacing`; equipment accordion via `CatalogueItem` | Data-table wrapper and entity not-found panels still use `rounded-xl border border-border`; projector stays on its own surface |
+| Index page stack | `src/components/shared/index-page.tsx` | `grid gap-8`, list header | Used only on collection indexes; match detail and admin headers still local |
+| Entity chrome | `src/components/shared/entity-chrome.tsx`, `src/components/shared/empty-state.tsx` | Entity toolbar/header, not-found, destructive confirmation, and dashed-empty variants | Shared across entity routes; projector remains local |
+| Card | `src/components/ui/card.tsx` | `rounded-2xl`, `ring-1 ring-foreground/10`, `--card-spacing`; equipment accordion via `CatalogueItem` | Data-table wrapper and `NotFoundPanel` still use `rounded-xl border border-border`; projector stays on its own surface |
 | Button / LinkButton | `src/components/ui/button.tsx` | `rounded-4xl` variants and sizes | Home CTAs, delete cancels, nav, not-found links, and several keep/cancel links use custom `Link` classes |
-| Stat tile / leaderboard | `src/components/shared/stat-display.tsx` | Metric `StatTile`, compact inner-tile variant, `HeroStat`, leaderboard heading, reserved dashed section | Warband dashboard still has a local `EmptyState` (Issue C) |
+| Stat tile / leaderboard | `src/components/shared/stat-display.tsx` | Metric `StatTile`, compact inner-tile variant, `HeroStat`, leaderboard heading, reserved dashed section | None remaining on the migrate list |
 | Dialog | `src/components/ui/dialog.tsx` | Form default `max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl`; `size="lg"` lightbox (`sm:max-w-3xl`); `size="xl"` match completion (`sm:max-w-4xl`) | Lightbox still overrides max-height with `max-h-[90dvh]` |
 
 Canonical list-page shell is `<Page>` (`mx-auto w-full max-w-6xl px-4 py-10 sm:px-8`). Collection layouts, equipment, stats, home (`padding="loose"`), and the default 404 use it. `/settings` uses `width="narrow"`, `/queue` uses `width="form"`, and `/queue-jobs` plus `/generated-images` use `width="wide"`.
@@ -82,7 +83,7 @@ Group implementation work in this order. Each issue should land shared primitive
 
 - `Page`: `main` with `mx-auto w-full max-w-6xl px-4 py-10 sm:px-8`
 - Width/padding variants: `narrow` (`max-w-3xl`), `form` (`max-w-2xl`), `wide` (`max-w-7xl`), `loose` (`py-16 sm:py-24`)
-- `IndexPage`, `IndexPageHeader`, and `IndexEmptyState` live in `src/components/shared/index-page.tsx`
+- `IndexPage` and `IndexPageHeader` live in `src/components/shared/index-page.tsx`; `EmptyState` lives in `src/components/shared/empty-state.tsx`
 - `PagePending` / `PageError` wrap equipment, stats, and admin pending/error states
 
 **Migrated.** `/`, `/warbands`, `/warriors`, `/matches`, `/events`, `/equipment`, `/stats`, `/settings`, `/queue`, `/queue-jobs`, `/generated-images`, plus the default 404.
@@ -105,17 +106,11 @@ Group implementation work in this order. Each issue should land shared primitive
 
 Decide once whether Cormorant (`font-serif`) is for entity names in lists/cards only, or also for page titles. Today both uses exist.
 
-### Issue C — Entity chrome (P1)
+### Issue C — Entity chrome (P1) — shipped (MOR-53)
 
 **Problem.** Every entity family copies back/delete bars, not-found cards, empty states, and destructive confirmations with near-identical Tailwind.
 
-**Ship.**
-
-- `EntityToolbar` — back `LinkButton` + optional destructive action
-- `EntityHeader` — eyebrow, title, description, optional actions
-- `NotFoundPanel` — used by default 404 and `$entityId/route.tsx` not-found components
-- `EmptyState` — merge `IndexEmptyState`, warband-local `EmptyState`, match dashed empty, dialog dashed empties
-- `DestructiveConfirm` — delete/void panel including cancel `LinkButton`
+**Shipped.** `EntityToolbar`, `EntityHeader`, `NotFoundPanel`, `EmptyState`, and `DestructiveConfirm` now live under `src/components/shared/` and replace the corresponding campaign route chrome.
 
 **Migrate.** Warband, warrior, match, and event detail/delete/not-found routes. Also `src/router.tsx` default not-found.
 
@@ -141,7 +136,7 @@ Decide once whether Cormorant (`font-serif`) is for entity names in lists/cards 
 
 **Migrated.** Equipment catalogue, warband hero + metrics, queue family leftovers (settings form), warrior/match compact tiles, form dialogs listed in the audit.
 
-**Left local.** Warband `EmptyState` (Issue C). Data-table wrapper and entity not-found panels (Issue C). `/projector`.
+**Left local.** Data-table wrapper. `NotFoundPanel` still uses the old `rounded-xl border` surface internally. `/projector`.
 
 ### Issue F — Ad-hoc buttons and links (P2)
 
@@ -298,7 +293,7 @@ Canonical `<Page>`. Index, detail, and delete all inherit it.
 
 #### `/warbands/` index (`src/routes/warbands/index.tsx`)
 
-Uses `IndexPage` + `IndexPageHeader` + `IndexEmptyState`. Table vs empty. Create dialog inherits the `Dialog` form default.
+Uses `IndexPage` + `IndexPageHeader` + shared `EmptyState`. Table vs empty. Create dialog inherits the `Dialog` form default.
 
 **Inconsistencies.** None on the list shell; all indexes import `IndexPage*` from `@/components/shared/index-page`.
 
@@ -317,13 +312,13 @@ The visually richest campaign screen, and the largest source of route-local prim
 | Axis | Finding |
 | --- | --- |
 | Layout | `grid gap-10` (indexes use `gap-8`). Full width of collection main (not `max-w-3xl` like warrior/event). Hero is a two-column grid `lg:grid-cols-[minmax(0,1fr)_auto]`. Hero stats `sm:grid-cols-2 lg:grid-cols-5`. Metric grids `sm:grid-cols-2 lg:grid-cols-5`. Living roster `md:grid-cols-2`. Graveyard `sm:grid-cols-2 lg:grid-cols-3`. Event log `sm:grid-cols-[auto_minmax(0,1fr)_auto]`. |
-| Surface | Hero uses `Card`. Hero stat row `bg-muted/20` with breakpoint-specific left borders via shared `HeroStat`. Local `EmptyState` (`rounded-2xl` dashed). Graveyard cards tint with `bg-muted/20` on `Card`. Event outcome chips are ad-hoc pills. |
+| Surface | Hero uses `Card` wrapping shared `EntityHeader`. Hero stat row `bg-muted/20` with breakpoint-specific left borders via shared `HeroStat`. Shared dashboard `EmptyState`. Graveyard cards tint with `bg-muted/20` on `Card`. Event outcome chips are ad-hoc pills. |
 | Spacing | Section headings then `mt-5` grids. Toolbar has no `mb-*` (gap-10 on the parent provides it). |
 | Alignment | Toolbar space-between. Hero rating right-aligned. Event timestamps `sm:text-right`. Roster cards space-between. |
 | Responsive | Hero stats borders: `sm:[&:not(:nth-child(odd))]:border-l` vs `lg:[&:not(:first-child)]:border-l` — at `sm` even columns get a divider; at `lg` every column but the first does. Easy to regress. |
-| Typography | Hero title `font-mordheim text-5xl sm:text-6xl` (larger than list/match titles). Section titles `font-mordheim text-3xl`. Roster names `font-serif text-xl`. Local `SectionHeading` eyebrows match the global eyebrow pattern. |
+| Typography | Hero title `font-mordheim text-5xl sm:text-6xl` (larger than list/match titles). Section titles `font-mordheim text-3xl`. Roster names `font-serif text-xl`. Shared `SectionHeading` eyebrows match the global eyebrow pattern. |
 
-**Local components remaining.** `EmptyState` (Issue C). `SectionHeading`, `MetricCard`, and `HeroStat` now live in `src/components/shared/`.
+**Local components remaining.** None from this ticket. `SectionHeading`, `HeroStat`, and `StatTile` live in `src/components/shared/`; empties use shared `EmptyState`.
 
 **Verify after migration.**
 
@@ -351,7 +346,7 @@ Same campaign `<Page>` as warbands.
 
 #### `/warriors/` index (`src/routes/warriors/index.tsx`)
 
-Matches warbands index. Extra dashed empty **inside** the create dialog when no warbands exist (`py-10`, `font-serif text-2xl`) — different from `IndexEmptyState` (`py-16`, `font-mordheim`).
+Matches warbands index. The shared `EmptyState` uses a dialog variant inside the create dialog when no warbands exist.
 
 **Verify.** Header, table, empty, dialog, and “A warband is required” gated state.
 

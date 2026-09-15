@@ -13,14 +13,15 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { CreateWarriorDialog } from "@/components/shared/create-warrior-dialog";
+import { EmptyState } from "@/components/shared/empty-state";
+import { EntityHeader, EntityToolbar } from "@/components/shared/entity-chrome";
 import { SectionHeading } from "@/components/shared/section-heading";
 import {
 	CombatLeaderboard,
 	HeroStat,
 	StatTile,
 } from "@/components/shared/stat-display";
-import { Typography } from "@/components/shared/typography";
-import { Button, LinkButton } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
 	Dialog,
@@ -73,54 +74,44 @@ function WarbandDetailPage() {
 
 	return (
 		<div className="grid gap-10">
-			<div className="flex items-center justify-between gap-4">
-				<LinkButton size="sm" to="/warbands" variant="outline">
-					← Warbands
-				</LinkButton>
-				<LinkButton
-					params={{ warbandId }}
-					size="sm"
-					to="/warbands/$warbandId/delete"
-					variant="destructive"
-				>
-					Delete warband
-				</LinkButton>
-			</div>
+			<EntityToolbar
+				backLabel="← Warbands"
+				backLink={{ to: "/warbands" }}
+				destructiveLabel="Delete warband"
+				destructiveLink={{
+					params: { warbandId },
+					to: "/warbands/$warbandId/delete",
+				}}
+			/>
 
 			<Card className="relative gap-0 py-0">
-				<div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-					<div>
-						<Typography variant="eyebrow">{warband.faction}</Typography>
-						<Typography variant="pageTitle" className="mt-3 text-foreground">
-							{warband.name}
-						</Typography>
-						{warband.bio ? (
-							<Typography
-								variant="supportingBody"
-								className="mt-3 max-w-3xl whitespace-pre-line"
+				<EntityHeader
+					actions={
+						<div className="flex items-end gap-6">
+							<div className="text-right">
+								<p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">
+									Warband rating
+								</p>
+								<p className="mt-1 font-mordheim text-5xl tabular-nums text-primary">
+									{warband.rating}
+								</p>
+							</div>
+							<Button
+								variant="outline"
+								onPress={() => setIsEditWarbandOpen(true)}
 							>
-								{warband.bio}
-							</Typography>
-						) : null}
-					</div>
-					<div className="flex items-end gap-6">
-						<div className="text-right">
-							<p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">
-								Warband rating
-							</p>
-							<p className="mt-1 font-mordheim text-5xl tabular-nums text-primary">
-								{warband.rating}
-							</p>
+								<Pencil aria-hidden="true" data-icon="inline-start" />
+								Edit
+							</Button>
 						</div>
-						<Button
-							variant="outline"
-							onPress={() => setIsEditWarbandOpen(true)}
-						>
-							<Pencil aria-hidden="true" data-icon="inline-start" />
-							Edit
-						</Button>
-					</div>
-				</div>
+					}
+					className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end"
+					description={warband.bio || undefined}
+					descriptionClassName="mt-3 max-w-3xl whitespace-pre-line"
+					eyebrow={warband.faction}
+					title={warband.name}
+					titleClassName="mt-3"
+				/>
 				<div className="grid border-t border-border bg-muted/20 sm:grid-cols-2 lg:grid-cols-5">
 					<HeroStat icon={Coins} label="Gold crowns" value={warband.gold} />
 					<HeroStat
@@ -168,7 +159,15 @@ function WarbandDetailPage() {
 					<EmptyState
 						className="mt-4"
 						description="Add this warband to a match to begin its campaign record."
+						icon={
+							<Shield
+								aria-hidden="true"
+								className="mx-auto size-6 text-muted-foreground"
+							/>
+						}
 						title="No matches yet"
+						titleAs="h3"
+						variant="dashboard"
 					/>
 				) : null}
 			</section>
@@ -257,14 +256,23 @@ function WarbandDetailPage() {
 					</ul>
 				) : (
 					<EmptyState
+						action={
+							<Button onPress={() => setIsNewWarriorOpen(true)}>
+								Recruit a warrior
+							</Button>
+						}
 						className="mt-5"
 						description="Recruit a fighter to begin building this warband’s active roster."
+						icon={
+							<Shield
+								aria-hidden="true"
+								className="mx-auto size-6 text-muted-foreground"
+							/>
+						}
 						title="No living warriors"
-					>
-						<Button onPress={() => setIsNewWarriorOpen(true)}>
-							Recruit a warrior
-						</Button>
-					</EmptyState>
+						titleAs="h3"
+						variant="dashboard"
+					/>
 				)}
 			</section>
 
@@ -324,7 +332,15 @@ function WarbandDetailPage() {
 					<EmptyState
 						className="mt-5"
 						description="No warriors from this warband have been recorded among the fallen."
+						icon={
+							<Shield
+								aria-hidden="true"
+								className="mx-auto size-6 text-muted-foreground"
+							/>
+						}
 						title="The graveyard is empty"
+						titleAs="h3"
+						variant="dashboard"
 					/>
 				)}
 			</section>
@@ -395,7 +411,15 @@ function WarbandDetailPage() {
 					<EmptyState
 						className="mt-5"
 						description="Events will appear here when this warband enters combat."
+						icon={
+							<Shield
+								aria-hidden="true"
+								className="mx-auto size-6 text-muted-foreground"
+							/>
+						}
 						title="No events recorded"
+						titleAs="h3"
+						variant="dashboard"
 					/>
 				)}
 			</section>
@@ -465,40 +489,6 @@ function WarbandDetailPage() {
 					/>
 				) : null}
 			</Dialog>
-		</div>
-	);
-}
-
-function EmptyState({
-	children,
-	className = "",
-	description,
-	title,
-}: {
-	children?: React.ReactNode;
-	className?: string;
-	description: string;
-	title: string;
-}) {
-	return (
-		<div
-			className={`rounded-2xl border border-dashed border-input bg-card/40 px-6 py-10 text-center ${className}`}
-		>
-			<Shield
-				aria-hidden="true"
-				className="mx-auto size-6 text-muted-foreground"
-			/>
-			<Typography
-				as="h3"
-				variant="sectionTitle"
-				className="mt-3 text-foreground"
-			>
-				{title}
-			</Typography>
-			<Typography variant="supportingBody" className="mx-auto mt-1 max-w-md">
-				{description}
-			</Typography>
-			{children ? <div className="mt-5">{children}</div> : null}
 		</div>
 	);
 }
