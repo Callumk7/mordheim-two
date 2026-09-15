@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { EntityHeader, EntityToolbar } from "@/components/shared/entity-chrome";
 import { MatchCompletionDialog } from "@/components/shared/match-completion-dialog";
 import { MatchStatusActions } from "@/components/shared/match-status-actions";
+import { StatTile } from "@/components/shared/stat-display";
 import { Typography } from "@/components/shared/typography";
 import {
 	isActiveImageJobStatus,
@@ -294,11 +295,7 @@ function MatchDetailPage() {
 				warriors={warriorRows}
 			/>
 
-			<Dialog
-				className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl"
-				isOpen={isNewEventOpen}
-				onOpenChange={setIsNewEventOpen}
-			>
+			<Dialog isOpen={isNewEventOpen} onOpenChange={setIsNewEventOpen}>
 				<DialogHeader>
 					<DialogTitle>Add event</DialogTitle>
 					<DialogDescription>
@@ -321,11 +318,7 @@ function MatchDetailPage() {
 				/>
 			</Dialog>
 
-			<Dialog
-				className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl"
-				isOpen={isEditMatchOpen}
-				onOpenChange={setIsEditMatchOpen}
-			>
+			<Dialog isOpen={isEditMatchOpen} onOpenChange={setIsEditMatchOpen}>
 				<DialogHeader>
 					<DialogTitle>Edit match</DialogTitle>
 					<DialogDescription>
@@ -404,9 +397,21 @@ function ParticipantCard({
 			</CardHeader>
 			<CardContent className="grid gap-5">
 				<dl className="grid grid-cols-3 gap-3">
-					<WarbandStat label="KDs given" value={stats.knockdownsGiven} />
-					<WarbandStat label="Injuries given" value={stats.injuriesGiven} />
-					<WarbandStat label="Deaths given" value={stats.deathsGiven} />
+					<StatTile
+						label="KDs given"
+						value={stats.knockdownsGiven}
+						variant="compact"
+					/>
+					<StatTile
+						label="Injuries given"
+						value={stats.injuriesGiven}
+						variant="compact"
+					/>
+					<StatTile
+						label="Deaths given"
+						value={stats.deathsGiven}
+						variant="compact"
+					/>
 				</dl>
 
 				<div>
@@ -476,21 +481,6 @@ function ParticipantWarrior({
 			>
 				View
 			</LinkButton>
-		</div>
-	);
-}
-
-function WarbandStat({
-	label,
-	value,
-}: {
-	label: string;
-	value: number | string;
-}) {
-	return (
-		<div className="rounded-xl bg-muted border px-3 py-2">
-			<dt className="text-xs text-muted-foreground">{label}</dt>
-			<dd className="mt-0.5 truncate font-medium text-foreground">{value}</dd>
 		</div>
 	);
 }

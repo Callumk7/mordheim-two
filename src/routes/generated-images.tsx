@@ -109,7 +109,7 @@ function GeneratedImagesPage() {
 										>
 											<GeneratedImage id={image.id} prompt={image.prompt} />
 										</Button>
-										<Dialog className="max-h-[90dvh] overflow-y-auto sm:max-w-3xl">
+										<Dialog className="max-h-[90dvh]" size="lg">
 											<DialogTitle className="pr-8">
 												Generated image
 											</DialogTitle>

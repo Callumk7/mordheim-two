@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { TextField } from "react-aria-components";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
 	Field,
 	FieldDescription,
@@ -65,47 +66,51 @@ export function ImageGenerationSettingsForm({
 	}
 
 	return (
-		<form
-			className="space-y-4 rounded-xl border border-border bg-card p-6"
-			onSubmit={(event) => {
-				event.preventDefault();
-				void submit();
-			}}
-		>
-			<TextField
-				value={instructions}
-				onChange={(value) => {
-					setInstructions(value);
-					setError("");
-				}}
-				isRequired
-				isDisabled={isSubmitting}
-				isInvalid={Boolean(error)}
-			>
-				<Field>
-					<FieldLabel>Base image-generation instructions</FieldLabel>
-					<FieldDescription>
-						Used as the prompt-refiner system brief for every subsequent
-						generation job, including portraits, match aftermaths, event
-						illustrations, and the queue playground. Maximum{" "}
-						{IMAGE_GENERATION_INSTRUCTIONS_MAX_LENGTH} characters.
-					</FieldDescription>
-					<Textarea
-						name="instructions"
-						rows={12}
-						className="min-h-64 font-mono text-sm"
-					/>
-					<FieldError>{error}</FieldError>
-				</Field>
-			</TextField>
-			<p className="text-xs text-muted-foreground">
-				{instructions.trim().length} /{" "}
-				{IMAGE_GENERATION_INSTRUCTIONS_MAX_LENGTH}
-			</p>
-			<Button type="submit" isDisabled={isSubmitting}>
-				{isSubmitting ? "Saving…" : "Save instructions"}
-			</Button>
-			<output className="block break-words text-sm">{message}</output>
-		</form>
+		<Card>
+			<CardContent>
+				<form
+					className="space-y-4"
+					onSubmit={(event) => {
+						event.preventDefault();
+						void submit();
+					}}
+				>
+					<TextField
+						value={instructions}
+						onChange={(value) => {
+							setInstructions(value);
+							setError("");
+						}}
+						isRequired
+						isDisabled={isSubmitting}
+						isInvalid={Boolean(error)}
+					>
+						<Field>
+							<FieldLabel>Base image-generation instructions</FieldLabel>
+							<FieldDescription>
+								Used as the prompt-refiner system brief for every subsequent
+								generation job, including portraits, match aftermaths, event
+								illustrations, and the queue playground. Maximum{" "}
+								{IMAGE_GENERATION_INSTRUCTIONS_MAX_LENGTH} characters.
+							</FieldDescription>
+							<Textarea
+								name="instructions"
+								rows={12}
+								className="min-h-64 font-mono text-sm"
+							/>
+							<FieldError>{error}</FieldError>
+						</Field>
+					</TextField>
+					<p className="text-xs text-muted-foreground">
+						{instructions.trim().length} /{" "}
+						{IMAGE_GENERATION_INSTRUCTIONS_MAX_LENGTH}
+					</p>
+					<Button type="submit" isDisabled={isSubmitting}>
+						{isSubmitting ? "Saving…" : "Save instructions"}
+					</Button>
+					<output className="block break-words text-sm">{message}</output>
+				</form>
+			</CardContent>
+		</Card>
 	);
 }

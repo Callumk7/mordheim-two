@@ -1,6 +1,7 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { CatalogueItem } from "@/components/shared/catalogue-item";
 import { EmptyState } from "@/components/shared/empty-state";
 import { IndexPage, IndexPageHeader } from "@/components/shared/index-page";
 import { Page, PageError, PagePending } from "@/components/shared/page";
@@ -130,66 +131,64 @@ function EquipmentPage() {
 						) : (
 							<div className="grid gap-3">
 								{visible.map((item) => (
-									<details
+									<CatalogueItem
 										key={item.id}
-										className="rounded-xl border border-border bg-card text-card-foreground"
+										summary={
+											<>
+												<span className="font-semibold">{item.name}</span>
+												<span className="ml-3 text-sm text-muted-foreground">
+													{item.type} · {item.cost ?? "Cost not stated"}
+												</span>
+											</>
+										}
 									>
-										<summary className="cursor-pointer rounded-xl px-5 py-4 focus-visible:outline-2 focus-visible:outline-ring">
-											<span className="font-semibold">{item.name}</span>
-											<span className="ml-3 text-sm text-muted-foreground">
-												{item.type} · {item.cost ?? "Cost not stated"}
-											</span>
-										</summary>
-										<div className="grid gap-5 border-t border-border p-5 text-sm">
-											<dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-												{[
-													["Availability", item.availability],
-													["Range", item.range],
-													["Strength", item.strength],
-													["Save", item.save],
-												].map(([label, value]) => (
-													<div key={label}>
-														<dt className="text-muted-foreground">{label}</dt>
-														<dd className="mt-1">{value ?? "—"}</dd>
-													</div>
-												))}
-											</dl>
-											<p>
-												<span className="font-semibold">Special rules: </span>
-												{item.specialRules.join(", ") || "None listed"}
-											</p>
-											{item.notes && (
-												<p className="whitespace-pre-wrap">
-													<span className="font-semibold">Notes: </span>
-													{item.notes}
-												</p>
-											)}
-											{item.sourceUrl &&
-												/^https?:\/\//i.test(item.sourceUrl) && (
-													<a
-														href={item.sourceUrl}
-														target="_blank"
-														rel="noreferrer"
-														className="text-primary underline"
-													>
-														View original source ↗
-													</a>
-												)}
-											{item.sourceText && (
-												<div>
-													<Typography variant="sectionTitle" className="mb-2">
-														Full source text
-													</Typography>
-													<p className="whitespace-pre-wrap break-words leading-relaxed">
-														{item.sourceText}
-													</p>
+										<dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+											{[
+												["Availability", item.availability],
+												["Range", item.range],
+												["Strength", item.strength],
+												["Save", item.save],
+											].map(([label, value]) => (
+												<div key={label}>
+													<dt className="text-muted-foreground">{label}</dt>
+													<dd className="mt-1">{value ?? "—"}</dd>
 												</div>
-											)}
-											<p className="break-all font-mono text-xs text-muted-foreground">
-												ID: {item.id}
+											))}
+										</dl>
+										<p>
+											<span className="font-semibold">Special rules: </span>
+											{item.specialRules.join(", ") || "None listed"}
+										</p>
+										{item.notes && (
+											<p className="whitespace-pre-wrap">
+												<span className="font-semibold">Notes: </span>
+												{item.notes}
 											</p>
-										</div>
-									</details>
+										)}
+										{item.sourceUrl && /^https?:\/\//i.test(item.sourceUrl) && (
+											<a
+												href={item.sourceUrl}
+												target="_blank"
+												rel="noreferrer"
+												className="text-primary underline"
+											>
+												View original source ↗
+											</a>
+										)}
+										{item.sourceText && (
+											<div>
+												<Typography variant="sectionTitle" className="mb-2">
+													Full source text
+												</Typography>
+												<p className="whitespace-pre-wrap break-words leading-relaxed">
+													{item.sourceText}
+												</p>
+											</div>
+										)}
+										<p className="break-all font-mono text-xs text-muted-foreground">
+											ID: {item.id}
+										</p>
+									</CatalogueItem>
 								))}
 							</div>
 						)}

@@ -83,11 +83,7 @@ function EventsIndexPage() {
 				/>
 			)}
 
-			<Dialog
-				className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl"
-				isOpen={isNewEventOpen}
-				onOpenChange={setIsNewEventOpen}
-			>
+			<Dialog isOpen={isNewEventOpen} onOpenChange={setIsNewEventOpen}>
 				<DialogHeader>
 					<DialogTitle>New event</DialogTitle>
 					<DialogDescription>

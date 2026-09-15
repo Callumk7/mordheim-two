@@ -69,11 +69,7 @@ function MatchesIndexPage() {
 				/>
 			)}
 
-			<Dialog
-				className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl"
-				isOpen={isNewMatchOpen}
-				onOpenChange={setIsNewMatchOpen}
-			>
+			<Dialog isOpen={isNewMatchOpen} onOpenChange={setIsNewMatchOpen}>
 				<DialogHeader>
 					<DialogTitle>New match</DialogTitle>
 					<DialogDescription>

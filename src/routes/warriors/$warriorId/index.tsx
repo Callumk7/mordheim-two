@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { EntityHeader, EntityToolbar } from "@/components/shared/entity-chrome";
-import { CombatStatValue } from "@/components/shared/stat-display";
+import { CombatStatValue, StatTile } from "@/components/shared/stat-display";
 import { Typography } from "@/components/shared/typography";
 import { WarriorEquipment } from "@/components/warrior-equipment";
 import { WarriorPortrait } from "@/components/warrior-portrait";
@@ -81,7 +81,11 @@ function WarriorDetailPage() {
 						Combat stats
 					</Typography>
 					<dl className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
-						<Stat label="Status" value={combat.isDead ? "Dead" : "Alive"} />
+						<StatTile
+							label="Status"
+							value={combat.isDead ? "Dead" : "Alive"}
+							variant="compact"
+						/>
 						<CombatStat
 							label="Knockdowns given"
 							stat="knockdownsGiven"
@@ -144,20 +148,10 @@ function CombatStat({
 	stats: CombatStats;
 }) {
 	return (
-		<div className="rounded-xl bg-muted/40 p-3">
-			<dt className="text-xs text-muted-foreground">{label}</dt>
-			<dd className="mt-1 font-mono text-foreground">
-				<CombatStatValue stat={stat} stats={stats} />
-			</dd>
-		</div>
-	);
-}
-
-function Stat({ label, value }: { label: string; value: number | string }) {
-	return (
-		<div className="rounded-xl bg-muted/40 p-3">
-			<dt className="text-xs text-muted-foreground">{label}</dt>
-			<dd className="mt-1 font-mono text-foreground">{value}</dd>
-		</div>
+		<StatTile
+			label={label}
+			value={<CombatStatValue stat={stat} stats={stats} />}
+			variant="compact"
+		/>
 	);
 }

@@ -44,10 +44,10 @@ These are the building blocks later issues should extend instead of inventing pa
 | Page shell | `src/components/shared/page.tsx` | Campaign `<main>` width/padding (`max-w-6xl` / `py-10`), plus `narrow` (`max-w-3xl`), `form` (`max-w-2xl`), `wide` (`max-w-7xl`), and `loose` padding; `PagePending` / `PageError` | Nested detail/delete columns still use local `max-w-3xl` / `max-w-2xl` wrappers; projector stays on its own landmark |
 | Index page stack | `src/components/shared/index-page.tsx` | `grid gap-8`, list header | Used only on collection indexes; match detail and admin headers still local |
 | Entity chrome | `src/components/shared/entity-chrome.tsx`, `src/components/shared/empty-state.tsx` | Entity toolbar/header, not-found, destructive confirmation, and dashed-empty variants | Shared across entity routes; projector remains local |
-| Card | `src/components/ui/card.tsx` | `rounded-2xl`, `ring-1 ring-foreground/10`, `--card-spacing` | Many routes rebuild cards with `rounded-xl border border-border` |
+| Card | `src/components/ui/card.tsx` | `rounded-2xl`, `ring-1 ring-foreground/10`, `--card-spacing`; equipment accordion via `CatalogueItem` | Data-table wrapper and `NotFoundPanel` still use `rounded-xl border border-border`; projector stays on its own surface |
 | Button / LinkButton | `src/components/ui/button.tsx` | `rounded-4xl` variants and sizes | Home CTAs, delete cancels, nav, not-found links, and several keep/cancel links use custom `Link` classes |
-| Stat tile / leaderboard | `src/components/shared/stat-display.tsx` | Metric cards, leaderboard heading, reserved dashed section | Warband detail reimplements `MetricCard` and a local `EmptyState` |
-| Dialog | `src/components/ui/dialog.tsx` | Dialog chrome | Almost every create/edit dialog repeats `className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl"` |
+| Stat tile / leaderboard | `src/components/shared/stat-display.tsx` | Metric `StatTile`, compact inner-tile variant, `HeroStat`, leaderboard heading, reserved dashed section | None remaining on the migrate list |
+| Dialog | `src/components/ui/dialog.tsx` | Form default `max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl`; `size="lg"` lightbox (`sm:max-w-3xl`); `size="xl"` match completion (`sm:max-w-4xl`) | Lightbox still overrides max-height with `max-h-[90dvh]` |
 
 Canonical list-page shell is `<Page>` (`mx-auto w-full max-w-6xl px-4 py-10 sm:px-8`). Collection layouts, equipment, stats, home (`padding="loose"`), and the default 404 use it. `/settings` uses `width="narrow"`, `/queue` uses `width="form"`, and `/queue-jobs` plus `/generated-images` use `width="wide"`.
 
@@ -120,16 +120,23 @@ Decide once whether Cormorant (`font-serif`) is for entity names in lists/cards 
 
 **Ship.** Reuse Issue A shell and Issue B page title. Extract `AdminPageHeader` (title, description, related-link cluster, optional refresh). Shared pending (`p-6` paragraph) and error (`section space-y-4 p-6`) components.
 
-### Issue E — Surfaces, metrics, and dialog defaults (P2)
+### Issue E — Surfaces, metrics, and dialog defaults (P2) — shipped (MOR-57)
 
 **Problem.** Route-local “cards” fight the `Card` primitive. Metric tiles are duplicated. Dialog max-width is copy-pasted.
 
-**Ship.**
+**Shipped.**
 
 - Prefer `Card` over `rounded-xl border border-border bg-card`
 - Fold warband `MetricCard` into `StatTile` (label casing is the only real difference)
+- Compact `StatTile` variant for warrior muted tiles and match `WarbandStat`
 - Default form-dialog class on `Dialog` (`max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl`)
-- Shared catalogue/accordion surface if equipment stays a details list
+- Wider dialog variants: match completion `size="xl"` (`sm:max-w-4xl`), generated-image lightbox `size="lg"` (`sm:max-w-3xl`, plus `max-h-[90dvh]`)
+- Shared `CatalogueItem` accordion surface for the equipment catalogue
+- Shared `SectionHeading` and `HeroStat` (lifted from warband detail)
+
+**Migrated.** Equipment catalogue, warband hero + metrics, queue family leftovers (settings form), warrior/match compact tiles, form dialogs listed in the audit.
+
+**Left local.** Data-table wrapper. `NotFoundPanel` still uses the old `rounded-xl border` surface internally. `/projector`.
 
 ### Issue F — Ad-hoc buttons and links (P2)
 
@@ -214,23 +221,17 @@ Keep {entity} → rounded-lg border border-input px-5 py-2.5 font-semibold
 
 Four near-copies: warband/warrior/match delete and event void. Event void adds a reason field; “Keep event” omits `hover:text-foreground` present on the other three keep links.
 
-### 8. Ad-hoc card surface
+### 8. Ad-hoc card surface — folded into `Card` (MOR-57)
 
-```txt
-rounded-xl border border-border bg-card
-```
+Equipment catalogue uses `CatalogueItem` (`Card` wrapping `<details>`). Queue form, jobs table wrapper, generated-image tiles/empty copy, warband hero, and the settings instructions form use `Card`. Remaining `rounded-xl border border-border bg-card` surfaces are entity not-found panels (Issue C), the data-table wrapper, and projector.
 
-Equipment accordion, queue form, queue-jobs table wrapper, generated-image tiles and empty copy. The `Card` primitive is `rounded-2xl` with a ring, not a border. Mixing them on adjacent screens is visible.
+### 9. Metric tiles — folded into `StatTile` (MOR-57)
 
-Warband hero uses yet another surface: `rounded-2xl border border-border bg-card shadow-sm`.
+`StatTile` (`text-sm` label, `font-mordheim text-4xl` value) is the campaign metric card. Warband match/combat records use it (replacing local `MetricCard`). Compact variant (`rounded-xl border bg-muted/40`, `font-mono`) covers warrior combat tiles and match participant stats. `HeroStat` is the warband hero footer cell with breakpoint-specific left borders.
 
-### 9. Metric tiles
+### 10. Form dialog width — folded into `Dialog` (MOR-57)
 
-`StatTile` (`text-sm` label, `font-mordheim text-4xl` value) vs warband `MetricCard` (`text-xs uppercase tracking-wide` label, same value treatment). Warrior detail uses a third: `rounded-xl bg-muted/40 p-3` + `font-mono`. Match participant stats use a fourth: `rounded-xl bg-muted border px-3 py-2`.
-
-### 10. Form dialog width
-
-`className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl"` on every create/edit dialog except match completion (`sm:max-w-4xl`) and generated-image lightbox (`sm:max-w-3xl`).
+`Dialog` defaults to `max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-2xl`. Match completion uses `size="xl"` (`sm:max-w-4xl`). Generated-image lightbox uses `size="lg"` (`sm:max-w-3xl`) and overrides max-height with `max-h-[90dvh]`.
 
 ### 11. Pending and error — folded into `PagePending` / `PageError` (MOR-54)
 
@@ -292,11 +293,11 @@ Canonical `<Page>`. Index, detail, and delete all inherit it.
 
 #### `/warbands/` index (`src/routes/warbands/index.tsx`)
 
-Uses `IndexPage` + `IndexPageHeader` + shared `EmptyState`. Table vs empty. Create dialog uses the repeated max-height class.
+Uses `IndexPage` + `IndexPageHeader` + shared `EmptyState`. Table vs empty. Create dialog inherits the `Dialog` form default.
 
 **Inconsistencies.** None on the list shell; all indexes import `IndexPage*` from `@/components/shared/index-page`.
 
-**Verify.** Header title “Warbands”, “New warband” on the right, empty dashed state, populated table, dialog scroll/width.
+**Verify.** Header title “Warbands”, “New warband” on the right, empty dashed state, populated table, dialog scroll/width (inherited from `Dialog`).
 
 #### `/warbands/$warbandId` not-found (`src/routes/warbands/$warbandId/route.tsx`)
 
@@ -311,13 +312,13 @@ The visually richest campaign screen, and the largest source of route-local prim
 | Axis | Finding |
 | --- | --- |
 | Layout | `grid gap-10` (indexes use `gap-8`). Full width of collection main (not `max-w-3xl` like warrior/event). Hero is a two-column grid `lg:grid-cols-[minmax(0,1fr)_auto]`. Hero stats `sm:grid-cols-2 lg:grid-cols-5`. Metric grids `sm:grid-cols-2 lg:grid-cols-5`. Living roster `md:grid-cols-2`. Graveyard `sm:grid-cols-2 lg:grid-cols-3`. Event log `sm:grid-cols-[auto_minmax(0,1fr)_auto]`. |
-| Surface | Custom hero (`rounded-2xl border … shadow-sm`) instead of `Card`. Hero stat row `bg-muted/20` with breakpoint-specific left borders. Local `EmptyState` (`rounded-2xl` dashed). Graveyard cards add extra `border` on top of `Card`. Event outcome chips are ad-hoc pills. |
+| Surface | Hero uses `Card` wrapping shared `EntityHeader`. Hero stat row `bg-muted/20` with breakpoint-specific left borders via shared `HeroStat`. Shared dashboard `EmptyState`. Graveyard cards tint with `bg-muted/20` on `Card`. Event outcome chips are ad-hoc pills. |
 | Spacing | Section headings then `mt-5` grids. Toolbar has no `mb-*` (gap-10 on the parent provides it). |
 | Alignment | Toolbar space-between. Hero rating right-aligned. Event timestamps `sm:text-right`. Roster cards space-between. |
 | Responsive | Hero stats borders: `sm:[&:not(:nth-child(odd))]:border-l` vs `lg:[&:not(:first-child)]:border-l` — at `sm` even columns get a divider; at `lg` every column but the first does. Easy to regress. |
-| Typography | Hero title `font-mordheim text-5xl sm:text-6xl` (larger than list/match titles). Section titles `font-mordheim text-3xl`. Roster names `font-serif text-xl`. Local `SectionHeading` eyebrows match the global eyebrow pattern. |
+| Typography | Hero title `font-mordheim text-5xl sm:text-6xl` (larger than list/match titles). Section titles `font-mordheim text-3xl`. Roster names `font-serif text-xl`. Shared `SectionHeading` eyebrows match the global eyebrow pattern. |
 
-**Local components to lift.** `SectionHeading`, `EmptyState`, `MetricCard`, `HeroStat`.
+**Local components remaining.** None from this ticket. `SectionHeading`, `HeroStat`, and `StatTile` live in `src/components/shared/`; empties use shared `EmptyState`.
 
 **Verify after migration.**
 
@@ -358,7 +359,7 @@ Same not-found panel as warband.
 | Axis | Finding |
 | --- | --- |
 | Layout | Extra `mx-auto max-w-3xl` inside collection main. Stack of toolbar, border header, then cards with `mt-7`. |
-| Surface | Header is a bottom border only (no hero card, unlike warband). Portrait, equipment, stats, and form use `Card`. Stat cells are muted tiles, not `StatTile`. |
+| Surface | Header is a bottom border only (no hero card, unlike warband). Portrait, equipment, stats, and form use `Card`. Stat cells use compact `StatTile`. |
 | Spacing | `mt-7` between major blocks vs warband `gap-10` vs match `gap-8`. |
 | Alignment | Same toolbar as other entities. Stats `grid-cols-2 sm:grid-cols-3`. |
 | Responsive | Narrow column reads well on desktop but wastes the collection max-width; warband/match details stay wide. |
@@ -379,7 +380,7 @@ Same destructive confirm as warband delete.
 | Axis | Finding |
 | --- | --- |
 | Layout | Own `<Page>` (no `equipment/route.tsx`) wrapping `IndexPage`. Pending/error use `PagePending` / `PageError`. |
-| Surface | Catalogue rows are `<details>` with `rounded-xl border border-border bg-card`, not `Card`. |
+| Surface | Catalogue rows use shared `CatalogueItem` (`Card` wrapping `<details>`). |
 | Spacing | Filters `flex-col gap-4 sm:flex-row sm:items-end`. Accordion list `grid gap-3`. |
 | Alignment | Filter buttons sit at end of the search field on `sm+`. |
 | Responsive | Inner dl `sm:grid-cols-2 lg:grid-cols-4`. |
@@ -410,7 +411,7 @@ Same not-found panel.
 | Axis | Finding |
 | --- | --- |
 | Layout | `grid gap-8` (matches indexes, not warband’s `gap-10`). Full width. Participant cards `lg:grid-cols-2`. Warrior rows change columns at `sm`. |
-| Surface | Page header is a bottom border (like warrior/event), not a hero card. Participants use `Card`. Empty participants: dashed `py-12`. Warrior rows: `rounded-lg border bg-background`. WarbandStat tiles: `rounded-xl bg-muted border`. |
+| Surface | Page header is a bottom border (like warrior/event), not a hero card. Participants use `Card`. Empty participants: dashed `py-12`. Warrior rows: `rounded-lg border bg-background`. WarbandStat tiles use compact `StatTile`. |
 | Spacing | Header `pb-7` matches `IndexPageHeader`. Duplicate “Add event” in the page header **and** the events section header. |
 | Alignment | Header actions wrap (`md:items-end`). Events heading row `sm:flex-row sm:items-end`. |
 | Responsive | Participant warrior stats collapse to a single extra line on small screens (`sm:hidden` / `sm:block`). |
@@ -477,25 +478,25 @@ These four routes now use `Page` (Issue A) but still share a second header langu
 
 #### `/settings` (`src/routes/settings.tsx`)
 
-`Page width="narrow"` (`max-w-3xl`). Header links sit **above** the description. Pending/error use `PagePending` / `PageError`. Form is a child component, not wrapped in `Card` here.
+`Page width="narrow"` (`max-w-3xl`). Header links sit **above** the description. Pending/error use `PagePending` / `PageError`. Form is wrapped in `Card` inside `ImageGenerationSettingsForm`.
 
 **Verify.** Title, three related links, description, instructions form, loading and D1 error retry.
 
 #### `/queue` (`src/routes/queue.tsx`)
 
-`Page width="form"` (`max-w-2xl`). Same header cluster (jobs/images/settings). Form uses ad-hoc card (`rounded-xl border … p-6`), not `Card`. No pending/error route components.
+`Page width="form"` (`max-w-2xl`). Same header cluster (jobs/images/settings). Form uses `Card`. No pending/error route components.
 
 **Verify.** Title, links, prompt/model/submit, status `output`, footer note.
 
 #### `/queue-jobs` (`src/routes/queue-jobs.tsx`)
 
-`Page width="wide"` (`max-w-7xl`) — **wider than campaign pages, by product decision**. Header is `items-start justify-between` with actions on the right (closer to `IndexPageHeader` than settings). Table wrapped in ad-hoc card. `Table` has `min-w-5xl` so the card must scroll horizontally on smaller viewports; there is no explicit `overflow-x-auto` on the wrapper.
+`Page width="wide"` (`max-w-7xl`) — **wider than campaign pages, by product decision**. Header is `items-start justify-between` with actions on the right (closer to `IndexPageHeader` than settings). Table wrapped in `Card`. `Table` has `min-w-5xl` so the card must scroll horizontally on smaller viewports; there is no explicit `overflow-x-auto` on the wrapper.
 
 **Verify.** Title, related links, refresh, empty table, populated columns, pending, retry error.
 
 #### `/generated-images` (`src/routes/generated-images.tsx`)
 
-`Page width="wide"` (`max-w-7xl`) like jobs. Empty is a solid card paragraph. Grid `sm:2 lg:3 xl:4`. Tiles are ad-hoc cards. Lightbox dialog `sm:max-w-3xl`.
+`Page width="wide"` (`max-w-7xl`) like jobs. Empty is a `Card` paragraph. Grid `sm:2 lg:3 xl:4`. Tiles use `Card`. Lightbox dialog `size="lg"` (`sm:max-w-3xl`) with `max-h-[90dvh]`.
 
 **Verify.** Title, links, refresh, empty copy, grid, enlarge dialog, image error text.
 
@@ -536,10 +537,12 @@ Concrete replacements for follow-on PRs. Names are suggestions; match existing `
 | `NotFoundPanel` | Five not-found cards | Entity routes + `router.tsx` |
 | `EmptyState` | Index, dialog, match, warband empties | List pages, warband dashboard, match detail |
 | `DestructiveConfirm` | Four delete/void pages | Warband, warrior, match, event |
-| `SectionHeading` | Warband local heading; optionally match section titles | Warband detail, then match/stats |
-| `StatTile` (extend) | Warband `MetricCard` | Warband + stats |
+| `SectionHeading` | **Shipped (MOR-57).** Warband local heading | Warband detail |
+| `StatTile` (extend) | **Shipped (MOR-57).** Warband `MetricCard` plus compact warrior/match tiles | Warband + stats + warrior + match |
+| `HeroStat` | **Shipped (MOR-57).** Warband hero footer cells | Warband detail |
+| `CatalogueItem` | **Shipped (MOR-57).** Equipment `<details>` accordion | `/equipment` |
 | `NavLink` | Eight root `Link`s | `__root.tsx` |
-| `Dialog` default class | Repeated max-height/width | All form dialogs |
+| `Dialog` default class | **Shipped (MOR-57).** Repeated max-height/width; `size="lg"`/`size="xl"` variants | All form dialogs; completion; lightbox |
 | `AdminRelatedLinks` | Repeated queue/settings/gallery `LinkButton` rows | Four diagnostic routes |
 | Typography utilities or a short heading component | Mixed `font-mordheim` / `font-serif` titles | After Issue B decision |
 
@@ -568,17 +571,17 @@ Legend: **S** shell/padding/width · **T** typography · **C** chrome (toolbar/e
 | Route | S | T | C | R | Checks |
 | --- | --- | --- | --- | --- | --- |
 | `/` | ✓ | | | | Display title; four CTAs use shared buttons; loose vertical padding |
-| `/warbands` | ✓ | | | | `Page` + `PageHeader`; empty dashed; new dialog |
-| `/warbands/$id` | ✓ | | | | Toolbar; hero; five-up stats at lg; empties; leaderboard |
+| `/warbands` | ✓ | | ✓ | | `Page` + `PageHeader`; empty dashed; new dialog inherits form default |
+| `/warbands/$id` | ✓ | | ✓ | | Toolbar; `Card` hero; five-up `StatTile`s at lg; empties; leaderboard |
 | `/warbands/$id` unknown | ✓ | | | | Shared not-found panel |
 | `/warbands/$id/delete` | ✓ | | | | Shared destructive confirm |
 | `/warriors` | ✓ | | | | Same list pattern as warbands; gated dialog empty |
-| `/warriors/$id` | ✓ | | | | Title on the agreed scale; cards; stats tiles |
+| `/warriors/$id` | ✓ | | ✓ | | Title on the agreed scale; cards; compact `StatTile`s |
 | `/warriors/$id` unknown | ✓ | | | | Shared not-found |
 | `/warriors/$id/delete` | ✓ | | | | Shared destructive confirm |
-| `/equipment` | ✓ | | | | Same shell as lists; pending/error use `Page`; accordion surface |
+| `/equipment` | ✓ | | ✓ | | Same shell as lists; pending/error use `Page`; `CatalogueItem` accordion |
 | `/matches` | ✓ | | | | Same list pattern |
-| `/matches/$id` | ✓ | | | | Header actions wrap; events + rosters; empty participants |
+| `/matches/$id` | ✓ | | ✓ | | Header actions wrap; events + rosters; compact participant tiles |
 | `/matches/$id` unknown | ✓ | | | | Shared not-found |
 | `/matches/$id/delete` | ✓ | | | | Shared destructive confirm |
 | `/stats` | ✓ | | | | Same shell as lists; totals/charts/leaderboards; reserved panel width |
@@ -586,11 +589,11 @@ Legend: **S** shell/padding/width · **T** typography · **C** chrome (toolbar/e
 | `/events/$id` | ✓ | | | | Same detail chrome as warrior; void hidden when voided |
 | `/events/$id` unknown | ✓ | | | | Shared not-found |
 | `/events/$id/delete` | ✓ | | | | Destructive confirm + reason field |
-| `/settings` | ✓ | | | | Campaign shell + page title scale; related links; error retry |
-| `/queue` | ✓ | | | | Same header cluster; form on `Card` |
-| `/queue-jobs` | ✓ | | | | Same header; table scrolls; width decision documented |
-| `/generated-images` | ✓ | | | | Same header; empty; grid 1/2/3/4 cols; lightbox |
-| `/projector` | ✓ | | | | Unchanged broadcast layout; app nav still hidden |
+| `/settings` | ✓ | | ✓ | | Campaign shell + page title scale; related links; form on `Card` |
+| `/queue` | ✓ | | ✓ | | Same header cluster; form on `Card` |
+| `/queue-jobs` | ✓ | | ✓ | | Same header; table scrolls; width decision documented |
+| `/generated-images` | ✓ | | ✓ | | Same header; empty; grid 1/2/3/4 cols; lightbox `size="lg"` |
+| `/projector` | ✓ | | ✓ | | Unchanged broadcast layout; app nav still hidden |
 | Unknown URL | ✓ | | | | Default not-found uses shared panel |
 
 **Width decision (MOR-54).** `/queue-jobs` and `/generated-images` stay `width="wide"` (`max-w-7xl`). Do not shrink them to `max-w-6xl` when ticking **S**.
