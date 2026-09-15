@@ -1,5 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
-import { Trash2 } from "lucide-react";
+import { Archive } from "lucide-react";
 import { useMemo } from "react";
 import type { Match } from "@/db/validation/match";
 import type { Warband } from "@/db/validation/warband";
@@ -53,7 +53,7 @@ export function MatchesTable({ matches, warbands }: MatchesTableProps) {
 					cell: ({ row }) => (
 						<TableActions>
 							<Button
-								aria-label={`Delete ${row.original.name}`}
+								aria-label={`Archive ${row.original.name}`}
 								onPress={() =>
 									navigate({
 										to: "/matches/$matchId/delete",
@@ -63,7 +63,7 @@ export function MatchesTable({ matches, warbands }: MatchesTableProps) {
 								size="icon-xs"
 								variant="destructive"
 							>
-								<Trash2 aria-hidden="true" />
+								<Archive aria-hidden="true" />
 							</Button>
 						</TableActions>
 					),
