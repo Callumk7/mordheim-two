@@ -1,5 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
-import { Trash2 } from "lucide-react";
+import { Archive } from "lucide-react";
 import { useMemo } from "react";
 import { CombatStatValue } from "@/components/shared/stat-display";
 import type { Warrior } from "@/db/validation/warrior";
@@ -112,7 +112,7 @@ export function WarriorsTable({
 					cell: ({ row }) => (
 						<TableActions>
 							<Button
-								aria-label={`Delete ${row.original.name}`}
+								aria-label={`Archive ${row.original.name}`}
 								onPress={() =>
 									navigate({
 										to: "/warriors/$warriorId/delete",
@@ -122,7 +122,7 @@ export function WarriorsTable({
 								size="icon-xs"
 								variant="destructive"
 							>
-								<Trash2 aria-hidden="true" />
+								<Archive aria-hidden="true" />
 							</Button>
 						</TableActions>
 					),

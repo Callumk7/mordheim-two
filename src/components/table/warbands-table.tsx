@@ -1,5 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
-import { ChevronRight, Eye, Trash2, Users } from "lucide-react";
+import { Archive, ChevronRight, Eye, Users } from "lucide-react";
 import { useMemo } from "react";
 import { CombatStatValue } from "@/components/shared/stat-display";
 import type { Warband } from "@/db/validation/warband";
@@ -222,7 +222,7 @@ export function WarbandsTable({
 					cell: ({ row }) => (
 						<TableActions>
 							<Button
-								aria-label={`Delete ${row.original.name}`}
+								aria-label={`Archive ${row.original.name}`}
 								onPress={() =>
 									navigate({
 										to: "/warbands/$warbandId/delete",
@@ -232,7 +232,7 @@ export function WarbandsTable({
 								size="icon-xs"
 								variant="destructive"
 							>
-								<Trash2 aria-hidden="true" />
+								<Archive aria-hidden="true" />
 							</Button>
 						</TableActions>
 					),
