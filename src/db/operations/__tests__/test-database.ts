@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { drizzle } from "drizzle-orm/d1";
 import { getPlatformProxy } from "wrangler";
 import * as schema from "@/db/schema";
+import { seedCampaign } from "./fixtures";
 
 // A fresh workerd D1 binding per test: no production config, remote bindings,
 // persisted developer database, or test-owned implementation of transactions.
@@ -28,8 +29,10 @@ export async function createTestDatabase() {
 				statements.map((statement) => platform.env.DB.prepare(statement)),
 			);
 		}
+		const db = drizzle(platform.env.DB, { schema });
+		await seedCampaign(db);
 		return {
-			db: drizzle(platform.env.DB, { schema }),
+			db,
 			binding: platform.env.DB,
 			dispose: platform.dispose,
 		};

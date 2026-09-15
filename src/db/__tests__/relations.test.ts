@@ -14,6 +14,7 @@ import { WarbandMatchSchema } from "../validation/warband-match";
 
 const validEvent = {
 	id: "event-1",
+	campaignId: "campaign-1",
 	matchId: "match-1",
 	attackerWarbandId: "warband-a",
 	attackerWarriorId: "warrior-a",
@@ -25,6 +26,7 @@ const validEvent = {
 describe("match results", () => {
 	const validMatch = {
 		id: "match-1",
+		campaignId: "campaign-1",
 		name: "The Encounter",
 		scenario: "Street Fight",
 		status: "Completed" as const,

@@ -4,6 +4,7 @@ import { WarriorSchema, WarriorUpdateInputSchema } from "../validation/warrior";
 
 const validWarrior = {
 	id: "warrior-1",
+	campaignId: "campaign-1",
 	name: "Marius",
 	class: "Champion",
 	status: "Alive" as const,

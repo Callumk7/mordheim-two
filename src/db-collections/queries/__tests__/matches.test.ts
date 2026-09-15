@@ -78,6 +78,7 @@ function createCollections({
 function warband(id: string, name = id): Warband {
 	return {
 		id,
+		campaignId: "campaign-1",
 		name,
 		faction: "Mercenaries",
 		bio: null,
@@ -94,6 +95,7 @@ function warband(id: string, name = id): Warband {
 function warrior(id: string, warbandId: string, name = id): Warrior {
 	return {
 		id,
+		campaignId: "campaign-1",
 		name,
 		class: "Hero",
 		status: "Alive",
@@ -119,6 +121,7 @@ function participant(
 function event(id: string, createdAt: string, matchId = "match-1"): Event {
 	return {
 		id,
+		campaignId: "campaign-1",
 		matchId,
 		attackerWarbandId: "alpha",
 		attackerWarriorId: "alpha-warrior",

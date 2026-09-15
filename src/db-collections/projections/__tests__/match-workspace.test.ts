@@ -8,6 +8,7 @@ import { type MatchEventRow, projectMatchWorkspace } from "../match-workspace";
 
 const match: Match = {
 	id: "match-1",
+	campaignId: "campaign-1",
 	name: "The Encounter",
 	scenario: "Street Fight",
 	status: "InProgress",
@@ -20,6 +21,7 @@ const match: Match = {
 function makeWarband(id: string, overrides: Partial<Warband> = {}): Warband {
 	return {
 		id,
+		campaignId: "campaign-1",
 		name: id,
 		faction: "Mercenaries",
 		bio: null,
@@ -51,6 +53,7 @@ function makeWarrior(
 ): Warrior {
 	return {
 		id,
+		campaignId: "campaign-1",
 		name: id,
 		class: "Hero",
 		status: "Alive",
@@ -73,6 +76,7 @@ function makeEvent(
 ): MatchEventRow {
 	const event: Event = {
 		id,
+		campaignId: "campaign-1",
 		matchId: match.id,
 		attackerWarbandId,
 		attackerWarriorId: `${attackerWarbandId}-warrior`,

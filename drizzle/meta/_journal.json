@@ -176,6 +176,13 @@
       "when": 1789487047580,
       "tag": "0024_wandering_cerise",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "6",
+      "when": 1789496841269,
+      "tag": "0025_cheerful_shockwave",
+      "breakpoints": true
     }
   ]
 }

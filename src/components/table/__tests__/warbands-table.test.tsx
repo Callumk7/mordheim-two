@@ -20,6 +20,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 const warbands: Array<Warband & { warriors: [] }> = [
 	{
 		id: "warband-1",
+		campaignId: "campaign-1",
 		name: "Reikland Reavers",
 		faction: "Mercenaries",
 		bio: null,
@@ -34,6 +35,7 @@ const warbands: Array<Warband & { warriors: [] }> = [
 	},
 	{
 		id: "warband-2",
+		campaignId: "campaign-1",
 		name: "Sisters of Sigmar",
 		faction: "Sisters of Sigmar",
 		bio: null,
@@ -73,6 +75,7 @@ async function renderTable(
 	await act(async () => {
 		root.render(
 			<WarbandsTable
+				campaignId="campaign-1"
 				combatStats={projectCombatStats([])}
 				onAddWarrior={handlers.onAddWarrior ?? vi.fn()}
 				onUpdateGold={handlers.onUpdateGold ?? vi.fn(async () => undefined)}
@@ -159,8 +162,8 @@ describe("WarbandsTable", () => {
 		await act(async () => row.click());
 
 		expect(testState.navigate).toHaveBeenCalledWith({
-			to: "/warbands/$warbandId",
-			params: { warbandId: expect.any(String) },
+			to: "/campaigns/$campaignId/warbands/$warbandId",
+			params: { campaignId: "campaign-1", warbandId: expect.any(String) },
 		});
 	});
 });

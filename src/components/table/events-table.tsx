@@ -16,8 +16,16 @@ export type EventTableRow = Event & {
 
 const columnHelper = createDataTableColumnHelper<EventTableRow>();
 
-export function EventsTable({ events }: { events: EventTableRow[] }) {
-	const navigate = useNavigate({ from: "/events" });
+export function EventsTable({
+	campaignId,
+	events,
+}: {
+	campaignId: string;
+	events: EventTableRow[];
+}) {
+	const navigate = useNavigate({
+		from: "/campaigns/$campaignId/events",
+	});
 	const columns = useMemo(
 		() =>
 			columnHelper.columns([
@@ -93,8 +101,8 @@ export function EventsTable({ events }: { events: EventTableRow[] }) {
 									aria-label={`Void event from ${row.original.matchName}`}
 									onPress={() =>
 										navigate({
-											to: "/events/$eventId/delete",
-											params: { eventId: row.original.id },
+											to: "/campaigns/$campaignId/events/$eventId/delete",
+											params: { campaignId, eventId: row.original.id },
 										})
 									}
 									size="icon-xs"
@@ -106,7 +114,7 @@ export function EventsTable({ events }: { events: EventTableRow[] }) {
 						) : null,
 				}),
 			]),
-		[navigate],
+		[campaignId, navigate],
 	);
 	const rows = useMemo(() => events, [events]);
 
@@ -119,8 +127,8 @@ export function EventsTable({ events }: { events: EventTableRow[] }) {
 			itemLabel={{ singular: "event", plural: "events" }}
 			onRowAction={(event) =>
 				navigate({
-					to: "/events/$eventId",
-					params: { eventId: event.id },
+					to: "/campaigns/$campaignId/events/$eventId",
+					params: { campaignId, eventId: event.id },
 				})
 			}
 			searchPlaceholder="Search events…"

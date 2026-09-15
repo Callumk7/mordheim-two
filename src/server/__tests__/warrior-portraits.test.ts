@@ -16,10 +16,11 @@ function setup() {
 	const connection = setupDatabase();
 	connections.push(connection);
 	connection.sqlite.exec(`
-		INSERT INTO warbands (id, name, faction, bio) VALUES ('band', 'The Crows', 'Reikland', 'Veteran treasure hunters');
-		INSERT INTO warriors (id, name, class, description, warband_id) VALUES
-		('warrior', 'Klaus', 'Marksman', 'Scarred face, green hood', 'band'),
-		('other', 'Hans', 'Swordsman', NULL, 'band');
+		INSERT INTO campaigns (id, name) VALUES ('campaign-1', 'City of the Damned');
+		INSERT INTO warbands (id, campaign_id, name, faction, bio) VALUES ('band', 'campaign-1', 'The Crows', 'Reikland', 'Veteran treasure hunters');
+		INSERT INTO warriors (id, campaign_id, name, class, description, warband_id) VALUES
+		('warrior', 'campaign-1', 'Klaus', 'Marksman', 'Scarred face, green hood', 'band'),
+		('other', 'campaign-1', 'Hans', 'Swordsman', NULL, 'band');
 	`);
 	return {
 		...connection,

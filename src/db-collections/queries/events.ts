@@ -1,7 +1,7 @@
 import { type DbClient, eq, useLiveQuery } from "@tanstack/react-db";
 import { getCollections } from "..";
 
-export function useEvents(dbClient: DbClient) {
+export function useEvents(dbClient: DbClient, campaignId: string) {
 	const collections = getCollections(dbClient);
 	const { events, matches, warbands, warriors } = collections;
 
@@ -9,6 +9,7 @@ export function useEvents(dbClient: DbClient) {
 		query: (q) =>
 			q
 				.from({ event: events })
+				.where(({ event }) => eq(event.campaignId, campaignId))
 				.innerJoin({ match: matches }, ({ event, match }) =>
 					eq(event.matchId, match.id),
 				)
@@ -38,6 +39,7 @@ export function useEvents(dbClient: DbClient) {
 						defenderWarrior,
 					}) => ({
 						id: event.id,
+						campaignId: event.campaignId,
 						matchId: event.matchId,
 						attackerWarbandId: event.attackerWarbandId,
 						attackerWarriorId: event.attackerWarriorId,

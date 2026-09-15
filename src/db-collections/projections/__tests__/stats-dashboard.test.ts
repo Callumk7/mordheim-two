@@ -11,6 +11,7 @@ import { projectStatsDashboard } from "@/db-collections/projections/stats-dashbo
 function makeWarband(id: string): Warband {
 	return {
 		id,
+		campaignId: "campaign-1",
 		name: id,
 		faction: "Mercenaries",
 		bio: null,
@@ -27,6 +28,7 @@ function makeWarband(id: string): Warband {
 function makeWarrior(id: string, warbandId: string): Warrior {
 	return {
 		id,
+		campaignId: "campaign-1",
 		name: id,
 		class: "Hero",
 		status: "Alive",

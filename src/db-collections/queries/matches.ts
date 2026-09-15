@@ -23,13 +23,17 @@ export function useMatch(dbClient: DbClient, matchId: string) {
 	return data[0];
 }
 
-export function useMatchParticipants(dbClient: DbClient, matchId: string) {
+export function useMatchParticipants(
+	dbClient: DbClient,
+	campaignId: string,
+	matchId: string,
+) {
 	const collections = getCollections(dbClient);
 	const { data: participants } = useLiveQuery({
 		query: matchParticipantsQuery(collections, matchId),
 	});
 	const { data: allWarbands } = useLiveQuery({
-		query: allWarbandsQuery(collections),
+		query: allWarbandsQuery(collections, campaignId),
 	});
 	return { allWarbands, participants };
 }
@@ -50,9 +54,17 @@ export function useMatchEvents(dbClient: DbClient, matchId: string) {
 	return data;
 }
 
-export function useMatchWorkspace(dbClient: DbClient, matchId: string) {
+export function useMatchWorkspace(
+	dbClient: DbClient,
+	campaignId: string,
+	matchId: string,
+) {
 	const match = useMatch(dbClient, matchId);
-	const { allWarbands, participants } = useMatchParticipants(dbClient, matchId);
+	const { allWarbands, participants } = useMatchParticipants(
+		dbClient,
+		campaignId,
+		matchId,
+	);
 	const warriors = useMatchRoster(dbClient, matchId);
 	const events = useMatchEvents(dbClient, matchId);
 

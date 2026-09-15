@@ -19,6 +19,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 
 const event: MatchEventRow = {
 	id: "event-1",
+	campaignId: "campaign-1",
 	matchId: "match-1",
 	attackerWarbandId: "warband-1",
 	attackerWarriorId: "warrior-1",
@@ -67,6 +68,7 @@ function renderTable(
 	return act(async () => {
 		root.render(
 			<MatchEventsTable
+				campaignId="campaign-1"
 				events={events}
 				imageJobs={imageJobs}
 				onSetOutcome={vi.fn(async () => undefined)}
@@ -89,8 +91,8 @@ describe("MatchEventsTable actions", () => {
 		await act(async () => row.click());
 
 		expect(testState.navigate).toHaveBeenCalledWith({
-			to: "/events/$eventId",
-			params: { eventId: "event-1" },
+			to: "/campaigns/$campaignId/events/$eventId",
+			params: { campaignId: "campaign-1", eventId: "event-1" },
 		});
 	});
 
@@ -106,8 +108,8 @@ describe("MatchEventsTable actions", () => {
 
 		await act(async () => button?.click());
 		expect(testState.navigate).toHaveBeenLastCalledWith({
-			to: "/events/$eventId/delete",
-			params: { eventId: "event-1" },
+			to: "/campaigns/$campaignId/events/$eventId/delete",
+			params: { campaignId: "campaign-1", eventId: "event-1" },
 		});
 	});
 

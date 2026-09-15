@@ -23,6 +23,7 @@ const columnHelper = createDataTableColumnHelper<WarriorTableRow>();
 
 interface WarriorsTableProps {
 	archivedWarbandIds: ReadonlySet<string>;
+	campaignId: string;
 	combatStats: CombatStatsProjection;
 	warbandNames: Map<string, string>;
 	warriors: Warrior[];
@@ -30,11 +31,14 @@ interface WarriorsTableProps {
 
 export function WarriorsTable({
 	archivedWarbandIds,
+	campaignId,
 	combatStats,
 	warbandNames,
 	warriors,
 }: WarriorsTableProps) {
-	const navigate = useNavigate({ from: "/warriors" });
+	const navigate = useNavigate({
+		from: "/campaigns/$campaignId/warriors",
+	});
 	const columns = useMemo(
 		() =>
 			columnHelper.columns([
@@ -115,8 +119,8 @@ export function WarriorsTable({
 								aria-label={`Archive ${row.original.name}`}
 								onPress={() =>
 									navigate({
-										to: "/warriors/$warriorId/delete",
-										params: { warriorId: row.original.id },
+										to: "/campaigns/$campaignId/warriors/$warriorId/delete",
+										params: { campaignId, warriorId: row.original.id },
 									})
 								}
 								size="icon-xs"
@@ -128,7 +132,7 @@ export function WarriorsTable({
 					),
 				}),
 			]),
-		[navigate],
+		[campaignId, navigate],
 	);
 	const rows = useMemo<WarriorTableRow[]>(
 		() =>
@@ -152,8 +156,8 @@ export function WarriorsTable({
 			itemLabel={{ singular: "warrior", plural: "warriors" }}
 			onRowAction={(warrior) =>
 				navigate({
-					to: "/warriors/$warriorId",
-					params: { warriorId: warrior.id },
+					to: "/campaigns/$campaignId/warriors/$warriorId",
+					params: { campaignId, warriorId: warrior.id },
 				})
 			}
 			searchPlaceholder="Search warriors…"

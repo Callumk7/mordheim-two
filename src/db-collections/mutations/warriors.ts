@@ -8,7 +8,7 @@ export type NewWarrior = Omit<
 	Warrior,
 	"id" | "isArchived" | "archivedAt" | "createdAt" | "updatedAt"
 >;
-export type WarriorChanges = Partial<NewWarrior>;
+export type WarriorChanges = Partial<Omit<NewWarrior, "campaignId">>;
 
 export function createWarriorTransaction(
 	collections: AppCollections,

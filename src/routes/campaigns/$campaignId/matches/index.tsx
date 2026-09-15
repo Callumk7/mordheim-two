@@ -1,0 +1,114 @@
+import { eq, safeRandomUUID, useLiveQuery } from "@tanstack/react-db";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { MatchForm, type MatchFormValues } from "@/components/match-form";
+import { EmptyState } from "@/components/shared/empty-state";
+import { IndexPage, IndexPageHeader } from "@/components/shared/index-page";
+import { MatchesTable } from "@/components/table/matches-table";
+import { Button } from "@/components/ui/button";
+import {
+	Dialog,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
+import { getCollections } from "@/db-collections";
+import { createMatchTransaction } from "@/db-collections/mutations/matches";
+import { buildCreateMatchCommand } from "@/lib/match-commands";
+
+export const Route = createFileRoute("/campaigns/$campaignId/matches/")({
+	component: MatchesIndexPage,
+});
+
+const initialValues: MatchFormValues = {
+	name: "",
+	scenario: "",
+	status: "Scheduled",
+	result: "Pending",
+	winnerWarbandId: null,
+	participantWarbandIds: [],
+};
+
+function MatchesIndexPage() {
+	const [isNewMatchOpen, setIsNewMatchOpen] = useState(false);
+	const { campaignId } = Route.useParams();
+	const { dbClient } = Route.useRouteContext();
+	const collections = getCollections(dbClient);
+	const { matches, warbands } = collections;
+	const { data: matchRows } = useLiveQuery({
+		query: (q) =>
+			q
+				.from({ match: matches })
+				.where(({ match }) => eq(match.campaignId, campaignId))
+				.orderBy(({ match }) => match.createdAt, "desc"),
+	});
+	const { data: warbandRows } = useLiveQuery({
+		query: (q) =>
+			q
+				.from({ warband: warbands })
+				.where(({ warband }) => eq(warband.campaignId, campaignId))
+				.orderBy(({ warband }) => warband.name),
+	});
+
+	return (
+		<IndexPage>
+			<IndexPageHeader
+				action={
+					<Button onPress={() => setIsNewMatchOpen(true)}>New match</Button>
+				}
+				description="Schedule scenarios and track each encounter through completion."
+				title="Matches"
+			/>
+
+			{matchRows.length ? (
+				<MatchesTable
+					campaignId={campaignId}
+					matches={matchRows}
+					warbands={warbandRows}
+				/>
+			) : (
+				<EmptyState
+					action={
+						<Button variant="link" onPress={() => setIsNewMatchOpen(true)}>
+							Create a match →
+						</Button>
+					}
+					description="Schedule the campaign’s first encounter."
+					title="No matches yet"
+				/>
+			)}
+
+			<Dialog isOpen={isNewMatchOpen} onOpenChange={setIsNewMatchOpen}>
+				<DialogHeader>
+					<DialogTitle>New match</DialogTitle>
+					<DialogDescription>
+						Schedule a new campaign encounter.
+					</DialogDescription>
+				</DialogHeader>
+				<MatchForm
+					initialValues={initialValues}
+					onSubmit={async (values) => {
+						const { match, participants } = buildCreateMatchCommand(
+							values,
+							{
+								newId: safeRandomUUID,
+								now: () => new Date().toISOString(),
+							},
+							campaignId,
+						);
+						const transaction = createMatchTransaction(
+							dbClient,
+							collections,
+							match,
+							participants,
+						);
+						await transaction.isPersisted.promise;
+						setIsNewMatchOpen(false);
+					}}
+					submitLabel="Create match"
+					warbands={warbandRows.filter((warband) => !warband.isArchived)}
+				/>
+			</Dialog>
+		</IndexPage>
+	);
+}

@@ -163,6 +163,7 @@ describe("match completion illustrations", () => {
 	it("illustrates a match created as already completed, and only then", async () => {
 		const match = {
 			id: "match-1",
+			campaignId: "campaign-1",
 			name: "The Encounter",
 			scenario: "Street Fight",
 			result: "Pending" as const,
