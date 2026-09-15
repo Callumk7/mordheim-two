@@ -1,0 +1,146 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { CreateWarriorDialog } from "@/components/shared/create-warrior-dialog";
+import { EmptyState } from "@/components/shared/empty-state";
+import { IndexPage, IndexPageHeader } from "@/components/shared/index-page";
+import { WarbandsTable } from "@/components/table/warbands-table";
+import { Button } from "@/components/ui/button";
+import {
+	Dialog,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
+import { Toggle } from "@/components/ui/toggle";
+import { WarbandForm, type WarbandFormValues } from "@/components/warband-form";
+import type { Warband } from "@/db/validation/warband";
+import { getCollections } from "@/db-collections";
+import {
+	createWarbandTransaction,
+	updateWarbandTransaction,
+} from "@/db-collections/mutations/warbands";
+import { createWarriorTransaction } from "@/db-collections/mutations/warriors";
+import { useCombatStats } from "@/db-collections/queries";
+import { useWarbands } from "@/db-collections/queries/warbands";
+
+export const Route = createFileRoute("/campaigns/$campaignId/warbands/")({
+	component: WarbandsIndexPage,
+});
+
+const initialValues: WarbandFormValues = {
+	name: "",
+	faction: "Mercenaries",
+	bio: "",
+	gold: 500,
+	rating: 100,
+	wins: 0,
+};
+
+function WarbandsIndexPage() {
+	const [isNewWarbandOpen, setIsNewWarbandOpen] = useState(false);
+	const [showArchived, setShowArchived] = useState(false);
+	const [recruitingWarband, setRecruitingWarband] = useState<Warband | null>(
+		null,
+	);
+	const { campaignId } = Route.useParams();
+	const { dbClient } = Route.useRouteContext();
+	const collections = getCollections(dbClient);
+	const combatStats = useCombatStats(dbClient, campaignId);
+	const warbands = useWarbands(dbClient, campaignId, showArchived);
+
+	async function updateGold(warbandId: string, gold: number) {
+		const transaction = updateWarbandTransaction(collections, warbandId, {
+			gold,
+		});
+		await transaction.isPersisted.promise;
+	}
+
+	async function updateRating(warbandId: string, rating: number) {
+		const transaction = updateWarbandTransaction(collections, warbandId, {
+			rating,
+		});
+		await transaction.isPersisted.promise;
+	}
+
+	return (
+		<IndexPage>
+			<IndexPageHeader
+				action={
+					<div className="flex flex-wrap items-center gap-4">
+						<Toggle
+							isSelected={showArchived}
+							variant="outline"
+							onChange={setShowArchived}
+						>
+							Show archived
+						</Toggle>
+						<Button onPress={() => setIsNewWarbandOpen(true)}>
+							New warband
+						</Button>
+					</div>
+				}
+				description="Manage every company fighting through the City of the Damned."
+				title="Warbands"
+			/>
+
+			{warbands.length ? (
+				<WarbandsTable
+					campaignId={campaignId}
+					combatStats={combatStats}
+					onAddWarrior={setRecruitingWarband}
+					onUpdateGold={updateGold}
+					onUpdateRating={updateRating}
+					warbands={warbands}
+				/>
+			) : (
+				<EmptyState
+					action={
+						<Button variant="link" onPress={() => setIsNewWarbandOpen(true)}>
+							Create a warband →
+						</Button>
+					}
+					description="Create the first company in this campaign."
+					title="No warbands yet"
+				/>
+			)}
+
+			{recruitingWarband ? (
+				<CreateWarriorDialog
+					isOpen
+					onOpenChange={(isOpen) => {
+						if (!isOpen) setRecruitingWarband(null);
+					}}
+					onSubmit={async (values) => {
+						const transaction = createWarriorTransaction(collections, {
+							...values,
+							campaignId,
+						});
+						await transaction.isPersisted.promise;
+					}}
+					warband={recruitingWarband}
+				/>
+			) : null}
+
+			<Dialog isOpen={isNewWarbandOpen} onOpenChange={setIsNewWarbandOpen}>
+				<DialogHeader>
+					<DialogTitle>New warband</DialogTitle>
+					<DialogDescription>
+						Record a new company for the campaign.
+					</DialogDescription>
+				</DialogHeader>
+				<WarbandForm
+					initialValues={initialValues}
+					onSubmit={async (values) => {
+						const transaction = createWarbandTransaction(collections, {
+							...values,
+							campaignId,
+						});
+						await transaction.isPersisted.promise;
+						setIsNewWarbandOpen(false);
+					}}
+					submitLabel="Create warband"
+				/>
+			</Dialog>
+		</IndexPage>
+	);
+}

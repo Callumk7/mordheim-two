@@ -22,6 +22,7 @@ const archiveFields = {
 
 export const WarriorSchema = WarriorFieldsSchema.extend({
 	id: z.string().min(1),
+	campaignId: z.string().min(1),
 	...archiveFields,
 	createdAt: z.string().default(() => new Date().toISOString()),
 	updatedAt: z.string().default(() => new Date().toISOString()),

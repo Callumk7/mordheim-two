@@ -22,6 +22,7 @@ function warband(
 ): Warband {
 	return {
 		id,
+		campaignId: "campaign-1",
 		name,
 		faction: `${name} faction`,
 		bio: null,
@@ -38,6 +39,7 @@ function warband(
 function warrior(id: string, name: string, warbandId: string): Warrior {
 	return {
 		id,
+		campaignId: "campaign-1",
 		name,
 		class: "Champion",
 		description: null,
@@ -56,6 +58,7 @@ function warrior(id: string, name: string, warbandId: string): Warrior {
 function match(status: Match["status"] = "InProgress"): Match {
 	return {
 		id: "match",
+		campaignId: "campaign-1",
 		name: "The Crossing",
 		scenario: "Street Fight",
 		status,
@@ -69,6 +72,7 @@ function match(status: Match["status"] = "InProgress"): Match {
 function event(outcome: Event["outcome"] = null): Event {
 	return {
 		id: "event",
+		campaignId: "campaign-1",
 		matchId: "match",
 		attackerWarbandId: "red",
 		attackerWarriorId: "attacker",

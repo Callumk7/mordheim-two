@@ -1,4 +1,5 @@
 import type { DbClient } from "@tanstack/react-db";
+import { campaignsCollectionOptions } from "./campaigns";
 import { equipmentCollectionOptions } from "./equipment";
 import { eventsCollectionOptions } from "./events";
 import { matchesCollectionOptions } from "./matches";
@@ -9,6 +10,7 @@ import { warriorsCollectionOptions } from "./warriors";
 
 export function getCollections(dbClient: DbClient) {
 	return {
+		campaigns: dbClient.collection(campaignsCollectionOptions),
 		equipment: dbClient.collection(equipmentCollectionOptions),
 		events: dbClient.collection(eventsCollectionOptions),
 		matches: dbClient.collection(matchesCollectionOptions),

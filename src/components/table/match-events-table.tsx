@@ -213,30 +213,34 @@ const NO_IMAGE_JOBS: MatchEventImageJobs = {};
 const NO_DEAD_WARRIORS: ReadonlySet<string> = new Set();
 
 export function MatchEventsTable({
+	campaignId,
 	deadWarriorIds = NO_DEAD_WARRIORS,
 	events,
 	imageJobs = NO_IMAGE_JOBS,
 	onSetOutcome,
 }: {
+	campaignId: string;
 	deadWarriorIds?: ReadonlySet<string>;
 	events: readonly MatchEventRow[];
 	imageJobs?: MatchEventImageJobs;
 	onSetOutcome: (eventId: string, outcome: EventOutcome) => Promise<void>;
 }) {
-	const navigate = useNavigate({ from: "/matches/$matchId/" });
+	const navigate = useNavigate({
+		from: "/campaigns/$campaignId/matches/$matchId/",
+	});
 	const columns = useMemo(
 		() =>
 			createColumns(
 				onSetOutcome,
 				(eventId) =>
 					navigate({
-						to: "/events/$eventId/delete",
-						params: { eventId },
+						to: "/campaigns/$campaignId/events/$eventId/delete",
+						params: { campaignId, eventId },
 					}),
 				imageJobs,
 				deadWarriorIds,
 			),
-		[deadWarriorIds, imageJobs, navigate, onSetOutcome],
+		[campaignId, deadWarriorIds, imageJobs, navigate, onSetOutcome],
 	);
 	const rows = useMemo(() => [...events], [events]);
 
@@ -250,8 +254,8 @@ export function MatchEventsTable({
 			itemLabel={{ singular: "event", plural: "events" }}
 			onRowAction={(event) =>
 				navigate({
-					to: "/events/$eventId",
-					params: { eventId: event.id },
+					to: "/campaigns/$campaignId/events/$eventId",
+					params: { campaignId, eventId: event.id },
 				})
 			}
 			searchPlaceholder="Search match events…"

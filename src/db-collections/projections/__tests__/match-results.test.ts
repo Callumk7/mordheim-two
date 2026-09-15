@@ -9,6 +9,7 @@ const timestamp = "2026-01-01T00:00:00.000Z";
 function warband(id: string, name = id): Warband {
 	return {
 		id,
+		campaignId: "campaign-1",
 		name,
 		faction: "Mercenaries",
 		bio: null,
@@ -30,6 +31,7 @@ function match(
 ): Match {
 	return {
 		id,
+		campaignId: "campaign-1",
 		name: id,
 		scenario: "Skirmish",
 		status,

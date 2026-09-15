@@ -1,7 +1,9 @@
 import type { Database } from "@/db/index.server";
+import { createCampaign } from "@/db/operations/campaigns.server";
 import { createMatchWithParticipants } from "@/db/operations/matches.server";
 import { createWarband } from "@/db/operations/warbands.server";
 import { createWarrior } from "@/db/operations/warriors.server";
+import { CampaignSchema } from "@/db/validation/campaign";
 import { EquipmentSchema } from "@/db/validation/equipment";
 import { EventCreateSchema } from "@/db/validation/event";
 import { MatchSchema } from "@/db/validation/match";
@@ -14,10 +16,23 @@ export const createdAt = "2026-09-01T00:00:00.000Z";
 export const updatedAt = "2026-09-10T12:00:00.000Z";
 export const clock = () => updatedAt;
 const timestamps = { createdAt, updatedAt: createdAt };
+export const campaignId = "campaign-1";
+
+export const campaign = () =>
+	CampaignSchema.parse({
+		id: campaignId,
+		name: "City of the Damned",
+		...timestamps,
+	});
+
+export async function seedCampaign(db: Database) {
+	await createCampaign(db, campaign());
+}
 
 export const warband = (id = "a") =>
 	WarbandSchema.parse({
 		id,
+		campaignId,
 		name: id,
 		faction: "Reikland",
 		bio: "Veteran mercenaries",
@@ -29,6 +44,7 @@ export const warband = (id = "a") =>
 export const warrior = (id = "wa", warbandId = "a") =>
 	WarriorSchema.parse({
 		id,
+		campaignId,
 		warbandId,
 		name: id,
 		class: "Marksman",
@@ -64,6 +80,7 @@ export const assignment = (
 export const match = (id = "match") =>
 	MatchSchema.parse({
 		id,
+		campaignId,
 		name: id,
 		scenario: "Skirmish",
 		status: "Scheduled",
@@ -81,6 +98,7 @@ export const participant = (warbandId = "a", matchId = "match") =>
 export const event = (id = "event") =>
 	EventCreateSchema.parse({
 		id,
+		campaignId,
 		matchId: "match",
 		attackerWarbandId: "a",
 		attackerWarriorId: "wa",

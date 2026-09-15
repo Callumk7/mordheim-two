@@ -46,7 +46,10 @@ describe("DestructiveConfirm", () => {
 	it("keeps pending precedence, disabled state, and the optional error slot", () => {
 		const pending = renderToStaticMarkup(
 			<DestructiveConfirm
-				cancelLink={{ to: "/warbands" }}
+				cancelLink={{
+					to: "/campaigns/$campaignId/warbands",
+					params: { campaignId: "campaign-1" },
+				}}
 				description="This cannot be undone."
 				error="Unable to delete warband."
 				isDisabled
@@ -63,7 +66,10 @@ describe("DestructiveConfirm", () => {
 
 		const blocked = renderToStaticMarkup(
 			<DestructiveConfirm
-				cancelLink={{ to: "/warbands" }}
+				cancelLink={{
+					to: "/campaigns/$campaignId/warbands",
+					params: { campaignId: "campaign-1" },
+				}}
 				description="This cannot be undone."
 				isDisabled
 				keepLabel="Keep warband"
@@ -79,7 +85,10 @@ describe("DestructiveConfirm", () => {
 
 		const ready = renderToStaticMarkup(
 			<DestructiveConfirm
-				cancelLink={{ to: "/warbands" }}
+				cancelLink={{
+					to: "/campaigns/$campaignId/warbands",
+					params: { campaignId: "campaign-1" },
+				}}
 				description="This cannot be undone."
 				keepLabel="Keep warband"
 				onConfirm={() => undefined}

@@ -24,6 +24,13 @@ export const appSettings = sqliteTable("app_settings", {
 	updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
+export const campaigns = sqliteTable("campaigns", {
+	id: text("id").primaryKey(),
+	name: text("name").notNull(),
+	createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+	updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
 export const imageGenerationJobs = sqliteTable(
 	"image_generation_jobs",
 	{
@@ -79,6 +86,9 @@ export const warbands = sqliteTable(
 	"warbands",
 	{
 		id: text("id").primaryKey(),
+		campaignId: text("campaign_id")
+			.notNull()
+			.references(() => campaigns.id, { onDelete: "restrict" }),
 		name: text("name").notNull(),
 		faction: text("faction").notNull(),
 		bio: text("bio"),
@@ -93,6 +103,8 @@ export const warbands = sqliteTable(
 		updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 	},
 	(table) => [
+		uniqueIndex("warbands_campaign_id_unique").on(table.campaignId, table.id),
+		index("warbands_campaign_idx").on(table.campaignId),
 		check(
 			"warbands_archive_pair_consistent",
 			sql`(${table.isArchived} = 0 AND ${table.archivedAt} IS NULL) OR (${table.isArchived} = 1 AND ${table.archivedAt} IS NOT NULL)`,
@@ -104,6 +116,9 @@ export const warriors = sqliteTable(
 	"warriors",
 	{
 		id: text("id").primaryKey(),
+		campaignId: text("campaign_id")
+			.notNull()
+			.references(() => campaigns.id, { onDelete: "restrict" }),
 		name: text("name").notNull(),
 		class: text("class").notNull(),
 		description: text("description"),
@@ -125,6 +140,13 @@ export const warriors = sqliteTable(
 	},
 	(table) => [
 		uniqueIndex("warriors_warband_id_unique").on(table.warbandId, table.id),
+		uniqueIndex("warriors_campaign_id_unique").on(table.campaignId, table.id),
+		index("warriors_campaign_idx").on(table.campaignId),
+		foreignKey({
+			name: "warriors_campaign_warband_fk",
+			columns: [table.campaignId, table.warbandId],
+			foreignColumns: [warbands.campaignId, warbands.id],
+		}),
 		check(
 			"warriors_archive_pair_consistent",
 			sql`(${table.isArchived} = 0 AND ${table.archivedAt} IS NULL) OR (${table.isArchived} = 1 AND ${table.archivedAt} IS NOT NULL)`,
@@ -202,6 +224,9 @@ export const matches = sqliteTable(
 	"matches",
 	{
 		id: text("id").primaryKey(),
+		campaignId: text("campaign_id")
+			.notNull()
+			.references(() => campaigns.id, { onDelete: "restrict" }),
 		name: text("name").notNull(),
 		scenario: text("scenario").notNull(),
 		status: text("status", { enum: MATCH_STATUSES })
@@ -215,6 +240,8 @@ export const matches = sqliteTable(
 		updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 	},
 	(table) => [
+		uniqueIndex("matches_campaign_id_unique").on(table.campaignId, table.id),
+		index("matches_campaign_idx").on(table.campaignId),
 		check(
 			"matches_result_winner_consistent",
 			sql`(${table.result} = 'Pending' AND ${table.winnerWarbandId} IS NULL) OR (${table.result} = 'Draw' AND ${table.winnerWarbandId} IS NULL) OR (${table.result} = 'Victory' AND ${table.winnerWarbandId} IS NOT NULL)`,
@@ -231,6 +258,9 @@ export const events = sqliteTable(
 	"events",
 	{
 		id: text("id").primaryKey(),
+		campaignId: text("campaign_id")
+			.notNull()
+			.references(() => campaigns.id, { onDelete: "restrict" }),
 		matchId: text("match_id")
 			.notNull()
 			.references(() => matches.id, { onDelete: "restrict" }),
@@ -263,6 +293,31 @@ export const events = sqliteTable(
 			sql`${table.attackerWarbandId} <> ${table.defenderWarbandId}`,
 		),
 		foreignKey({
+			name: "events_campaign_match_fk",
+			columns: [table.campaignId, table.matchId],
+			foreignColumns: [matches.campaignId, matches.id],
+		}),
+		foreignKey({
+			name: "events_campaign_attacker_warband_fk",
+			columns: [table.campaignId, table.attackerWarbandId],
+			foreignColumns: [warbands.campaignId, warbands.id],
+		}),
+		foreignKey({
+			name: "events_campaign_defender_warband_fk",
+			columns: [table.campaignId, table.defenderWarbandId],
+			foreignColumns: [warbands.campaignId, warbands.id],
+		}),
+		foreignKey({
+			name: "events_campaign_attacker_warrior_fk",
+			columns: [table.campaignId, table.attackerWarriorId],
+			foreignColumns: [warriors.campaignId, warriors.id],
+		}),
+		foreignKey({
+			name: "events_campaign_defender_warrior_fk",
+			columns: [table.campaignId, table.defenderWarriorId],
+			foreignColumns: [warriors.campaignId, warriors.id],
+		}),
+		foreignKey({
 			name: "events_attacker_participant_fk",
 			columns: [table.matchId, table.attackerWarbandId],
 			foreignColumns: [warbandMatches.matchId, warbandMatches.warbandId],
@@ -282,6 +337,7 @@ export const events = sqliteTable(
 			columns: [table.defenderWarbandId, table.defenderWarriorId],
 			foreignColumns: [warriors.warbandId, warriors.id],
 		}),
+		index("events_campaign_idx").on(table.campaignId),
 		index("events_match_idx").on(table.matchId),
 		index("events_attacker_warrior_idx").on(table.attackerWarriorId),
 		index("events_defender_warrior_idx").on(table.defenderWarriorId),
@@ -295,7 +351,18 @@ export const events = sqliteTable(
 	],
 );
 
-export const warbandsRelations = relations(warbands, ({ many }) => ({
+export const campaignsRelations = relations(campaigns, ({ many }) => ({
+	warbands: many(warbands),
+	warriors: many(warriors),
+	matches: many(matches),
+	events: many(events),
+}));
+
+export const warbandsRelations = relations(warbands, ({ many, one }) => ({
+	campaign: one(campaigns, {
+		fields: [warbands.campaignId],
+		references: [campaigns.id],
+	}),
 	warriors: many(warriors),
 	warbandMatches: many(warbandMatches),
 	attackingEvents: many(events, { relationName: "attackerWarband" }),
@@ -303,6 +370,10 @@ export const warbandsRelations = relations(warbands, ({ many }) => ({
 }));
 
 export const warriorsRelations = relations(warriors, ({ many, one }) => ({
+	campaign: one(campaigns, {
+		fields: [warriors.campaignId],
+		references: [campaigns.id],
+	}),
 	warband: one(warbands, {
 		fields: [warriors.warbandId],
 		references: [warbands.id],
@@ -328,7 +399,11 @@ export const warriorEquipmentRelations = relations(
 	}),
 );
 
-export const matchesRelations = relations(matches, ({ many }) => ({
+export const matchesRelations = relations(matches, ({ many, one }) => ({
+	campaign: one(campaigns, {
+		fields: [matches.campaignId],
+		references: [campaigns.id],
+	}),
 	warbandMatches: many(warbandMatches),
 	events: many(events),
 }));
@@ -345,6 +420,10 @@ export const warbandMatchesRelations = relations(warbandMatches, ({ one }) => ({
 }));
 
 export const eventsRelations = relations(events, ({ one }) => ({
+	campaign: one(campaigns, {
+		fields: [events.campaignId],
+		references: [campaigns.id],
+	}),
 	match: one(matches, {
 		fields: [events.matchId],
 		references: [matches.id],

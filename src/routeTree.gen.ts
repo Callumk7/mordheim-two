@@ -11,33 +11,35 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EquipmentRouteImport } from './routes/equipment'
-import { Route as EventsRouteRouteImport } from './routes/events/route'
 import { Route as GeneratedImagesRouteImport } from './routes/generated-images'
-import { Route as MatchesRouteRouteImport } from './routes/matches/route'
-import { Route as ProjectorRouteImport } from './routes/projector'
 import { Route as QueueRouteImport } from './routes/queue'
 import { Route as QueueJobsRouteImport } from './routes/queue-jobs'
 import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as WarbandsRouteRouteImport } from './routes/warbands/route'
-import { Route as WarriorsRouteRouteImport } from './routes/warriors/route'
-import { Route as EventsIndexRouteImport } from './routes/events/index'
-import { Route as EventsEventIdRouteRouteImport } from './routes/events/$eventId/route'
-import { Route as MatchesIndexRouteImport } from './routes/matches/index'
-import { Route as MatchesMatchIdRouteRouteImport } from './routes/matches/$matchId/route'
-import { Route as StatsIndexRouteImport } from './routes/stats/index'
-import { Route as WarbandsIndexRouteImport } from './routes/warbands/index'
-import { Route as WarbandsWarbandIdRouteRouteImport } from './routes/warbands/$warbandId/route'
-import { Route as WarriorsIndexRouteImport } from './routes/warriors/index'
-import { Route as WarriorsWarriorIdRouteRouteImport } from './routes/warriors/$warriorId/route'
+import { Route as CampaignsCampaignIdRouteRouteImport } from './routes/campaigns/$campaignId/route'
 import { Route as ApiGeneratedImagesJobIdRouteImport } from './routes/api/generated-images/$jobId'
-import { Route as EventsEventIdIndexRouteImport } from './routes/events/$eventId/index'
-import { Route as EventsEventIdDeleteRouteImport } from './routes/events/$eventId/delete'
-import { Route as MatchesMatchIdIndexRouteImport } from './routes/matches/$matchId/index'
-import { Route as MatchesMatchIdDeleteRouteImport } from './routes/matches/$matchId/delete'
-import { Route as WarbandsWarbandIdIndexRouteImport } from './routes/warbands/$warbandId/index'
-import { Route as WarbandsWarbandIdDeleteRouteImport } from './routes/warbands/$warbandId/delete'
-import { Route as WarriorsWarriorIdIndexRouteImport } from './routes/warriors/$warriorId/index'
-import { Route as WarriorsWarriorIdDeleteRouteImport } from './routes/warriors/$warriorId/delete'
+import { Route as CampaignsCampaignIdIndexRouteImport } from './routes/campaigns/$campaignId/index'
+import { Route as CampaignsCampaignIdEventsRouteRouteImport } from './routes/campaigns/$campaignId/events/route'
+import { Route as CampaignsCampaignIdMatchesRouteRouteImport } from './routes/campaigns/$campaignId/matches/route'
+import { Route as CampaignsCampaignIdProjectorRouteImport } from './routes/campaigns/$campaignId/projector'
+import { Route as CampaignsCampaignIdWarbandsRouteRouteImport } from './routes/campaigns/$campaignId/warbands/route'
+import { Route as CampaignsCampaignIdWarriorsRouteRouteImport } from './routes/campaigns/$campaignId/warriors/route'
+import { Route as CampaignsCampaignIdEventsIndexRouteImport } from './routes/campaigns/$campaignId/events/index'
+import { Route as CampaignsCampaignIdEventsEventIdRouteRouteImport } from './routes/campaigns/$campaignId/events/$eventId/route'
+import { Route as CampaignsCampaignIdMatchesIndexRouteImport } from './routes/campaigns/$campaignId/matches/index'
+import { Route as CampaignsCampaignIdMatchesMatchIdRouteRouteImport } from './routes/campaigns/$campaignId/matches/$matchId/route'
+import { Route as CampaignsCampaignIdStatsIndexRouteImport } from './routes/campaigns/$campaignId/stats/index'
+import { Route as CampaignsCampaignIdWarbandsIndexRouteImport } from './routes/campaigns/$campaignId/warbands/index'
+import { Route as CampaignsCampaignIdWarbandsWarbandIdRouteRouteImport } from './routes/campaigns/$campaignId/warbands/$warbandId/route'
+import { Route as CampaignsCampaignIdWarriorsIndexRouteImport } from './routes/campaigns/$campaignId/warriors/index'
+import { Route as CampaignsCampaignIdWarriorsWarriorIdRouteRouteImport } from './routes/campaigns/$campaignId/warriors/$warriorId/route'
+import { Route as CampaignsCampaignIdEventsEventIdIndexRouteImport } from './routes/campaigns/$campaignId/events/$eventId/index'
+import { Route as CampaignsCampaignIdEventsEventIdDeleteRouteImport } from './routes/campaigns/$campaignId/events/$eventId/delete'
+import { Route as CampaignsCampaignIdMatchesMatchIdIndexRouteImport } from './routes/campaigns/$campaignId/matches/$matchId/index'
+import { Route as CampaignsCampaignIdMatchesMatchIdDeleteRouteImport } from './routes/campaigns/$campaignId/matches/$matchId/delete'
+import { Route as CampaignsCampaignIdWarbandsWarbandIdIndexRouteImport } from './routes/campaigns/$campaignId/warbands/$warbandId/index'
+import { Route as CampaignsCampaignIdWarbandsWarbandIdDeleteRouteImport } from './routes/campaigns/$campaignId/warbands/$warbandId/delete'
+import { Route as CampaignsCampaignIdWarriorsWarriorIdIndexRouteImport } from './routes/campaigns/$campaignId/warriors/$warriorId/index'
+import { Route as CampaignsCampaignIdWarriorsWarriorIdDeleteRouteImport } from './routes/campaigns/$campaignId/warriors/$warriorId/delete'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -49,24 +51,9 @@ const EquipmentRoute = EquipmentRouteImport.update({
   path: '/equipment',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EventsRouteRoute = EventsRouteRouteImport.update({
-  id: '/events',
-  path: '/events',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const GeneratedImagesRoute = GeneratedImagesRouteImport.update({
   id: '/generated-images',
   path: '/generated-images',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MatchesRouteRoute = MatchesRouteRouteImport.update({
-  id: '/matches',
-  path: '/matches',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProjectorRoute = ProjectorRouteImport.update({
-  id: '/projector',
-  path: '/projector',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QueueRoute = QueueRouteImport.update({
@@ -84,294 +71,348 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WarbandsRouteRoute = WarbandsRouteRouteImport.update({
-  id: '/warbands',
-  path: '/warbands',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WarriorsRouteRoute = WarriorsRouteRouteImport.update({
-  id: '/warriors',
-  path: '/warriors',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EventsIndexRoute = EventsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => EventsRouteRoute,
-} as any)
-const EventsEventIdRouteRoute = EventsEventIdRouteRouteImport.update({
-  id: '/$eventId',
-  path: '/$eventId',
-  getParentRoute: () => EventsRouteRoute,
-} as any)
-const MatchesIndexRoute = MatchesIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => MatchesRouteRoute,
-} as any)
-const MatchesMatchIdRouteRoute = MatchesMatchIdRouteRouteImport.update({
-  id: '/$matchId',
-  path: '/$matchId',
-  getParentRoute: () => MatchesRouteRoute,
-} as any)
-const StatsIndexRoute = StatsIndexRouteImport.update({
-  id: '/stats/',
-  path: '/stats/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WarbandsIndexRoute = WarbandsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => WarbandsRouteRoute,
-} as any)
-const WarbandsWarbandIdRouteRoute = WarbandsWarbandIdRouteRouteImport.update({
-  id: '/$warbandId',
-  path: '/$warbandId',
-  getParentRoute: () => WarbandsRouteRoute,
-} as any)
-const WarriorsIndexRoute = WarriorsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => WarriorsRouteRoute,
-} as any)
-const WarriorsWarriorIdRouteRoute = WarriorsWarriorIdRouteRouteImport.update({
-  id: '/$warriorId',
-  path: '/$warriorId',
-  getParentRoute: () => WarriorsRouteRoute,
-} as any)
+const CampaignsCampaignIdRouteRoute =
+  CampaignsCampaignIdRouteRouteImport.update({
+    id: '/campaigns/$campaignId',
+    path: '/campaigns/$campaignId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiGeneratedImagesJobIdRoute = ApiGeneratedImagesJobIdRouteImport.update({
   id: '/api/generated-images/$jobId',
   path: '/api/generated-images/$jobId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EventsEventIdIndexRoute = EventsEventIdIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => EventsEventIdRouteRoute,
-} as any)
-const EventsEventIdDeleteRoute = EventsEventIdDeleteRouteImport.update({
-  id: '/delete',
-  path: '/delete',
-  getParentRoute: () => EventsEventIdRouteRoute,
-} as any)
-const MatchesMatchIdIndexRoute = MatchesMatchIdIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => MatchesMatchIdRouteRoute,
-} as any)
-const MatchesMatchIdDeleteRoute = MatchesMatchIdDeleteRouteImport.update({
-  id: '/delete',
-  path: '/delete',
-  getParentRoute: () => MatchesMatchIdRouteRoute,
-} as any)
-const WarbandsWarbandIdIndexRoute = WarbandsWarbandIdIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => WarbandsWarbandIdRouteRoute,
-} as any)
-const WarbandsWarbandIdDeleteRoute = WarbandsWarbandIdDeleteRouteImport.update({
-  id: '/delete',
-  path: '/delete',
-  getParentRoute: () => WarbandsWarbandIdRouteRoute,
-} as any)
-const WarriorsWarriorIdIndexRoute = WarriorsWarriorIdIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => WarriorsWarriorIdRouteRoute,
-} as any)
-const WarriorsWarriorIdDeleteRoute = WarriorsWarriorIdDeleteRouteImport.update({
-  id: '/delete',
-  path: '/delete',
-  getParentRoute: () => WarriorsWarriorIdRouteRoute,
-} as any)
+const CampaignsCampaignIdIndexRoute =
+  CampaignsCampaignIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => CampaignsCampaignIdRouteRoute,
+  } as any)
+const CampaignsCampaignIdEventsRouteRoute =
+  CampaignsCampaignIdEventsRouteRouteImport.update({
+    id: '/events',
+    path: '/events',
+    getParentRoute: () => CampaignsCampaignIdRouteRoute,
+  } as any)
+const CampaignsCampaignIdMatchesRouteRoute =
+  CampaignsCampaignIdMatchesRouteRouteImport.update({
+    id: '/matches',
+    path: '/matches',
+    getParentRoute: () => CampaignsCampaignIdRouteRoute,
+  } as any)
+const CampaignsCampaignIdProjectorRoute =
+  CampaignsCampaignIdProjectorRouteImport.update({
+    id: '/projector',
+    path: '/projector',
+    getParentRoute: () => CampaignsCampaignIdRouteRoute,
+  } as any)
+const CampaignsCampaignIdWarbandsRouteRoute =
+  CampaignsCampaignIdWarbandsRouteRouteImport.update({
+    id: '/warbands',
+    path: '/warbands',
+    getParentRoute: () => CampaignsCampaignIdRouteRoute,
+  } as any)
+const CampaignsCampaignIdWarriorsRouteRoute =
+  CampaignsCampaignIdWarriorsRouteRouteImport.update({
+    id: '/warriors',
+    path: '/warriors',
+    getParentRoute: () => CampaignsCampaignIdRouteRoute,
+  } as any)
+const CampaignsCampaignIdEventsIndexRoute =
+  CampaignsCampaignIdEventsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => CampaignsCampaignIdEventsRouteRoute,
+  } as any)
+const CampaignsCampaignIdEventsEventIdRouteRoute =
+  CampaignsCampaignIdEventsEventIdRouteRouteImport.update({
+    id: '/$eventId',
+    path: '/$eventId',
+    getParentRoute: () => CampaignsCampaignIdEventsRouteRoute,
+  } as any)
+const CampaignsCampaignIdMatchesIndexRoute =
+  CampaignsCampaignIdMatchesIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => CampaignsCampaignIdMatchesRouteRoute,
+  } as any)
+const CampaignsCampaignIdMatchesMatchIdRouteRoute =
+  CampaignsCampaignIdMatchesMatchIdRouteRouteImport.update({
+    id: '/$matchId',
+    path: '/$matchId',
+    getParentRoute: () => CampaignsCampaignIdMatchesRouteRoute,
+  } as any)
+const CampaignsCampaignIdStatsIndexRoute =
+  CampaignsCampaignIdStatsIndexRouteImport.update({
+    id: '/stats/',
+    path: '/stats/',
+    getParentRoute: () => CampaignsCampaignIdRouteRoute,
+  } as any)
+const CampaignsCampaignIdWarbandsIndexRoute =
+  CampaignsCampaignIdWarbandsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => CampaignsCampaignIdWarbandsRouteRoute,
+  } as any)
+const CampaignsCampaignIdWarbandsWarbandIdRouteRoute =
+  CampaignsCampaignIdWarbandsWarbandIdRouteRouteImport.update({
+    id: '/$warbandId',
+    path: '/$warbandId',
+    getParentRoute: () => CampaignsCampaignIdWarbandsRouteRoute,
+  } as any)
+const CampaignsCampaignIdWarriorsIndexRoute =
+  CampaignsCampaignIdWarriorsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => CampaignsCampaignIdWarriorsRouteRoute,
+  } as any)
+const CampaignsCampaignIdWarriorsWarriorIdRouteRoute =
+  CampaignsCampaignIdWarriorsWarriorIdRouteRouteImport.update({
+    id: '/$warriorId',
+    path: '/$warriorId',
+    getParentRoute: () => CampaignsCampaignIdWarriorsRouteRoute,
+  } as any)
+const CampaignsCampaignIdEventsEventIdIndexRoute =
+  CampaignsCampaignIdEventsEventIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => CampaignsCampaignIdEventsEventIdRouteRoute,
+  } as any)
+const CampaignsCampaignIdEventsEventIdDeleteRoute =
+  CampaignsCampaignIdEventsEventIdDeleteRouteImport.update({
+    id: '/delete',
+    path: '/delete',
+    getParentRoute: () => CampaignsCampaignIdEventsEventIdRouteRoute,
+  } as any)
+const CampaignsCampaignIdMatchesMatchIdIndexRoute =
+  CampaignsCampaignIdMatchesMatchIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => CampaignsCampaignIdMatchesMatchIdRouteRoute,
+  } as any)
+const CampaignsCampaignIdMatchesMatchIdDeleteRoute =
+  CampaignsCampaignIdMatchesMatchIdDeleteRouteImport.update({
+    id: '/delete',
+    path: '/delete',
+    getParentRoute: () => CampaignsCampaignIdMatchesMatchIdRouteRoute,
+  } as any)
+const CampaignsCampaignIdWarbandsWarbandIdIndexRoute =
+  CampaignsCampaignIdWarbandsWarbandIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => CampaignsCampaignIdWarbandsWarbandIdRouteRoute,
+  } as any)
+const CampaignsCampaignIdWarbandsWarbandIdDeleteRoute =
+  CampaignsCampaignIdWarbandsWarbandIdDeleteRouteImport.update({
+    id: '/delete',
+    path: '/delete',
+    getParentRoute: () => CampaignsCampaignIdWarbandsWarbandIdRouteRoute,
+  } as any)
+const CampaignsCampaignIdWarriorsWarriorIdIndexRoute =
+  CampaignsCampaignIdWarriorsWarriorIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => CampaignsCampaignIdWarriorsWarriorIdRouteRoute,
+  } as any)
+const CampaignsCampaignIdWarriorsWarriorIdDeleteRoute =
+  CampaignsCampaignIdWarriorsWarriorIdDeleteRouteImport.update({
+    id: '/delete',
+    path: '/delete',
+    getParentRoute: () => CampaignsCampaignIdWarriorsWarriorIdRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/events': typeof EventsRouteRouteWithChildren
-  '/matches': typeof MatchesRouteRouteWithChildren
-  '/warbands': typeof WarbandsRouteRouteWithChildren
-  '/warriors': typeof WarriorsRouteRouteWithChildren
   '/equipment': typeof EquipmentRoute
   '/generated-images': typeof GeneratedImagesRoute
-  '/projector': typeof ProjectorRoute
   '/queue': typeof QueueRoute
   '/queue-jobs': typeof QueueJobsRoute
   '/settings': typeof SettingsRoute
-  '/events/$eventId': typeof EventsEventIdRouteRouteWithChildren
-  '/matches/$matchId': typeof MatchesMatchIdRouteRouteWithChildren
-  '/warbands/$warbandId': typeof WarbandsWarbandIdRouteRouteWithChildren
-  '/warriors/$warriorId': typeof WarriorsWarriorIdRouteRouteWithChildren
-  '/events/': typeof EventsIndexRoute
-  '/matches/': typeof MatchesIndexRoute
-  '/stats/': typeof StatsIndexRoute
-  '/warbands/': typeof WarbandsIndexRoute
-  '/warriors/': typeof WarriorsIndexRoute
+  '/campaigns/$campaignId': typeof CampaignsCampaignIdRouteRouteWithChildren
+  '/campaigns/$campaignId/events': typeof CampaignsCampaignIdEventsRouteRouteWithChildren
+  '/campaigns/$campaignId/matches': typeof CampaignsCampaignIdMatchesRouteRouteWithChildren
+  '/campaigns/$campaignId/warbands': typeof CampaignsCampaignIdWarbandsRouteRouteWithChildren
+  '/campaigns/$campaignId/warriors': typeof CampaignsCampaignIdWarriorsRouteRouteWithChildren
   '/api/generated-images/$jobId': typeof ApiGeneratedImagesJobIdRoute
-  '/events/$eventId/delete': typeof EventsEventIdDeleteRoute
-  '/matches/$matchId/delete': typeof MatchesMatchIdDeleteRoute
-  '/warbands/$warbandId/delete': typeof WarbandsWarbandIdDeleteRoute
-  '/warriors/$warriorId/delete': typeof WarriorsWarriorIdDeleteRoute
-  '/events/$eventId/': typeof EventsEventIdIndexRoute
-  '/matches/$matchId/': typeof MatchesMatchIdIndexRoute
-  '/warbands/$warbandId/': typeof WarbandsWarbandIdIndexRoute
-  '/warriors/$warriorId/': typeof WarriorsWarriorIdIndexRoute
+  '/campaigns/$campaignId/projector': typeof CampaignsCampaignIdProjectorRoute
+  '/campaigns/$campaignId/': typeof CampaignsCampaignIdIndexRoute
+  '/campaigns/$campaignId/events/$eventId': typeof CampaignsCampaignIdEventsEventIdRouteRouteWithChildren
+  '/campaigns/$campaignId/matches/$matchId': typeof CampaignsCampaignIdMatchesMatchIdRouteRouteWithChildren
+  '/campaigns/$campaignId/warbands/$warbandId': typeof CampaignsCampaignIdWarbandsWarbandIdRouteRouteWithChildren
+  '/campaigns/$campaignId/warriors/$warriorId': typeof CampaignsCampaignIdWarriorsWarriorIdRouteRouteWithChildren
+  '/campaigns/$campaignId/events/': typeof CampaignsCampaignIdEventsIndexRoute
+  '/campaigns/$campaignId/matches/': typeof CampaignsCampaignIdMatchesIndexRoute
+  '/campaigns/$campaignId/stats/': typeof CampaignsCampaignIdStatsIndexRoute
+  '/campaigns/$campaignId/warbands/': typeof CampaignsCampaignIdWarbandsIndexRoute
+  '/campaigns/$campaignId/warriors/': typeof CampaignsCampaignIdWarriorsIndexRoute
+  '/campaigns/$campaignId/events/$eventId/delete': typeof CampaignsCampaignIdEventsEventIdDeleteRoute
+  '/campaigns/$campaignId/matches/$matchId/delete': typeof CampaignsCampaignIdMatchesMatchIdDeleteRoute
+  '/campaigns/$campaignId/warbands/$warbandId/delete': typeof CampaignsCampaignIdWarbandsWarbandIdDeleteRoute
+  '/campaigns/$campaignId/warriors/$warriorId/delete': typeof CampaignsCampaignIdWarriorsWarriorIdDeleteRoute
+  '/campaigns/$campaignId/events/$eventId/': typeof CampaignsCampaignIdEventsEventIdIndexRoute
+  '/campaigns/$campaignId/matches/$matchId/': typeof CampaignsCampaignIdMatchesMatchIdIndexRoute
+  '/campaigns/$campaignId/warbands/$warbandId/': typeof CampaignsCampaignIdWarbandsWarbandIdIndexRoute
+  '/campaigns/$campaignId/warriors/$warriorId/': typeof CampaignsCampaignIdWarriorsWarriorIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/equipment': typeof EquipmentRoute
   '/generated-images': typeof GeneratedImagesRoute
-  '/projector': typeof ProjectorRoute
   '/queue': typeof QueueRoute
   '/queue-jobs': typeof QueueJobsRoute
   '/settings': typeof SettingsRoute
-  '/events': typeof EventsIndexRoute
-  '/matches': typeof MatchesIndexRoute
-  '/stats': typeof StatsIndexRoute
-  '/warbands': typeof WarbandsIndexRoute
-  '/warriors': typeof WarriorsIndexRoute
   '/api/generated-images/$jobId': typeof ApiGeneratedImagesJobIdRoute
-  '/events/$eventId/delete': typeof EventsEventIdDeleteRoute
-  '/matches/$matchId/delete': typeof MatchesMatchIdDeleteRoute
-  '/warbands/$warbandId/delete': typeof WarbandsWarbandIdDeleteRoute
-  '/warriors/$warriorId/delete': typeof WarriorsWarriorIdDeleteRoute
-  '/events/$eventId': typeof EventsEventIdIndexRoute
-  '/matches/$matchId': typeof MatchesMatchIdIndexRoute
-  '/warbands/$warbandId': typeof WarbandsWarbandIdIndexRoute
-  '/warriors/$warriorId': typeof WarriorsWarriorIdIndexRoute
+  '/campaigns/$campaignId/projector': typeof CampaignsCampaignIdProjectorRoute
+  '/campaigns/$campaignId': typeof CampaignsCampaignIdIndexRoute
+  '/campaigns/$campaignId/events': typeof CampaignsCampaignIdEventsIndexRoute
+  '/campaigns/$campaignId/matches': typeof CampaignsCampaignIdMatchesIndexRoute
+  '/campaigns/$campaignId/stats': typeof CampaignsCampaignIdStatsIndexRoute
+  '/campaigns/$campaignId/warbands': typeof CampaignsCampaignIdWarbandsIndexRoute
+  '/campaigns/$campaignId/warriors': typeof CampaignsCampaignIdWarriorsIndexRoute
+  '/campaigns/$campaignId/events/$eventId/delete': typeof CampaignsCampaignIdEventsEventIdDeleteRoute
+  '/campaigns/$campaignId/matches/$matchId/delete': typeof CampaignsCampaignIdMatchesMatchIdDeleteRoute
+  '/campaigns/$campaignId/warbands/$warbandId/delete': typeof CampaignsCampaignIdWarbandsWarbandIdDeleteRoute
+  '/campaigns/$campaignId/warriors/$warriorId/delete': typeof CampaignsCampaignIdWarriorsWarriorIdDeleteRoute
+  '/campaigns/$campaignId/events/$eventId': typeof CampaignsCampaignIdEventsEventIdIndexRoute
+  '/campaigns/$campaignId/matches/$matchId': typeof CampaignsCampaignIdMatchesMatchIdIndexRoute
+  '/campaigns/$campaignId/warbands/$warbandId': typeof CampaignsCampaignIdWarbandsWarbandIdIndexRoute
+  '/campaigns/$campaignId/warriors/$warriorId': typeof CampaignsCampaignIdWarriorsWarriorIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/events': typeof EventsRouteRouteWithChildren
-  '/matches': typeof MatchesRouteRouteWithChildren
-  '/warbands': typeof WarbandsRouteRouteWithChildren
-  '/warriors': typeof WarriorsRouteRouteWithChildren
   '/equipment': typeof EquipmentRoute
   '/generated-images': typeof GeneratedImagesRoute
-  '/projector': typeof ProjectorRoute
   '/queue': typeof QueueRoute
   '/queue-jobs': typeof QueueJobsRoute
   '/settings': typeof SettingsRoute
-  '/events/$eventId': typeof EventsEventIdRouteRouteWithChildren
-  '/matches/$matchId': typeof MatchesMatchIdRouteRouteWithChildren
-  '/warbands/$warbandId': typeof WarbandsWarbandIdRouteRouteWithChildren
-  '/warriors/$warriorId': typeof WarriorsWarriorIdRouteRouteWithChildren
-  '/events/': typeof EventsIndexRoute
-  '/matches/': typeof MatchesIndexRoute
-  '/stats/': typeof StatsIndexRoute
-  '/warbands/': typeof WarbandsIndexRoute
-  '/warriors/': typeof WarriorsIndexRoute
+  '/campaigns/$campaignId': typeof CampaignsCampaignIdRouteRouteWithChildren
+  '/campaigns/$campaignId/events': typeof CampaignsCampaignIdEventsRouteRouteWithChildren
+  '/campaigns/$campaignId/matches': typeof CampaignsCampaignIdMatchesRouteRouteWithChildren
+  '/campaigns/$campaignId/warbands': typeof CampaignsCampaignIdWarbandsRouteRouteWithChildren
+  '/campaigns/$campaignId/warriors': typeof CampaignsCampaignIdWarriorsRouteRouteWithChildren
   '/api/generated-images/$jobId': typeof ApiGeneratedImagesJobIdRoute
-  '/events/$eventId/delete': typeof EventsEventIdDeleteRoute
-  '/matches/$matchId/delete': typeof MatchesMatchIdDeleteRoute
-  '/warbands/$warbandId/delete': typeof WarbandsWarbandIdDeleteRoute
-  '/warriors/$warriorId/delete': typeof WarriorsWarriorIdDeleteRoute
-  '/events/$eventId/': typeof EventsEventIdIndexRoute
-  '/matches/$matchId/': typeof MatchesMatchIdIndexRoute
-  '/warbands/$warbandId/': typeof WarbandsWarbandIdIndexRoute
-  '/warriors/$warriorId/': typeof WarriorsWarriorIdIndexRoute
+  '/campaigns/$campaignId/projector': typeof CampaignsCampaignIdProjectorRoute
+  '/campaigns/$campaignId/': typeof CampaignsCampaignIdIndexRoute
+  '/campaigns/$campaignId/events/$eventId': typeof CampaignsCampaignIdEventsEventIdRouteRouteWithChildren
+  '/campaigns/$campaignId/matches/$matchId': typeof CampaignsCampaignIdMatchesMatchIdRouteRouteWithChildren
+  '/campaigns/$campaignId/warbands/$warbandId': typeof CampaignsCampaignIdWarbandsWarbandIdRouteRouteWithChildren
+  '/campaigns/$campaignId/warriors/$warriorId': typeof CampaignsCampaignIdWarriorsWarriorIdRouteRouteWithChildren
+  '/campaigns/$campaignId/events/': typeof CampaignsCampaignIdEventsIndexRoute
+  '/campaigns/$campaignId/matches/': typeof CampaignsCampaignIdMatchesIndexRoute
+  '/campaigns/$campaignId/stats/': typeof CampaignsCampaignIdStatsIndexRoute
+  '/campaigns/$campaignId/warbands/': typeof CampaignsCampaignIdWarbandsIndexRoute
+  '/campaigns/$campaignId/warriors/': typeof CampaignsCampaignIdWarriorsIndexRoute
+  '/campaigns/$campaignId/events/$eventId/delete': typeof CampaignsCampaignIdEventsEventIdDeleteRoute
+  '/campaigns/$campaignId/matches/$matchId/delete': typeof CampaignsCampaignIdMatchesMatchIdDeleteRoute
+  '/campaigns/$campaignId/warbands/$warbandId/delete': typeof CampaignsCampaignIdWarbandsWarbandIdDeleteRoute
+  '/campaigns/$campaignId/warriors/$warriorId/delete': typeof CampaignsCampaignIdWarriorsWarriorIdDeleteRoute
+  '/campaigns/$campaignId/events/$eventId/': typeof CampaignsCampaignIdEventsEventIdIndexRoute
+  '/campaigns/$campaignId/matches/$matchId/': typeof CampaignsCampaignIdMatchesMatchIdIndexRoute
+  '/campaigns/$campaignId/warbands/$warbandId/': typeof CampaignsCampaignIdWarbandsWarbandIdIndexRoute
+  '/campaigns/$campaignId/warriors/$warriorId/': typeof CampaignsCampaignIdWarriorsWarriorIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/events'
-    | '/matches'
-    | '/warbands'
-    | '/warriors'
     | '/equipment'
     | '/generated-images'
-    | '/projector'
     | '/queue'
     | '/queue-jobs'
     | '/settings'
-    | '/events/$eventId'
-    | '/matches/$matchId'
-    | '/warbands/$warbandId'
-    | '/warriors/$warriorId'
-    | '/events/'
-    | '/matches/'
-    | '/stats/'
-    | '/warbands/'
-    | '/warriors/'
+    | '/campaigns/$campaignId'
+    | '/campaigns/$campaignId/events'
+    | '/campaigns/$campaignId/matches'
+    | '/campaigns/$campaignId/warbands'
+    | '/campaigns/$campaignId/warriors'
     | '/api/generated-images/$jobId'
-    | '/events/$eventId/delete'
-    | '/matches/$matchId/delete'
-    | '/warbands/$warbandId/delete'
-    | '/warriors/$warriorId/delete'
-    | '/events/$eventId/'
-    | '/matches/$matchId/'
-    | '/warbands/$warbandId/'
-    | '/warriors/$warriorId/'
+    | '/campaigns/$campaignId/projector'
+    | '/campaigns/$campaignId/'
+    | '/campaigns/$campaignId/events/$eventId'
+    | '/campaigns/$campaignId/matches/$matchId'
+    | '/campaigns/$campaignId/warbands/$warbandId'
+    | '/campaigns/$campaignId/warriors/$warriorId'
+    | '/campaigns/$campaignId/events/'
+    | '/campaigns/$campaignId/matches/'
+    | '/campaigns/$campaignId/stats/'
+    | '/campaigns/$campaignId/warbands/'
+    | '/campaigns/$campaignId/warriors/'
+    | '/campaigns/$campaignId/events/$eventId/delete'
+    | '/campaigns/$campaignId/matches/$matchId/delete'
+    | '/campaigns/$campaignId/warbands/$warbandId/delete'
+    | '/campaigns/$campaignId/warriors/$warriorId/delete'
+    | '/campaigns/$campaignId/events/$eventId/'
+    | '/campaigns/$campaignId/matches/$matchId/'
+    | '/campaigns/$campaignId/warbands/$warbandId/'
+    | '/campaigns/$campaignId/warriors/$warriorId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/equipment'
     | '/generated-images'
-    | '/projector'
     | '/queue'
     | '/queue-jobs'
     | '/settings'
-    | '/events'
-    | '/matches'
-    | '/stats'
-    | '/warbands'
-    | '/warriors'
     | '/api/generated-images/$jobId'
-    | '/events/$eventId/delete'
-    | '/matches/$matchId/delete'
-    | '/warbands/$warbandId/delete'
-    | '/warriors/$warriorId/delete'
-    | '/events/$eventId'
-    | '/matches/$matchId'
-    | '/warbands/$warbandId'
-    | '/warriors/$warriorId'
+    | '/campaigns/$campaignId/projector'
+    | '/campaigns/$campaignId'
+    | '/campaigns/$campaignId/events'
+    | '/campaigns/$campaignId/matches'
+    | '/campaigns/$campaignId/stats'
+    | '/campaigns/$campaignId/warbands'
+    | '/campaigns/$campaignId/warriors'
+    | '/campaigns/$campaignId/events/$eventId/delete'
+    | '/campaigns/$campaignId/matches/$matchId/delete'
+    | '/campaigns/$campaignId/warbands/$warbandId/delete'
+    | '/campaigns/$campaignId/warriors/$warriorId/delete'
+    | '/campaigns/$campaignId/events/$eventId'
+    | '/campaigns/$campaignId/matches/$matchId'
+    | '/campaigns/$campaignId/warbands/$warbandId'
+    | '/campaigns/$campaignId/warriors/$warriorId'
   id:
     | '__root__'
     | '/'
-    | '/events'
-    | '/matches'
-    | '/warbands'
-    | '/warriors'
     | '/equipment'
     | '/generated-images'
-    | '/projector'
     | '/queue'
     | '/queue-jobs'
     | '/settings'
-    | '/events/$eventId'
-    | '/matches/$matchId'
-    | '/warbands/$warbandId'
-    | '/warriors/$warriorId'
-    | '/events/'
-    | '/matches/'
-    | '/stats/'
-    | '/warbands/'
-    | '/warriors/'
+    | '/campaigns/$campaignId'
+    | '/campaigns/$campaignId/events'
+    | '/campaigns/$campaignId/matches'
+    | '/campaigns/$campaignId/warbands'
+    | '/campaigns/$campaignId/warriors'
     | '/api/generated-images/$jobId'
-    | '/events/$eventId/delete'
-    | '/matches/$matchId/delete'
-    | '/warbands/$warbandId/delete'
-    | '/warriors/$warriorId/delete'
-    | '/events/$eventId/'
-    | '/matches/$matchId/'
-    | '/warbands/$warbandId/'
-    | '/warriors/$warriorId/'
+    | '/campaigns/$campaignId/projector'
+    | '/campaigns/$campaignId/'
+    | '/campaigns/$campaignId/events/$eventId'
+    | '/campaigns/$campaignId/matches/$matchId'
+    | '/campaigns/$campaignId/warbands/$warbandId'
+    | '/campaigns/$campaignId/warriors/$warriorId'
+    | '/campaigns/$campaignId/events/'
+    | '/campaigns/$campaignId/matches/'
+    | '/campaigns/$campaignId/stats/'
+    | '/campaigns/$campaignId/warbands/'
+    | '/campaigns/$campaignId/warriors/'
+    | '/campaigns/$campaignId/events/$eventId/delete'
+    | '/campaigns/$campaignId/matches/$matchId/delete'
+    | '/campaigns/$campaignId/warbands/$warbandId/delete'
+    | '/campaigns/$campaignId/warriors/$warriorId/delete'
+    | '/campaigns/$campaignId/events/$eventId/'
+    | '/campaigns/$campaignId/matches/$matchId/'
+    | '/campaigns/$campaignId/warbands/$warbandId/'
+    | '/campaigns/$campaignId/warriors/$warriorId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  EventsRouteRoute: typeof EventsRouteRouteWithChildren
-  MatchesRouteRoute: typeof MatchesRouteRouteWithChildren
-  WarbandsRouteRoute: typeof WarbandsRouteRouteWithChildren
-  WarriorsRouteRoute: typeof WarriorsRouteRouteWithChildren
   EquipmentRoute: typeof EquipmentRoute
   GeneratedImagesRoute: typeof GeneratedImagesRoute
-  ProjectorRoute: typeof ProjectorRoute
   QueueRoute: typeof QueueRoute
   QueueJobsRoute: typeof QueueJobsRoute
   SettingsRoute: typeof SettingsRoute
-  StatsIndexRoute: typeof StatsIndexRoute
+  CampaignsCampaignIdRouteRoute: typeof CampaignsCampaignIdRouteRouteWithChildren
   ApiGeneratedImagesJobIdRoute: typeof ApiGeneratedImagesJobIdRoute
 }
 
@@ -391,32 +432,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EquipmentRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/events': {
-      id: '/events'
-      path: '/events'
-      fullPath: '/events'
-      preLoaderRoute: typeof EventsRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/generated-images': {
       id: '/generated-images'
       path: '/generated-images'
       fullPath: '/generated-images'
       preLoaderRoute: typeof GeneratedImagesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/matches': {
-      id: '/matches'
-      path: '/matches'
-      fullPath: '/matches'
-      preLoaderRoute: typeof MatchesRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/projector': {
-      id: '/projector'
-      path: '/projector'
-      fullPath: '/projector'
-      preLoaderRoute: typeof ProjectorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/queue': {
@@ -440,82 +460,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/warbands': {
-      id: '/warbands'
-      path: '/warbands'
-      fullPath: '/warbands'
-      preLoaderRoute: typeof WarbandsRouteRouteImport
+    '/campaigns/$campaignId': {
+      id: '/campaigns/$campaignId'
+      path: '/campaigns/$campaignId'
+      fullPath: '/campaigns/$campaignId'
+      preLoaderRoute: typeof CampaignsCampaignIdRouteRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/warriors': {
-      id: '/warriors'
-      path: '/warriors'
-      fullPath: '/warriors'
-      preLoaderRoute: typeof WarriorsRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/events/': {
-      id: '/events/'
-      path: '/'
-      fullPath: '/events/'
-      preLoaderRoute: typeof EventsIndexRouteImport
-      parentRoute: typeof EventsRouteRoute
-    }
-    '/events/$eventId': {
-      id: '/events/$eventId'
-      path: '/$eventId'
-      fullPath: '/events/$eventId'
-      preLoaderRoute: typeof EventsEventIdRouteRouteImport
-      parentRoute: typeof EventsRouteRoute
-    }
-    '/matches/': {
-      id: '/matches/'
-      path: '/'
-      fullPath: '/matches/'
-      preLoaderRoute: typeof MatchesIndexRouteImport
-      parentRoute: typeof MatchesRouteRoute
-    }
-    '/matches/$matchId': {
-      id: '/matches/$matchId'
-      path: '/$matchId'
-      fullPath: '/matches/$matchId'
-      preLoaderRoute: typeof MatchesMatchIdRouteRouteImport
-      parentRoute: typeof MatchesRouteRoute
-    }
-    '/stats/': {
-      id: '/stats/'
-      path: '/stats'
-      fullPath: '/stats/'
-      preLoaderRoute: typeof StatsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/warbands/': {
-      id: '/warbands/'
-      path: '/'
-      fullPath: '/warbands/'
-      preLoaderRoute: typeof WarbandsIndexRouteImport
-      parentRoute: typeof WarbandsRouteRoute
-    }
-    '/warbands/$warbandId': {
-      id: '/warbands/$warbandId'
-      path: '/$warbandId'
-      fullPath: '/warbands/$warbandId'
-      preLoaderRoute: typeof WarbandsWarbandIdRouteRouteImport
-      parentRoute: typeof WarbandsRouteRoute
-    }
-    '/warriors/': {
-      id: '/warriors/'
-      path: '/'
-      fullPath: '/warriors/'
-      preLoaderRoute: typeof WarriorsIndexRouteImport
-      parentRoute: typeof WarriorsRouteRoute
-    }
-    '/warriors/$warriorId': {
-      id: '/warriors/$warriorId'
-      path: '/$warriorId'
-      fullPath: '/warriors/$warriorId'
-      preLoaderRoute: typeof WarriorsWarriorIdRouteRouteImport
-      parentRoute: typeof WarriorsRouteRoute
     }
     '/api/generated-images/$jobId': {
       id: '/api/generated-images/$jobId'
@@ -524,192 +474,350 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiGeneratedImagesJobIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/events/$eventId/': {
-      id: '/events/$eventId/'
+    '/campaigns/$campaignId/': {
+      id: '/campaigns/$campaignId/'
       path: '/'
-      fullPath: '/events/$eventId/'
-      preLoaderRoute: typeof EventsEventIdIndexRouteImport
-      parentRoute: typeof EventsEventIdRouteRoute
+      fullPath: '/campaigns/$campaignId/'
+      preLoaderRoute: typeof CampaignsCampaignIdIndexRouteImport
+      parentRoute: typeof CampaignsCampaignIdRouteRoute
     }
-    '/events/$eventId/delete': {
-      id: '/events/$eventId/delete'
-      path: '/delete'
-      fullPath: '/events/$eventId/delete'
-      preLoaderRoute: typeof EventsEventIdDeleteRouteImport
-      parentRoute: typeof EventsEventIdRouteRoute
+    '/campaigns/$campaignId/events': {
+      id: '/campaigns/$campaignId/events'
+      path: '/events'
+      fullPath: '/campaigns/$campaignId/events'
+      preLoaderRoute: typeof CampaignsCampaignIdEventsRouteRouteImport
+      parentRoute: typeof CampaignsCampaignIdRouteRoute
     }
-    '/matches/$matchId/': {
-      id: '/matches/$matchId/'
+    '/campaigns/$campaignId/matches': {
+      id: '/campaigns/$campaignId/matches'
+      path: '/matches'
+      fullPath: '/campaigns/$campaignId/matches'
+      preLoaderRoute: typeof CampaignsCampaignIdMatchesRouteRouteImport
+      parentRoute: typeof CampaignsCampaignIdRouteRoute
+    }
+    '/campaigns/$campaignId/projector': {
+      id: '/campaigns/$campaignId/projector'
+      path: '/projector'
+      fullPath: '/campaigns/$campaignId/projector'
+      preLoaderRoute: typeof CampaignsCampaignIdProjectorRouteImport
+      parentRoute: typeof CampaignsCampaignIdRouteRoute
+    }
+    '/campaigns/$campaignId/warbands': {
+      id: '/campaigns/$campaignId/warbands'
+      path: '/warbands'
+      fullPath: '/campaigns/$campaignId/warbands'
+      preLoaderRoute: typeof CampaignsCampaignIdWarbandsRouteRouteImport
+      parentRoute: typeof CampaignsCampaignIdRouteRoute
+    }
+    '/campaigns/$campaignId/warriors': {
+      id: '/campaigns/$campaignId/warriors'
+      path: '/warriors'
+      fullPath: '/campaigns/$campaignId/warriors'
+      preLoaderRoute: typeof CampaignsCampaignIdWarriorsRouteRouteImport
+      parentRoute: typeof CampaignsCampaignIdRouteRoute
+    }
+    '/campaigns/$campaignId/events/': {
+      id: '/campaigns/$campaignId/events/'
       path: '/'
-      fullPath: '/matches/$matchId/'
-      preLoaderRoute: typeof MatchesMatchIdIndexRouteImport
-      parentRoute: typeof MatchesMatchIdRouteRoute
+      fullPath: '/campaigns/$campaignId/events/'
+      preLoaderRoute: typeof CampaignsCampaignIdEventsIndexRouteImport
+      parentRoute: typeof CampaignsCampaignIdEventsRouteRoute
     }
-    '/matches/$matchId/delete': {
-      id: '/matches/$matchId/delete'
-      path: '/delete'
-      fullPath: '/matches/$matchId/delete'
-      preLoaderRoute: typeof MatchesMatchIdDeleteRouteImport
-      parentRoute: typeof MatchesMatchIdRouteRoute
+    '/campaigns/$campaignId/events/$eventId': {
+      id: '/campaigns/$campaignId/events/$eventId'
+      path: '/$eventId'
+      fullPath: '/campaigns/$campaignId/events/$eventId'
+      preLoaderRoute: typeof CampaignsCampaignIdEventsEventIdRouteRouteImport
+      parentRoute: typeof CampaignsCampaignIdEventsRouteRoute
     }
-    '/warbands/$warbandId/': {
-      id: '/warbands/$warbandId/'
+    '/campaigns/$campaignId/matches/': {
+      id: '/campaigns/$campaignId/matches/'
       path: '/'
-      fullPath: '/warbands/$warbandId/'
-      preLoaderRoute: typeof WarbandsWarbandIdIndexRouteImport
-      parentRoute: typeof WarbandsWarbandIdRouteRoute
+      fullPath: '/campaigns/$campaignId/matches/'
+      preLoaderRoute: typeof CampaignsCampaignIdMatchesIndexRouteImport
+      parentRoute: typeof CampaignsCampaignIdMatchesRouteRoute
     }
-    '/warbands/$warbandId/delete': {
-      id: '/warbands/$warbandId/delete'
-      path: '/delete'
-      fullPath: '/warbands/$warbandId/delete'
-      preLoaderRoute: typeof WarbandsWarbandIdDeleteRouteImport
-      parentRoute: typeof WarbandsWarbandIdRouteRoute
+    '/campaigns/$campaignId/matches/$matchId': {
+      id: '/campaigns/$campaignId/matches/$matchId'
+      path: '/$matchId'
+      fullPath: '/campaigns/$campaignId/matches/$matchId'
+      preLoaderRoute: typeof CampaignsCampaignIdMatchesMatchIdRouteRouteImport
+      parentRoute: typeof CampaignsCampaignIdMatchesRouteRoute
     }
-    '/warriors/$warriorId/': {
-      id: '/warriors/$warriorId/'
+    '/campaigns/$campaignId/stats/': {
+      id: '/campaigns/$campaignId/stats/'
+      path: '/stats'
+      fullPath: '/campaigns/$campaignId/stats/'
+      preLoaderRoute: typeof CampaignsCampaignIdStatsIndexRouteImport
+      parentRoute: typeof CampaignsCampaignIdRouteRoute
+    }
+    '/campaigns/$campaignId/warbands/': {
+      id: '/campaigns/$campaignId/warbands/'
       path: '/'
-      fullPath: '/warriors/$warriorId/'
-      preLoaderRoute: typeof WarriorsWarriorIdIndexRouteImport
-      parentRoute: typeof WarriorsWarriorIdRouteRoute
+      fullPath: '/campaigns/$campaignId/warbands/'
+      preLoaderRoute: typeof CampaignsCampaignIdWarbandsIndexRouteImport
+      parentRoute: typeof CampaignsCampaignIdWarbandsRouteRoute
     }
-    '/warriors/$warriorId/delete': {
-      id: '/warriors/$warriorId/delete'
+    '/campaigns/$campaignId/warbands/$warbandId': {
+      id: '/campaigns/$campaignId/warbands/$warbandId'
+      path: '/$warbandId'
+      fullPath: '/campaigns/$campaignId/warbands/$warbandId'
+      preLoaderRoute: typeof CampaignsCampaignIdWarbandsWarbandIdRouteRouteImport
+      parentRoute: typeof CampaignsCampaignIdWarbandsRouteRoute
+    }
+    '/campaigns/$campaignId/warriors/': {
+      id: '/campaigns/$campaignId/warriors/'
+      path: '/'
+      fullPath: '/campaigns/$campaignId/warriors/'
+      preLoaderRoute: typeof CampaignsCampaignIdWarriorsIndexRouteImport
+      parentRoute: typeof CampaignsCampaignIdWarriorsRouteRoute
+    }
+    '/campaigns/$campaignId/warriors/$warriorId': {
+      id: '/campaigns/$campaignId/warriors/$warriorId'
+      path: '/$warriorId'
+      fullPath: '/campaigns/$campaignId/warriors/$warriorId'
+      preLoaderRoute: typeof CampaignsCampaignIdWarriorsWarriorIdRouteRouteImport
+      parentRoute: typeof CampaignsCampaignIdWarriorsRouteRoute
+    }
+    '/campaigns/$campaignId/events/$eventId/': {
+      id: '/campaigns/$campaignId/events/$eventId/'
+      path: '/'
+      fullPath: '/campaigns/$campaignId/events/$eventId/'
+      preLoaderRoute: typeof CampaignsCampaignIdEventsEventIdIndexRouteImport
+      parentRoute: typeof CampaignsCampaignIdEventsEventIdRouteRoute
+    }
+    '/campaigns/$campaignId/events/$eventId/delete': {
+      id: '/campaigns/$campaignId/events/$eventId/delete'
       path: '/delete'
-      fullPath: '/warriors/$warriorId/delete'
-      preLoaderRoute: typeof WarriorsWarriorIdDeleteRouteImport
-      parentRoute: typeof WarriorsWarriorIdRouteRoute
+      fullPath: '/campaigns/$campaignId/events/$eventId/delete'
+      preLoaderRoute: typeof CampaignsCampaignIdEventsEventIdDeleteRouteImport
+      parentRoute: typeof CampaignsCampaignIdEventsEventIdRouteRoute
+    }
+    '/campaigns/$campaignId/matches/$matchId/': {
+      id: '/campaigns/$campaignId/matches/$matchId/'
+      path: '/'
+      fullPath: '/campaigns/$campaignId/matches/$matchId/'
+      preLoaderRoute: typeof CampaignsCampaignIdMatchesMatchIdIndexRouteImport
+      parentRoute: typeof CampaignsCampaignIdMatchesMatchIdRouteRoute
+    }
+    '/campaigns/$campaignId/matches/$matchId/delete': {
+      id: '/campaigns/$campaignId/matches/$matchId/delete'
+      path: '/delete'
+      fullPath: '/campaigns/$campaignId/matches/$matchId/delete'
+      preLoaderRoute: typeof CampaignsCampaignIdMatchesMatchIdDeleteRouteImport
+      parentRoute: typeof CampaignsCampaignIdMatchesMatchIdRouteRoute
+    }
+    '/campaigns/$campaignId/warbands/$warbandId/': {
+      id: '/campaigns/$campaignId/warbands/$warbandId/'
+      path: '/'
+      fullPath: '/campaigns/$campaignId/warbands/$warbandId/'
+      preLoaderRoute: typeof CampaignsCampaignIdWarbandsWarbandIdIndexRouteImport
+      parentRoute: typeof CampaignsCampaignIdWarbandsWarbandIdRouteRoute
+    }
+    '/campaigns/$campaignId/warbands/$warbandId/delete': {
+      id: '/campaigns/$campaignId/warbands/$warbandId/delete'
+      path: '/delete'
+      fullPath: '/campaigns/$campaignId/warbands/$warbandId/delete'
+      preLoaderRoute: typeof CampaignsCampaignIdWarbandsWarbandIdDeleteRouteImport
+      parentRoute: typeof CampaignsCampaignIdWarbandsWarbandIdRouteRoute
+    }
+    '/campaigns/$campaignId/warriors/$warriorId/': {
+      id: '/campaigns/$campaignId/warriors/$warriorId/'
+      path: '/'
+      fullPath: '/campaigns/$campaignId/warriors/$warriorId/'
+      preLoaderRoute: typeof CampaignsCampaignIdWarriorsWarriorIdIndexRouteImport
+      parentRoute: typeof CampaignsCampaignIdWarriorsWarriorIdRouteRoute
+    }
+    '/campaigns/$campaignId/warriors/$warriorId/delete': {
+      id: '/campaigns/$campaignId/warriors/$warriorId/delete'
+      path: '/delete'
+      fullPath: '/campaigns/$campaignId/warriors/$warriorId/delete'
+      preLoaderRoute: typeof CampaignsCampaignIdWarriorsWarriorIdDeleteRouteImport
+      parentRoute: typeof CampaignsCampaignIdWarriorsWarriorIdRouteRoute
     }
   }
 }
 
-interface EventsEventIdRouteRouteChildren {
-  EventsEventIdDeleteRoute: typeof EventsEventIdDeleteRoute
-  EventsEventIdIndexRoute: typeof EventsEventIdIndexRoute
+interface CampaignsCampaignIdEventsEventIdRouteRouteChildren {
+  CampaignsCampaignIdEventsEventIdDeleteRoute: typeof CampaignsCampaignIdEventsEventIdDeleteRoute
+  CampaignsCampaignIdEventsEventIdIndexRoute: typeof CampaignsCampaignIdEventsEventIdIndexRoute
 }
 
-const EventsEventIdRouteRouteChildren: EventsEventIdRouteRouteChildren = {
-  EventsEventIdDeleteRoute: EventsEventIdDeleteRoute,
-  EventsEventIdIndexRoute: EventsEventIdIndexRoute,
-}
-
-const EventsEventIdRouteRouteWithChildren =
-  EventsEventIdRouteRoute._addFileChildren(EventsEventIdRouteRouteChildren)
-
-interface EventsRouteRouteChildren {
-  EventsEventIdRouteRoute: typeof EventsEventIdRouteRouteWithChildren
-  EventsIndexRoute: typeof EventsIndexRoute
-}
-
-const EventsRouteRouteChildren: EventsRouteRouteChildren = {
-  EventsEventIdRouteRoute: EventsEventIdRouteRouteWithChildren,
-  EventsIndexRoute: EventsIndexRoute,
-}
-
-const EventsRouteRouteWithChildren = EventsRouteRoute._addFileChildren(
-  EventsRouteRouteChildren,
-)
-
-interface MatchesMatchIdRouteRouteChildren {
-  MatchesMatchIdDeleteRoute: typeof MatchesMatchIdDeleteRoute
-  MatchesMatchIdIndexRoute: typeof MatchesMatchIdIndexRoute
-}
-
-const MatchesMatchIdRouteRouteChildren: MatchesMatchIdRouteRouteChildren = {
-  MatchesMatchIdDeleteRoute: MatchesMatchIdDeleteRoute,
-  MatchesMatchIdIndexRoute: MatchesMatchIdIndexRoute,
-}
-
-const MatchesMatchIdRouteRouteWithChildren =
-  MatchesMatchIdRouteRoute._addFileChildren(MatchesMatchIdRouteRouteChildren)
-
-interface MatchesRouteRouteChildren {
-  MatchesMatchIdRouteRoute: typeof MatchesMatchIdRouteRouteWithChildren
-  MatchesIndexRoute: typeof MatchesIndexRoute
-}
-
-const MatchesRouteRouteChildren: MatchesRouteRouteChildren = {
-  MatchesMatchIdRouteRoute: MatchesMatchIdRouteRouteWithChildren,
-  MatchesIndexRoute: MatchesIndexRoute,
-}
-
-const MatchesRouteRouteWithChildren = MatchesRouteRoute._addFileChildren(
-  MatchesRouteRouteChildren,
-)
-
-interface WarbandsWarbandIdRouteRouteChildren {
-  WarbandsWarbandIdDeleteRoute: typeof WarbandsWarbandIdDeleteRoute
-  WarbandsWarbandIdIndexRoute: typeof WarbandsWarbandIdIndexRoute
-}
-
-const WarbandsWarbandIdRouteRouteChildren: WarbandsWarbandIdRouteRouteChildren =
+const CampaignsCampaignIdEventsEventIdRouteRouteChildren: CampaignsCampaignIdEventsEventIdRouteRouteChildren =
   {
-    WarbandsWarbandIdDeleteRoute: WarbandsWarbandIdDeleteRoute,
-    WarbandsWarbandIdIndexRoute: WarbandsWarbandIdIndexRoute,
+    CampaignsCampaignIdEventsEventIdDeleteRoute:
+      CampaignsCampaignIdEventsEventIdDeleteRoute,
+    CampaignsCampaignIdEventsEventIdIndexRoute:
+      CampaignsCampaignIdEventsEventIdIndexRoute,
   }
 
-const WarbandsWarbandIdRouteRouteWithChildren =
-  WarbandsWarbandIdRouteRoute._addFileChildren(
-    WarbandsWarbandIdRouteRouteChildren,
+const CampaignsCampaignIdEventsEventIdRouteRouteWithChildren =
+  CampaignsCampaignIdEventsEventIdRouteRoute._addFileChildren(
+    CampaignsCampaignIdEventsEventIdRouteRouteChildren,
   )
 
-interface WarbandsRouteRouteChildren {
-  WarbandsWarbandIdRouteRoute: typeof WarbandsWarbandIdRouteRouteWithChildren
-  WarbandsIndexRoute: typeof WarbandsIndexRoute
+interface CampaignsCampaignIdEventsRouteRouteChildren {
+  CampaignsCampaignIdEventsEventIdRouteRoute: typeof CampaignsCampaignIdEventsEventIdRouteRouteWithChildren
+  CampaignsCampaignIdEventsIndexRoute: typeof CampaignsCampaignIdEventsIndexRoute
 }
 
-const WarbandsRouteRouteChildren: WarbandsRouteRouteChildren = {
-  WarbandsWarbandIdRouteRoute: WarbandsWarbandIdRouteRouteWithChildren,
-  WarbandsIndexRoute: WarbandsIndexRoute,
-}
-
-const WarbandsRouteRouteWithChildren = WarbandsRouteRoute._addFileChildren(
-  WarbandsRouteRouteChildren,
-)
-
-interface WarriorsWarriorIdRouteRouteChildren {
-  WarriorsWarriorIdDeleteRoute: typeof WarriorsWarriorIdDeleteRoute
-  WarriorsWarriorIdIndexRoute: typeof WarriorsWarriorIdIndexRoute
-}
-
-const WarriorsWarriorIdRouteRouteChildren: WarriorsWarriorIdRouteRouteChildren =
+const CampaignsCampaignIdEventsRouteRouteChildren: CampaignsCampaignIdEventsRouteRouteChildren =
   {
-    WarriorsWarriorIdDeleteRoute: WarriorsWarriorIdDeleteRoute,
-    WarriorsWarriorIdIndexRoute: WarriorsWarriorIdIndexRoute,
+    CampaignsCampaignIdEventsEventIdRouteRoute:
+      CampaignsCampaignIdEventsEventIdRouteRouteWithChildren,
+    CampaignsCampaignIdEventsIndexRoute: CampaignsCampaignIdEventsIndexRoute,
   }
 
-const WarriorsWarriorIdRouteRouteWithChildren =
-  WarriorsWarriorIdRouteRoute._addFileChildren(
-    WarriorsWarriorIdRouteRouteChildren,
+const CampaignsCampaignIdEventsRouteRouteWithChildren =
+  CampaignsCampaignIdEventsRouteRoute._addFileChildren(
+    CampaignsCampaignIdEventsRouteRouteChildren,
   )
 
-interface WarriorsRouteRouteChildren {
-  WarriorsWarriorIdRouteRoute: typeof WarriorsWarriorIdRouteRouteWithChildren
-  WarriorsIndexRoute: typeof WarriorsIndexRoute
+interface CampaignsCampaignIdMatchesMatchIdRouteRouteChildren {
+  CampaignsCampaignIdMatchesMatchIdDeleteRoute: typeof CampaignsCampaignIdMatchesMatchIdDeleteRoute
+  CampaignsCampaignIdMatchesMatchIdIndexRoute: typeof CampaignsCampaignIdMatchesMatchIdIndexRoute
 }
 
-const WarriorsRouteRouteChildren: WarriorsRouteRouteChildren = {
-  WarriorsWarriorIdRouteRoute: WarriorsWarriorIdRouteRouteWithChildren,
-  WarriorsIndexRoute: WarriorsIndexRoute,
+const CampaignsCampaignIdMatchesMatchIdRouteRouteChildren: CampaignsCampaignIdMatchesMatchIdRouteRouteChildren =
+  {
+    CampaignsCampaignIdMatchesMatchIdDeleteRoute:
+      CampaignsCampaignIdMatchesMatchIdDeleteRoute,
+    CampaignsCampaignIdMatchesMatchIdIndexRoute:
+      CampaignsCampaignIdMatchesMatchIdIndexRoute,
+  }
+
+const CampaignsCampaignIdMatchesMatchIdRouteRouteWithChildren =
+  CampaignsCampaignIdMatchesMatchIdRouteRoute._addFileChildren(
+    CampaignsCampaignIdMatchesMatchIdRouteRouteChildren,
+  )
+
+interface CampaignsCampaignIdMatchesRouteRouteChildren {
+  CampaignsCampaignIdMatchesMatchIdRouteRoute: typeof CampaignsCampaignIdMatchesMatchIdRouteRouteWithChildren
+  CampaignsCampaignIdMatchesIndexRoute: typeof CampaignsCampaignIdMatchesIndexRoute
 }
 
-const WarriorsRouteRouteWithChildren = WarriorsRouteRoute._addFileChildren(
-  WarriorsRouteRouteChildren,
-)
+const CampaignsCampaignIdMatchesRouteRouteChildren: CampaignsCampaignIdMatchesRouteRouteChildren =
+  {
+    CampaignsCampaignIdMatchesMatchIdRouteRoute:
+      CampaignsCampaignIdMatchesMatchIdRouteRouteWithChildren,
+    CampaignsCampaignIdMatchesIndexRoute: CampaignsCampaignIdMatchesIndexRoute,
+  }
+
+const CampaignsCampaignIdMatchesRouteRouteWithChildren =
+  CampaignsCampaignIdMatchesRouteRoute._addFileChildren(
+    CampaignsCampaignIdMatchesRouteRouteChildren,
+  )
+
+interface CampaignsCampaignIdWarbandsWarbandIdRouteRouteChildren {
+  CampaignsCampaignIdWarbandsWarbandIdDeleteRoute: typeof CampaignsCampaignIdWarbandsWarbandIdDeleteRoute
+  CampaignsCampaignIdWarbandsWarbandIdIndexRoute: typeof CampaignsCampaignIdWarbandsWarbandIdIndexRoute
+}
+
+const CampaignsCampaignIdWarbandsWarbandIdRouteRouteChildren: CampaignsCampaignIdWarbandsWarbandIdRouteRouteChildren =
+  {
+    CampaignsCampaignIdWarbandsWarbandIdDeleteRoute:
+      CampaignsCampaignIdWarbandsWarbandIdDeleteRoute,
+    CampaignsCampaignIdWarbandsWarbandIdIndexRoute:
+      CampaignsCampaignIdWarbandsWarbandIdIndexRoute,
+  }
+
+const CampaignsCampaignIdWarbandsWarbandIdRouteRouteWithChildren =
+  CampaignsCampaignIdWarbandsWarbandIdRouteRoute._addFileChildren(
+    CampaignsCampaignIdWarbandsWarbandIdRouteRouteChildren,
+  )
+
+interface CampaignsCampaignIdWarbandsRouteRouteChildren {
+  CampaignsCampaignIdWarbandsWarbandIdRouteRoute: typeof CampaignsCampaignIdWarbandsWarbandIdRouteRouteWithChildren
+  CampaignsCampaignIdWarbandsIndexRoute: typeof CampaignsCampaignIdWarbandsIndexRoute
+}
+
+const CampaignsCampaignIdWarbandsRouteRouteChildren: CampaignsCampaignIdWarbandsRouteRouteChildren =
+  {
+    CampaignsCampaignIdWarbandsWarbandIdRouteRoute:
+      CampaignsCampaignIdWarbandsWarbandIdRouteRouteWithChildren,
+    CampaignsCampaignIdWarbandsIndexRoute:
+      CampaignsCampaignIdWarbandsIndexRoute,
+  }
+
+const CampaignsCampaignIdWarbandsRouteRouteWithChildren =
+  CampaignsCampaignIdWarbandsRouteRoute._addFileChildren(
+    CampaignsCampaignIdWarbandsRouteRouteChildren,
+  )
+
+interface CampaignsCampaignIdWarriorsWarriorIdRouteRouteChildren {
+  CampaignsCampaignIdWarriorsWarriorIdDeleteRoute: typeof CampaignsCampaignIdWarriorsWarriorIdDeleteRoute
+  CampaignsCampaignIdWarriorsWarriorIdIndexRoute: typeof CampaignsCampaignIdWarriorsWarriorIdIndexRoute
+}
+
+const CampaignsCampaignIdWarriorsWarriorIdRouteRouteChildren: CampaignsCampaignIdWarriorsWarriorIdRouteRouteChildren =
+  {
+    CampaignsCampaignIdWarriorsWarriorIdDeleteRoute:
+      CampaignsCampaignIdWarriorsWarriorIdDeleteRoute,
+    CampaignsCampaignIdWarriorsWarriorIdIndexRoute:
+      CampaignsCampaignIdWarriorsWarriorIdIndexRoute,
+  }
+
+const CampaignsCampaignIdWarriorsWarriorIdRouteRouteWithChildren =
+  CampaignsCampaignIdWarriorsWarriorIdRouteRoute._addFileChildren(
+    CampaignsCampaignIdWarriorsWarriorIdRouteRouteChildren,
+  )
+
+interface CampaignsCampaignIdWarriorsRouteRouteChildren {
+  CampaignsCampaignIdWarriorsWarriorIdRouteRoute: typeof CampaignsCampaignIdWarriorsWarriorIdRouteRouteWithChildren
+  CampaignsCampaignIdWarriorsIndexRoute: typeof CampaignsCampaignIdWarriorsIndexRoute
+}
+
+const CampaignsCampaignIdWarriorsRouteRouteChildren: CampaignsCampaignIdWarriorsRouteRouteChildren =
+  {
+    CampaignsCampaignIdWarriorsWarriorIdRouteRoute:
+      CampaignsCampaignIdWarriorsWarriorIdRouteRouteWithChildren,
+    CampaignsCampaignIdWarriorsIndexRoute:
+      CampaignsCampaignIdWarriorsIndexRoute,
+  }
+
+const CampaignsCampaignIdWarriorsRouteRouteWithChildren =
+  CampaignsCampaignIdWarriorsRouteRoute._addFileChildren(
+    CampaignsCampaignIdWarriorsRouteRouteChildren,
+  )
+
+interface CampaignsCampaignIdRouteRouteChildren {
+  CampaignsCampaignIdEventsRouteRoute: typeof CampaignsCampaignIdEventsRouteRouteWithChildren
+  CampaignsCampaignIdMatchesRouteRoute: typeof CampaignsCampaignIdMatchesRouteRouteWithChildren
+  CampaignsCampaignIdWarbandsRouteRoute: typeof CampaignsCampaignIdWarbandsRouteRouteWithChildren
+  CampaignsCampaignIdWarriorsRouteRoute: typeof CampaignsCampaignIdWarriorsRouteRouteWithChildren
+  CampaignsCampaignIdProjectorRoute: typeof CampaignsCampaignIdProjectorRoute
+  CampaignsCampaignIdIndexRoute: typeof CampaignsCampaignIdIndexRoute
+  CampaignsCampaignIdStatsIndexRoute: typeof CampaignsCampaignIdStatsIndexRoute
+}
+
+const CampaignsCampaignIdRouteRouteChildren: CampaignsCampaignIdRouteRouteChildren =
+  {
+    CampaignsCampaignIdEventsRouteRoute:
+      CampaignsCampaignIdEventsRouteRouteWithChildren,
+    CampaignsCampaignIdMatchesRouteRoute:
+      CampaignsCampaignIdMatchesRouteRouteWithChildren,
+    CampaignsCampaignIdWarbandsRouteRoute:
+      CampaignsCampaignIdWarbandsRouteRouteWithChildren,
+    CampaignsCampaignIdWarriorsRouteRoute:
+      CampaignsCampaignIdWarriorsRouteRouteWithChildren,
+    CampaignsCampaignIdProjectorRoute: CampaignsCampaignIdProjectorRoute,
+    CampaignsCampaignIdIndexRoute: CampaignsCampaignIdIndexRoute,
+    CampaignsCampaignIdStatsIndexRoute: CampaignsCampaignIdStatsIndexRoute,
+  }
+
+const CampaignsCampaignIdRouteRouteWithChildren =
+  CampaignsCampaignIdRouteRoute._addFileChildren(
+    CampaignsCampaignIdRouteRouteChildren,
+  )
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  EventsRouteRoute: EventsRouteRouteWithChildren,
-  MatchesRouteRoute: MatchesRouteRouteWithChildren,
-  WarbandsRouteRoute: WarbandsRouteRouteWithChildren,
-  WarriorsRouteRoute: WarriorsRouteRouteWithChildren,
   EquipmentRoute: EquipmentRoute,
   GeneratedImagesRoute: GeneratedImagesRoute,
-  ProjectorRoute: ProjectorRoute,
   QueueRoute: QueueRoute,
   QueueJobsRoute: QueueJobsRoute,
   SettingsRoute: SettingsRoute,
-  StatsIndexRoute: StatsIndexRoute,
+  CampaignsCampaignIdRouteRoute: CampaignsCampaignIdRouteRouteWithChildren,
   ApiGeneratedImagesJobIdRoute: ApiGeneratedImagesJobIdRoute,
 }
 export const routeTree = rootRouteImport

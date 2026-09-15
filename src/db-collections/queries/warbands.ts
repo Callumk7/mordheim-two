@@ -30,16 +30,24 @@ export function warbandsQuery(
 		warbands: StringKeyedCollection<Warband>;
 		warriors: StringKeyedCollection<Warrior>;
 	},
+	campaignId: string,
 	showArchived = false,
 ) {
 	return (q: InitialQueryBuilder) => {
-		const source = q.from({ warband: warbands });
-		const filtered = showArchived
-			? source
-			: source.where(({ warband }) => eq(warband.isArchived, false));
-		return filtered
+		const source = q
+			.from({ warband: warbands })
+			.where(({ warband }) =>
+				showArchived
+					? eq(warband.campaignId, campaignId)
+					: and(
+							eq(warband.campaignId, campaignId),
+							eq(warband.isArchived, false),
+						),
+			);
+		return source
 			.select(({ warband }) => ({
 				id: warband.id,
+				campaignId: warband.campaignId,
 				name: warband.name,
 				faction: warband.faction,
 				bio: warband.bio,
@@ -55,8 +63,12 @@ export function warbandsQuery(
 						.from({ warrior: warriors })
 						.where(({ warrior }) =>
 							showArchived
-								? eq(warrior.warbandId, warband.id)
+								? and(
+										eq(warrior.campaignId, campaignId),
+										eq(warrior.warbandId, warband.id),
+									)
 								: and(
+										eq(warrior.campaignId, campaignId),
 										eq(warrior.warbandId, warband.id),
 										eq(warrior.isArchived, false),
 									),
@@ -64,6 +76,7 @@ export function warbandsQuery(
 						.orderBy(({ warrior }) => warrior.name)
 						.select(({ warrior }) => ({
 							id: warrior.id,
+							campaignId: warrior.campaignId,
 							name: warrior.name,
 							class: warrior.class,
 							status: warrior.status,
@@ -82,10 +95,14 @@ export function warbandsQuery(
 	};
 }
 
-export function useWarbands(dbClient: DbClient, showArchived = false) {
+export function useWarbands(
+	dbClient: DbClient,
+	campaignId: string,
+	showArchived = false,
+) {
 	const collections = getCollections(dbClient);
 	const { data } = useLiveQuery({
-		query: warbandsQuery(collections, showArchived),
+		query: warbandsQuery(collections, campaignId, showArchived),
 	});
 	return data;
 }

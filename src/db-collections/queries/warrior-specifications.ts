@@ -35,6 +35,7 @@ type WarriorWarbandCollections = {
 
 export function warriorsQuery(
 	{ warbands, warriors }: WarriorCollections,
+	campaignId: string,
 	showArchived = false,
 ) {
 	return (q: InitialQueryBuilder) => {
@@ -42,16 +43,24 @@ export function warriorsQuery(
 			.from({ warrior: warriors })
 			.innerJoin({ warband: warbands }, ({ warrior, warband }) =>
 				eq(warrior.warbandId, warband.id),
+			)
+			.where(({ warrior, warband }) =>
+				showArchived
+					? and(
+							eq(warrior.campaignId, campaignId),
+							eq(warband.campaignId, campaignId),
+						)
+					: and(
+							eq(warrior.campaignId, campaignId),
+							eq(warband.campaignId, campaignId),
+							eq(warrior.isArchived, false),
+							eq(warband.isArchived, false),
+						),
 			);
-		return (
-			showArchived
-				? query
-				: query.where(({ warrior, warband }) =>
-						and(eq(warrior.isArchived, false), eq(warband.isArchived, false)),
-					)
-		)
+		return query
 			.select(({ warrior }) => ({
 				id: warrior.id,
+				campaignId: warrior.campaignId,
 				name: warrior.name,
 				class: warrior.class,
 				description: warrior.description,
@@ -96,14 +105,19 @@ export function warriorEventReferencesQuery(
 
 export function warriorWarbandsQuery(
 	{ warbands }: WarriorWarbandCollections,
+	campaignId: string,
 	showArchived = false,
 ) {
-	return (q: InitialQueryBuilder) => {
-		const query = q.from({ warband: warbands });
-		return (
-			showArchived
-				? query
-				: query.where(({ warband }) => eq(warband.isArchived, false))
-		).orderBy(({ warband }) => warband.name);
-	};
+	return (q: InitialQueryBuilder) =>
+		q
+			.from({ warband: warbands })
+			.where(({ warband }) =>
+				showArchived
+					? eq(warband.campaignId, campaignId)
+					: and(
+							eq(warband.campaignId, campaignId),
+							eq(warband.isArchived, false),
+						),
+			)
+			.orderBy(({ warband }) => warband.name);
 }

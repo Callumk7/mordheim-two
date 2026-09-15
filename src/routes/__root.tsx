@@ -70,15 +70,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 	shellComponent: RootDocument,
 });
 
-type PrimaryNavTarget =
-	| "/"
-	| "/warbands"
-	| "/warriors"
-	| "/equipment"
-	| "/matches"
-	| "/stats"
-	| "/events"
-	| "/settings";
+type PrimaryNavTarget = "/" | "/equipment" | "/settings";
 
 function NavLink({
 	children,
@@ -100,18 +92,24 @@ function NavLink({
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-	const isProjector = useRouterState({
-		select: (state) =>
-			state.location.pathname === "/projector" ||
-			state.location.pathname.startsWith("/projector/"),
+	const { isCampaign, isProjector } = useRouterState({
+		select: (state) => {
+			const pathname = state.location.pathname;
+			return {
+				isCampaign: pathname.startsWith("/campaigns/"),
+				isProjector:
+					pathname === "/projector" || pathname.includes("/projector"),
+			};
+		},
 	});
+	const showGlobalChrome = !isProjector && !isCampaign;
 	return (
 		<html lang="en">
 			<head>
 				<HeadContent />
 			</head>
 			<body className="dark min-h-screen">
-				{!isProjector && (
+				{showGlobalChrome && (
 					<header className="border-b border-border backdrop-blur">
 						<div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-4 sm:px-8">
 							<nav
@@ -119,19 +117,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 								className="flex flex-wrap items-center gap-2 text-sm"
 							>
 								<NavLink to="/">Home</NavLink>
-								<NavLink to="/warbands">Warbands</NavLink>
-								<NavLink to="/warriors">Warriors</NavLink>
 								<NavLink to="/equipment">Equipment</NavLink>
-								<NavLink to="/matches">Matches</NavLink>
-								<NavLink to="/stats">Stats</NavLink>
-								<NavLink to="/events">Events</NavLink>
 								<NavLink to="/settings">Settings</NavLink>
 							</nav>
 						</div>
 					</header>
 				)}
 				{children}
-				{!isProjector && (
+				{showGlobalChrome && (
 					<TanStackDevtools
 						config={{
 							position: "bottom-right",

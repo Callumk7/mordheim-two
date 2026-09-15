@@ -26,10 +26,12 @@ function buildParticipants(
 export function buildCreateMatchCommand(
 	{ participantWarbandIds, ...values }: MatchFormValues,
 	{ newId, now }: CommandSources,
+	campaignId: string,
 ) {
 	const timestamp = now();
 	const match: Match = {
 		id: newId(),
+		campaignId,
 		...values,
 		createdAt: timestamp,
 		updatedAt: timestamp,
