@@ -68,13 +68,14 @@ function MatchDetailPage() {
 	const {
 		allWarbands: warbandRows,
 		canAddEvent,
+		eligibleWarbands,
+		eligibleWarriors,
 		events: eventRows,
 		lockedParticipantWarbandIds,
 		match,
 		participants: participantRows,
 		staffedWarbands: staffedParticipantWarbands,
 		warbands: participantWarbands,
-		warriors: warriorRows,
 		winnerWarband,
 	} = useMatchWorkspace(dbClient, matchId);
 	// Projected over every event, so a warrior killed in an earlier match is
@@ -103,12 +104,14 @@ function MatchDetailPage() {
 		matchId,
 		attackerWarbandId,
 		attackerWarriorId:
-			warriorRows.find((warrior) => warrior.warbandId === attackerWarbandId)
-				?.id ?? "",
+			eligibleWarriors.find(
+				(warrior) => warrior.warbandId === attackerWarbandId,
+			)?.id ?? "",
 		defenderWarbandId,
 		defenderWarriorId:
-			warriorRows.find((warrior) => warrior.warbandId === defenderWarbandId)
-				?.id ?? "",
+			eligibleWarriors.find(
+				(warrior) => warrior.warbandId === defenderWarbandId,
+			)?.id ?? "",
 		notes: null,
 	};
 	const addEvent = async (
@@ -291,8 +294,8 @@ function MatchDetailPage() {
 				onSaveResult={(changes) => updateMatch(changes)}
 				onSetOutcome={setEventOutcome}
 				participants={participantRows}
-				warbands={participantWarbands}
-				warriors={warriorRows}
+				warbands={eligibleWarbands}
+				warriors={eligibleWarriors}
 			/>
 
 			<Dialog isOpen={isNewEventOpen} onOpenChange={setIsNewEventOpen}>
@@ -313,8 +316,8 @@ function MatchDetailPage() {
 					}}
 					participants={participantRows}
 					submitLabel="Add event"
-					warbands={participantWarbands}
-					warriors={warriorRows}
+					warbands={eligibleWarbands}
+					warriors={eligibleWarriors}
 				/>
 			</Dialog>
 
@@ -354,7 +357,7 @@ function MatchDetailPage() {
 						setIsEditMatchOpen(false);
 					}}
 					submitLabel="Save changes"
-					warbands={warbandRows}
+					warbands={warbandRows.filter((warband) => !warband.isArchived)}
 				/>
 			</Dialog>
 		</div>

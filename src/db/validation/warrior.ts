@@ -15,12 +15,27 @@ export const WarriorFieldsSchema = z.object({
 	knockedDowns: z.number().int(),
 });
 
+const archiveFields = {
+	isArchived: z.boolean().default(false),
+	archivedAt: z.string().datetime({ offset: true }).nullable().default(null),
+};
+
 export const WarriorSchema = WarriorFieldsSchema.extend({
 	id: z.string().min(1),
+	...archiveFields,
 	createdAt: z.string().default(() => new Date().toISOString()),
 	updatedAt: z.string().default(() => new Date().toISOString()),
+}).superRefine((warrior, context) => {
+	if (warrior.isArchived !== (warrior.archivedAt !== null)) {
+		context.addIssue({
+			code: "custom",
+			message: "Archived warriors must have an archive timestamp.",
+			path: ["archivedAt"],
+		});
+	}
 });
 
+// Archival state is changed only through the dedicated operations below.
 export const WarriorUpdateSchema = WarriorFieldsSchema.partial().strict();
 
 export const WarriorUpdateInputSchema = z.object({
@@ -28,6 +43,8 @@ export const WarriorUpdateInputSchema = z.object({
 	changes: WarriorUpdateSchema,
 });
 
-export const WarriorDeleteInputSchema = z.object({ id: z.string().min(1) });
+export const WarriorArchiveInputSchema = z.object({ id: z.string().min(1) });
+
+export const WarriorDeleteInputSchema = WarriorArchiveInputSchema;
 
 export type Warrior = z.output<typeof WarriorSchema>;

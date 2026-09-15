@@ -17,6 +17,8 @@ function warband(id: string): Warband {
 		gold: 0,
 		rating: 100,
 		wins: 0,
+		isArchived: false,
+		archivedAt: null,
 		createdAt: timestamp,
 		updatedAt: timestamp,
 	};
@@ -36,6 +38,8 @@ function warrior(
 		knocked: 0,
 		injuries: 0,
 		knockedDowns: 0,
+		isArchived: false,
+		archivedAt: null,
 		createdAt: timestamp,
 		updatedAt: timestamp,
 	};

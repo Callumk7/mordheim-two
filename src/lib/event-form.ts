@@ -29,8 +29,9 @@ export function deriveEventFormOptions(
 	);
 	const participantWarbands = warbands.filter(
 		(warband) =>
+			!warband.isArchived &&
 			participantWarbandIds.includes(warband.id) &&
-			warriors.some((warrior) => warrior.warbandId === warband.id),
+			getWarriorsForWarband(warband.id, warriors).length > 0,
 	);
 
 	return {
@@ -48,7 +49,7 @@ export function changeEventMatch(
 	warriors: readonly Warrior[],
 ): EventFormValues {
 	const nextWarbandIds = getParticipantWarbandIds(matchId, participants).filter(
-		(warbandId) => warriors.some((warrior) => warrior.warbandId === warbandId),
+		(warbandId) => getWarriorsForWarband(warbandId, warriors).length > 0,
 	);
 	const attackerWarbandId = nextWarbandIds[0] ?? "";
 	const defenderWarbandId = nextWarbandIds[1] ?? "";
@@ -113,15 +114,11 @@ export function canSubmitEvent(
 		participantWarbandIds.includes(values.attackerWarbandId) &&
 		participantWarbandIds.includes(values.defenderWarbandId) &&
 		values.attackerWarbandId !== values.defenderWarbandId &&
-		warriors.some(
-			(warrior) =>
-				warrior.id === values.attackerWarriorId &&
-				warrior.warbandId === values.attackerWarbandId,
+		getWarriorsForWarband(values.attackerWarbandId, warriors).some(
+			(warrior) => warrior.id === values.attackerWarriorId,
 		) &&
-		warriors.some(
-			(warrior) =>
-				warrior.id === values.defenderWarriorId &&
-				warrior.warbandId === values.defenderWarbandId,
+		getWarriorsForWarband(values.defenderWarbandId, warriors).some(
+			(warrior) => warrior.id === values.defenderWarriorId,
 		)
 	);
 }

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { WarbandSchema, WarbandUpdateInputSchema } from "../validation/warband";
 import { WarriorSchema, WarriorUpdateInputSchema } from "../validation/warrior";
 
 const validWarrior = {
@@ -38,6 +39,48 @@ describe("warrior validation", () => {
 				description: "  A scarred veteran in a crimson hood.  ",
 			}).description,
 		).toBe("A scarred veteran in a crimson hood.");
+	});
+
+	it("rejects inconsistent archive pairs and archival generic updates", () => {
+		for (const schema of [WarriorSchema, WarbandSchema]) {
+			expect(
+				schema.safeParse({
+					...validWarrior,
+					faction: "Reikland",
+					gold: 0,
+					rating: 0,
+					wins: 0,
+					isArchived: true,
+					archivedAt: null,
+				}).success,
+			).toBe(false);
+			expect(
+				schema.safeParse({
+					...validWarrior,
+					faction: "Reikland",
+					gold: 0,
+					rating: 0,
+					wins: 0,
+					isArchived: false,
+					archivedAt: "2026-01-01T00:00:00.000Z",
+				}).success,
+			).toBe(false);
+		}
+		expect(
+			WarriorUpdateInputSchema.safeParse({
+				id: validWarrior.id,
+				changes: { isArchived: true, archivedAt: null },
+			}).success,
+		).toBe(false);
+		expect(
+			WarbandUpdateInputSchema.safeParse({
+				id: "warband-1",
+				changes: {
+					isArchived: true,
+					archivedAt: "2026-01-01T00:00:00.000Z",
+				},
+			}).success,
+		).toBe(false);
 	});
 
 	it("allows description-only updates, including clearing the field", () => {

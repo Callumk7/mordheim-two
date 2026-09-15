@@ -40,6 +40,8 @@ const warrior: Warrior = {
 	knocked: 0,
 	injuries: 0,
 	knockedDowns: 0,
+	isArchived: false,
+	archivedAt: null,
 	createdAt: timestamp,
 	updatedAt: timestamp,
 };

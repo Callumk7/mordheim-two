@@ -71,10 +71,11 @@ export function projectCombatStats(
 		| "resolvedAt"
 		| "voidedAt"
 	>[],
-	warriors: readonly Pick<
+	warriors: readonly (Pick<
 		Warrior,
 		"id" | "warbandId" | "knocked" | "injuries" | "knockedDowns"
-	>[] = [],
+	> &
+		Partial<Pick<Warrior, "isArchived" | "archivedAt">>)[] = [],
 ): CombatStatsProjection {
 	const warbands = new Map<string, CombatStats>();
 	const warriorStatsById = new Map<string, WarriorCombatStats>();

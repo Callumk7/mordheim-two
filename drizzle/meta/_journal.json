@@ -169,6 +169,13 @@
       "when": 1789331348004,
       "tag": "0023_wild_pixie",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "6",
+      "when": 1789487047580,
+      "tag": "0024_wandering_cerise",
+      "breakpoints": true
     }
   ]
 }

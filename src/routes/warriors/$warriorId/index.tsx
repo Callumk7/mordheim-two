@@ -1,4 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+import {
+	ArchiveAction,
+	ArchivedBanner,
+} from "@/components/shared/archive-controls";
 import { EntityHeader, EntityToolbar } from "@/components/shared/entity-chrome";
 import { CombatStatValue, StatTile } from "@/components/shared/stat-display";
 import { Typography } from "@/components/shared/typography";
@@ -28,7 +32,7 @@ function WarriorDetailPage() {
 	const portrait = Route.useLoaderData();
 	const { dbClient } = Route.useRouteContext();
 	const collections = getCollections(dbClient);
-	const { updateWarrior } = useWarriorMutations(dbClient);
+	const { setWarriorArchived, updateWarrior } = useWarriorMutations(dbClient);
 	const { eventReferences, warbands, warrior } = useWarriorDetails(
 		dbClient,
 		warriorId,
@@ -46,6 +50,16 @@ function WarriorDetailPage() {
 	return (
 		<div className="mx-auto max-w-3xl">
 			<EntityToolbar
+				actions={
+					<ArchiveAction
+						entityLabel="warrior"
+						isArchived={warrior.isArchived}
+						name={warrior.name}
+						onConfirm={() =>
+							setWarriorArchived(warrior.id, !warrior.isArchived)
+						}
+					/>
+				}
 				backLabel="← Warriors"
 				backLink={{ to: "/warriors" }}
 				destructiveLabel="Delete warrior"
@@ -54,6 +68,12 @@ function WarriorDetailPage() {
 					to: "/warriors/$warriorId/delete",
 				}}
 			/>
+
+			{warrior.isArchived && warrior.archivedAt ? (
+				<div className="mt-7">
+					<ArchivedBanner archivedAt={warrior.archivedAt} />
+				</div>
+			) : null}
 
 			<EntityHeader
 				className="mt-7 border-b border-border pb-6"

@@ -10,6 +10,7 @@ import {
 	warriors,
 } from "@/db/schema";
 import type {
+	WarbandArchiveInputSchema,
 	WarbandDeleteInputSchema,
 	WarbandSchema,
 	WarbandUpdateInputSchema,
@@ -39,6 +40,29 @@ export async function updateWarband(
 			...data.changes,
 			updatedAt: clock(),
 		})
+		.where(eq(warbands.id, data.id));
+}
+
+export async function archiveWarband(
+	db: Database,
+	data: z.output<typeof WarbandArchiveInputSchema>,
+	clock: Clock = systemClock,
+) {
+	const now = clock();
+	await db
+		.update(warbands)
+		.set({ isArchived: true, archivedAt: now, updatedAt: now })
+		.where(eq(warbands.id, data.id));
+}
+
+export async function unarchiveWarband(
+	db: Database,
+	data: z.output<typeof WarbandArchiveInputSchema>,
+	clock: Clock = systemClock,
+) {
+	await db
+		.update(warbands)
+		.set({ isArchived: false, archivedAt: null, updatedAt: clock() })
 		.where(eq(warbands.id, data.id));
 }
 

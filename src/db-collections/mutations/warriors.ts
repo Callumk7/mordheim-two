@@ -4,7 +4,10 @@ import type { Warrior } from "@/db/validation/warrior";
 import { deleteWarrior } from "@/server/warriors";
 import { type AppCollections, getCollections } from "..";
 
-export type NewWarrior = Omit<Warrior, "id" | "createdAt" | "updatedAt">;
+export type NewWarrior = Omit<
+	Warrior,
+	"id" | "isArchived" | "archivedAt" | "createdAt" | "updatedAt"
+>;
 export type WarriorChanges = Partial<NewWarrior>;
 
 export function createWarriorTransaction(
@@ -15,6 +18,8 @@ export function createWarriorTransaction(
 	return collections.warriors.insert({
 		id: safeRandomUUID(),
 		...values,
+		isArchived: false,
+		archivedAt: null,
 		createdAt: now,
 		updatedAt: now,
 	});
@@ -27,6 +32,20 @@ export function updateWarriorTransaction(
 ) {
 	return collections.warriors.update(warriorId, (draft) => {
 		Object.assign(draft, changes);
+	});
+}
+
+export function setWarriorArchivedTransaction(
+	collections: AppCollections,
+	warriorId: string,
+	isArchived: boolean,
+	now: () => string = () => new Date().toISOString(),
+) {
+	return collections.warriors.update(warriorId, (draft) => {
+		const timestamp = now();
+		draft.isArchived = isArchived;
+		draft.archivedAt = isArchived ? timestamp : null;
+		draft.updatedAt = timestamp;
 	});
 }
 
@@ -75,6 +94,17 @@ export function useWarriorMutations(dbClient: DbClient) {
 		},
 		[dbClient],
 	);
+	const setWarriorArchived = useCallback(
+		async (warriorId: string, isArchived: boolean) => {
+			const transaction = setWarriorArchivedTransaction(
+				getCollections(dbClient),
+				warriorId,
+				isArchived,
+			);
+			await transaction.isPersisted.promise;
+		},
+		[dbClient],
+	);
 	const removeWarrior = useCallback(
 		async (warriorId: string, eventIds: string[]) => {
 			const collections = getCollections(dbClient);
@@ -89,5 +119,5 @@ export function useWarriorMutations(dbClient: DbClient) {
 		[dbClient],
 	);
 
-	return { createWarrior, removeWarrior, updateWarrior };
+	return { createWarrior, removeWarrior, setWarriorArchived, updateWarrior };
 }

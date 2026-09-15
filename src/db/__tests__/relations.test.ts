@@ -185,6 +185,8 @@ describe("event relations", () => {
 			knocked: 0,
 			injuries: 0,
 			knockedDowns: 0,
+			isArchived: false,
+			archivedAt: null,
 			createdAt: "now",
 			updatedAt: "now",
 		};

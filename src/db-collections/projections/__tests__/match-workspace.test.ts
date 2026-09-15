@@ -17,7 +17,7 @@ const match: Match = {
 	updatedAt: "2026-01-01T00:00:00.000Z",
 };
 
-function makeWarband(id: string): Warband {
+function makeWarband(id: string, overrides: Partial<Warband> = {}): Warband {
 	return {
 		id,
 		name: id,
@@ -26,8 +26,11 @@ function makeWarband(id: string): Warband {
 		gold: 0,
 		rating: 100,
 		wins: 0,
+		isArchived: false,
+		archivedAt: null,
 		createdAt: "2026-01-01T00:00:00.000Z",
 		updatedAt: "2026-01-01T00:00:00.000Z",
+		...overrides,
 	};
 }
 
@@ -41,7 +44,11 @@ function makeParticipant(id: string, warbandId: string): WarbandMatch {
 	};
 }
 
-function makeWarrior(id: string, warbandId: string): Warrior {
+function makeWarrior(
+	id: string,
+	warbandId: string,
+	overrides: Partial<Warrior> = {},
+): Warrior {
 	return {
 		id,
 		name: id,
@@ -51,8 +58,11 @@ function makeWarrior(id: string, warbandId: string): Warrior {
 		knocked: 0,
 		injuries: 0,
 		knockedDowns: 0,
+		isArchived: false,
+		archivedAt: null,
 		createdAt: "2026-01-01T00:00:00.000Z",
 		updatedAt: "2026-01-01T00:00:00.000Z",
+		...overrides,
 	};
 }
 
@@ -133,6 +143,42 @@ describe("projectMatchWorkspace", () => {
 		expect(workspace.staffedWarbands.map((warband) => warband.id)).toEqual([
 			alpha.id,
 		]);
+	});
+
+	it("preserves historical participants but excludes archived entities from play", () => {
+		const archivedAt = "2026-02-01T00:00:00.000Z";
+		const active = makeWarband("active");
+		const archived = makeWarband("archived", {
+			isArchived: true,
+			archivedAt,
+		});
+		const workspace = project({
+			allWarbands: [active, archived],
+			participants: [
+				makeParticipant("active-participant", active.id),
+				makeParticipant("archived-participant", archived.id),
+			],
+			warriors: [
+				makeWarrior("active-warrior", active.id),
+				makeWarrior("archived-warrior", active.id, {
+					isArchived: true,
+					archivedAt,
+				}),
+				makeWarrior("active-under-archived", archived.id),
+			],
+		});
+
+		expect(workspace.warbands.map((warband) => warband.id)).toEqual([
+			"active",
+			"archived",
+		]);
+		expect(workspace.eligibleWarbands.map((warband) => warband.id)).toEqual([
+			"active",
+		]);
+		expect(workspace.eligibleWarriors.map((warrior) => warrior.id)).toEqual([
+			"active-warrior",
+		]);
+		expect(workspace.canAddEvent).toBe(false);
 	});
 
 	it("allows event creation only when two participating warbands are staffed", () => {

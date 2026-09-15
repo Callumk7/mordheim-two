@@ -80,6 +80,8 @@ export function matchRosterQuery(
 				knocked: warrior.knocked,
 				injuries: warrior.injuries,
 				knockedDowns: warrior.knockedDowns,
+				isArchived: warrior.isArchived,
+				archivedAt: warrior.archivedAt,
 				createdAt: warrior.createdAt,
 				updatedAt: warrior.updatedAt,
 			}))

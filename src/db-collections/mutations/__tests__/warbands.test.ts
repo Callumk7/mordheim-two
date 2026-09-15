@@ -7,12 +7,15 @@ import { getCollections } from "@/db-collections";
 import {
 	createWarbandTransaction,
 	deleteWarbandTransaction,
+	setWarbandArchivedTransaction,
 	updateWarbandTransaction,
 } from "../warbands";
 
 // Only the network boundary is doubled: the collections, their schemas and the
 // transaction machinery below are the ones the app runs.
 const warbandsServer = vi.hoisted(() => ({
+	archiveWarband: vi.fn(),
+	unarchiveWarband: vi.fn(),
 	listWarbands: vi.fn(),
 	createWarband: vi.fn(),
 	updateWarband: vi.fn(),
@@ -38,6 +41,8 @@ const warband: Warband = {
 	gold: 500,
 	rating: 100,
 	wins: 0,
+	isArchived: false,
+	archivedAt: null,
 	createdAt: timestamp,
 	updatedAt: timestamp,
 };
@@ -51,6 +56,8 @@ const warrior: Warrior = {
 	knocked: 0,
 	injuries: 0,
 	knockedDowns: 0,
+	isArchived: false,
+	archivedAt: null,
 	createdAt: timestamp,
 	updatedAt: timestamp,
 };
@@ -133,6 +140,48 @@ describe("updateWarbandTransaction", () => {
 		await expect(transaction.isPersisted.promise).rejects.toThrow();
 
 		expect(collections.warbands.get(warband.id)?.gold).toBe(warband.gold);
+	});
+});
+
+describe("setWarbandArchivedTransaction", () => {
+	it("optimistically archives and unarchives as a consistent pair", async () => {
+		const archivedAt = "2026-02-01T00:00:00.000Z";
+		warbandsServer.listWarbands.mockResolvedValue([
+			{ ...warband, isArchived: true, archivedAt, updatedAt: archivedAt },
+		]);
+		const transaction = setWarbandArchivedTransaction(
+			collections,
+			warband.id,
+			true,
+			() => archivedAt,
+		);
+		expect(collections.warbands.get(warband.id)).toMatchObject({
+			isArchived: true,
+			archivedAt,
+			updatedAt: archivedAt,
+		});
+		await transaction.isPersisted.promise;
+		expect(warbandsServer.archiveWarband).toHaveBeenCalledWith({
+			data: { id: warband.id },
+		});
+
+		collections.warbands.utils.writeUpdate({
+			id: warband.id,
+			isArchived: true,
+			archivedAt,
+			updatedAt: archivedAt,
+		});
+		warbandsServer.listWarbands.mockResolvedValue([warband]);
+		const unarchive = setWarbandArchivedTransaction(
+			collections,
+			warband.id,
+			false,
+			() => timestamp,
+		);
+		await unarchive.isPersisted.promise;
+		expect(warbandsServer.unarchiveWarband).toHaveBeenCalledWith({
+			data: { id: warband.id },
+		});
 	});
 });
 

@@ -41,11 +41,19 @@ function EventsIndexPage() {
 		query: (q) =>
 			q.from({ warrior: warriors }).orderBy(({ warrior }) => warrior.name),
 	});
+	const activeWarbandRows = warbandRows.filter(
+		(warband) => !warband.isArchived,
+	);
+	const activeWarriorRows = warriorRows.filter(
+		(warrior) =>
+			!warrior.isArchived &&
+			activeWarbandRows.some((warband) => warband.id === warrior.warbandId),
+	);
 	const eligibleMatches = matchRows.filter((match) => {
 		const participantIds = getParticipantWarbandIds(match.id, participantRows);
 		return (
 			participantIds.filter((warbandId) =>
-				warriorRows.some((warrior) => warrior.warbandId === warbandId),
+				activeWarriorRows.some((warrior) => warrior.warbandId === warbandId),
 			).length >= 2
 		);
 	});
@@ -53,7 +61,7 @@ function EventsIndexPage() {
 	const initialWarbandIds = initialMatch
 		? getParticipantWarbandIds(initialMatch.id, participantRows).filter(
 				(warbandId) =>
-					warriorRows.some((warrior) => warrior.warbandId === warbandId),
+					activeWarriorRows.some((warrior) => warrior.warbandId === warbandId),
 			)
 		: [];
 	const attackerWarbandId = initialWarbandIds[0] ?? "";
@@ -96,12 +104,12 @@ function EventsIndexPage() {
 							matchId: initialMatch.id,
 							attackerWarbandId,
 							attackerWarriorId:
-								warriorRows.find(
+								activeWarriorRows.find(
 									(warrior) => warrior.warbandId === attackerWarbandId,
 								)?.id ?? "",
 							defenderWarbandId,
 							defenderWarriorId:
-								warriorRows.find(
+								activeWarriorRows.find(
 									(warrior) => warrior.warbandId === defenderWarbandId,
 								)?.id ?? "",
 							notes: null,
@@ -114,8 +122,8 @@ function EventsIndexPage() {
 						}}
 						participants={participantRows}
 						submitLabel="Create event"
-						warbands={warbandRows}
-						warriors={warriorRows}
+						warbands={activeWarbandRows}
+						warriors={activeWarriorRows}
 					/>
 				) : (
 					<EmptyState

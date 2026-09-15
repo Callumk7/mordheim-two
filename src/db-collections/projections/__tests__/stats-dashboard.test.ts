@@ -17,6 +17,8 @@ function makeWarband(id: string): Warband {
 		gold: 0,
 		rating: 100,
 		wins: 0,
+		isArchived: false,
+		archivedAt: null,
 		createdAt: "2026-01-01T00:00:00.000Z",
 		updatedAt: "2026-01-01T00:00:00.000Z",
 	};
@@ -32,6 +34,8 @@ function makeWarrior(id: string, warbandId: string): Warrior {
 		knocked: 0,
 		injuries: 0,
 		knockedDowns: 0,
+		isArchived: false,
+		archivedAt: null,
 		createdAt: "2026-01-01T00:00:00.000Z",
 		updatedAt: "2026-01-01T00:00:00.000Z",
 	};
