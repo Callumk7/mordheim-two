@@ -96,7 +96,6 @@ export function projectMatchResults({
 	const playedRows = rankedRows.filter((row) => row.played > 0);
 
 	return {
-		hasMatchResults: playedRows.length > 0,
 		matchResultRows: rankedRows,
 		leadingMatchResults: playedRows.slice(0, 8),
 	};
@@ -110,6 +109,7 @@ function compareCompetitiveRecord(
 		b.wins - a.wins ||
 		b.winPercentage - a.winPercentage ||
 		b.draws - a.draws ||
+		b.played - a.played ||
 		a.losses - b.losses
 	);
 }

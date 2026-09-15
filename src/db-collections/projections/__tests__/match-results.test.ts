@@ -94,7 +94,6 @@ describe("projectMatchResults", () => {
 				rank: 3,
 			}),
 		]);
-		expect(result.hasMatchResults).toBe(true);
 		expect(result.leadingMatchResults.map((row) => row.id)).toEqual([
 			"blue",
 			"red",
@@ -154,6 +153,23 @@ describe("projectMatchResults", () => {
 		expect(result.leadingMatchResults).toHaveLength(8);
 	});
 
+	it("ranks a played winless record ahead of an idle warband", () => {
+		const result = projectMatchResults({
+			warbands: [warband("idle"), warband("red"), warband("blue")],
+			matches: [match("loss", "Victory", "blue")],
+			participants: [
+				participant("1", "loss", "red"),
+				participant("2", "loss", "blue"),
+			],
+		});
+
+		expect(result.matchResultRows.map((row) => row.id)).toEqual([
+			"blue",
+			"red",
+			"idle",
+		]);
+	});
+
 	it("returns finite zero percentages and an empty leader set without results", () => {
 		const result = projectMatchResults({
 			warbands: [warband("idle")],
@@ -166,7 +182,6 @@ describe("projectMatchResults", () => {
 			winPercentage: 0,
 		});
 		expect(Number.isFinite(result.matchResultRows[0].winPercentage)).toBe(true);
-		expect(result.hasMatchResults).toBe(false);
 		expect(result.leadingMatchResults).toEqual([]);
 	});
 });

@@ -207,32 +207,3 @@ export function CombatLeaderboard({
 		</Card>
 	);
 }
-
-export function ReservedStatSection({
-	description,
-	label,
-	title,
-}: {
-	description: string;
-	label: string;
-	title: string;
-}) {
-	return (
-		<section
-			aria-labelledby={`${label}-title`}
-			className="min-h-56 rounded-2xl border border-dashed border-input bg-card/40 p-6"
-		>
-			<Typography variant="eyebrow">Reserved · {label}</Typography>
-			<Typography
-				variant="sectionTitle"
-				className="mt-4 text-foreground"
-				id={`${label}-title`}
-			>
-				{title}
-			</Typography>
-			<Typography variant="supportingBody" className="mt-2 max-w-md leading-6">
-				{description}
-			</Typography>
-		</section>
-	);
-}
