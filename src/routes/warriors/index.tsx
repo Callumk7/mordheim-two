@@ -5,7 +5,7 @@ import { WarriorForm, type WarriorFormValues } from "#/components/warrior-form";
 import { EmptyState } from "@/components/shared/empty-state";
 import { IndexPage, IndexPageHeader } from "@/components/shared/index-page";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Toggle } from "@/components/ui/toggle";
 import {
 	Dialog,
 	DialogDescription,
@@ -50,9 +50,13 @@ function WarriorsIndexPage() {
 			<IndexPageHeader
 				action={
 					<div className="flex flex-wrap items-center gap-4">
-						<Checkbox isSelected={showArchived} onChange={setShowArchived}>
+						<Toggle
+							isSelected={showArchived}
+							variant="outline"
+							onChange={setShowArchived}
+						>
 							Show archived
-						</Checkbox>
+						</Toggle>
 						<Button onPress={() => setIsNewWarriorOpen(true)}>
 							New warrior
 						</Button>
