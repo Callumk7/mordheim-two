@@ -1,0 +1,17 @@
+{
+	"name": "Mordheim Campaign Ledger",
+	"install": "bash .cursor/install.sh",
+	"terminals": [
+		{
+			"name": "dev",
+			"command": "pnpm dev",
+			"description": "Vite dev server for the app and the local image-generation worker on http://localhost:3000"
+		}
+	],
+	"ports": [
+		{
+			"name": "app",
+			"port": 3000
+		}
+	]
+}
