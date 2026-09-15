@@ -5,13 +5,13 @@ import { WarriorForm, type WarriorFormValues } from "#/components/warrior-form";
 import { EmptyState } from "@/components/shared/empty-state";
 import { IndexPage, IndexPageHeader } from "@/components/shared/index-page";
 import { Button } from "@/components/ui/button";
-import { Toggle } from "@/components/ui/toggle";
 import {
 	Dialog,
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { Toggle } from "@/components/ui/toggle";
 import { useWarriorMutations } from "@/db-collections/mutations/warriors";
 import { useCombatStats, useWarriorsIndex } from "@/db-collections/queries";
 

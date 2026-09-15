@@ -5,13 +5,13 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { IndexPage, IndexPageHeader } from "@/components/shared/index-page";
 import { WarbandsTable } from "@/components/table/warbands-table";
 import { Button } from "@/components/ui/button";
-import { Toggle } from "@/components/ui/toggle";
 import {
 	Dialog,
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { Toggle } from "@/components/ui/toggle";
 import { WarbandForm, type WarbandFormValues } from "@/components/warband-form";
 import type { Warband } from "@/db/validation/warband";
 import { getCollections } from "@/db-collections";
