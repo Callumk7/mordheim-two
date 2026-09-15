@@ -9,11 +9,11 @@ import {
 	YAxis,
 } from "recharts";
 import { IndexPage, IndexPageHeader } from "@/components/shared/index-page";
+import { MatchResultsTable } from "@/components/shared/match-results-table";
 import { Page, PageError, PagePending } from "@/components/shared/page";
 import {
 	AdjustedBadge,
 	CombatLeaderboard,
-	ReservedStatSection,
 	StatTile,
 } from "@/components/shared/stat-display";
 import { Typography } from "@/components/shared/typography";
@@ -34,6 +34,10 @@ import {
 import { getCollections } from "@/db-collections";
 import { useStatsDashboard } from "@/db-collections/queries";
 
+const matchResultsChartConfig = {
+	winPercentage: { label: "Win percentage", color: "var(--chart-1)" },
+} satisfies ChartConfig;
+
 const combatChartConfig = {
 	knockdownsGiven: { label: "Knockdowns", color: "var(--chart-1)" },
 	injuriesGiven: { label: "Injuries", color: "var(--chart-2)" },
@@ -43,9 +47,12 @@ const combatChartConfig = {
 export const Route = createFileRoute("/stats/")({
 	ssr: false,
 	loader: async ({ context }) => {
-		const { events, warbands, warriors } = getCollections(context.dbClient);
+		const { events, matches, warbandMatches, warbands, warriors } =
+			getCollections(context.dbClient);
 		await Promise.all([
 			events.preload(),
+			matches.preload(),
+			warbandMatches.preload(),
 			warbands.preload(),
 			warriors.preload(),
 		]);
@@ -74,6 +81,8 @@ function StatsIndexPage() {
 		totalAdjustments,
 		hasCombat,
 		leadingWarbands,
+		matchResultRows,
+		leadingMatchResults,
 	} = useStatsDashboard(dbClient);
 
 	const hasAdjustedOutcomes = Object.values(totalAdjustments).some(
@@ -301,13 +310,66 @@ function StatsIndexPage() {
 					/>
 				</div>
 
-				<div className="grid gap-6 md:grid-cols-2">
-					<ReservedStatSection
-						description="Match results are not calculated on this dashboard. This space is reserved for a future results summary."
-						label="match-results"
-						title="Match results"
-					/>
-				</div>
+				<section
+					aria-label="Campaign match standings"
+					className="grid gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(20rem,2fr)]"
+				>
+					<MatchResultsTable rows={matchResultRows} />
+					<Card className="min-w-0">
+						<CardHeader>
+							<Typography variant="sectionTitle">Match leaders</Typography>
+							<CardDescription>
+								Win percentages for the top eight warbands with completed
+								results, in standings order.
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							{leadingMatchResults.length > 0 ? (
+								<ChartContainer
+									config={matchResultsChartConfig}
+									className="h-80 w-full aspect-auto"
+									aria-label="Win percentages for current match leaders; exact records are in the match results table."
+								>
+									<BarChart
+										accessibilityLayer
+										data={leadingMatchResults}
+										layout="vertical"
+										margin={{ left: 0, right: 12 }}
+									>
+										<CartesianGrid horizontal={false} />
+										<XAxis
+											type="number"
+											domain={[0, 100]}
+											axisLine={false}
+											tickLine={false}
+											tickFormatter={(value: number) => `${value}%`}
+										/>
+										<YAxis
+											type="category"
+											dataKey="name"
+											width={100}
+											axisLine={false}
+											tickLine={false}
+											tickFormatter={(name: string) =>
+												name.length > 14 ? `${name.slice(0, 14)}…` : name
+											}
+										/>
+										<ChartTooltip content={<ChartTooltipContent />} />
+										<Bar
+											dataKey="winPercentage"
+											fill="var(--color-winPercentage)"
+											radius={[0, 4, 4, 0]}
+										/>
+									</BarChart>
+								</ChartContainer>
+							) : (
+								<p className="flex h-80 items-center justify-center text-center text-muted-foreground">
+									Complete a match to compare win percentages.
+								</p>
+							)}
+						</CardContent>
+					</Card>
+				</section>
 			</IndexPage>
 		</Page>
 	);
