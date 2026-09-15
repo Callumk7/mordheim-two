@@ -8,24 +8,28 @@ import {
 	getWarriorCombatStats,
 	type WarriorCombatStats,
 } from "@/db-collections/projections";
+import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { TableActions } from "../ui/table";
 import { createDataTableColumnHelper, DataTable } from "./data-table";
 
 type WarriorTableRow = Warrior & {
 	combat: WarriorCombatStats;
+	isEffectivelyArchived: boolean;
 	warbandName: string;
 };
 
 const columnHelper = createDataTableColumnHelper<WarriorTableRow>();
 
 interface WarriorsTableProps {
+	archivedWarbandIds: ReadonlySet<string>;
 	combatStats: CombatStatsProjection;
 	warbandNames: Map<string, string>;
 	warriors: Warrior[];
 }
 
 export function WarriorsTable({
+	archivedWarbandIds,
 	combatStats,
 	warbandNames,
 	warriors,
@@ -40,9 +44,16 @@ export function WarriorsTable({
 					meta: { isRowHeader: true },
 					cell: ({ row }) => (
 						<>
-							<span className="font-semibold text-foreground">
-								{row.original.name}
-							</span>
+							<div className="flex items-center gap-2">
+								<span className="font-semibold text-foreground">
+									{row.original.name}
+								</span>
+								{row.original.isEffectivelyArchived ? (
+									<Badge className="text-muted-foreground" variant="outline">
+										Archived
+									</Badge>
+								) : null}
+							</div>
 							<div className="mt-1 text-xs text-muted-foreground">
 								{row.original.class}
 							</div>
@@ -124,9 +135,11 @@ export function WarriorsTable({
 			warriors.map((warrior) => ({
 				...warrior,
 				combat: getWarriorCombatStats(combatStats, warrior.id),
+				isEffectivelyArchived:
+					warrior.isArchived || archivedWarbandIds.has(warrior.warbandId),
 				warbandName: warbandNames.get(warrior.warbandId) ?? "Unknown warband",
 			})),
-		[combatStats, warbandNames, warriors],
+		[archivedWarbandIds, combatStats, warbandNames, warriors],
 	);
 
 	return (

@@ -14,5 +14,7 @@ export function getWarriorsForWarband(
 	warbandId: string,
 	warriors: readonly Warrior[],
 ) {
-	return warriors.filter((warrior) => warrior.warbandId === warbandId);
+	return warriors.filter(
+		(warrior) => warrior.warbandId === warbandId && !warrior.isArchived,
+	);
 }

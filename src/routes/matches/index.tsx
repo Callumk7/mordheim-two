@@ -93,7 +93,7 @@ function MatchesIndexPage() {
 						setIsNewMatchOpen(false);
 					}}
 					submitLabel="Create match"
-					warbands={warbandRows}
+					warbands={warbandRows.filter((warband) => !warband.isArchived)}
 				/>
 			</Dialog>
 		</IndexPage>

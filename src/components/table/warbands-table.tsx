@@ -9,6 +9,7 @@ import {
 	getWarbandCombatStats,
 	getWarriorCombatStats,
 } from "@/db-collections/projections";
+import { Badge } from "../ui/badge";
 import { Button, LinkButton } from "../ui/button";
 import { TableActions } from "../ui/table";
 import { TableCellNumberField } from "../ui/table-cell-field";
@@ -46,6 +47,7 @@ function WarbandWarriors({
 				</div>
 				<Button
 					aria-label={`Add warrior to ${warband.name}`}
+					isDisabled={warband.isArchived}
 					onPress={() => onAddWarrior(warband)}
 					size="sm"
 					variant="outline"
@@ -63,9 +65,19 @@ function WarbandWarriors({
 								key={warrior.id}
 							>
 								<div className="min-w-0">
-									<p className="truncate font-medium text-foreground">
-										{warrior.name}
-									</p>
+									<div className="flex items-center gap-2">
+										<p className="truncate font-medium text-foreground">
+											{warrior.name}
+										</p>
+										{warrior.isArchived ? (
+											<Badge
+												className="text-muted-foreground"
+												variant="outline"
+											>
+												Archived
+											</Badge>
+										) : null}
+									</div>
 									<p className="truncate text-xs text-muted-foreground">
 										{warrior.class} · {stats.isDead ? "Dead" : "Alive"}
 									</p>
@@ -139,9 +151,16 @@ export function WarbandsTable({
 						meta: { isRowHeader: true },
 						cell: ({ row }) => (
 							<div className="flex min-w-44 flex-col gap-0.5">
-								<span className="font-semibold text-foreground">
-									{row.original.name}
-								</span>
+								<div className="flex items-center gap-2">
+									<span className="font-semibold text-foreground">
+										{row.original.name}
+									</span>
+									{row.original.isArchived ? (
+										<Badge className="text-muted-foreground" variant="outline">
+											Archived
+										</Badge>
+									) : null}
+								</div>
 								<span className="text-xs text-muted-foreground">
 									{row.original.faction}
 								</span>

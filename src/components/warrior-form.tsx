@@ -63,6 +63,11 @@ export function WarriorForm({
 	const warbandDescriptionId = useId();
 	const statusId = useId();
 	const descriptionId = useId();
+	const selectableWarbands = warbands.filter(
+		(warband) =>
+			!warband.isArchived ||
+			(isWarbandLocked && warband.id === values.warbandId),
+	);
 
 	return (
 		<form
@@ -136,7 +141,7 @@ export function WarriorForm({
 							<SelectValue />
 						</SelectTrigger>
 						<SelectContent>
-							{warbands.map((warband) => (
+							{selectableWarbands.map((warband) => (
 								<SelectItem id={warband.id} key={warband.id}>
 									{warband.name}
 								</SelectItem>

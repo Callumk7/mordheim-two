@@ -4,6 +4,7 @@ import type { Database } from "@/db/index.server";
 import { type Clock, systemClock } from "@/db/operations/clock";
 import { events, warriors } from "@/db/schema";
 import type {
+	WarriorArchiveInputSchema,
 	WarriorDeleteInputSchema,
 	WarriorSchema,
 	WarriorUpdateInputSchema,
@@ -33,6 +34,29 @@ export async function updateWarrior(
 			...data.changes,
 			updatedAt: clock(),
 		})
+		.where(eq(warriors.id, data.id));
+}
+
+export async function archiveWarrior(
+	db: Database,
+	data: z.output<typeof WarriorArchiveInputSchema>,
+	clock: Clock = systemClock,
+) {
+	const now = clock();
+	await db
+		.update(warriors)
+		.set({ isArchived: true, archivedAt: now, updatedAt: now })
+		.where(eq(warriors.id, data.id));
+}
+
+export async function unarchiveWarrior(
+	db: Database,
+	data: z.output<typeof WarriorArchiveInputSchema>,
+	clock: Clock = systemClock,
+) {
+	await db
+		.update(warriors)
+		.set({ isArchived: false, archivedAt: null, updatedAt: clock() })
 		.where(eq(warriors.id, data.id));
 }
 

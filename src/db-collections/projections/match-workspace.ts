@@ -39,7 +39,16 @@ export function projectMatchWorkspace({
 			...warband,
 			warriors: warriors.filter((warrior) => warrior.warbandId === warband.id),
 		}));
-	const staffedWarbands = warbands.filter(
+	const eligibleWarbands = warbands
+		.filter((warband) => !warband.isArchived)
+		.map((warband) => ({
+			...warband,
+			warriors: warband.warriors.filter((warrior) => !warrior.isArchived),
+		}));
+	const eligibleWarriors = eligibleWarbands.flatMap(
+		(warband) => warband.warriors,
+	);
+	const staffedWarbands = eligibleWarbands.filter(
 		(warband) => warband.warriors.length > 0,
 	);
 	const winnerWarband =
@@ -61,6 +70,8 @@ export function projectMatchWorkspace({
 			Boolean(match) &&
 			match?.status !== "Completed" &&
 			staffedWarbands.length >= 2,
+		eligibleWarbands,
+		eligibleWarriors,
 		events,
 		lockedParticipantWarbandIds,
 		match,

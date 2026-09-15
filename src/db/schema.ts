@@ -75,17 +75,30 @@ export const imageGenerationJobs = sqliteTable(
 	],
 );
 
-export const warbands = sqliteTable("warbands", {
-	id: text("id").primaryKey(),
-	name: text("name").notNull(),
-	faction: text("faction").notNull(),
-	bio: text("bio"),
-	gold: integer("gold").notNull().default(0),
-	rating: integer("rating").notNull().default(0),
-	wins: integer("wins").notNull().default(0),
-	createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
-	updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
-});
+export const warbands = sqliteTable(
+	"warbands",
+	{
+		id: text("id").primaryKey(),
+		name: text("name").notNull(),
+		faction: text("faction").notNull(),
+		bio: text("bio"),
+		gold: integer("gold").notNull().default(0),
+		rating: integer("rating").notNull().default(0),
+		wins: integer("wins").notNull().default(0),
+		isArchived: integer("is_archived", { mode: "boolean" })
+			.notNull()
+			.default(false),
+		archivedAt: text("archived_at"),
+		createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+		updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+	},
+	(table) => [
+		check(
+			"warbands_archive_pair_consistent",
+			sql`(${table.isArchived} = 0 AND ${table.archivedAt} IS NULL) OR (${table.isArchived} = 1 AND ${table.archivedAt} IS NOT NULL)`,
+		),
+	],
+);
 
 export const warriors = sqliteTable(
 	"warriors",
@@ -103,11 +116,19 @@ export const warriors = sqliteTable(
 		knocked: integer("knocked").notNull().default(0),
 		injuries: integer("injuries").notNull().default(0), // TODO: add an injury table
 		knockedDowns: integer("knocked_downs").notNull().default(0),
+		isArchived: integer("is_archived", { mode: "boolean" })
+			.notNull()
+			.default(false),
+		archivedAt: text("archived_at"),
 		createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 		updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 	},
 	(table) => [
 		uniqueIndex("warriors_warband_id_unique").on(table.warbandId, table.id),
+		check(
+			"warriors_archive_pair_consistent",
+			sql`(${table.isArchived} = 0 AND ${table.archivedAt} IS NULL) OR (${table.isArchived} = 1 AND ${table.archivedAt} IS NOT NULL)`,
+		),
 	],
 );
 

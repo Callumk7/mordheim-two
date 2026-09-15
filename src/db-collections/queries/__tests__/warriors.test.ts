@@ -16,7 +16,11 @@ import {
 
 const timestamp = "2026-01-01T00:00:00.000Z";
 
-function warrior(id: string, name: string): Warrior {
+function warrior(
+	id: string,
+	name: string,
+	overrides: Partial<Warrior> = {},
+): Warrior {
 	return {
 		id,
 		name,
@@ -26,12 +30,19 @@ function warrior(id: string, name: string): Warrior {
 		knocked: 0,
 		injuries: 0,
 		knockedDowns: 0,
+		isArchived: false,
+		archivedAt: null,
 		createdAt: timestamp,
 		updatedAt: timestamp,
+		...overrides,
 	};
 }
 
-function warband(id: string, name: string): Warband {
+function warband(
+	id: string,
+	name: string,
+	overrides: Partial<Warband> = {},
+): Warband {
 	return {
 		id,
 		name,
@@ -40,8 +51,11 @@ function warband(id: string, name: string): Warband {
 		gold: 0,
 		rating: 100,
 		wins: 0,
+		isArchived: false,
+		archivedAt: null,
 		createdAt: timestamp,
 		updatedAt: timestamp,
+		...overrides,
 	};
 }
 
@@ -82,23 +96,68 @@ describe("warrior query specifications", () => {
 			localOnlyCollectionOptions({
 				id: "warbands",
 				getKey: (item: Warband) => item.id,
-				initialData: [warband("2", "Zeta"), warband("1", "Aldorf")],
+				initialData: [warband("2", "Zeta"), warband("warband-1", "Aldorf")],
 				schema: WarbandSchema,
 			}),
 		);
 
-		await expect(queryOnce(warriorsQuery({ warriors }))).resolves.toMatchObject(
-			[
-				{ id: "1", name: "Alpha" },
-				{ id: "2", name: "Zed" },
-			],
-		);
+		await expect(
+			queryOnce(warriorsQuery({ warbands, warriors })),
+		).resolves.toMatchObject([
+			{ id: "1", name: "Alpha" },
+			{ id: "2", name: "Zed" },
+		]);
 		await expect(
 			queryOnce(warriorWarbandsQuery({ warbands })),
 		).resolves.toMatchObject([
-			{ id: "1", name: "Aldorf" },
+			{ id: "warband-1", name: "Aldorf" },
 			{ id: "2", name: "Zeta" },
 		]);
+	});
+
+	it("hides archived warriors and warriors whose warband is archived by default", async () => {
+		const warriors = createCollection(
+			localOnlyCollectionOptions({
+				id: "archive-warriors",
+				getKey: (item: Warrior) => item.id,
+				initialData: [
+					warrior("active", "Active"),
+					warrior("archived", "Archived", {
+						isArchived: true,
+						archivedAt: timestamp,
+					}),
+					warrior("hidden-by-parent", "Hidden", {
+						warbandId: "archived-warband",
+					}),
+				],
+				schema: WarriorSchema,
+			}),
+		);
+		const warbands = createCollection(
+			localOnlyCollectionOptions({
+				id: "archive-warbands",
+				getKey: (item: Warband) => item.id,
+				initialData: [
+					warband("warband-1", "Active"),
+					warband("archived-warband", "Archived", {
+						isArchived: true,
+						archivedAt: timestamp,
+					}),
+				],
+				schema: WarbandSchema,
+			}),
+		);
+
+		expect(
+			(await queryOnce(warriorsQuery({ warbands, warriors }))).map(
+				(row) => row.id,
+			),
+		).toEqual(["active"]);
+		expect(
+			(await queryOnce(warriorsQuery({ warbands, warriors }, true)))
+				.map((row) => row.id)
+				.sort(),
+		).toEqual(["active", "archived", "hidden-by-parent"]);
 	});
 
 	it("selects one warrior and every event that references them", async () => {

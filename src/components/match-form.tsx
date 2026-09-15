@@ -65,6 +65,7 @@ export function MatchForm({
 	const selectedWarbands = warbands.filter((warband) =>
 		values.participantWarbandIds.includes(warband.id),
 	);
+	const selectableWarbands = warbands.filter((warband) => !warband.isArchived);
 
 	return (
 		<form
@@ -199,7 +200,7 @@ export function MatchForm({
 					event can be recorded.
 				</FieldDescription>
 				<FieldGroup className="grid gap-2 sm:grid-cols-2">
-					{warbands.map((warband) => {
+					{selectableWarbands.map((warband) => {
 						const isChecked = values.participantWarbandIds.includes(warband.id);
 						const isLocked = isMatchParticipantLocked(
 							warband.id,

@@ -5,6 +5,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { IndexPage, IndexPageHeader } from "@/components/shared/index-page";
 import { WarbandsTable } from "@/components/table/warbands-table";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
 	Dialog,
 	DialogDescription,
@@ -37,13 +38,14 @@ const initialValues: WarbandFormValues = {
 
 function WarbandsIndexPage() {
 	const [isNewWarbandOpen, setIsNewWarbandOpen] = useState(false);
+	const [showArchived, setShowArchived] = useState(false);
 	const [recruitingWarband, setRecruitingWarband] = useState<Warband | null>(
 		null,
 	);
 	const { dbClient } = Route.useRouteContext();
 	const collections = getCollections(dbClient);
 	const combatStats = useCombatStats(dbClient);
-	const warbands = useWarbands(dbClient);
+	const warbands = useWarbands(dbClient, showArchived);
 
 	async function updateGold(warbandId: string, gold: number) {
 		const transaction = updateWarbandTransaction(collections, warbandId, {
@@ -63,7 +65,14 @@ function WarbandsIndexPage() {
 		<IndexPage>
 			<IndexPageHeader
 				action={
-					<Button onPress={() => setIsNewWarbandOpen(true)}>New warband</Button>
+					<div className="flex flex-wrap items-center gap-4">
+						<Checkbox isSelected={showArchived} onChange={setShowArchived}>
+							Show archived
+						</Checkbox>
+						<Button onPress={() => setIsNewWarbandOpen(true)}>
+							New warband
+						</Button>
+					</div>
 				}
 				description="Manage every company fighting through the City of the Damned."
 				title="Warbands"

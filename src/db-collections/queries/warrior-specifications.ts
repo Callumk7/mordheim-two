@@ -1,4 +1,5 @@
 import {
+	and,
 	type Collection,
 	eq,
 	type InitialQueryBuilder,
@@ -20,6 +21,7 @@ type StringKeyedCollection<T extends object> = Collection<
 >;
 
 type WarriorCollections = {
+	warbands: StringKeyedCollection<Warband>;
 	warriors: StringKeyedCollection<Warrior>;
 };
 
@@ -31,13 +33,44 @@ type WarriorWarbandCollections = {
 	warbands: StringKeyedCollection<Warband>;
 };
 
-export function warriorsQuery({ warriors }: WarriorCollections) {
-	return (q: InitialQueryBuilder) =>
-		q.from({ warrior: warriors }).orderBy(({ warrior }) => warrior.name, "asc");
+export function warriorsQuery(
+	{ warbands, warriors }: WarriorCollections,
+	showArchived = false,
+) {
+	return (q: InitialQueryBuilder) => {
+		const query = q
+			.from({ warrior: warriors })
+			.innerJoin({ warband: warbands }, ({ warrior, warband }) =>
+				eq(warrior.warbandId, warband.id),
+			);
+		return (
+			showArchived
+				? query
+				: query.where(({ warrior, warband }) =>
+						and(eq(warrior.isArchived, false), eq(warband.isArchived, false)),
+					)
+		)
+			.select(({ warrior }) => ({
+				id: warrior.id,
+				name: warrior.name,
+				class: warrior.class,
+				description: warrior.description,
+				status: warrior.status,
+				warbandId: warrior.warbandId,
+				knocked: warrior.knocked,
+				injuries: warrior.injuries,
+				knockedDowns: warrior.knockedDowns,
+				isArchived: warrior.isArchived,
+				archivedAt: warrior.archivedAt,
+				createdAt: warrior.createdAt,
+				updatedAt: warrior.updatedAt,
+			}))
+			.orderBy(({ warrior }) => warrior.name, "asc");
+	};
 }
 
 export function warriorQuery(
-	{ warriors }: WarriorCollections,
+	{ warriors }: Pick<WarriorCollections, "warriors">,
 	warriorId: string,
 ) {
 	return (q: InitialQueryBuilder) =>
@@ -61,7 +94,16 @@ export function warriorEventReferencesQuery(
 			);
 }
 
-export function warriorWarbandsQuery({ warbands }: WarriorWarbandCollections) {
-	return (q: InitialQueryBuilder) =>
-		q.from({ warband: warbands }).orderBy(({ warband }) => warband.name);
+export function warriorWarbandsQuery(
+	{ warbands }: WarriorWarbandCollections,
+	showArchived = false,
+) {
+	return (q: InitialQueryBuilder) => {
+		const query = q.from({ warband: warbands });
+		return (
+			showArchived
+				? query
+				: query.where(({ warband }) => eq(warband.isArchived, false))
+		).orderBy(({ warband }) => warband.name);
+	};
 }

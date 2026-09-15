@@ -3,9 +3,11 @@ import { BasicIndex, collectionOptions } from "@tanstack/react-db";
 import type { QueryClient } from "@tanstack/react-query";
 import { WarriorSchema, WarriorUpdateSchema } from "@/db/validation/warrior";
 import {
+	archiveWarrior,
 	createWarrior,
 	deleteWarrior,
 	listWarriors,
+	unarchiveWarrior,
 	updateWarrior,
 } from "@/server/warriors";
 
@@ -30,14 +32,23 @@ export const warriorsCollectionOptions = collectionOptions(
 			},
 			onUpdate: async ({ transaction }) => {
 				await Promise.all(
-					transaction.mutations.map((mutation) =>
-						updateWarrior({
+					transaction.mutations.map((mutation) => {
+						if (
+							"isArchived" in mutation.changes ||
+							"archivedAt" in mutation.changes
+						) {
+							const warrior = WarriorSchema.parse(mutation.modified);
+							return warrior.isArchived
+								? archiveWarrior({ data: { id: warrior.id } })
+								: unarchiveWarrior({ data: { id: warrior.id } });
+						}
+						return updateWarrior({
 							data: {
 								id: mutation.original.id,
 								changes: WarriorUpdateSchema.parse(mutation.changes),
 							},
-						}),
-					),
+						});
+					}),
 				);
 			},
 			onDelete: async ({ transaction }) => {

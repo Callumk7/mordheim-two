@@ -3,7 +3,10 @@ import type { Warband } from "@/db/validation/warband";
 import { deleteWarband } from "@/server/warbands";
 import type { AppCollections } from "..";
 
-type NewWarband = Omit<Warband, "id" | "createdAt" | "updatedAt">;
+type NewWarband = Omit<
+	Warband,
+	"id" | "isArchived" | "archivedAt" | "createdAt" | "updatedAt"
+>;
 type WarbandChanges = Partial<NewWarband>;
 
 export function createWarbandTransaction(
@@ -14,6 +17,8 @@ export function createWarbandTransaction(
 	return collections.warbands.insert({
 		id: safeRandomUUID(),
 		...values,
+		isArchived: false,
+		archivedAt: null,
 		createdAt: now,
 		updatedAt: now,
 	});
@@ -26,6 +31,20 @@ export function updateWarbandTransaction(
 ) {
 	return collections.warbands.update(warbandId, (draft) => {
 		Object.assign(draft, changes);
+	});
+}
+
+export function setWarbandArchivedTransaction(
+	collections: AppCollections,
+	warbandId: string,
+	isArchived: boolean,
+	now: () => string = () => new Date().toISOString(),
+) {
+	return collections.warbands.update(warbandId, (draft) => {
+		const timestamp = now();
+		draft.isArchived = isArchived;
+		draft.archivedAt = isArchived ? timestamp : null;
+		draft.updatedAt = timestamp;
 	});
 }
 

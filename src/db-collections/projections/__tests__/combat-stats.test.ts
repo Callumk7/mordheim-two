@@ -93,6 +93,34 @@ describe("projectCombatStats", () => {
 		});
 	});
 
+	it("keeps archived entities in historical combat projections", () => {
+		const projection = projectCombatStats(
+			[event("death", "Death")],
+			[
+				{
+					id: "attacker",
+					warbandId: "current-warband",
+					knocked: 2,
+					injuries: 0,
+					knockedDowns: 0,
+					isArchived: true,
+					archivedAt: "2026-01-03T00:00:00.000Z",
+				},
+			],
+		);
+
+		expect(getWarriorCombatStats(projection, "attacker")).toMatchObject({
+			deathsGiven: 3,
+			injuriesGiven: 1,
+		});
+		expect(getWarbandCombatStats(projection, "old-attackers").deathsGiven).toBe(
+			1,
+		);
+		expect(
+			getWarbandCombatStats(projection, "current-warband").deathsGiven,
+		).toBe(2);
+	});
+
 	it("attributes warband history from event IDs rather than current membership", () => {
 		const projection = projectCombatStats([event("injury", "Injury")]);
 		expect(getWarbandCombatStats(projection, "old-attackers")).toMatchObject({

@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getDb } from "@/db/index.server";
 import * as operations from "@/db/operations/warriors.server";
 import {
+	WarriorArchiveInputSchema,
 	WarriorDeleteInputSchema,
 	WarriorSchema,
 	WarriorUpdateInputSchema,
@@ -18,6 +19,14 @@ export const createWarrior = createServerFn({ method: "POST" })
 export const updateWarrior = createServerFn({ method: "POST" })
 	.validator(WarriorUpdateInputSchema)
 	.handler(({ data }) => operations.updateWarrior(getDb(), data));
+
+export const archiveWarrior = createServerFn({ method: "POST" })
+	.validator(WarriorArchiveInputSchema)
+	.handler(({ data }) => operations.archiveWarrior(getDb(), data));
+
+export const unarchiveWarrior = createServerFn({ method: "POST" })
+	.validator(WarriorArchiveInputSchema)
+	.handler(({ data }) => operations.unarchiveWarrior(getDb(), data));
 
 export const deleteWarrior = createServerFn({ method: "POST" })
 	.validator(WarriorDeleteInputSchema)

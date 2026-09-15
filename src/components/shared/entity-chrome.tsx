@@ -19,11 +19,13 @@ type EntityLink =
 	| { to: "/warriors/$warriorId/delete"; params: { warriorId: string } };
 
 export function EntityToolbar({
+	actions,
 	backLabel,
 	backLink,
 	destructiveLabel,
 	destructiveLink,
 }: {
+	actions?: ReactNode;
 	backLabel: ReactNode;
 	backLink: EntityLink;
 	destructiveLabel?: ReactNode;
@@ -34,11 +36,14 @@ export function EntityToolbar({
 			<LinkButton size="sm" variant="outline" {...backLink}>
 				{backLabel}
 			</LinkButton>
-			{destructiveLink && destructiveLabel ? (
-				<LinkButton size="sm" variant="destructive" {...destructiveLink}>
-					{destructiveLabel}
-				</LinkButton>
-			) : null}
+			<div className="flex flex-wrap items-center gap-2">
+				{actions}
+				{destructiveLink && destructiveLabel ? (
+					<LinkButton size="sm" variant="destructive" {...destructiveLink}>
+						{destructiveLabel}
+					</LinkButton>
+				) : null}
+			</div>
 		</div>
 	);
 }

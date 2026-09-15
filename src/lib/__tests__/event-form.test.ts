@@ -15,7 +15,7 @@ import {
 
 const now = "2026-01-01T00:00:00.000Z";
 
-function makeWarband(id: string): Warband {
+function makeWarband(id: string, overrides: Partial<Warband> = {}): Warband {
 	return {
 		id,
 		name: id,
@@ -24,8 +24,11 @@ function makeWarband(id: string): Warband {
 		gold: 0,
 		rating: 100,
 		wins: 0,
+		isArchived: false,
+		archivedAt: null,
 		createdAt: now,
 		updatedAt: now,
+		...overrides,
 	};
 }
 
@@ -39,7 +42,11 @@ function makeParticipant(matchId: string, warbandId: string): WarbandMatch {
 	};
 }
 
-function makeWarrior(id: string, warbandId: string): Warrior {
+function makeWarrior(
+	id: string,
+	warbandId: string,
+	overrides: Partial<Warrior> = {},
+): Warrior {
 	return {
 		id,
 		name: id,
@@ -49,8 +56,11 @@ function makeWarrior(id: string, warbandId: string): Warrior {
 		knocked: 0,
 		injuries: 0,
 		knockedDowns: 0,
+		isArchived: false,
+		archivedAt: null,
 		createdAt: now,
 		updatedAt: now,
+		...overrides,
 	};
 }
 
@@ -109,6 +119,32 @@ describe("event form options", () => {
 });
 
 describe("event form selection transitions", () => {
+	it("excludes archived warbands and warriors from new event options", () => {
+		const options = deriveEventFormOptions(
+			values,
+			participants,
+			[
+				makeWarband("alpha"),
+				makeWarband("beta", { isArchived: true, archivedAt: now }),
+			],
+			[
+				makeWarrior("alpha-1", "alpha"),
+				makeWarrior("alpha-archived", "alpha", {
+					isArchived: true,
+					archivedAt: now,
+				}),
+				makeWarrior("beta-1", "beta"),
+			],
+		);
+
+		expect(options.participantWarbands.map((warband) => warband.id)).toEqual([
+			"alpha",
+		]);
+		expect(options.attackerWarriors.map((warrior) => warrior.id)).toEqual([
+			"alpha-1",
+		]);
+	});
+
 	it("resets both sides to the first staffed participants when match changes", () => {
 		const next = changeEventMatch(values, "match-2", participants, warriors);
 

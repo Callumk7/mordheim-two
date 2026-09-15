@@ -57,6 +57,28 @@ describe("warband operations on local D1", () => {
 		expect(await operations.listWarbands(db)).toEqual([warband("b")]);
 	});
 
+	it("archives and unarchives with the injected timestamp", async () => {
+		const { binding, db } = connection;
+		await operations.createWarband(db, warband());
+		await operations.archiveWarband(db, { id: "a" }, clock);
+		expect(await operations.listWarbands(db)).toContainEqual({
+			...warband(),
+			isArchived: true,
+			archivedAt: updatedAt,
+			updatedAt,
+		});
+		await expect(
+			binding
+				.prepare("UPDATE warbands SET is_archived = 0 WHERE id = 'a'")
+				.run(),
+		).rejects.toThrow();
+		await operations.unarchiveWarband(db, { id: "a" }, clock);
+		expect(await operations.listWarbands(db)).toContainEqual({
+			...warband(),
+			updatedAt,
+		});
+	});
+
 	it("deletes warriors, assignments and participation but keeps equipment", async () => {
 		const { db } = connection;
 		await seedMatch(db);

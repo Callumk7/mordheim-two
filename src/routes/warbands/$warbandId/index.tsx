@@ -12,6 +12,10 @@ import {
 	Users,
 } from "lucide-react";
 import { useState } from "react";
+import {
+	ArchiveAction,
+	ArchivedBanner,
+} from "@/components/shared/archive-controls";
 import { CreateWarriorDialog } from "@/components/shared/create-warrior-dialog";
 import { EmptyState } from "@/components/shared/empty-state";
 import { EntityHeader, EntityToolbar } from "@/components/shared/entity-chrome";
@@ -32,7 +36,10 @@ import {
 import { WarbandForm } from "@/components/warband-form";
 import { WarriorForm } from "@/components/warrior-form";
 import { getCollections } from "@/db-collections";
-import { updateWarbandTransaction } from "@/db-collections/mutations/warbands";
+import {
+	setWarbandArchivedTransaction,
+	updateWarbandTransaction,
+} from "@/db-collections/mutations/warbands";
 import {
 	createWarriorTransaction,
 	updateWarriorTransaction,
@@ -75,6 +82,21 @@ function WarbandDetailPage() {
 	return (
 		<div className="grid gap-10">
 			<EntityToolbar
+				actions={
+					<ArchiveAction
+						entityLabel="warband"
+						isArchived={warband.isArchived}
+						name={warband.name}
+						onConfirm={async () => {
+							const transaction = setWarbandArchivedTransaction(
+								collections,
+								warband.id,
+								!warband.isArchived,
+							);
+							await transaction.isPersisted.promise;
+						}}
+					/>
+				}
 				backLabel="← Warbands"
 				backLink={{ to: "/warbands" }}
 				destructiveLabel="Delete warband"
@@ -83,6 +105,10 @@ function WarbandDetailPage() {
 					to: "/warbands/$warbandId/delete",
 				}}
 			/>
+
+			{warband.isArchived && warband.archivedAt ? (
+				<ArchivedBanner archivedAt={warband.archivedAt} />
+			) : null}
 
 			<Card className="relative gap-0 py-0">
 				<EntityHeader
@@ -222,7 +248,12 @@ function WarbandDetailPage() {
 						id="roster-heading"
 						title="Living warriors"
 					/>
-					<Button onPress={() => setIsNewWarriorOpen(true)}>Add warrior</Button>
+					<Button
+						isDisabled={warband.isArchived}
+						onPress={() => setIsNewWarriorOpen(true)}
+					>
+						Add warrior
+					</Button>
 				</div>
 				{dashboard.livingRoster.length ? (
 					<ul className="mt-5 grid gap-4 md:grid-cols-2">
@@ -257,7 +288,10 @@ function WarbandDetailPage() {
 				) : (
 					<EmptyState
 						action={
-							<Button onPress={() => setIsNewWarriorOpen(true)}>
+							<Button
+								isDisabled={warband.isArchived}
+								onPress={() => setIsNewWarriorOpen(true)}
+							>
 								Recruit a warrior
 							</Button>
 						}

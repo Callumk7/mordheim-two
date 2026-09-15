@@ -3,9 +3,11 @@ import { BasicIndex, collectionOptions } from "@tanstack/react-db";
 import type { QueryClient } from "@tanstack/react-query";
 import { WarbandSchema, WarbandUpdateSchema } from "@/db/validation/warband";
 import {
+	archiveWarband,
 	createWarband,
 	deleteWarband,
 	listWarbands,
+	unarchiveWarband,
 	updateWarband,
 } from "@/server/warbands";
 
@@ -30,14 +32,23 @@ export const warbandsCollectionOptions = collectionOptions(
 			},
 			onUpdate: async ({ transaction }) => {
 				await Promise.all(
-					transaction.mutations.map((mutation) =>
-						updateWarband({
+					transaction.mutations.map((mutation) => {
+						if (
+							"isArchived" in mutation.changes ||
+							"archivedAt" in mutation.changes
+						) {
+							const warband = WarbandSchema.parse(mutation.modified);
+							return warband.isArchived
+								? archiveWarband({ data: { id: warband.id } })
+								: unarchiveWarband({ data: { id: warband.id } });
+						}
+						return updateWarband({
 							data: {
 								id: mutation.original.id,
 								changes: WarbandUpdateSchema.parse(mutation.changes),
 							},
-						}),
-					),
+						});
+					}),
 				);
 			},
 			onDelete: async ({ transaction }) => {

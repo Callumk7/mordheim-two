@@ -43,6 +43,14 @@ function EventDetailPage() {
 		query: (q) =>
 			q.from({ warrior: warriors }).orderBy(({ warrior }) => warrior.name),
 	});
+	const activeWarbandIds = new Set(
+		warbandRows
+			.filter((warband) => !warband.isArchived)
+			.map((warband) => warband.id),
+	);
+	const activeWarriorRows = warriorRows.filter(
+		(warrior) => !warrior.isArchived && activeWarbandIds.has(warrior.warbandId),
+	);
 	const event = eventRows[0];
 	const match = matchRows.find((candidate) => candidate.id === event?.matchId);
 	const attacker = warriorRows.find(
@@ -58,7 +66,7 @@ function EventDetailPage() {
 		);
 		return (
 			participantIds.filter((warbandId) =>
-				warriorRows.some((warrior) => warrior.warbandId === warbandId),
+				activeWarriorRows.some((warrior) => warrior.warbandId === warbandId),
 			).length >= 2
 		);
 	});
@@ -126,7 +134,7 @@ function EventDetailPage() {
 								participants={participantRows}
 								submitLabel="Save changes"
 								warbands={warbandRows}
-								warriors={warriorRows}
+								warriors={activeWarriorRows}
 							/>
 						</div>
 					) : null}

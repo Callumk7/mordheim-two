@@ -5,6 +5,7 @@ import { WarriorForm, type WarriorFormValues } from "#/components/warrior-form";
 import { EmptyState } from "@/components/shared/empty-state";
 import { IndexPage, IndexPageHeader } from "@/components/shared/index-page";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
 	Dialog,
 	DialogDescription,
@@ -20,18 +21,25 @@ export const Route = createFileRoute("/warriors/")({
 
 function WarriorsIndexPage() {
 	const [isNewWarriorOpen, setIsNewWarriorOpen] = useState(false);
+	const [showArchived, setShowArchived] = useState(false);
 	const { dbClient } = Route.useRouteContext();
 	const combatStats = useCombatStats(dbClient);
 	const { createWarrior } = useWarriorMutations(dbClient);
-	const { warbands, warriors } = useWarriorsIndex(dbClient);
+	const { warbands, warriors } = useWarriorsIndex(dbClient, showArchived);
+	const activeWarbands = warbands.filter((warband) => !warband.isArchived);
 	const warbandNames = new Map(
 		warbands.map((warband) => [warband.id, warband.name]),
+	);
+	const archivedWarbandIds = new Set(
+		warbands
+			.filter((warband) => warband.isArchived)
+			.map((warband) => warband.id),
 	);
 	const initialValues: WarriorFormValues = {
 		name: "",
 		class: "",
 		status: "Alive",
-		warbandId: warbands[0]?.id ?? "",
+		warbandId: activeWarbands[0]?.id ?? "",
 		knocked: 0,
 		injuries: 0,
 		knockedDowns: 0,
@@ -41,7 +49,14 @@ function WarriorsIndexPage() {
 		<IndexPage>
 			<IndexPageHeader
 				action={
-					<Button onPress={() => setIsNewWarriorOpen(true)}>New warrior</Button>
+					<div className="flex flex-wrap items-center gap-4">
+						<Checkbox isSelected={showArchived} onChange={setShowArchived}>
+							Show archived
+						</Checkbox>
+						<Button onPress={() => setIsNewWarriorOpen(true)}>
+							New warrior
+						</Button>
+					</div>
 				}
 				description="Manage every fighter serving in the campaign’s warbands."
 				title="Warriors"
@@ -49,6 +64,7 @@ function WarriorsIndexPage() {
 
 			{warriors.length ? (
 				<WarriorsTable
+					archivedWarbandIds={archivedWarbandIds}
 					combatStats={combatStats}
 					warbandNames={warbandNames}
 					warriors={warriors}
@@ -72,7 +88,7 @@ function WarriorsIndexPage() {
 						Add a new fighter to a campaign warband.
 					</DialogDescription>
 				</DialogHeader>
-				{warbands.length ? (
+				{activeWarbands.length ? (
 					<WarriorForm
 						initialValues={initialValues}
 						onSubmit={async (values) => {
@@ -80,7 +96,7 @@ function WarriorsIndexPage() {
 							setIsNewWarriorOpen(false);
 						}}
 						submitLabel="Create warrior"
-						warbands={warbands}
+						warbands={activeWarbands}
 					/>
 				) : (
 					<EmptyState

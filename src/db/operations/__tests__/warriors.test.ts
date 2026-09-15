@@ -55,6 +55,25 @@ describe("warrior operations on local D1", () => {
 		expect(await listWarriorEquipment(db)).toEqual([]);
 	});
 
+	it("archives and unarchives without changing the warband", async () => {
+		const { db } = connection;
+		await createWarband(db, warband());
+		await operations.createWarrior(db, warrior());
+		await operations.archiveWarrior(db, { id: "wa" }, clock);
+		expect(await operations.listWarriors(db)).toContainEqual({
+			...warrior(),
+			isArchived: true,
+			archivedAt: updatedAt,
+			updatedAt,
+		});
+		expect((await operations.listWarriors(db))[0].warbandId).toBe("a");
+		await operations.unarchiveWarrior(db, { id: "wa" }, clock);
+		expect(await operations.listWarriors(db)).toContainEqual({
+			...warrior(),
+			updatedAt,
+		});
+	});
+
 	it("protects both attacking and defending warriors from history deletion", async () => {
 		const { db } = connection;
 		await seedMatch(db);
