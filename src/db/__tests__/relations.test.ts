@@ -185,6 +185,7 @@ describe("event relations", () => {
 			class: "Hero",
 			status: "Alive" as const,
 			warbandId: "warband-a",
+			experience: 0,
 			knocked: 0,
 			injuries: 0,
 			knockedDowns: 0,

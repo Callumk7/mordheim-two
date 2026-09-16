@@ -62,6 +62,7 @@ export function deleteWarriorTransaction(
 				collections.warriors.utils.refetch(),
 				collections.events.utils.refetch(),
 				collections.warriorEquipment.utils.refetch(),
+				collections.warriorSkills.utils.refetch(),
 			]);
 		},
 	});

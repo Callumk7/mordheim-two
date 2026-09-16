@@ -28,6 +28,7 @@ function warrior(
 		class: "Hero",
 		status: "Alive",
 		warbandId: "warband-1",
+		experience: 0,
 		knocked: 0,
 		injuries: 0,
 		knockedDowns: 0,

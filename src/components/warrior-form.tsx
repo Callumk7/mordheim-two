@@ -27,6 +27,7 @@ export type WarriorFormValues = Pick<
 	| "class"
 	| "status"
 	| "warbandId"
+	| "experience"
 	| "knocked"
 	| "injuries"
 	| "knockedDowns"
@@ -53,6 +54,7 @@ export function WarriorForm({
 		class: initialValues.class,
 		status: initialValues.status,
 		warbandId: initialValues.warbandId,
+		experience: initialValues.experience,
 		knocked: initialValues.knocked,
 		injuries: initialValues.injuries,
 		knockedDowns: initialValues.knockedDowns,
@@ -181,6 +183,18 @@ export function WarriorForm({
 						</SelectContent>
 					</Select>
 				</Field>
+				<NumberField
+					description="Experience points earned through the campaign."
+					isRequired
+					label="Experience"
+					minValue={0}
+					name="experience"
+					onChange={(experience) =>
+						setValues((current) => ({ ...current, experience }))
+					}
+					step={1}
+					value={values.experience}
+				/>
 				<NumberField
 					description="Signed correction added to the event-calculated total."
 					isRequired

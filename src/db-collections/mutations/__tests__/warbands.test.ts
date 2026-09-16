@@ -55,6 +55,7 @@ const warrior: Warrior = {
 	class: "Hero",
 	status: "Alive",
 	warbandId: warband.id,
+	experience: 0,
 	knocked: 0,
 	injuries: 0,
 	knockedDowns: 0,

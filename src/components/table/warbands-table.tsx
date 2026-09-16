@@ -64,7 +64,7 @@ function WarbandWarriors({
 						const stats = getWarriorCombatStats(combatStats, warrior.id);
 						return (
 							<div
-								className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 rounded-lg border border-border bg-background px-3 py-2 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto]"
+								className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 rounded-lg border border-border bg-background px-3 py-2 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto_auto]"
 								key={warrior.id}
 							>
 								<div className="min-w-0">
@@ -85,6 +85,9 @@ function WarbandWarriors({
 										{warrior.class} · {stats.isDead ? "Dead" : "Alive"}
 									</p>
 								</div>
+								<span className="hidden text-xs text-muted-foreground sm:block">
+									{warrior.experience} XP
+								</span>
 								<span className="hidden text-xs text-muted-foreground sm:block">
 									<CombatStatValue stat="injuriesTaken" stats={stats} />{" "}
 									injuries

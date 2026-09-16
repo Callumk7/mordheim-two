@@ -15,6 +15,28 @@ const validWarrior = {
 };
 
 describe("warrior validation", () => {
+	it("defaults experience to zero and accepts non-negative integer updates", () => {
+		expect(WarriorSchema.parse(validWarrior).experience).toBe(0);
+		expect(
+			WarriorUpdateInputSchema.parse({
+				id: validWarrior.id,
+				changes: { experience: 12 },
+			}),
+		).toMatchObject({ changes: { experience: 12 } });
+		expect(
+			WarriorUpdateInputSchema.safeParse({
+				id: validWarrior.id,
+				changes: { experience: -1 },
+			}).success,
+		).toBe(false);
+		expect(
+			WarriorUpdateInputSchema.safeParse({
+				id: validWarrior.id,
+				changes: { experience: 1.5 },
+			}).success,
+		).toBe(false);
+	});
+
 	it("accepts signed integer combat corrections and rejects fractional values", () => {
 		expect(
 			WarriorSchema.parse({

@@ -7,10 +7,12 @@ import { CampaignSchema } from "@/db/validation/campaign";
 import { EquipmentSchema } from "@/db/validation/equipment";
 import { EventCreateSchema } from "@/db/validation/event";
 import { MatchSchema } from "@/db/validation/match";
+import { SkillSchema } from "@/db/validation/skill";
 import { WarbandSchema } from "@/db/validation/warband";
 import { WarbandMatchSchema } from "@/db/validation/warband-match";
 import { WarriorSchema } from "@/db/validation/warrior";
 import { WarriorEquipmentSchema } from "@/db/validation/warrior-equipment";
+import { WarriorSkillSchema } from "@/db/validation/warrior-skill";
 
 export const createdAt = "2026-09-01T00:00:00.000Z";
 export const updatedAt = "2026-09-10T12:00:00.000Z";
@@ -77,6 +79,18 @@ export const assignment = (
 	equipmentId = "sword",
 ) =>
 	WarriorEquipmentSchema.parse({ id, warriorId, equipmentId, ...timestamps });
+export const skill = (id = "strongman") =>
+	SkillSchema.parse({
+		id,
+		name: id,
+		description: "The warrior ignores heavy weapon penalties.",
+		...timestamps,
+	});
+export const skillAssignment = (
+	id = "skill-assignment",
+	warriorId = "wa",
+	skillId = "strongman",
+) => WarriorSkillSchema.parse({ id, warriorId, skillId, ...timestamps });
 export const match = (id = "match") =>
 	MatchSchema.parse({
 		id,

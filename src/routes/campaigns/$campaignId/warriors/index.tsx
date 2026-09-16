@@ -45,6 +45,7 @@ function WarriorsIndexPage() {
 		class: "",
 		status: "Alive",
 		warbandId: activeWarbands[0]?.id ?? "",
+		experience: 0,
 		knocked: 0,
 		injuries: 0,
 		knockedDowns: 0,

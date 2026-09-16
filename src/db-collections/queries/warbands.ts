@@ -81,6 +81,7 @@ export function warbandsQuery(
 							class: warrior.class,
 							status: warrior.status,
 							warbandId: warrior.warbandId,
+							experience: warrior.experience,
 							knocked: warrior.knocked,
 							injuries: warrior.injuries,
 							knockedDowns: warrior.knockedDowns,
