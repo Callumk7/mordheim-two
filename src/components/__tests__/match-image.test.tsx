@@ -26,6 +26,7 @@ function renderGroup(statuses: GeneratedImageJob["status"][]) {
 		<MatchImage
 			imagery={{
 				match: imageJob(matchStatus),
+				matchHistory: [imageJob(matchStatus)],
 				events: Object.fromEntries(
 					eventStatuses.map((status, index) => [
 						`event-${index}`,

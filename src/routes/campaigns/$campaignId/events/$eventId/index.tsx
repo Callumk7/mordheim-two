@@ -149,6 +149,7 @@ function EventDetailPage() {
 
 			<EventImage
 				attackerName={attacker?.name ?? "The attacker"}
+				eventId={event.id}
 				defenderName={defender?.name ?? "the defender"}
 				image={image}
 				outcome={event.outcome}

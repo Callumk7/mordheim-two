@@ -1,6 +1,11 @@
 import { and, desc, eq, isNotNull, or } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
-import { imageGenerationJobs as jobs } from "@/db/schema";
+import {
+	events,
+	imageGenerationJobs as jobs,
+	matches,
+	warriors,
+} from "@/db/schema";
 
 export const PROJECTOR_IMAGE_LIMIT = 30;
 
@@ -8,7 +13,15 @@ export function queryGeneratedImages(db: Pick<DrizzleD1Database, "select">) {
 	return db
 		.select({ id: jobs.id, prompt: jobs.prompt, completedAt: jobs.completedAt })
 		.from(jobs)
-		.where(eq(jobs.status, "completed"))
+		.leftJoin(warriors, eq(warriors.activeImageJobId, jobs.id))
+		.leftJoin(events, eq(events.activeImageJobId, jobs.id))
+		.leftJoin(matches, eq(matches.activeImageJobId, jobs.id))
+		.where(
+			and(
+				eq(jobs.status, "completed"),
+				or(isNotNull(warriors.id), isNotNull(events.id), isNotNull(matches.id)),
+			),
+		)
 		.orderBy(desc(jobs.completedAt), desc(jobs.id))
 		.limit(100)
 		.all();
@@ -24,14 +37,13 @@ export function queryProjectorImages(db: Pick<DrizzleD1Database, "select">) {
 			completedAt: jobs.completedAt,
 		})
 		.from(jobs)
+		.leftJoin(warriors, eq(warriors.activeImageJobId, jobs.id))
+		.leftJoin(events, eq(events.activeImageJobId, jobs.id))
+		.leftJoin(matches, eq(matches.activeImageJobId, jobs.id))
 		.where(
 			and(
 				eq(jobs.status, "completed"),
-				or(
-					isNotNull(jobs.warriorId),
-					isNotNull(jobs.eventId),
-					isNotNull(jobs.matchId),
-				),
+				or(isNotNull(warriors.id), isNotNull(events.id), isNotNull(matches.id)),
 			),
 		)
 		.orderBy(desc(jobs.completedAt), desc(jobs.id))

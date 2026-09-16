@@ -1,10 +1,7 @@
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import type { Database } from "@/db/index.server";
 import { type Clock, systemClock } from "@/db/operations/clock";
-import {
-	enqueueImageGeneration,
-	retryImageGeneration,
-} from "@/db/operations/image-generation.server";
+import { enqueueImageGeneration } from "@/db/operations/image-generation.server";
 import {
 	equipment,
 	events,
@@ -20,16 +17,31 @@ import {
 	OPENAI_IMAGE_MODEL,
 } from "@/db/validation/image-generation";
 
+const eventImageSelection = {
+	jobId: imageGenerationJobs.id,
+	status: imageGenerationJobs.status,
+	error: imageGenerationJobs.error,
+};
+
 export function queryEventImage(db: Pick<Database, "select">, eventId: string) {
 	return db
-		.select({
-			jobId: imageGenerationJobs.id,
-			status: imageGenerationJobs.status,
-			error: imageGenerationJobs.error,
-		})
+		.select(eventImageSelection)
+		.from(imageGenerationJobs)
+		.innerJoin(events, eq(events.activeImageJobId, imageGenerationJobs.id))
+		.where(eq(events.id, eventId))
+		.get();
+}
+
+export function queryEventImageHistory(
+	db: Pick<Database, "select">,
+	eventId: string,
+) {
+	return db
+		.select(eventImageSelection)
 		.from(imageGenerationJobs)
 		.where(eq(imageGenerationJobs.eventId, eventId))
-		.get();
+		.orderBy(desc(imageGenerationJobs.createdAt), desc(imageGenerationJobs.id))
+		.all();
 }
 
 type WarriorContext = {
@@ -130,18 +142,6 @@ export async function submitEventImage(
 	eventId: string,
 	clock: Clock = systemClock,
 ) {
-	const existing = await queryEventImage(db, eventId);
-	if (existing) {
-		// A job stranded before queue delivery still holds its prompt. Re-deliver it
-		// instead of treating the row as proof that generation was already requested.
-		if (existing.status === "enqueue_failed") {
-			return {
-				job: await retryImageGeneration(db, queue, existing.jobId, clock),
-			} as const;
-		}
-		return { job: existing } as const;
-	}
-
 	const event = await db
 		.select({
 			outcome: events.outcome,

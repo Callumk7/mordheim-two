@@ -1,12 +1,15 @@
-import {
-	type GeneratedImageJob,
-	GeneratedImageStatus,
-} from "@/components/shared/generated-image-status";
+import { useServerFn } from "@tanstack/react-start";
+import { EntityImagePicker } from "@/components/shared/entity-image-picker";
+import type { GeneratedImageJob } from "@/components/shared/generated-image-status";
 import { Typography } from "@/components/shared/typography";
 import { isActiveImageJobStatus } from "@/components/shared/use-image-generation-polling";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Match } from "@/db/validation/match";
-import type { getMatchImagery } from "@/server/match-images";
+import {
+	createMatchImage,
+	type getMatchImagery,
+	selectMatchImage,
+} from "@/server/match-images";
 
 export function MatchImage({
 	imagery,
@@ -17,6 +20,8 @@ export function MatchImage({
 	match: Match;
 	winnerName: string;
 }) {
+	const generate = useServerFn(createMatchImage);
+	const select = useServerFn(selectMatchImage);
 	const isCompletedVictory =
 		match.status === "Completed" &&
 		match.result === "Victory" &&
@@ -39,18 +44,16 @@ export function MatchImage({
 				{jobs.length > 1 ? <ImageGroupStatus jobs={jobs} /> : null}
 				{"error" in imagery ? (
 					<p role="alert">{imagery.error}</p>
-				) : job ? (
-					<GeneratedImageStatus
-						alt={`${winnerName} victorious in ${match.name}`}
-						job={job}
-						label="Match illustration"
-					/>
 				) : (
-					<p className="text-sm text-muted-foreground">
-						No image job is associated with this match yet. The result was
-						saved, but image submission may not have completed. Re-saving the
-						result from the completion dialog submits it again.
-					</p>
+					<EntityImagePicker
+						active={job}
+						alt={`${winnerName} victorious in ${match.name}`}
+						emptyDescription="No match illustration is selected. Generated attempts remain available in image history."
+						history={imagery.matchHistory ?? []}
+						label="Match illustration"
+						onGenerate={() => generate({ data: { matchId: match.id } })}
+						onSelect={(jobId) => select({ data: { matchId: match.id, jobId } })}
+					/>
 				)}
 			</CardContent>
 		</Card>

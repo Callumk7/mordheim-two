@@ -65,68 +65,19 @@ async function deliverImageGeneration(
 	return { jobId, status: "queued" as const };
 }
 
-/**
- * Re-delivers an existing job whose prompt is already durable in D1. Only jobs
- * left in "enqueue_failed" are retryable: every later state belongs to the
- * consumer, and re-sending those would duplicate paid generation work.
- */
-export function retryImageGeneration(
-	db: DeliveryDatabase,
-	queue: Pick<Queue<ImageGenerationMessage>, "send">,
-	jobId: string,
-	clock: Clock = systemClock,
-) {
-	return deliverImageGeneration(db, queue, jobId, clock);
-}
-
 export async function enqueueImageGeneration(
-	db: Pick<Database, "insert" | "update" | "select">,
+	db: Pick<Database, "insert" | "update">,
 	queue: Pick<Queue<ImageGenerationMessage>, "send">,
 	options: ImageGenerationOptions,
 	clock: Clock = systemClock,
 ) {
 	const { prompt, model, association } = options;
 	const jobId = crypto.randomUUID();
-	if (association) {
-		const associationColumn = association.warriorId
-			? imageGenerationJobs.warriorId
-			: association.eventId
-				? imageGenerationJobs.eventId
-				: imageGenerationJobs.matchId;
-		const associationId =
-			association.warriorId ?? association.eventId ?? association.matchId;
-		if (associationId === undefined) {
-			throw new Error("An image association ID is required.");
-		}
-		const inserted = await db
-			.insert(imageGenerationJobs)
-			.values({ id: jobId, prompt, model, ...association })
-			.onConflictDoNothing({ target: associationColumn })
-			.returning({ id: imageGenerationJobs.id })
-			.get();
-		if (!inserted) {
-			const existing = await db
-				.select({
-					jobId: imageGenerationJobs.id,
-					status: imageGenerationJobs.status,
-				})
-				.from(imageGenerationJobs)
-				.where(eq(associationColumn, associationId))
-				.get();
-			if (!existing)
-				throw new Error(
-					"Image association changed. Refresh before trying again.",
-				);
-			// A job that never reached the queue is not a duplicate request. Deliver
-			// the prompt already stored against it rather than stranding the job.
-			if (existing.status === "enqueue_failed") {
-				return deliverImageGeneration(db, queue, existing.jobId, clock);
-			}
-			return existing;
-		}
-	} else {
-		await db.insert(imageGenerationJobs).values({ id: jobId, prompt, model });
-	}
+	// Every user request gets an immutable prompt snapshot and its own result key.
+	// A later generation request never mutates or reuses historical work.
+	await db
+		.insert(imageGenerationJobs)
+		.values({ id: jobId, prompt, model, ...association });
 
 	return deliverImageGeneration(db, queue, jobId, clock);
 }

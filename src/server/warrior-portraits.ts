@@ -1,10 +1,13 @@
 import { env } from "cloudflare:workers";
 import { createServerFn } from "@tanstack/react-start";
 import { getDb } from "@/db/index.server";
+import { selectActiveImageJob } from "@/db/operations/image-selection.server";
 import {
 	queryWarriorPortrait,
+	queryWarriorPortraitHistory,
 	submitWarriorPortrait,
 } from "@/db/operations/warrior-portraits.server";
+import { WarriorImageSelectionSchema } from "@/db/validation/image-selection";
 import { WarriorPortraitInputSchema } from "@/db/validation/warrior-portrait";
 
 // Unauthenticated spike RPCs: protect these along with the rest of the app
@@ -13,9 +16,12 @@ export const getWarriorPortrait = createServerFn({ method: "GET" })
 	.validator(WarriorPortraitInputSchema)
 	.handler(async ({ data }) => {
 		try {
-			return {
-				job: (await queryWarriorPortrait(getDb(), data.warriorId)) ?? null,
-			};
+			const db = getDb();
+			const [job, history] = await Promise.all([
+				queryWarriorPortrait(db, data.warriorId),
+				queryWarriorPortraitHistory(db, data.warriorId),
+			]);
+			return { job: job ?? null, history };
 		} catch {
 			return {
 				error:
@@ -36,7 +42,25 @@ export const createWarriorPortrait = createServerFn({ method: "POST" })
 		} catch {
 			return {
 				error:
-					"Could not confirm portrait submission. Wait a moment before trying again; a job may already exist.",
+					"Could not confirm portrait submission. Wait a moment before trying again.",
+			} as const;
+		}
+	});
+
+export const selectWarriorPortrait = createServerFn({ method: "POST" })
+	.validator(WarriorImageSelectionSchema)
+	.handler(async ({ data }) => {
+		try {
+			return await selectActiveImageJob(
+				getDb(),
+				"warrior",
+				data.warriorId,
+				data.jobId,
+			);
+		} catch {
+			return {
+				error:
+					"Could not select that portrait. Choose a completed portrait for this warrior.",
 			} as const;
 		}
 	});

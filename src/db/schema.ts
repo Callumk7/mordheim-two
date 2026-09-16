@@ -40,15 +40,16 @@ export const imageGenerationJobs = sqliteTable(
 		model: text("model", { enum: IMAGE_GENERATION_MODELS })
 			.notNull()
 			.default(GEMINI_IMAGE_MODEL),
-		warriorId: text("warrior_id")
-			.references((): AnySQLiteColumn => warriors.id, { onDelete: "set null" })
-			.unique(),
-		eventId: text("event_id")
-			.references((): AnySQLiteColumn => events.id, { onDelete: "set null" })
-			.unique(),
-		matchId: text("match_id")
-			.references((): AnySQLiteColumn => matches.id, { onDelete: "set null" })
-			.unique(),
+		warriorId: text("warrior_id").references(
+			(): AnySQLiteColumn => warriors.id,
+			{ onDelete: "set null" },
+		),
+		eventId: text("event_id").references((): AnySQLiteColumn => events.id, {
+			onDelete: "set null",
+		}),
+		matchId: text("match_id").references((): AnySQLiteColumn => matches.id, {
+			onDelete: "set null",
+		}),
 		status: text("status", {
 			enum: [
 				"pending",
@@ -79,6 +80,9 @@ export const imageGenerationJobs = sqliteTable(
 			table.status,
 			table.completedAt,
 		),
+		index("image_generation_jobs_warrior_id_idx").on(table.warriorId),
+		index("image_generation_jobs_event_id_idx").on(table.eventId),
+		index("image_generation_jobs_match_id_idx").on(table.matchId),
 	],
 );
 
@@ -128,6 +132,10 @@ export const warriors = sqliteTable(
 		warbandId: text("warband_id")
 			.notNull()
 			.references(() => warbands.id, { onDelete: "cascade" }),
+		activeImageJobId: text("active_image_job_id").references(
+			() => imageGenerationJobs.id,
+			{ onDelete: "set null" },
+		),
 		knocked: integer("knocked").notNull().default(0),
 		injuries: integer("injuries").notNull().default(0), // TODO: add an injury table
 		knockedDowns: integer("knocked_downs").notNull().default(0),
@@ -142,6 +150,7 @@ export const warriors = sqliteTable(
 		uniqueIndex("warriors_warband_id_unique").on(table.warbandId, table.id),
 		uniqueIndex("warriors_campaign_id_unique").on(table.campaignId, table.id),
 		index("warriors_campaign_idx").on(table.campaignId),
+		index("warriors_active_image_job_idx").on(table.activeImageJobId),
 		foreignKey({
 			name: "warriors_campaign_warband_fk",
 			columns: [table.campaignId, table.warbandId],
@@ -236,12 +245,17 @@ export const matches = sqliteTable(
 			.notNull()
 			.default("Pending"),
 		winnerWarbandId: text("winner_warband_id"),
+		activeImageJobId: text("active_image_job_id").references(
+			() => imageGenerationJobs.id,
+			{ onDelete: "set null" },
+		),
 		createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 		updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 	},
 	(table) => [
 		uniqueIndex("matches_campaign_id_unique").on(table.campaignId, table.id),
 		index("matches_campaign_idx").on(table.campaignId),
+		index("matches_active_image_job_idx").on(table.activeImageJobId),
 		check(
 			"matches_result_winner_consistent",
 			sql`(${table.result} = 'Pending' AND ${table.winnerWarbandId} IS NULL) OR (${table.result} = 'Draw' AND ${table.winnerWarbandId} IS NULL) OR (${table.result} = 'Victory' AND ${table.winnerWarbandId} IS NOT NULL)`,
@@ -284,6 +298,10 @@ export const events = sqliteTable(
 		resolvedAt: text("resolved_at"),
 		voidedAt: text("voided_at"),
 		voidReason: text("void_reason"),
+		activeImageJobId: text("active_image_job_id").references(
+			() => imageGenerationJobs.id,
+			{ onDelete: "set null" },
+		),
 		createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 		updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 	},
@@ -338,6 +356,7 @@ export const events = sqliteTable(
 			foreignColumns: [warriors.warbandId, warriors.id],
 		}),
 		index("events_campaign_idx").on(table.campaignId),
+		index("events_active_image_job_idx").on(table.activeImageJobId),
 		index("events_match_idx").on(table.matchId),
 		index("events_attacker_warrior_idx").on(table.attackerWarriorId),
 		index("events_defender_warrior_idx").on(table.defenderWarriorId),

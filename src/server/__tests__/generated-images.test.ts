@@ -40,44 +40,26 @@ function completedJob() {
 }
 
 describe("generated image listing", () => {
-	it("returns only completed jobs, latest completion first, with deterministic ties and a 100-row limit", async () => {
+	it("returns only actively selected completed jobs and excludes history", async () => {
 		const { db, sqlite } = setup();
-		const insert = sqlite.prepare(
-			"INSERT INTO image_generation_jobs (id, prompt, status, completed_at) VALUES (?, ?, ?, ?)",
-		);
-		for (let i = 0; i < 102; i++) {
-			insert.run(
-				String(i).padStart(3, "0"),
-				`Prompt ${i}`,
-				"completed",
-				"2026-01-01T00:00:00.000Z",
-			);
-		}
-		insert.run(
-			"newest",
-			"Newest portrait",
-			"completed",
-			"2026-01-02T00:00:00.000Z",
-		);
-		for (const status of [
-			"pending",
-			"queued",
-			"processing",
-			"failed",
-			"consumed",
-			"enqueue_failed",
-		]) {
-			insert.run(status, "Not an image", status, "2026-01-03T00:00:00.000Z");
-		}
-		const images = await queryGeneratedImages(db);
-		expect(images).toHaveLength(100);
-		expect(images[0]).toEqual({
-			id: "newest",
-			prompt: "Newest portrait",
-			completedAt: "2026-01-02T00:00:00.000Z",
-		});
-		expect(images[1].id).toBe("101");
-		expect(images[99].id).toBe("003");
+		sqlite.exec(`
+			INSERT INTO campaigns (id, name) VALUES ('campaign', 'Campaign');
+			INSERT INTO warbands (id, campaign_id, name, faction) VALUES ('band', 'campaign', 'Band', 'Reikland');
+			INSERT INTO warriors (id, campaign_id, name, class, warband_id) VALUES ('warrior', 'campaign', 'Marta', 'Champion', 'band');
+			INSERT INTO image_generation_jobs (id, prompt, status, completed_at, warrior_id) VALUES
+				('history', 'Historical portrait', 'completed', '2026-01-02T00:00:00.000Z', 'warrior'),
+				('active', 'Active portrait', 'completed', '2026-01-01T00:00:00.000Z', 'warrior'),
+				('generic', 'Generic image', 'completed', '2026-01-03T00:00:00.000Z', NULL);
+			UPDATE warriors SET active_image_job_id = 'active' WHERE id = 'warrior';
+		`);
+
+		expect(await queryGeneratedImages(db)).toEqual([
+			{
+				id: "active",
+				prompt: "Active portrait",
+				completedAt: "2026-01-01T00:00:00.000Z",
+			},
+		]);
 	});
 
 	it("returns an empty list when no images are completed", async () => {

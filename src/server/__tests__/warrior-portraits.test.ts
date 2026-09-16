@@ -5,6 +5,7 @@ import { enqueueImageGeneration } from "@/db/operations/image-generation.server"
 import {
 	buildWarriorPortraitPrompt,
 	queryWarriorPortrait,
+	queryWarriorPortraitHistory,
 	submitWarriorPortrait,
 } from "@/db/operations/warrior-portraits.server";
 import { GEMINI_IMAGE_MODEL } from "@/db/validation/image-generation";
@@ -113,7 +114,7 @@ describe("warrior portrait persistence", () => {
 			sqlite.close();
 		}
 	});
-	it("persists the association and snapshot before sending only the job ID", async () => {
+	it("creates a fresh associated prompt snapshot for every request", async () => {
 		const { db, sqlite, send } = setup();
 		send.mockImplementation(async ({ jobId }) => {
 			const row = sqlite
@@ -128,25 +129,29 @@ describe("warrior portrait persistence", () => {
 			"UPDATE warriors SET description = 'Changed' WHERE id = 'warrior'; UPDATE warbands SET name = 'Changed'",
 		);
 		await submitWarriorPortrait(db, { send }, "warrior");
-		expect(send).toHaveBeenCalledOnce();
-		expect(
-			sqlite.prepare("SELECT prompt FROM image_generation_jobs").get()?.prompt,
-		).toContain("The Crows");
+		expect(send).toHaveBeenCalledTimes(2);
+		const prompts = sqlite
+			.prepare("SELECT prompt FROM image_generation_jobs ORDER BY rowid")
+			.all()
+			.map((row) => String(row.prompt));
+		expect(prompts).toHaveLength(2);
+		expect(prompts[0]).toContain("The Crows");
+		expect(prompts[1]).toContain("Changed");
 	});
-	it("deduplicates concurrent submissions with the unique database constraint", async () => {
+	it("allows intentional concurrent generations as separate jobs", async () => {
 		const { db, sqlite, send } = setup();
 		const results = await Promise.all(
 			Array.from({ length: 5 }, () =>
 				submitWarriorPortrait(db, { send }, "warrior"),
 			),
 		);
-		expect(new Set(results.map((result) => result.job?.jobId)).size).toBe(1);
-		expect(send).toHaveBeenCalledOnce();
+		expect(new Set(results.map((result) => result.job?.jobId)).size).toBe(5);
+		expect(send).toHaveBeenCalledTimes(5);
 		expect(
 			sqlite
 				.prepare("SELECT count(*) AS count FROM image_generation_jobs")
 				.get()?.count,
-		).toBe(1);
+		).toBe(5);
 	});
 	it("rejects missing warriors and oversized saved prompts without sending or inserting", async () => {
 		const { db, sqlite, send } = setup();
@@ -200,10 +205,11 @@ describe("warrior portrait persistence", () => {
 			"INSERT INTO image_generation_jobs (id, prompt, status) VALUES (?, 'Generic', 'completed')",
 		);
 		for (let i = 0; i < 101; i++) insert.run(`generic-${i}`);
-		expect((await queryWarriorPortrait(db, "warrior"))?.jobId).toBe(
-			result.job?.jobId,
-		);
+		expect(await queryWarriorPortrait(db, "warrior")).toBeUndefined();
 		expect(await queryWarriorPortrait(db, "other")).toBeUndefined();
+		expect(await queryWarriorPortraitHistory(db, "warrior")).toEqual([
+			expect.objectContaining({ jobId: result.job?.jobId }),
+		]);
 		for (const status of [
 			"pending",
 			"queued",
@@ -218,22 +224,22 @@ describe("warrior portrait persistence", () => {
 					"UPDATE image_generation_jobs SET status = ?, error = 'Sanitized error' WHERE warrior_id = 'warrior'",
 				)
 				.run(status);
-			expect(await queryWarriorPortrait(db, "warrior")).toMatchObject({
-				status,
-				error: "Sanitized error",
-			});
+			expect(await queryWarriorPortraitHistory(db, "warrior")).toEqual([
+				expect.objectContaining({ status, error: "Sanitized error" }),
+			]);
 		}
 	});
-	it("records uncertain queue failure and never resends an existing job", async () => {
+	it("records uncertain queue failure and creates a fresh later request", async () => {
 		const { db, send } = setup();
 		send.mockRejectedValue(new Error("Private queue details"));
 		const result = await submitWarriorPortrait(db, { send }, "warrior");
 		expect(result.job?.status).toBe("enqueue_failed");
-		expect((await queryWarriorPortrait(db, "warrior"))?.error).not.toContain(
-			"Private",
-		);
+		expect(
+			(await queryWarriorPortraitHistory(db, "warrior"))[0]?.error,
+		).not.toContain("Private");
 		await submitWarriorPortrait(db, { send }, "warrior");
-		expect(send).toHaveBeenCalledOnce();
+		expect(send).toHaveBeenCalledTimes(2);
+		expect(await queryWarriorPortraitHistory(db, "warrior")).toHaveLength(2);
 	});
 	it("does not overwrite a consumer completion that races the producer", async () => {
 		const { db, sqlite, send } = setup();
@@ -259,12 +265,14 @@ describe("warrior portrait persistence", () => {
 		await expect(
 			submitWarriorPortrait(db, { send }, "warrior"),
 		).rejects.toThrow();
-		expect(await queryWarriorPortrait(db, "warrior")).toMatchObject({
-			status: "pending",
-			error: null,
-		});
-		await submitWarriorPortrait(db, { send }, "warrior");
-		expect(send).toHaveBeenCalledOnce();
+		expect(await queryWarriorPortrait(db, "warrior")).toBeUndefined();
+		expect(await queryWarriorPortraitHistory(db, "warrior")).toEqual([
+			expect.objectContaining({ status: "pending", error: null }),
+		]);
+		await expect(
+			submitWarriorPortrait(db, { send }, "warrior"),
+		).rejects.toThrow();
+		expect(send).toHaveBeenCalledTimes(2);
 	});
 	it("propagates unrelated D1 failures rather than treating them as duplicate submissions", async () => {
 		const { db, sqlite, send } = setup();
