@@ -1,31 +1,31 @@
 {
-    "$schema": "node_modules/wrangler/config-schema.json",
-    "name": "mordheim-tracker",
-    "compatibility_date": "2025-09-02",
-    "compatibility_flags": [
-        "nodejs_compat"
-    ],
-    "main": "@tanstack/react-start/server-entry",
-    "queues": {
-        "producers": [
-            {
-                "binding": "IMAGE_GENERATION_QUEUE",
-                "queue": "mordheim-image-generation"
-            }
-        ]
-    },
-    "r2_buckets": [
-        {
-            "binding": "IMAGE_GENERATION_BUCKET",
-            "bucket_name": "mordheim-generated-images"
-        }
-    ],
-    "d1_databases": [
-        {
-            "binding": "DB",
-            "database_name": "mordheim-two-db",
-            "database_id": "45d02283-1ed1-4ff0-ade4-83fe6c36d59c",
-            "migrations_dir": "drizzle"
-        }
-    ]
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "mordheim-tracker",
+	"compatibility_date": "2025-09-02",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"main": "@tanstack/react-start/server-entry",
+	"queues": {
+		"producers": [
+			{
+				"binding": "IMAGE_GENERATION_QUEUE",
+				"queue": "mordheim-image-generation"
+			}
+		]
+	},
+	"r2_buckets": [
+		{
+			"binding": "IMAGE_GENERATION_BUCKET",
+			"bucket_name": "mordheim-generated-images"
+		}
+	],
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "mordheim-two-db",
+			"database_id": "eb0db944-0a29-4c07-abc3-97b085d8e222",
+			"migrations_dir": "drizzle"
+		}
+	]
 }
