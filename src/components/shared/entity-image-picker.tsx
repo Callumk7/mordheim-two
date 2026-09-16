@@ -4,6 +4,7 @@ import {
 	type GeneratedImageJob,
 	GeneratedImageStatus,
 } from "@/components/shared/generated-image-status";
+import { isActiveImageJobStatus } from "@/components/shared/use-image-generation-polling";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -33,6 +34,9 @@ export function EntityImagePicker({
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [selectingId, setSelectingId] = useState<string | null>(null);
 	const [message, setMessage] = useState<string | null>(null);
+
+	const displayed =
+		active ?? history.find((job) => isActiveImageJobStatus(job.status));
 
 	const generate = async () => {
 		setIsGenerating(true);
@@ -66,8 +70,8 @@ export function EntityImagePicker({
 
 	return (
 		<div className="space-y-4">
-			{active ? (
-				<GeneratedImageStatus alt={alt} job={active} label={label} />
+			{displayed ? (
+				<GeneratedImageStatus alt={alt} job={displayed} label={label} />
 			) : (
 				<p className="text-sm text-muted-foreground">{emptyDescription}</p>
 			)}

@@ -65,31 +65,6 @@ async function deliverImageGeneration(
 	return { jobId, status: "queued" as const };
 }
 
-/**
- * Re-delivers an existing job whose prompt is already durable in D1. Only jobs
- * left in "enqueue_failed" are retryable: every later state belongs to the
- * consumer, and re-sending those would duplicate paid generation work.
- */
-export async function retryImageGeneration(
-	db: Pick<Database, "select" | "update">,
-	queue: Pick<Queue<ImageGenerationMessage>, "send">,
-	jobId: string,
-	clock: Clock = systemClock,
-) {
-	const retryable = await db
-		.select({ id: imageGenerationJobs.id })
-		.from(imageGenerationJobs)
-		.where(
-			and(
-				eq(imageGenerationJobs.id, jobId),
-				eq(imageGenerationJobs.status, "enqueue_failed"),
-			),
-		)
-		.get();
-	if (!retryable) return undefined;
-	return deliverImageGeneration(db, queue, jobId, clock);
-}
-
 export async function enqueueImageGeneration(
 	db: Pick<Database, "insert" | "update">,
 	queue: Pick<Queue<ImageGenerationMessage>, "send">,
@@ -99,8 +74,7 @@ export async function enqueueImageGeneration(
 	const { prompt, model, association } = options;
 	const jobId = crypto.randomUUID();
 	// Every user request gets an immutable prompt snapshot and its own result key.
-	// enqueue_failed redelivery remains an explicit operation on that original ID;
-	// a later generation request never mutates or reuses historical work.
+	// A later generation request never mutates or reuses historical work.
 	await db
 		.insert(imageGenerationJobs)
 		.values({ id: jobId, prompt, model, ...association });

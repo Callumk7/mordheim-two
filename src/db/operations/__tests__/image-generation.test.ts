@@ -10,10 +10,7 @@ import {
 	queryGeneratedImages,
 	queryProjectorImages,
 } from "@/db/operations/generated-images.server";
-import {
-	enqueueImageGeneration,
-	retryImageGeneration,
-} from "@/db/operations/image-generation.server";
+import { enqueueImageGeneration } from "@/db/operations/image-generation.server";
 import { selectActiveImageJob } from "@/db/operations/image-selection.server";
 import {
 	buildMatchImagePrompt,
@@ -355,50 +352,6 @@ describe("image job operations on local D1", () => {
 		expect(await listQueueJobs(db)).toHaveLength(4);
 		expect(await queryEventImage(db, "event")).toBeUndefined();
 		expect(await queryMatchImage(db, "match")).toBeUndefined();
-	});
-
-	it("re-delivers only the original enqueue-failed job", async () => {
-		const { db } = connection;
-		const failed = await enqueueImageGeneration(
-			db,
-			{ send: vi.fn().mockRejectedValue(new Error("uncertain")) },
-			{ prompt: "Original snapshot", model: GEMINI_IMAGE_MODEL },
-			clock,
-		);
-		const send = vi.fn().mockResolvedValue(undefined);
-
-		await retryImageGeneration(db, { send }, failed.jobId, clock);
-
-		expect(send).toHaveBeenCalledExactlyOnceWith({ jobId: failed.jobId });
-		expect(await listQueueJobs(db)).toEqual([
-			expect.objectContaining({
-				id: failed.jobId,
-				prompt: "Original snapshot",
-				status: "queued",
-			}),
-		]);
-	});
-
-	it("never re-delivers a job the consumer already owns", async () => {
-		const { db } = connection;
-		const queue = { send: vi.fn().mockResolvedValue(undefined) };
-		const { jobId } = await enqueueImageGeneration(
-			db,
-			queue,
-			{ prompt: "A ruined city", model: GEMINI_IMAGE_MODEL },
-			clock,
-		);
-		await db
-			.update(imageGenerationJobs)
-			.set({ status: "processing" })
-			.where(eq(imageGenerationJobs.id, jobId));
-
-		await retryImageGeneration(db, queue, jobId, clock);
-
-		expect(queue.send).toHaveBeenCalledTimes(1);
-		expect(await listQueueJobs(db)).toContainEqual(
-			expect.objectContaining({ id: jobId, status: "processing" }),
-		);
 	});
 
 	it("deterministically keeps final-match prompts within provider limits", () => {
