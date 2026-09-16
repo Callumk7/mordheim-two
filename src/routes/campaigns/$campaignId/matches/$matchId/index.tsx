@@ -3,7 +3,7 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { Pencil, Plus, Trophy, Users } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "#/components/ui/badge";
-import { EventForm } from "@/components/event-form";
+import { EventForm, type EventFormValues } from "@/components/event-form";
 import { formatStatus, MatchForm } from "@/components/match-form";
 import { MatchImage } from "@/components/match-image";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -116,9 +116,7 @@ function MatchDetailPage() {
 			)?.id ?? "",
 		notes: null,
 	};
-	const addEvent = async (
-		values: Parameters<typeof createEventTransaction>[1],
-	) => {
+	const addEvent = async (values: EventFormValues) => {
 		const transaction = createEventTransaction(collections, {
 			...values,
 			campaignId,

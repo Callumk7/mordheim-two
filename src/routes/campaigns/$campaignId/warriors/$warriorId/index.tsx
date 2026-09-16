@@ -18,8 +18,8 @@ import {
 } from "@/db-collections/projections";
 import { useWarriorDetails } from "@/db-collections/queries";
 import { getWarriorPortrait } from "@/server/warrior-portraits";
-import { Card, CardContent } from "../../../components/ui/card";
-import { WarriorForm } from "../../../components/warrior-form";
+import { Card, CardContent } from "@/components/ui/card";
+import { WarriorForm } from "@/components/warrior-form";
 
 export const Route = createFileRoute(
 	"/campaigns/$campaignId/warriors/$warriorId/",

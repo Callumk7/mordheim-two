@@ -13,6 +13,7 @@ function event(
 ): Event {
 	return {
 		id,
+		campaignId: "campaign-1",
 		matchId: "match-1",
 		attackerWarbandId: "old-attackers",
 		attackerWarriorId: "attacker",

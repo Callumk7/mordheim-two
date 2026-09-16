@@ -180,6 +180,7 @@ describe("event relations", () => {
 		];
 		const warrior = {
 			id: "warrior-a",
+			campaignId: "campaign-1",
 			name: "A",
 			class: "Hero",
 			status: "Alive" as const,
