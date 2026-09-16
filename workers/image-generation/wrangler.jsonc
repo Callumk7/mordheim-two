@@ -35,7 +35,7 @@
         {
             "binding": "DB",
             "database_name": "mordheim-two-db",
-            "database_id": "45d02283-1ed1-4ff0-ade4-83fe6c36d59c",
+            "database_id": "eb0db944-0a29-4c07-abc3-97b085d8e222",
             "migrations_dir": "../../drizzle"
         }
     ]
