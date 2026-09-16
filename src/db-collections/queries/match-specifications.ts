@@ -55,9 +55,15 @@ export function matchParticipantsQuery(
 			.where(({ participant }) => eq(participant.matchId, matchId));
 }
 
-export function allWarbandsQuery({ warbands }: ParticipantCollections) {
+export function allWarbandsQuery(
+	{ warbands }: ParticipantCollections,
+	campaignId: string,
+) {
 	return (q: InitialQueryBuilder) =>
-		q.from({ warband: warbands }).orderBy(({ warband }) => warband.name);
+		q
+			.from({ warband: warbands })
+			.where(({ warband }) => eq(warband.campaignId, campaignId))
+			.orderBy(({ warband }) => warband.name);
 }
 
 export function matchRosterQuery(
@@ -73,6 +79,7 @@ export function matchRosterQuery(
 			.where(({ participant }) => eq(participant.matchId, matchId))
 			.select(({ warrior }) => ({
 				id: warrior.id,
+				campaignId: warrior.campaignId,
 				name: warrior.name,
 				class: warrior.class,
 				status: warrior.status,
@@ -111,6 +118,7 @@ export function matchEventsQuery(
 			.select(
 				({ event, attacker, defender, attackerWarrior, defenderWarrior }) => ({
 					id: event.id,
+					campaignId: event.campaignId,
 					matchId: event.matchId,
 					attackerWarbandId: event.attackerWarbandId,
 					attackerWarriorId: event.attackerWarriorId,

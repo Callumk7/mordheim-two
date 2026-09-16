@@ -35,6 +35,7 @@ const timestamp = "2026-01-01T00:00:00.000Z";
 
 const warband: Warband = {
 	id: "warband-1",
+	campaignId: "campaign-1",
 	name: "Reikland Reavers",
 	faction: "Mercenaries",
 	bio: null,
@@ -49,6 +50,7 @@ const warband: Warband = {
 
 const warrior: Warrior = {
 	id: "warrior-1",
+	campaignId: "campaign-1",
 	name: "Rolf",
 	class: "Hero",
 	status: "Alive",
@@ -92,6 +94,7 @@ afterEach(() => {
 });
 
 const newWarband = {
+	campaignId: "campaign-1",
 	name: "Sisters of Sigmar",
 	faction: "Sisters of Sigmar",
 	bio: null,

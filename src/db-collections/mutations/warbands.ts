@@ -7,7 +7,7 @@ type NewWarband = Omit<
 	Warband,
 	"id" | "isArchived" | "archivedAt" | "createdAt" | "updatedAt"
 >;
-type WarbandChanges = Partial<NewWarband>;
+type WarbandChanges = Partial<Omit<NewWarband, "campaignId">>;
 
 export function createWarbandTransaction(
 	collections: AppCollections,

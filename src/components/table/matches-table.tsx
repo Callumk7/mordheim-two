@@ -11,12 +11,19 @@ import { createDataTableColumnHelper, DataTable } from "./data-table";
 const columnHelper = createDataTableColumnHelper<Match>();
 
 interface MatchesTableProps {
+	campaignId: string;
 	matches: Match[];
 	warbands: Warband[];
 }
 
-export function MatchesTable({ matches, warbands }: MatchesTableProps) {
-	const navigate = useNavigate({ from: "/matches" });
+export function MatchesTable({
+	campaignId,
+	matches,
+	warbands,
+}: MatchesTableProps) {
+	const navigate = useNavigate({
+		from: "/campaigns/$campaignId/matches",
+	});
 	const columns = useMemo(
 		() =>
 			columnHelper.columns([
@@ -56,8 +63,8 @@ export function MatchesTable({ matches, warbands }: MatchesTableProps) {
 								aria-label={`Archive ${row.original.name}`}
 								onPress={() =>
 									navigate({
-										to: "/matches/$matchId/delete",
-										params: { matchId: row.original.id },
+										to: "/campaigns/$campaignId/matches/$matchId/delete",
+										params: { campaignId, matchId: row.original.id },
 									})
 								}
 								size="icon-xs"
@@ -69,7 +76,7 @@ export function MatchesTable({ matches, warbands }: MatchesTableProps) {
 					),
 				}),
 			]),
-		[navigate, warbands],
+		[campaignId, navigate, warbands],
 	);
 
 	return (
@@ -81,8 +88,8 @@ export function MatchesTable({ matches, warbands }: MatchesTableProps) {
 			itemLabel={{ singular: "match", plural: "matches" }}
 			onRowAction={(match) =>
 				navigate({
-					to: "/matches/$matchId",
-					params: { matchId: match.id },
+					to: "/campaigns/$campaignId/matches/$matchId",
+					params: { campaignId, matchId: match.id },
 				})
 			}
 			searchPlaceholder="Search matches…"

@@ -61,6 +61,7 @@ export const EventSchema = z
 	.object({
 		...EventFieldsShape,
 		id: z.string().min(1),
+		campaignId: z.string().min(1),
 		notes: EventFieldsShape.notes.default(null),
 		createdAt: z.string().default(() => new Date().toISOString()),
 		updatedAt: z.string().default(() => new Date().toISOString()),

@@ -20,6 +20,7 @@ type WarbandWithWarriors = Warband & { warriors: Warrior[] };
 const columnHelper = createDataTableColumnHelper<WarbandWithWarriors>();
 
 interface WarbandsTableProps {
+	campaignId: string;
 	combatStats: CombatStatsProjection;
 	warbands: WarbandWithWarriors[];
 	onAddWarrior: (warband: Warband) => void;
@@ -28,10 +29,12 @@ interface WarbandsTableProps {
 }
 
 function WarbandWarriors({
+	campaignId,
 	combatStats,
 	onAddWarrior,
 	warband,
 }: {
+	campaignId: string;
 	combatStats: CombatStatsProjection;
 	onAddWarrior: (warband: Warband) => void;
 	warband: WarbandWithWarriors;
@@ -92,9 +95,9 @@ function WarbandWarriors({
 								</span>
 								<LinkButton
 									aria-label={`View warrior ${warrior.name}`}
-									params={{ warriorId: warrior.id }}
+									params={{ campaignId, warriorId: warrior.id }}
 									size="icon-xs"
-									to="/warriors/$warriorId"
+									to="/campaigns/$campaignId/warriors/$warriorId"
 									variant="ghost"
 								>
 									<Eye aria-hidden="true" />
@@ -113,13 +116,14 @@ function WarbandWarriors({
 }
 
 export function WarbandsTable({
+	campaignId,
 	combatStats,
 	onAddWarrior,
 	onUpdateGold,
 	onUpdateRating,
 	warbands,
 }: WarbandsTableProps) {
-	const navigate = useNavigate({ from: "/warbands" });
+	const navigate = useNavigate({ from: "/campaigns/$campaignId/warbands" });
 	const columns = useMemo(
 		() =>
 			columnHelper.columns([
@@ -225,8 +229,8 @@ export function WarbandsTable({
 								aria-label={`Archive ${row.original.name}`}
 								onPress={() =>
 									navigate({
-										to: "/warbands/$warbandId/delete",
-										params: { warbandId: row.original.id },
+										to: "/campaigns/$campaignId/warbands/$warbandId/delete",
+										params: { campaignId, warbandId: row.original.id },
 									})
 								}
 								size="icon-xs"
@@ -238,7 +242,7 @@ export function WarbandsTable({
 					),
 				}),
 			]),
-		[combatStats, navigate, onUpdateGold, onUpdateRating],
+		[campaignId, combatStats, navigate, onUpdateGold, onUpdateRating],
 	);
 
 	return (
@@ -251,12 +255,13 @@ export function WarbandsTable({
 			itemLabel={{ singular: "warband", plural: "warbands" }}
 			onRowAction={(warband) =>
 				navigate({
-					to: "/warbands/$warbandId",
-					params: { warbandId: warband.id },
+					to: "/campaigns/$campaignId/warbands/$warbandId",
+					params: { campaignId, warbandId: warband.id },
 				})
 			}
 			renderExpandedRow={(warband) => (
 				<WarbandWarriors
+					campaignId={campaignId}
 					combatStats={combatStats}
 					onAddWarrior={onAddWarrior}
 					warband={warband}

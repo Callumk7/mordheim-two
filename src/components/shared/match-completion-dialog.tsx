@@ -239,6 +239,7 @@ export function MatchCompletionDialog({
 					) : null}
 
 					<MatchEventsTable
+						campaignId={match.campaignId}
 						deadWarriorIds={deadWarriorIds}
 						events={events}
 						imageJobs={eventImageJobs}

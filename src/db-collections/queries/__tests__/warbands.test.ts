@@ -13,6 +13,7 @@ const timestamp = "2026-01-01T00:00:00.000Z";
 function warband(id: string, isArchived = false): Warband {
 	return WarbandSchema.parse({
 		id,
+		campaignId: "campaign-1",
 		name: id,
 		faction: "Mercenaries",
 		bio: null,
@@ -29,6 +30,7 @@ function warband(id: string, isArchived = false): Warband {
 function warrior(id: string, warbandId: string, isArchived = false): Warrior {
 	return WarriorSchema.parse({
 		id,
+		campaignId: "campaign-1",
 		name: id,
 		class: "Hero",
 		status: "Alive",
@@ -65,14 +67,16 @@ describe("warband index query", () => {
 			}),
 		);
 
-		const activeRows = await queryOnce(warbandsQuery({ warbands, warriors }));
+		const activeRows = await queryOnce(
+			warbandsQuery({ warbands, warriors }, "campaign-1"),
+		);
 		expect(activeRows).toHaveLength(1);
 		expect(activeRows[0].warriors.map((row) => row.id)).toEqual([
 			"active-warrior",
 		]);
 
 		const allRows = await queryOnce(
-			warbandsQuery({ warbands, warriors }, true),
+			warbandsQuery({ warbands, warriors }, "campaign-1", true),
 		);
 		expect(allRows).toHaveLength(2);
 		expect(

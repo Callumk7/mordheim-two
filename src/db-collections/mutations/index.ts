@@ -1,3 +1,4 @@
+export * from "./campaigns";
 export * from "./equipment";
 export * from "./events";
 export * from "./matches";

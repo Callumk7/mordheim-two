@@ -18,6 +18,7 @@ const now = "2026-01-01T00:00:00.000Z";
 function makeWarband(id: string, overrides: Partial<Warband> = {}): Warband {
 	return {
 		id,
+		campaignId: "campaign-1",
 		name: id,
 		faction: "Mercenaries",
 		bio: null,
@@ -49,6 +50,7 @@ function makeWarrior(
 ): Warrior {
 	return {
 		id,
+		campaignId: "campaign-1",
 		name: id,
 		class: "Hero",
 		status: "Alive",

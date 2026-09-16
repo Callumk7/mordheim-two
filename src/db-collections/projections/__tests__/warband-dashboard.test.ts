@@ -11,6 +11,7 @@ const timestamp = "2026-01-01T00:00:00.000Z";
 function warband(id: string): Warband {
 	return {
 		id,
+		campaignId: "campaign-1",
 		name: id === "red" ? "Red Reavers" : "Blue Blades",
 		faction: "Mercenaries",
 		bio: null,
@@ -31,6 +32,7 @@ function warrior(
 ): Warrior {
 	return {
 		id,
+		campaignId: "campaign-1",
 		name: id,
 		class: "Hero",
 		status,
@@ -53,6 +55,7 @@ function match(
 ): Match {
 	return {
 		id,
+		campaignId: "campaign-1",
 		name: id,
 		scenario: "Skirmish",
 		status: result === "Pending" ? "Scheduled" : "Completed",
@@ -74,6 +77,7 @@ function participant(
 function event(id: string, overrides: Partial<Event> = {}): Event {
 	return {
 		id,
+		campaignId: "campaign-1",
 		matchId: "win",
 		attackerWarbandId: "red",
 		attackerWarriorId: "red-hero",

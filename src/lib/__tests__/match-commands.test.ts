@@ -38,10 +38,11 @@ function participant(warbandId: string): WarbandMatch {
 describe("buildCreateMatchCommand", () => {
 	it("builds repeatable records with one shared timestamp and linked IDs", () => {
 		const dependencies = sources();
-		const command = buildCreateMatchCommand(values, dependencies);
+		const command = buildCreateMatchCommand(values, dependencies, "campaign-1");
 		expect(command).toEqual({
 			match: {
 				id: "id-1",
+				campaignId: "campaign-1",
 				name: values.name,
 				scenario: values.scenario,
 				status: values.status,
@@ -58,7 +59,9 @@ describe("buildCreateMatchCommand", () => {
 				updatedAt: timestamp,
 			})),
 		});
-		expect(buildCreateMatchCommand(values, sources())).toEqual(command);
+		expect(buildCreateMatchCommand(values, sources(), "campaign-1")).toEqual(
+			command,
+		);
 	});
 
 	it("deduplicates selections in first-occurrence order without mutating input", () => {
@@ -68,7 +71,11 @@ describe("buildCreateMatchCommand", () => {
 		};
 		const before = structuredClone(input);
 		const dependencies = sources();
-		const { participants } = buildCreateMatchCommand(input, dependencies);
+		const { participants } = buildCreateMatchCommand(
+			input,
+			dependencies,
+			"campaign-1",
+		);
 		expect(participants.map((row) => row.warbandId)).toEqual(["b", "a", "c"]);
 		expect(new Set(participants.map((row) => row.id)).size).toBe(3);
 		expect(input).toEqual(before);
@@ -79,6 +86,7 @@ describe("buildCreateMatchCommand", () => {
 			buildCreateMatchCommand(
 				{ ...values, participantWarbandIds: [] },
 				sources(),
+				"campaign-1",
 			).participants,
 		).toEqual([]);
 	});

@@ -13,7 +13,7 @@ type NewEvent = Omit<
 	| "voidReason"
 	| "isProcessed"
 >;
-type EventChanges = Partial<NewEvent>;
+type EventChanges = Partial<Omit<NewEvent, "campaignId">>;
 
 export function createEventTransaction(
 	collections: AppCollections,

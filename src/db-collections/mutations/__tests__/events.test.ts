@@ -26,6 +26,7 @@ const timestamp = "2026-01-01T00:00:00.000Z";
 
 const existing: Event = {
 	id: "event-1",
+	campaignId: "campaign-1",
 	matchId: "match-1",
 	attackerWarbandId: "warband-a",
 	attackerWarriorId: "warrior-a",
@@ -42,6 +43,7 @@ const existing: Event = {
 };
 
 const newEventValues = {
+	campaignId: "campaign-1",
 	matchId: "match-1",
 	attackerWarbandId: "warband-a",
 	attackerWarriorId: "warrior-a",

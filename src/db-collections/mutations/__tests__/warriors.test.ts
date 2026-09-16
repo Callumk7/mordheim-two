@@ -33,6 +33,7 @@ const timestamp = "2026-01-01T00:00:00.000Z";
 
 const warrior: Warrior = {
 	id: "warrior-1",
+	campaignId: "campaign-1",
 	name: "Rolf",
 	class: "Hero",
 	status: "Alive",
@@ -48,6 +49,7 @@ const warrior: Warrior = {
 
 const event: Event = {
 	id: "event-1",
+	campaignId: "campaign-1",
 	matchId: "match-1",
 	attackerWarbandId: "warband-1",
 	attackerWarriorId: warrior.id,
@@ -64,6 +66,7 @@ const event: Event = {
 };
 
 const newWarrior = {
+	campaignId: "campaign-1",
 	name: "Marta",
 	class: "Champion",
 	status: "Alive" as const,

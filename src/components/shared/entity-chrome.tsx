@@ -5,18 +5,42 @@ import { cn } from "@/lib/utils";
 
 type EntityLink =
 	| { to: "/" }
-	| { to: "/events" }
-	| { to: "/events/$eventId"; params: { eventId: string } }
-	| { to: "/events/$eventId/delete"; params: { eventId: string } }
-	| { to: "/matches" }
-	| { to: "/matches/$matchId"; params: { matchId: string } }
-	| { to: "/matches/$matchId/delete"; params: { matchId: string } }
-	| { to: "/warbands" }
-	| { to: "/warbands/$warbandId"; params: { warbandId: string } }
-	| { to: "/warbands/$warbandId/delete"; params: { warbandId: string } }
-	| { to: "/warriors" }
-	| { to: "/warriors/$warriorId"; params: { warriorId: string } }
-	| { to: "/warriors/$warriorId/delete"; params: { warriorId: string } };
+	| { to: "/campaigns/$campaignId/events"; params: { campaignId: string } }
+	| {
+			to: "/campaigns/$campaignId/events/$eventId";
+			params: { campaignId: string; eventId: string };
+	  }
+	| {
+			to: "/campaigns/$campaignId/events/$eventId/delete";
+			params: { campaignId: string; eventId: string };
+	  }
+	| { to: "/campaigns/$campaignId/matches"; params: { campaignId: string } }
+	| {
+			to: "/campaigns/$campaignId/matches/$matchId";
+			params: { campaignId: string; matchId: string };
+	  }
+	| {
+			to: "/campaigns/$campaignId/matches/$matchId/delete";
+			params: { campaignId: string; matchId: string };
+	  }
+	| { to: "/campaigns/$campaignId/warbands"; params: { campaignId: string } }
+	| {
+			to: "/campaigns/$campaignId/warbands/$warbandId";
+			params: { campaignId: string; warbandId: string };
+	  }
+	| {
+			to: "/campaigns/$campaignId/warbands/$warbandId/delete";
+			params: { campaignId: string; warbandId: string };
+	  }
+	| { to: "/campaigns/$campaignId/warriors"; params: { campaignId: string } }
+	| {
+			to: "/campaigns/$campaignId/warriors/$warriorId";
+			params: { campaignId: string; warriorId: string };
+	  }
+	| {
+			to: "/campaigns/$campaignId/warriors/$warriorId/delete";
+			params: { campaignId: string; warriorId: string };
+	  };
 
 export function EntityToolbar({
 	actions,

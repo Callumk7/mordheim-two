@@ -14,10 +14,14 @@ export {
 	warriorWarbandsQuery,
 } from "./warrior-specifications";
 
-export function useWarriors(dbClient: DbClient, showArchived = false) {
+export function useWarriors(
+	dbClient: DbClient,
+	campaignId: string,
+	showArchived = false,
+) {
 	const collections = getCollections(dbClient);
 	const { data } = useLiveQuery({
-		query: warriorsQuery(collections, showArchived),
+		query: warriorsQuery(collections, campaignId, showArchived),
 	});
 	return data;
 }
@@ -41,25 +45,37 @@ export function useWarriorEventReferences(
 	return data;
 }
 
-export function useWarriorWarbands(dbClient: DbClient, showArchived = false) {
+export function useWarriorWarbands(
+	dbClient: DbClient,
+	campaignId: string,
+	showArchived = false,
+) {
 	const collections = getCollections(dbClient);
 	const { data } = useLiveQuery({
-		query: warriorWarbandsQuery(collections, showArchived),
+		query: warriorWarbandsQuery(collections, campaignId, showArchived),
 	});
 	return data;
 }
 
-export function useWarriorsIndex(dbClient: DbClient, showArchived = false) {
+export function useWarriorsIndex(
+	dbClient: DbClient,
+	campaignId: string,
+	showArchived = false,
+) {
 	return {
-		warbands: useWarriorWarbands(dbClient, showArchived),
-		warriors: useWarriors(dbClient, showArchived),
+		warbands: useWarriorWarbands(dbClient, campaignId, showArchived),
+		warriors: useWarriors(dbClient, campaignId, showArchived),
 	};
 }
 
-export function useWarriorDetails(dbClient: DbClient, warriorId: string) {
+export function useWarriorDetails(
+	dbClient: DbClient,
+	campaignId: string,
+	warriorId: string,
+) {
 	return {
 		eventReferences: useWarriorEventReferences(dbClient, warriorId),
-		warbands: useWarriorWarbands(dbClient, true),
+		warbands: useWarriorWarbands(dbClient, campaignId, true),
 		warrior: useWarrior(dbClient, warriorId),
 	};
 }

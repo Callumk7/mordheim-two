@@ -23,6 +23,7 @@ function warrior(
 ): Warrior {
 	return {
 		id,
+		campaignId: "campaign-1",
 		name,
 		class: "Hero",
 		status: "Alive",
@@ -45,6 +46,7 @@ function warband(
 ): Warband {
 	return {
 		id,
+		campaignId: "campaign-1",
 		name,
 		faction: "Mercenaries",
 		bio: null,
@@ -66,6 +68,7 @@ function event(
 ): Event {
 	return {
 		id,
+		campaignId: "campaign-1",
 		matchId: "match-1",
 		attackerWarbandId: "warband-1",
 		attackerWarriorId,
@@ -102,13 +105,13 @@ describe("warrior query specifications", () => {
 		);
 
 		await expect(
-			queryOnce(warriorsQuery({ warbands, warriors })),
+			queryOnce(warriorsQuery({ warbands, warriors }, "campaign-1")),
 		).resolves.toMatchObject([
 			{ id: "1", name: "Alpha" },
 			{ id: "2", name: "Zed" },
 		]);
 		await expect(
-			queryOnce(warriorWarbandsQuery({ warbands })),
+			queryOnce(warriorWarbandsQuery({ warbands }, "campaign-1")),
 		).resolves.toMatchObject([
 			{ id: "warband-1", name: "Aldorf" },
 			{ id: "2", name: "Zeta" },
@@ -149,12 +152,16 @@ describe("warrior query specifications", () => {
 		);
 
 		expect(
-			(await queryOnce(warriorsQuery({ warbands, warriors }))).map(
-				(row) => row.id,
-			),
+			(
+				await queryOnce(warriorsQuery({ warbands, warriors }, "campaign-1"))
+			).map((row) => row.id),
 		).toEqual(["active"]);
 		expect(
-			(await queryOnce(warriorsQuery({ warbands, warriors }, true)))
+			(
+				await queryOnce(
+					warriorsQuery({ warbands, warriors }, "campaign-1", true),
+				)
+			)
 				.map((row) => row.id)
 				.sort(),
 		).toEqual(["active", "archived", "hidden-by-parent"]);

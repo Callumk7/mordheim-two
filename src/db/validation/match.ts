@@ -36,6 +36,7 @@ export const MatchFieldsSchema = z
 
 export const MatchSchema = MatchFieldsSchema.extend({
 	id: z.string().min(1),
+	campaignId: z.string().min(1),
 	createdAt: z.string().default(() => new Date().toISOString()),
 	updatedAt: z.string().default(() => new Date().toISOString()),
 });
