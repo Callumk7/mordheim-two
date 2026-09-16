@@ -10,8 +10,11 @@ import type {
 	WarriorUpdateInputSchema,
 } from "@/db/validation/warrior";
 
-export function listWarriors(db: Database) {
-	return db.select().from(warriors).orderBy(warriors.name);
+export async function listWarriors(db: Database) {
+	const rows = await db.select().from(warriors).orderBy(warriors.name);
+	return rows.map(
+		({ activeImageJobId: _activeImageJobId, ...warrior }) => warrior,
+	);
 }
 
 export async function createWarrior(

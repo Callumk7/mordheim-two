@@ -78,8 +78,8 @@ function GeneratedImagesPage() {
 				title="Generated images"
 				description={
 					<>
-						Latest 100 completed D1 jobs, newest completion first. Select an
-						image to enlarge it. Refresh to check for new results.
+						Latest 100 actively selected images, newest completion first. Select
+						an image to enlarge it. Refresh to check for new results.
 					</>
 				}
 				isRefreshing={isLoading}
@@ -91,8 +91,8 @@ function GeneratedImagesPage() {
 			{images.length === 0 ? (
 				<Card>
 					<CardContent>
-						No completed images yet. Queued, failed and historical consumed jobs
-						are not shown here.
+						No active images yet. Queued, failed, generic, and non-selected
+						historical jobs are not shown here.
 					</CardContent>
 				</Card>
 			) : (

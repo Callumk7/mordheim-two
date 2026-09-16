@@ -1,10 +1,7 @@
-import { asc, eq, inArray } from "drizzle-orm";
+import { asc, desc, eq, inArray } from "drizzle-orm";
 import type { Database } from "@/db/index.server";
 import { type Clock, systemClock } from "@/db/operations/clock";
-import {
-	enqueueImageGeneration,
-	retryImageGeneration,
-} from "@/db/operations/image-generation.server";
+import { enqueueImageGeneration } from "@/db/operations/image-generation.server";
 import {
 	events,
 	imageGenerationJobs,
@@ -178,16 +175,31 @@ export function buildMatchImagePrompt(context: {
 	return ImageGenerationInputSchema.parse({ prompt: format() }).prompt;
 }
 
+const matchImageSelection = {
+	jobId: imageGenerationJobs.id,
+	status: imageGenerationJobs.status,
+	error: imageGenerationJobs.error,
+};
+
 export function queryMatchImage(db: Pick<Database, "select">, matchId: string) {
 	return db
-		.select({
-			jobId: imageGenerationJobs.id,
-			status: imageGenerationJobs.status,
-			error: imageGenerationJobs.error,
-		})
+		.select(matchImageSelection)
+		.from(imageGenerationJobs)
+		.innerJoin(matches, eq(matches.activeImageJobId, imageGenerationJobs.id))
+		.where(eq(matches.id, matchId))
+		.get();
+}
+
+export function queryMatchImageHistory(
+	db: Pick<Database, "select">,
+	matchId: string,
+) {
+	return db
+		.select(matchImageSelection)
 		.from(imageGenerationJobs)
 		.where(eq(imageGenerationJobs.matchId, matchId))
-		.get();
+		.orderBy(desc(imageGenerationJobs.createdAt), desc(imageGenerationJobs.id))
+		.all();
 }
 
 /**
@@ -205,8 +217,11 @@ export function queryMatchEventImages(
 			status: imageGenerationJobs.status,
 			error: imageGenerationJobs.error,
 		})
-		.from(imageGenerationJobs)
-		.innerJoin(events, eq(imageGenerationJobs.eventId, events.id))
+		.from(events)
+		.innerJoin(
+			imageGenerationJobs,
+			eq(events.activeImageJobId, imageGenerationJobs.id),
+		)
 		.where(eq(events.matchId, matchId))
 		.all();
 }
@@ -217,18 +232,6 @@ export async function submitCompletedMatchImage(
 	matchId: string,
 	clock: Clock = systemClock,
 ) {
-	const existing = await queryMatchImage(db, matchId);
-	if (existing) {
-		// A job stranded before queue delivery still holds its prompt. Re-deliver it
-		// instead of treating the row as proof that generation was already requested.
-		if (existing.status === "enqueue_failed") {
-			return {
-				job: await retryImageGeneration(db, queue, existing.jobId, clock),
-			} as const;
-		}
-		return { job: existing } as const;
-	}
-
 	const match = await db
 		.select()
 		.from(matches)

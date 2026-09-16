@@ -14,6 +14,7 @@ import {
 	enqueueImageGeneration,
 	retryImageGeneration,
 } from "@/db/operations/image-generation.server";
+import { selectActiveImageJob } from "@/db/operations/image-selection.server";
 import {
 	buildMatchImagePrompt,
 	queryMatchImage,
@@ -28,7 +29,12 @@ import {
 	submitWarriorPortrait,
 } from "@/db/operations/warrior-portraits.server";
 import { createWarrior, deleteWarrior } from "@/db/operations/warriors.server";
-import { imageGenerationJobs } from "@/db/schema";
+import {
+	events as eventsTable,
+	imageGenerationJobs,
+	matches as matchesTable,
+	warriors as warriorsTable,
+} from "@/db/schema";
 import {
 	GEMINI_IMAGE_MODEL,
 	OPENAI_IMAGE_MODEL,
@@ -83,9 +89,9 @@ describe("image job operations on local D1", () => {
 			.update(imageGenerationJobs)
 			.set({ status: "completed", completedAt: updatedAt })
 			.where(eq(imageGenerationJobs.id, job.jobId));
-		expect(await queryGeneratedImages(db)).toEqual([
-			{ id: job.jobId, prompt: "A ruined city", completedAt: updatedAt },
-		]);
+		// Generic and historical completed jobs are intentionally absent from the
+		// normal gallery until an entity actively selects them.
+		expect(await queryGeneratedImages(db)).toEqual([]);
 	});
 
 	it("timestamps queue failure but never overwrites an advanced consumer state", async () => {
@@ -129,19 +135,17 @@ describe("image job operations on local D1", () => {
 		);
 	});
 
-	it("submits one portrait per warrior and preserves jobs after warrior deletion", async () => {
+	it("submits fresh portraits and preserves jobs after warrior deletion", async () => {
 		const { db } = connection;
 		await createWarband(db, warband());
 		await createWarrior(db, warrior());
 		const queue = { send: vi.fn().mockResolvedValue(undefined) };
 		const result = await submitWarriorPortrait(db, queue, "wa", clock);
 		expect(result).toHaveProperty("job.status", "queued");
-		expect(await queryWarriorPortrait(db, "wa")).toEqual(
-			expect.objectContaining({ status: "queued" }),
-		);
+		expect(await queryWarriorPortrait(db, "wa")).toBeUndefined();
 		await submitWarriorPortrait(db, queue, "wa", clock);
-		expect(queue.send).toHaveBeenCalledTimes(1);
-		expect(await listQueueJobs(db)).toHaveLength(1);
+		expect(queue.send).toHaveBeenCalledTimes(2);
+		expect(await listQueueJobs(db)).toHaveLength(2);
 		expect(await listQueueJobs(db)).toContainEqual(
 			expect.objectContaining({
 				warriorId: "wa",
@@ -151,8 +155,11 @@ describe("image job operations on local D1", () => {
 		);
 		await deleteWarrior(db, { id: "wa" });
 		expect(await queryWarriorPortrait(db, "wa")).toBeUndefined();
-		expect(await listQueueJobs(db)).toContainEqual(
-			expect.objectContaining({ warriorId: null }),
+		expect(await listQueueJobs(db)).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ warriorId: null }),
+				expect.objectContaining({ warriorId: null }),
+			]),
 		);
 		await expect(
 			submitWarriorPortrait(db, queue, "missing", clock),
@@ -178,12 +185,10 @@ describe("image job operations on local D1", () => {
 		const second = await submitEventImage(db, queue, "event", clock);
 
 		expect(first).toHaveProperty("job.status", "queued");
-		expect(second).toHaveProperty("job.jobId", first.job?.jobId);
+		expect(second.job?.jobId).not.toBe(first.job?.jobId);
 		expect(second).toHaveProperty("job.status", "queued");
-		expect(queue.send).toHaveBeenCalledTimes(1);
-		expect(await queryEventImage(db, "event")).toEqual(
-			expect.objectContaining({ status: "queued" }),
-		);
+		expect(queue.send).toHaveBeenCalledTimes(2);
+		expect(await queryEventImage(db, "event")).toBeUndefined();
 		expect(await listQueueJobs(db)).toContainEqual(
 			expect.objectContaining({
 				eventId: "event",
@@ -221,11 +226,9 @@ describe("image job operations on local D1", () => {
 		const second = await submitCompletedMatchImage(db, queue, "match", clock);
 
 		expect(first).toHaveProperty("job.status", "queued");
-		expect(second).toHaveProperty("job.jobId", first.job?.jobId);
-		expect(queue.send).toHaveBeenCalledTimes(1);
-		expect(await queryMatchImage(db, "match")).toEqual(
-			expect.objectContaining({ status: "queued" }),
-		);
+		expect(second.job?.jobId).not.toBe(first.job?.jobId);
+		expect(queue.send).toHaveBeenCalledTimes(2);
+		expect(await queryMatchImage(db, "match")).toBeUndefined();
 		expect(await listQueueJobs(db)).toContainEqual(
 			expect.objectContaining({
 				matchId: "match",
@@ -298,9 +301,7 @@ describe("image job operations on local D1", () => {
 			await submitCompletedMatchImage(db, queue, "match", clock),
 		).toHaveProperty("job.status", "queued");
 		expect(queue.send).toHaveBeenCalledTimes(1);
-		expect(await queryMatchImage(db, "match")).toEqual(
-			expect.objectContaining({ status: "queued" }),
-		);
+		expect(await queryMatchImage(db, "match")).toBeUndefined();
 	});
 
 	it("ignores match updates that cannot change the outcome", () => {
@@ -311,7 +312,7 @@ describe("image job operations on local D1", () => {
 		expect(affectsMatchOutcome({ winnerWarbandId: null })).toBe(true);
 	});
 
-	it("re-delivers stranded jobs instead of reporting them as submitted", async () => {
+	it("keeps stranded jobs and creates fresh later requests", async () => {
 		const { db } = connection;
 		await seedMatch(db);
 		await createEvent(db, { ...event(), notes: "wa felled wb." });
@@ -341,26 +342,41 @@ describe("image job operations on local D1", () => {
 		expect(strandedEvent).toHaveProperty("job.status", "enqueue_failed");
 		expect(strandedMatch).toHaveProperty("job.status", "enqueue_failed");
 
-		expect(await submitEventImage(db, working, "event", clock)).toEqual({
-			job: { jobId: strandedEvent.job?.jobId, status: "queued" },
-		});
-		expect(
-			await submitCompletedMatchImage(db, working, "match", clock),
-		).toEqual({ job: { jobId: strandedMatch.job?.jobId, status: "queued" } });
-
-		// Retried in place: no duplicate rows, and the prompts are the stored ones.
+		const nextEvent = await submitEventImage(db, working, "event", clock);
+		const nextMatch = await submitCompletedMatchImage(
+			db,
+			working,
+			"match",
+			clock,
+		);
+		expect(nextEvent.job?.jobId).not.toBe(strandedEvent.job?.jobId);
+		expect(nextMatch.job?.jobId).not.toBe(strandedMatch.job?.jobId);
 		expect(working.send).toHaveBeenCalledTimes(2);
-		expect(await listQueueJobs(db)).toHaveLength(2);
-		expect(await queryEventImage(db, "event")).toEqual({
-			jobId: strandedEvent.job?.jobId,
-			status: "queued",
-			error: null,
-		});
-		expect(await queryMatchImage(db, "match")).toEqual({
-			jobId: strandedMatch.job?.jobId,
-			status: "queued",
-			error: null,
-		});
+		expect(await listQueueJobs(db)).toHaveLength(4);
+		expect(await queryEventImage(db, "event")).toBeUndefined();
+		expect(await queryMatchImage(db, "match")).toBeUndefined();
+	});
+
+	it("re-delivers only the original enqueue-failed job", async () => {
+		const { db } = connection;
+		const failed = await enqueueImageGeneration(
+			db,
+			{ send: vi.fn().mockRejectedValue(new Error("uncertain")) },
+			{ prompt: "Original snapshot", model: GEMINI_IMAGE_MODEL },
+			clock,
+		);
+		const send = vi.fn().mockResolvedValue(undefined);
+
+		await retryImageGeneration(db, { send }, failed.jobId, clock);
+
+		expect(send).toHaveBeenCalledExactlyOnceWith({ jobId: failed.jobId });
+		expect(await listQueueJobs(db)).toEqual([
+			expect.objectContaining({
+				id: failed.jobId,
+				prompt: "Original snapshot",
+				status: "queued",
+			}),
+		]);
 	});
 
 	it("never re-delivers a job the consumer already owns", async () => {
@@ -379,6 +395,7 @@ describe("image job operations on local D1", () => {
 
 		await retryImageGeneration(db, queue, jobId, clock);
 
+		expect(queue.send).toHaveBeenCalledTimes(1);
 		expect(await listQueueJobs(db)).toContainEqual(
 			expect.objectContaining({ id: jobId, status: "processing" }),
 		);
@@ -464,6 +481,13 @@ describe("image job operations on local D1", () => {
 				completedAt: "2026-09-10T12:00:03.000Z",
 			},
 			{
+				id: "historical-portrait",
+				prompt: "Old portrait",
+				status: "completed",
+				warriorId: "wa",
+				completedAt: "2026-09-10T12:00:05.000Z",
+			},
+			{
 				id: "generic-job",
 				prompt: "Generic",
 				status: "completed",
@@ -477,6 +501,19 @@ describe("image job operations on local D1", () => {
 			},
 		]);
 
+		await db
+			.update(warriorsTable)
+			.set({ activeImageJobId: "portrait-job" })
+			.where(eq(warriorsTable.id, "wa"));
+		await db
+			.update(eventsTable)
+			.set({ activeImageJobId: "event-job" })
+			.where(eq(eventsTable.id, "event"));
+		await db
+			.update(matchesTable)
+			.set({ activeImageJobId: "match-job" })
+			.where(eq(matchesTable.id, "match"));
+
 		expect(await queryProjectorImages(db)).toEqual([
 			expect.objectContaining({ jobId: "match-job", matchId: "match" }),
 			expect.objectContaining({ jobId: "event-job", eventId: "event" }),
@@ -484,7 +521,44 @@ describe("image job operations on local D1", () => {
 		]);
 	});
 
-	it("bounds and orders diagnostic and completed-image listings", async () => {
+	it("auto-selects only the first success and validates manual active selection", async () => {
+		const { db } = connection;
+		await createWarband(db, warband());
+		await createWarrior(db, warrior());
+		await db.insert(imageGenerationJobs).values([
+			{ id: "first", prompt: "First", status: "queued", warriorId: "wa" },
+			{ id: "second", prompt: "Second", status: "queued", warriorId: "wa" },
+			{ id: "failed", prompt: "Failed", status: "failed", warriorId: "wa" },
+		]);
+
+		await db
+			.update(imageGenerationJobs)
+			.set({ status: "completed", completedAt: "2026-09-10T12:00:01.000Z" })
+			.where(eq(imageGenerationJobs.id, "first"));
+		await db
+			.update(imageGenerationJobs)
+			.set({ status: "completed", completedAt: "2026-09-10T12:00:02.000Z" })
+			.where(eq(imageGenerationJobs.id, "second"));
+
+		expect(await queryWarriorPortrait(db, "wa")).toEqual(
+			expect.objectContaining({ jobId: "first" }),
+		);
+		await expect(
+			selectActiveImageJob(db, "warrior", "wa", "failed"),
+		).rejects.toThrow("completed");
+		await expect(
+			selectActiveImageJob(db, "warrior", "missing", "second"),
+		).rejects.toThrow("completed");
+		await selectActiveImageJob(db, "warrior", "wa", "second");
+		expect(await queryWarriorPortrait(db, "wa")).toEqual(
+			expect.objectContaining({ jobId: "second" }),
+		);
+		expect((await queryGeneratedImages(db)).map((image) => image.id)).toEqual([
+			"second",
+		]);
+	});
+
+	it("bounds diagnostic listings while excluding unselected completed history", async () => {
 		const { db } = connection;
 		const rows = Array.from({ length: 102 }, (_, i) => ({
 			id: String(i).padStart(3, "0"),
@@ -501,8 +575,6 @@ describe("image job operations on local D1", () => {
 			String(101 - i).padStart(3, "0"),
 		);
 		expect((await listQueueJobs(db)).map((row) => row.id)).toEqual(expectedIds);
-		expect((await queryGeneratedImages(db)).map((row) => row.id)).toEqual(
-			expectedIds,
-		);
+		expect((await queryGeneratedImages(db)).map((row) => row.id)).toEqual([]);
 	});
 });

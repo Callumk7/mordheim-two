@@ -1,0 +1,1518 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "5bc9bcd3-0e6e-4020-9935-a59cbea28a0b",
+  "prevId": "e76ead6a-4346-4477-adda-db2cfeee5590",
+  "tables": {
+    "app_settings": {
+      "name": "app_settings",
+      "columns": {
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "campaigns": {
+      "name": "campaigns",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "equipment": {
+      "name": "equipment",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "cost": {
+          "name": "cost",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "availability": {
+          "name": "availability",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "range": {
+          "name": "range",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "strength": {
+          "name": "strength",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "special_rules": {
+          "name": "special_rules",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "save": {
+          "name": "save",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_url": {
+          "name": "source_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source_text": {
+          "name": "source_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "equipment_type_valid": {
+          "name": "equipment_type_valid",
+          "value": "\"equipment\".\"type\" IN ('weapon', 'armour')"
+        }
+      }
+    },
+    "events": {
+      "name": "events",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "campaign_id": {
+          "name": "campaign_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "match_id": {
+          "name": "match_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "attacker_warband_id": {
+          "name": "attacker_warband_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "attacker_warrior_id": {
+          "name": "attacker_warrior_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "defender_warband_id": {
+          "name": "defender_warband_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "defender_warrior_id": {
+          "name": "defender_warrior_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "is_processed": {
+          "name": "is_processed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "outcome": {
+          "name": "outcome",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "resolved_at": {
+          "name": "resolved_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "voided_at": {
+          "name": "voided_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "void_reason": {
+          "name": "void_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "active_image_job_id": {
+          "name": "active_image_job_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "events_campaign_idx": {
+          "name": "events_campaign_idx",
+          "columns": [
+            "campaign_id"
+          ],
+          "isUnique": false
+        },
+        "events_active_image_job_idx": {
+          "name": "events_active_image_job_idx",
+          "columns": [
+            "active_image_job_id"
+          ],
+          "isUnique": false
+        },
+        "events_match_idx": {
+          "name": "events_match_idx",
+          "columns": [
+            "match_id"
+          ],
+          "isUnique": false
+        },
+        "events_attacker_warrior_idx": {
+          "name": "events_attacker_warrior_idx",
+          "columns": [
+            "attacker_warrior_id"
+          ],
+          "isUnique": false
+        },
+        "events_defender_warrior_idx": {
+          "name": "events_defender_warrior_idx",
+          "columns": [
+            "defender_warrior_id"
+          ],
+          "isUnique": false
+        },
+        "events_attacker_warband_idx": {
+          "name": "events_attacker_warband_idx",
+          "columns": [
+            "attacker_warband_id"
+          ],
+          "isUnique": false
+        },
+        "events_defender_warband_idx": {
+          "name": "events_defender_warband_idx",
+          "columns": [
+            "defender_warband_id"
+          ],
+          "isUnique": false
+        },
+        "events_effective_death_defender_unique": {
+          "name": "events_effective_death_defender_unique",
+          "columns": [
+            "defender_warrior_id"
+          ],
+          "isUnique": true,
+          "where": "\"events\".\"outcome\" = 'Death' AND \"events\".\"resolved_at\" IS NOT NULL AND \"events\".\"voided_at\" IS NULL"
+        }
+      },
+      "foreignKeys": {
+        "events_campaign_id_campaigns_id_fk": {
+          "name": "events_campaign_id_campaigns_id_fk",
+          "tableFrom": "events",
+          "tableTo": "campaigns",
+          "columnsFrom": [
+            "campaign_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "events_match_id_matches_id_fk": {
+          "name": "events_match_id_matches_id_fk",
+          "tableFrom": "events",
+          "tableTo": "matches",
+          "columnsFrom": [
+            "match_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "events_attacker_warband_id_warbands_id_fk": {
+          "name": "events_attacker_warband_id_warbands_id_fk",
+          "tableFrom": "events",
+          "tableTo": "warbands",
+          "columnsFrom": [
+            "attacker_warband_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "events_attacker_warrior_id_warriors_id_fk": {
+          "name": "events_attacker_warrior_id_warriors_id_fk",
+          "tableFrom": "events",
+          "tableTo": "warriors",
+          "columnsFrom": [
+            "attacker_warrior_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "events_defender_warband_id_warbands_id_fk": {
+          "name": "events_defender_warband_id_warbands_id_fk",
+          "tableFrom": "events",
+          "tableTo": "warbands",
+          "columnsFrom": [
+            "defender_warband_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "events_defender_warrior_id_warriors_id_fk": {
+          "name": "events_defender_warrior_id_warriors_id_fk",
+          "tableFrom": "events",
+          "tableTo": "warriors",
+          "columnsFrom": [
+            "defender_warrior_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "events_active_image_job_id_image_generation_jobs_id_fk": {
+          "name": "events_active_image_job_id_image_generation_jobs_id_fk",
+          "tableFrom": "events",
+          "tableTo": "image_generation_jobs",
+          "columnsFrom": [
+            "active_image_job_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "events_campaign_match_fk": {
+          "name": "events_campaign_match_fk",
+          "tableFrom": "events",
+          "tableTo": "matches",
+          "columnsFrom": [
+            "campaign_id",
+            "match_id"
+          ],
+          "columnsTo": [
+            "campaign_id",
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "events_campaign_attacker_warband_fk": {
+          "name": "events_campaign_attacker_warband_fk",
+          "tableFrom": "events",
+          "tableTo": "warbands",
+          "columnsFrom": [
+            "campaign_id",
+            "attacker_warband_id"
+          ],
+          "columnsTo": [
+            "campaign_id",
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "events_campaign_defender_warband_fk": {
+          "name": "events_campaign_defender_warband_fk",
+          "tableFrom": "events",
+          "tableTo": "warbands",
+          "columnsFrom": [
+            "campaign_id",
+            "defender_warband_id"
+          ],
+          "columnsTo": [
+            "campaign_id",
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "events_campaign_attacker_warrior_fk": {
+          "name": "events_campaign_attacker_warrior_fk",
+          "tableFrom": "events",
+          "tableTo": "warriors",
+          "columnsFrom": [
+            "campaign_id",
+            "attacker_warrior_id"
+          ],
+          "columnsTo": [
+            "campaign_id",
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "events_campaign_defender_warrior_fk": {
+          "name": "events_campaign_defender_warrior_fk",
+          "tableFrom": "events",
+          "tableTo": "warriors",
+          "columnsFrom": [
+            "campaign_id",
+            "defender_warrior_id"
+          ],
+          "columnsTo": [
+            "campaign_id",
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "events_attacker_participant_fk": {
+          "name": "events_attacker_participant_fk",
+          "tableFrom": "events",
+          "tableTo": "warband_matches",
+          "columnsFrom": [
+            "match_id",
+            "attacker_warband_id"
+          ],
+          "columnsTo": [
+            "match_id",
+            "warband_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "events_defender_participant_fk": {
+          "name": "events_defender_participant_fk",
+          "tableFrom": "events",
+          "tableTo": "warband_matches",
+          "columnsFrom": [
+            "match_id",
+            "defender_warband_id"
+          ],
+          "columnsTo": [
+            "match_id",
+            "warband_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "events_attacker_warrior_membership_fk": {
+          "name": "events_attacker_warrior_membership_fk",
+          "tableFrom": "events",
+          "tableTo": "warriors",
+          "columnsFrom": [
+            "attacker_warband_id",
+            "attacker_warrior_id"
+          ],
+          "columnsTo": [
+            "warband_id",
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "events_defender_warrior_membership_fk": {
+          "name": "events_defender_warrior_membership_fk",
+          "tableFrom": "events",
+          "tableTo": "warriors",
+          "columnsFrom": [
+            "defender_warband_id",
+            "defender_warrior_id"
+          ],
+          "columnsTo": [
+            "warband_id",
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "events_distinct_warbands": {
+          "name": "events_distinct_warbands",
+          "value": "\"events\".\"attacker_warband_id\" <> \"events\".\"defender_warband_id\""
+        }
+      }
+    },
+    "image_generation_jobs": {
+      "name": "image_generation_jobs",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "prompt": {
+          "name": "prompt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "refined_prompt": {
+          "name": "refined_prompt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "model": {
+          "name": "model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'gemini-3.1-flash-image'"
+        },
+        "warrior_id": {
+          "name": "warrior_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "event_id": {
+          "name": "event_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "match_id": {
+          "name": "match_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "error": {
+          "name": "error",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "lease_token": {
+          "name": "lease_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "lease_expires_at": {
+          "name": "lease_expires_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "result_key": {
+          "name": "result_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "result_mime_type": {
+          "name": "result_mime_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "result_bytes": {
+          "name": "result_bytes",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "result_etag": {
+          "name": "result_etag",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "result_model": {
+          "name": "result_model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "image_generation_jobs_status_completed_at_idx": {
+          "name": "image_generation_jobs_status_completed_at_idx",
+          "columns": [
+            "status",
+            "completed_at"
+          ],
+          "isUnique": false
+        },
+        "image_generation_jobs_warrior_id_idx": {
+          "name": "image_generation_jobs_warrior_id_idx",
+          "columns": [
+            "warrior_id"
+          ],
+          "isUnique": false
+        },
+        "image_generation_jobs_event_id_idx": {
+          "name": "image_generation_jobs_event_id_idx",
+          "columns": [
+            "event_id"
+          ],
+          "isUnique": false
+        },
+        "image_generation_jobs_match_id_idx": {
+          "name": "image_generation_jobs_match_id_idx",
+          "columns": [
+            "match_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "image_generation_jobs_warrior_id_warriors_id_fk": {
+          "name": "image_generation_jobs_warrior_id_warriors_id_fk",
+          "tableFrom": "image_generation_jobs",
+          "tableTo": "warriors",
+          "columnsFrom": [
+            "warrior_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "image_generation_jobs_event_id_events_id_fk": {
+          "name": "image_generation_jobs_event_id_events_id_fk",
+          "tableFrom": "image_generation_jobs",
+          "tableTo": "events",
+          "columnsFrom": [
+            "event_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "image_generation_jobs_match_id_matches_id_fk": {
+          "name": "image_generation_jobs_match_id_matches_id_fk",
+          "tableFrom": "image_generation_jobs",
+          "tableTo": "matches",
+          "columnsFrom": [
+            "match_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "matches": {
+      "name": "matches",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "campaign_id": {
+          "name": "campaign_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "scenario": {
+          "name": "scenario",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'Scheduled'"
+        },
+        "result": {
+          "name": "result",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'Pending'"
+        },
+        "winner_warband_id": {
+          "name": "winner_warband_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "active_image_job_id": {
+          "name": "active_image_job_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "matches_campaign_id_unique": {
+          "name": "matches_campaign_id_unique",
+          "columns": [
+            "campaign_id",
+            "id"
+          ],
+          "isUnique": true
+        },
+        "matches_campaign_idx": {
+          "name": "matches_campaign_idx",
+          "columns": [
+            "campaign_id"
+          ],
+          "isUnique": false
+        },
+        "matches_active_image_job_idx": {
+          "name": "matches_active_image_job_idx",
+          "columns": [
+            "active_image_job_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "matches_campaign_id_campaigns_id_fk": {
+          "name": "matches_campaign_id_campaigns_id_fk",
+          "tableFrom": "matches",
+          "tableTo": "campaigns",
+          "columnsFrom": [
+            "campaign_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "matches_active_image_job_id_image_generation_jobs_id_fk": {
+          "name": "matches_active_image_job_id_image_generation_jobs_id_fk",
+          "tableFrom": "matches",
+          "tableTo": "image_generation_jobs",
+          "columnsFrom": [
+            "active_image_job_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "matches_winner_participant_fk": {
+          "name": "matches_winner_participant_fk",
+          "tableFrom": "matches",
+          "tableTo": "warband_matches",
+          "columnsFrom": [
+            "id",
+            "winner_warband_id"
+          ],
+          "columnsTo": [
+            "match_id",
+            "warband_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "matches_result_winner_consistent": {
+          "name": "matches_result_winner_consistent",
+          "value": "(\"matches\".\"result\" = 'Pending' AND \"matches\".\"winner_warband_id\" IS NULL) OR (\"matches\".\"result\" = 'Draw' AND \"matches\".\"winner_warband_id\" IS NULL) OR (\"matches\".\"result\" = 'Victory' AND \"matches\".\"winner_warband_id\" IS NOT NULL)"
+        }
+      }
+    },
+    "warband_matches": {
+      "name": "warband_matches",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "warband_id": {
+          "name": "warband_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "match_id": {
+          "name": "match_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "warband_matches_match_warband_unique": {
+          "name": "warband_matches_match_warband_unique",
+          "columns": [
+            "match_id",
+            "warband_id"
+          ],
+          "isUnique": true
+        },
+        "warband_matches_warband_idx": {
+          "name": "warband_matches_warband_idx",
+          "columns": [
+            "warband_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "warband_matches_warband_id_warbands_id_fk": {
+          "name": "warband_matches_warband_id_warbands_id_fk",
+          "tableFrom": "warband_matches",
+          "tableTo": "warbands",
+          "columnsFrom": [
+            "warband_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "warband_matches_match_id_matches_id_fk": {
+          "name": "warband_matches_match_id_matches_id_fk",
+          "tableFrom": "warband_matches",
+          "tableTo": "matches",
+          "columnsFrom": [
+            "match_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "warbands": {
+      "name": "warbands",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "campaign_id": {
+          "name": "campaign_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "faction": {
+          "name": "faction",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "bio": {
+          "name": "bio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "gold": {
+          "name": "gold",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "rating": {
+          "name": "rating",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "wins": {
+          "name": "wins",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "is_archived": {
+          "name": "is_archived",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "warbands_campaign_id_unique": {
+          "name": "warbands_campaign_id_unique",
+          "columns": [
+            "campaign_id",
+            "id"
+          ],
+          "isUnique": true
+        },
+        "warbands_campaign_idx": {
+          "name": "warbands_campaign_idx",
+          "columns": [
+            "campaign_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "warbands_campaign_id_campaigns_id_fk": {
+          "name": "warbands_campaign_id_campaigns_id_fk",
+          "tableFrom": "warbands",
+          "tableTo": "campaigns",
+          "columnsFrom": [
+            "campaign_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "warbands_archive_pair_consistent": {
+          "name": "warbands_archive_pair_consistent",
+          "value": "(\"warbands\".\"is_archived\" = 0 AND \"warbands\".\"archived_at\" IS NULL) OR (\"warbands\".\"is_archived\" = 1 AND \"warbands\".\"archived_at\" IS NOT NULL)"
+        }
+      }
+    },
+    "warrior_equipment": {
+      "name": "warrior_equipment",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "warrior_id": {
+          "name": "warrior_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "equipment_id": {
+          "name": "equipment_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "warrior_equipment_warrior_idx": {
+          "name": "warrior_equipment_warrior_idx",
+          "columns": [
+            "warrior_id"
+          ],
+          "isUnique": false
+        },
+        "warrior_equipment_equipment_idx": {
+          "name": "warrior_equipment_equipment_idx",
+          "columns": [
+            "equipment_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "warrior_equipment_warrior_id_warriors_id_fk": {
+          "name": "warrior_equipment_warrior_id_warriors_id_fk",
+          "tableFrom": "warrior_equipment",
+          "tableTo": "warriors",
+          "columnsFrom": [
+            "warrior_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "warrior_equipment_equipment_id_equipment_id_fk": {
+          "name": "warrior_equipment_equipment_id_equipment_id_fk",
+          "tableFrom": "warrior_equipment",
+          "tableTo": "equipment",
+          "columnsFrom": [
+            "equipment_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "warriors": {
+      "name": "warriors",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "campaign_id": {
+          "name": "campaign_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "class": {
+          "name": "class",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'Alive'"
+        },
+        "warband_id": {
+          "name": "warband_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "active_image_job_id": {
+          "name": "active_image_job_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "knocked": {
+          "name": "knocked",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "injuries": {
+          "name": "injuries",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "knocked_downs": {
+          "name": "knocked_downs",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "is_archived": {
+          "name": "is_archived",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "archived_at": {
+          "name": "archived_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "warriors_warband_id_unique": {
+          "name": "warriors_warband_id_unique",
+          "columns": [
+            "warband_id",
+            "id"
+          ],
+          "isUnique": true
+        },
+        "warriors_campaign_id_unique": {
+          "name": "warriors_campaign_id_unique",
+          "columns": [
+            "campaign_id",
+            "id"
+          ],
+          "isUnique": true
+        },
+        "warriors_campaign_idx": {
+          "name": "warriors_campaign_idx",
+          "columns": [
+            "campaign_id"
+          ],
+          "isUnique": false
+        },
+        "warriors_active_image_job_idx": {
+          "name": "warriors_active_image_job_idx",
+          "columns": [
+            "active_image_job_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "warriors_campaign_id_campaigns_id_fk": {
+          "name": "warriors_campaign_id_campaigns_id_fk",
+          "tableFrom": "warriors",
+          "tableTo": "campaigns",
+          "columnsFrom": [
+            "campaign_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "warriors_warband_id_warbands_id_fk": {
+          "name": "warriors_warband_id_warbands_id_fk",
+          "tableFrom": "warriors",
+          "tableTo": "warbands",
+          "columnsFrom": [
+            "warband_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "warriors_active_image_job_id_image_generation_jobs_id_fk": {
+          "name": "warriors_active_image_job_id_image_generation_jobs_id_fk",
+          "tableFrom": "warriors",
+          "tableTo": "image_generation_jobs",
+          "columnsFrom": [
+            "active_image_job_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "warriors_campaign_warband_fk": {
+          "name": "warriors_campaign_warband_fk",
+          "tableFrom": "warriors",
+          "tableTo": "warbands",
+          "columnsFrom": [
+            "campaign_id",
+            "warband_id"
+          ],
+          "columnsTo": [
+            "campaign_id",
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "warriors_archive_pair_consistent": {
+          "name": "warriors_archive_pair_consistent",
+          "value": "(\"warriors\".\"is_archived\" = 0 AND \"warriors\".\"archived_at\" IS NULL) OR (\"warriors\".\"is_archived\" = 1 AND \"warriors\".\"archived_at\" IS NOT NULL)"
+        }
+      }
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}

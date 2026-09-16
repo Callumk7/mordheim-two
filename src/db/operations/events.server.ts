@@ -13,8 +13,9 @@ import {
 	validateEventMembership,
 } from "@/db/validation/event";
 
-export function listEvents(db: Database) {
-	return db.select().from(events).orderBy(events.createdAt);
+export async function listEvents(db: Database) {
+	const rows = await db.select().from(events).orderBy(events.createdAt);
+	return rows.map(({ activeImageJobId: _activeImageJobId, ...event }) => event);
 }
 
 async function assertEventMembership(

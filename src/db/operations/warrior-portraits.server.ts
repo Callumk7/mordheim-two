@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import type { Database } from "@/db/index.server";
 import { type Clock, systemClock } from "@/db/operations/clock";
 import { enqueueImageGeneration } from "@/db/operations/image-generation.server";
@@ -9,19 +9,34 @@ import {
 	OPENAI_IMAGE_MODEL,
 } from "@/db/validation/image-generation";
 
-export function queryWarriorPortrait(
+const portraitSelection = {
+	jobId: imageGenerationJobs.id,
+	status: imageGenerationJobs.status,
+	error: imageGenerationJobs.error,
+};
+
+export async function queryWarriorPortrait(
 	db: Pick<Database, "select">,
 	warriorId: string,
 ) {
 	return db
-		.select({
-			jobId: imageGenerationJobs.id,
-			status: imageGenerationJobs.status,
-			error: imageGenerationJobs.error,
-		})
+		.select(portraitSelection)
+		.from(imageGenerationJobs)
+		.innerJoin(warriors, eq(warriors.activeImageJobId, imageGenerationJobs.id))
+		.where(eq(warriors.id, warriorId))
+		.get();
+}
+
+export function queryWarriorPortraitHistory(
+	db: Pick<Database, "select">,
+	warriorId: string,
+) {
+	return db
+		.select(portraitSelection)
 		.from(imageGenerationJobs)
 		.where(eq(imageGenerationJobs.warriorId, warriorId))
-		.get();
+		.orderBy(desc(imageGenerationJobs.createdAt), desc(imageGenerationJobs.id))
+		.all();
 }
 
 export function buildWarriorPortraitPrompt(context: {
@@ -75,8 +90,6 @@ export async function submitWarriorPortrait(
 		return {
 			error: "Warrior or parent warband no longer exists.",
 		} as const;
-	const existing = await queryWarriorPortrait(db, warriorId);
-	if (existing) return { job: existing };
 	const built = buildWarriorPortraitPrompt(context);
 	if (built.error) return { error: built.error } as const;
 	const job = await enqueueImageGeneration(

@@ -12,8 +12,9 @@ import {
 	type MatchWithParticipantsSchema,
 } from "@/db/validation/match";
 
-export function listMatches(db: Database) {
-	return db.select().from(matches).orderBy(matches.createdAt);
+export async function listMatches(db: Database) {
+	const rows = await db.select().from(matches).orderBy(matches.createdAt);
+	return rows.map(({ activeImageJobId: _activeImageJobId, ...match }) => match);
 }
 
 export async function createMatch(
