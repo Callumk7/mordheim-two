@@ -191,8 +191,18 @@ function AssignSkillDialog({
 		}
 	}
 
+	function handleOpenChange(nextIsOpen: boolean) {
+		onOpenChange(nextIsOpen);
+		if (!nextIsOpen) {
+			setDialogError(undefined);
+			setSkillId(undefined);
+			setName("");
+			setDescription("");
+		}
+	}
+
 	return (
-		<Dialog isOpen={isOpen} onOpenChange={onOpenChange}>
+		<Dialog isOpen={isOpen} onOpenChange={handleOpenChange}>
 			<DialogHeader>
 				<DialogTitle>Assign skill</DialogTitle>
 				<DialogDescription>
