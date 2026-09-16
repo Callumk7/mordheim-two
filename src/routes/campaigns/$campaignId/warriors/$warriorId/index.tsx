@@ -6,7 +6,9 @@ import {
 import { EntityHeader, EntityToolbar } from "@/components/shared/entity-chrome";
 import { CombatStatValue, StatTile } from "@/components/shared/stat-display";
 import { Typography } from "@/components/shared/typography";
+import { Card, CardContent } from "@/components/ui/card";
 import { WarriorEquipment } from "@/components/warrior-equipment";
+import { WarriorForm } from "@/components/warrior-form";
 import { WarriorPortrait } from "@/components/warrior-portrait";
 import { getCollections } from "@/db-collections";
 import { useWarriorMutations } from "@/db-collections/mutations/warriors";
@@ -18,8 +20,6 @@ import {
 } from "@/db-collections/projections";
 import { useWarriorDetails } from "@/db-collections/queries";
 import { getWarriorPortrait } from "@/server/warrior-portraits";
-import { Card, CardContent } from "@/components/ui/card";
-import { WarriorForm } from "@/components/warrior-form";
 
 export const Route = createFileRoute(
 	"/campaigns/$campaignId/warriors/$warriorId/",
