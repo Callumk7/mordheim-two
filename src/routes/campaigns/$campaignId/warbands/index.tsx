@@ -29,7 +29,7 @@ export const Route = createFileRoute("/campaigns/$campaignId/warbands/")({
 
 const initialValues: WarbandFormValues = {
 	name: "",
-	faction: "Mercenaries",
+	faction: "",
 	bio: "",
 	gold: 500,
 	rating: 100,

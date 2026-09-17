@@ -40,6 +40,7 @@ export type ProjectorHighlight = {
 	attackerName: string;
 	defenderId: string;
 	defenderName: string;
+	notes: string | null;
 	createdAt: string;
 	resolvedAt: string | null;
 };
@@ -55,11 +56,20 @@ export type ProjectorImageJob = {
 export type ProjectorImage = {
 	jobId: string;
 	type: "warrior" | "event" | "match";
+	warriorId: string | null;
+	eventId: string | null;
+	matchId: string | null;
 	eyebrow: string;
 	title: string;
 	description: string;
 	alt: string;
+	notes: string | null;
 	completedAt: string | null;
+};
+
+export type IllustratedMatch = {
+	match: ProjectorMatch;
+	image: ProjectorImage;
 };
 
 export type ProjectorData = {
@@ -72,10 +82,24 @@ export type ProjectorData = {
 	};
 	highlights: ProjectorHighlight[];
 	images: ProjectorImage[];
+	illustratedEvents: ProjectorImage[];
+	illustratedMatches: IllustratedMatch[];
 	ticker: string[];
 };
 
 export type BreakingAlert = ProjectorHighlight;
+
+export function pickRandomItem<T>(
+	items: readonly T[],
+	random: () => number = Math.random,
+): T | undefined {
+	if (items.length === 0) return undefined;
+	const sample = random();
+	const index = Number.isFinite(sample)
+		? Math.min(items.length - 1, Math.max(0, Math.floor(sample * items.length)))
+		: 0;
+	return items[index];
+}
 
 export function parseRotationSeconds(value: unknown) {
 	// Router's JSON search parser supplies numbers for unquoted query values.
@@ -213,13 +237,22 @@ export function projectProjectorData(
 	};
 
 	const highlights = projectProjectorHighlights(input).slice(0, 6);
+	const images = projectProjectorImages(input, imageJobs, projectedMatches);
+	const matchById = new Map(projectedMatches.map((match) => [match.id, match]));
 
 	return {
 		standings,
 		warriors,
 		matches,
 		highlights,
-		images: projectProjectorImages(input, imageJobs, projectedMatches),
+		images,
+		illustratedEvents: images.filter((image) => image.type === "event"),
+		illustratedMatches: images.flatMap((image) => {
+			if (image.type !== "match" || image.matchId === null) return [];
+			const match = matchById.get(image.matchId);
+			if (!match || match.status !== "Completed") return [];
+			return [{ match, image }];
+		}),
 		ticker: buildTicker(standings, matches.live, highlights),
 	};
 }
@@ -275,10 +308,14 @@ export function projectProjectorImages(
 				{
 					jobId: job.jobId,
 					type: "match",
+					warriorId: null,
+					eventId: null,
+					matchId: job.matchId,
 					eyebrow: "Match illustration",
 					title: match.name,
 					description: `${match.participantNames.join(" vs ") || "Participants pending"} · ${match.scenario}${winner ? ` · ${winner} victorious` : ""}`,
 					alt: `Illustration of ${match.name}`,
+					notes: null,
 					completedAt: job.completedAt,
 				},
 			];
@@ -290,10 +327,14 @@ export function projectProjectorImages(
 				{
 					jobId: job.jobId,
 					type: "event",
+					warriorId: null,
+					eventId: job.eventId,
+					matchId: null,
 					eyebrow: `${highlight.phase} illustration`,
 					title: `${highlight.attackerName} → ${highlight.defenderName}`,
 					description: highlight.matchName,
 					alt: `${highlight.attackerName} inflicting ${highlight.phase.toLowerCase()} on ${highlight.defenderName}`,
+					notes: highlight.notes,
 					completedAt: job.completedAt,
 				},
 			];
@@ -305,10 +346,14 @@ export function projectProjectorImages(
 				{
 					jobId: job.jobId,
 					type: "warrior",
+					warriorId: job.warriorId,
+					eventId: null,
+					matchId: null,
 					eyebrow: "Warrior portrait",
 					title: warrior.name,
 					description: `${warrior.class} · ${warbandById.get(warrior.warbandId)?.name ?? "Unknown warband"}`,
 					alt: `Portrait of ${warrior.name}`,
+					notes: null,
 					completedAt: job.completedAt,
 				},
 			];
@@ -339,6 +384,7 @@ function projectProjectorHighlights(input: ProjectorInput) {
 					defenderId: event.defenderWarriorId,
 					defenderName:
 						warriorById.get(event.defenderWarriorId)?.name ?? "Unknown warrior",
+					notes: event.notes?.trim() || null,
 					createdAt: event.createdAt,
 					resolvedAt: event.resolvedAt,
 				},

@@ -9,6 +9,7 @@ import {
 	getCurrentAlertKeys,
 	type ProjectorInput,
 	parseRotationSeconds,
+	pickRandomItem,
 	projectProjectorData,
 } from "@/lib/projector";
 
@@ -119,6 +120,13 @@ function input(events: Event[] = [event()]): ProjectorInput {
 }
 
 describe("projector rotation", () => {
+	it("picks a random item from the available pool", () => {
+		expect(pickRandomItem([])).toBeUndefined();
+		expect(pickRandomItem(["a", "b", "c"], () => 0)).toBe("a");
+		expect(pickRandomItem(["a", "b", "c"], () => 0.99)).toBe("c");
+		expect(pickRandomItem(["a", "b", "c"], () => Number.NaN)).toBe("a");
+	});
+
 	it("validates and clamps the rotation query value", () => {
 		expect(parseRotationSeconds(undefined)).toBe(DEFAULT_ROTATION_SECONDS);
 		expect(parseRotationSeconds("not-a-number")).toBe(DEFAULT_ROTATION_SECONDS);
@@ -213,6 +221,84 @@ describe("projector data", () => {
 				alt: "Illustration of The Crossing",
 			}),
 		]);
+	});
+
+	it("features illustrated events and completed match images", () => {
+		const campaign = {
+			...input([
+				{ ...event("Death"), notes: "Otto caught Skritch in the open." },
+			]),
+			matches: [
+				{
+					...match("Completed"),
+					result: "Victory" as const,
+					winnerWarbandId: "red",
+				},
+			],
+		};
+		const data = projectProjectorData(campaign, [
+			{
+				jobId: "portrait-job",
+				warriorId: "attacker",
+				eventId: null,
+				matchId: null,
+				completedAt: timestamp,
+			},
+			{
+				jobId: "event-job",
+				warriorId: null,
+				eventId: "event",
+				matchId: null,
+				completedAt: timestamp,
+			},
+			{
+				jobId: "match-job",
+				warriorId: null,
+				eventId: null,
+				matchId: "match",
+				completedAt: timestamp,
+			},
+		]);
+
+		expect(data.illustratedEvents).toEqual([
+			expect.objectContaining({
+				jobId: "event-job",
+				type: "event",
+				eventId: "event",
+				title: "Aldred → Berta",
+				notes: "Otto caught Skritch in the open.",
+			}),
+		]);
+		expect(data.illustratedMatches).toEqual([
+			{
+				match: expect.objectContaining({
+					id: "match",
+					status: "Completed",
+					result: "Victory",
+					winnerName: "Red",
+				}),
+				image: expect.objectContaining({
+					jobId: "match-job",
+					type: "match",
+					matchId: "match",
+				}),
+			},
+		]);
+	});
+
+	it("does not feature in-progress match images as recent matches", () => {
+		const data = projectProjectorData(input(), [
+			{
+				jobId: "match-job",
+				warriorId: null,
+				eventId: null,
+				matchId: "match",
+				completedAt: timestamp,
+			},
+		]);
+
+		expect(data.images).toHaveLength(1);
+		expect(data.illustratedMatches).toEqual([]);
 	});
 
 	it("omits generic and orphaned image jobs from campaign frames", () => {

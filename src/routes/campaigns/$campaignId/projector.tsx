@@ -15,22 +15,24 @@ import {
 	UserRound,
 	Zap,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { CombatStatValue } from "@/components/shared/stat-display";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import "@/projector.css";
 import { type AppCollections, getCollections } from "@/db-collections";
-import type { ProjectorWarrior } from "@/lib/projector";
 import {
 	type BreakingAlert,
 	findBreakingAlerts,
 	getCurrentAlertKeys,
+	type IllustratedMatch,
 	type ProjectorData,
 	type ProjectorHighlight,
 	type ProjectorInput,
 	type ProjectorMatch,
+	type ProjectorWarrior,
 	parseRotationSeconds,
+	pickRandomItem,
 	projectProjectorData,
 } from "@/lib/projector";
 import { getProjectorImages } from "@/server/projector-images";
@@ -43,6 +45,8 @@ const SEGMENTS = [
 	"Warrior spotlight",
 	"Match center",
 	"Highlights",
+	"Event highlight",
+	"Recent match",
 	"Campaign imagery",
 ] as const;
 
@@ -240,7 +244,9 @@ function ProjectorPage() {
 							setRotationCount((current) => current + 1);
 						}}
 					>
-						<span className="rundown-number">0{index + 1}</span>
+						<span className="rundown-number">
+							{String(index + 1).padStart(2, "0")}
+						</span>
 						{segment}
 						{index === segmentIndex && !activeAlert && (
 							<span
@@ -440,9 +446,31 @@ function Segment({
 			return <MatchCenter data={data} page={spotlightIndex} />;
 		case 3:
 			return <Highlights highlights={data.highlights} />;
+		case 4:
+			return <EventHighlight data={data} />;
+		case 5:
+			return <RecentMatch data={data} />;
 		default:
 			return <CampaignImagery data={data} index={spotlightIndex} />;
 	}
+}
+
+function useRandomPick<T>(items: readonly T[], getId: (item: T) => string) {
+	const [pickedId, setPickedId] = useState<string | null>(() => {
+		const picked = pickRandomItem(items);
+		return picked ? getId(picked) : null;
+	});
+	const idKey = items.map(getId).join("\0");
+	const stillValid =
+		pickedId !== null && items.some((item) => getId(item) === pickedId);
+
+	useEffect(() => {
+		if (stillValid) return;
+		const ids = idKey.length === 0 ? [] : idKey.split("\0");
+		setPickedId(pickRandomItem(ids) ?? null);
+	}, [idKey, stillValid]);
+
+	return items.find((item) => getId(item) === pickedId);
 }
 
 function SegmentHeading({
@@ -698,6 +726,73 @@ function Highlights({ highlights }: { highlights: ProjectorHighlight[] }) {
 	);
 }
 
+function EventHighlight({ data }: { data: ProjectorData }) {
+	const image = useRandomPick(
+		data.illustratedEvents,
+		(eventImage) => eventImage.jobId,
+	);
+	return (
+		<div className="flex h-full flex-col">
+			<SegmentHeading eyebrow="From the streets" title="Event highlight" />
+			{image ? (
+				<ProjectorImageFrame image={image}>
+					<p className="mt-6 text-[clamp(1rem,1.7vw,1.5rem)] text-muted-foreground">
+						{image.description}
+					</p>
+					{image.notes ? (
+						<p className="mt-6 text-[clamp(1.05rem,1.9vw,1.7rem)] leading-snug">
+							{image.notes}
+						</p>
+					) : null}
+				</ProjectorImageFrame>
+			) : (
+				<EmptyState message="No illustrated events are available." />
+			)}
+		</div>
+	);
+}
+
+function RecentMatch({ data }: { data: ProjectorData }) {
+	const featured = useRandomPick(
+		data.illustratedMatches,
+		(item) => item.match.id,
+	);
+	return (
+		<div className="flex h-full flex-col">
+			<SegmentHeading eyebrow="After the dust settled" title="Recent match" />
+			{featured ? (
+				<RecentMatchFrame featured={featured} />
+			) : (
+				<EmptyState message="No completed match illustrations are available." />
+			)}
+		</div>
+	);
+}
+
+function matchResultLabel(match: ProjectorMatch) {
+	if (match.result === "Victory") {
+		return `${match.winnerName ?? "Unknown warband"} won`;
+	}
+	return match.result;
+}
+
+function RecentMatchFrame({ featured }: { featured: IllustratedMatch }) {
+	const { match, image } = featured;
+	return (
+		<ProjectorImageFrame image={image}>
+			<p className="mt-6 text-[clamp(1rem,1.7vw,1.5rem)] font-semibold">
+				{match.participantNames.join(" vs ") || "Participants pending"}
+			</p>
+			<p className="mt-2 text-[clamp(1rem,1.7vw,1.5rem)] text-muted-foreground">
+				Scenario: {match.scenario}
+			</p>
+			<p className="mt-8 text-[clamp(1.1rem,2vw,2rem)] font-black uppercase tracking-[0.12em] text-primary">
+				Result: {matchResultLabel(match)}
+			</p>
+		</ProjectorImageFrame>
+	);
+}
+
 function CampaignImagery({
 	data,
 	index,
@@ -722,8 +817,10 @@ function CampaignImagery({
 }
 
 function ProjectorImageFrame({
+	children,
 	image,
 }: {
+	children?: ReactNode;
 	image: ProjectorData["images"][number];
 }) {
 	const [imageFailed, setImageFailed] = useState(false);
@@ -748,12 +845,16 @@ function ProjectorImageFrame({
 				<h2 className="mt-3 font-mordheim text-[clamp(2.5rem,6vw,6rem)] uppercase italic leading-[0.9]">
 					{image.title}
 				</h2>
-				<p className="mt-6 text-[clamp(1rem,1.7vw,1.5rem)] text-muted-foreground">
-					{image.description}
-				</p>
-				<p className="mt-8 text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
-					Frame {imageKindLabel(image.type)} · {image.type} image
-				</p>
+				{children ?? (
+					<>
+						<p className="mt-6 text-[clamp(1rem,1.7vw,1.5rem)] text-muted-foreground">
+							{image.description}
+						</p>
+						<p className="mt-8 text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">
+							Frame {imageKindLabel(image.type)} · {image.type} image
+						</p>
+					</>
+				)}
 			</div>
 		</article>
 	);
