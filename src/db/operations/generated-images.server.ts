@@ -11,7 +11,12 @@ export const PROJECTOR_IMAGE_LIMIT = 30;
 
 export function queryGeneratedImages(db: Pick<DrizzleD1Database, "select">) {
 	return db
-		.select({ id: jobs.id, prompt: jobs.prompt, completedAt: jobs.completedAt })
+		.select({
+			id: jobs.id,
+			prompt: jobs.prompt,
+			refinedPrompt: jobs.refinedPrompt,
+			completedAt: jobs.completedAt,
+		})
 		.from(jobs)
 		.leftJoin(warriors, eq(warriors.activeImageJobId, jobs.id))
 		.leftJoin(events, eq(events.activeImageJobId, jobs.id))

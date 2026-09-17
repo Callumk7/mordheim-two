@@ -46,10 +46,10 @@ describe("generated image listing", () => {
 			INSERT INTO campaigns (id, name) VALUES ('campaign', 'Campaign');
 			INSERT INTO warbands (id, campaign_id, name, faction) VALUES ('band', 'campaign', 'Band', 'Reikland');
 			INSERT INTO warriors (id, campaign_id, name, class, warband_id) VALUES ('warrior', 'campaign', 'Marta', 'Champion', 'band');
-			INSERT INTO image_generation_jobs (id, prompt, status, completed_at, warrior_id) VALUES
-				('history', 'Historical portrait', 'completed', '2026-01-02T00:00:00.000Z', 'warrior'),
-				('active', 'Active portrait', 'completed', '2026-01-01T00:00:00.000Z', 'warrior'),
-				('generic', 'Generic image', 'completed', '2026-01-03T00:00:00.000Z', NULL);
+			INSERT INTO image_generation_jobs (id, prompt, refined_prompt, status, completed_at, warrior_id) VALUES
+				('history', 'Historical portrait', 'Historical refined', 'completed', '2026-01-02T00:00:00.000Z', 'warrior'),
+				('active', 'Active portrait', 'Active refined', 'completed', '2026-01-01T00:00:00.000Z', 'warrior'),
+				('generic', 'Generic image', 'Generic refined', 'completed', '2026-01-03T00:00:00.000Z', NULL);
 			UPDATE warriors SET active_image_job_id = 'active' WHERE id = 'warrior';
 		`);
 
@@ -57,6 +57,7 @@ describe("generated image listing", () => {
 			{
 				id: "active",
 				prompt: "Active portrait",
+				refinedPrompt: "Active refined",
 				completedAt: "2026-01-01T00:00:00.000Z",
 			},
 		]);

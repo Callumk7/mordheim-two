@@ -97,42 +97,45 @@ function GeneratedImagesPage() {
 				</Card>
 			) : (
 				<ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-					{images.map((image) => (
-						<li key={`${image.id}:${refreshKey}`} className="min-w-0">
-							<Card size="sm">
-								<CardContent className="space-y-3">
-									<DialogTrigger>
-										<Button
-											variant="ghost"
-											className="h-auto w-full rounded-xl p-0"
-											aria-label={`Enlarge image: ${image.prompt}`}
-										>
-											<GeneratedImage id={image.id} prompt={image.prompt} />
-										</Button>
-										<Dialog className="max-h-[90dvh]" size="lg">
-											<DialogTitle className="pr-8">
-												Generated image
-											</DialogTitle>
-											<GeneratedImage
-												id={image.id}
-												prompt={image.prompt}
-												enlarged
-											/>
-											<p className="break-words whitespace-pre-wrap">
-												{image.prompt}
-											</p>
-										</Dialog>
-									</DialogTrigger>
-									<p className="text-sm break-words whitespace-pre-wrap">
-										{image.prompt}
-									</p>
-									<p className="text-xs text-muted-foreground">
-										Completed (UTC): {image.completedAt ?? "Unknown"}
-									</p>
-								</CardContent>
-							</Card>
-						</li>
-					))}
+					{images.map((image) => {
+						const caption = image.refinedPrompt ?? image.prompt;
+						return (
+							<li key={`${image.id}:${refreshKey}`} className="min-w-0">
+								<Card size="sm">
+									<CardContent className="space-y-3">
+										<DialogTrigger>
+											<Button
+												variant="ghost"
+												className="h-auto w-full rounded-xl p-0"
+												aria-label={`Enlarge image: ${caption}`}
+											>
+												<GeneratedImage id={image.id} prompt={caption} />
+											</Button>
+											<Dialog className="max-h-[90dvh]" size="lg">
+												<DialogTitle className="pr-8">
+													Generated image
+												</DialogTitle>
+												<GeneratedImage
+													id={image.id}
+													prompt={caption}
+													enlarged
+												/>
+												<p className="break-words whitespace-pre-wrap">
+													{caption}
+												</p>
+											</Dialog>
+										</DialogTrigger>
+										<p className="text-sm break-words whitespace-pre-wrap">
+											{caption}
+										</p>
+										<p className="text-xs text-muted-foreground">
+											Completed (UTC): {image.completedAt ?? "Unknown"}
+										</p>
+									</CardContent>
+								</Card>
+							</li>
+						);
+					})}
 				</ul>
 			)}
 			<p className="text-sm text-muted-foreground">
