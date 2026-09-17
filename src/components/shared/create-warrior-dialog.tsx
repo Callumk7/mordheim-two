@@ -32,6 +32,7 @@ export function CreateWarriorDialog({
 					class: "",
 					status: "Alive",
 					warbandId: warband.id,
+					experience: 0,
 					knocked: 0,
 					injuries: 0,
 					knockedDowns: 0,

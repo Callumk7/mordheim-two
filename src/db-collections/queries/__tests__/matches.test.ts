@@ -100,6 +100,7 @@ function warrior(id: string, warbandId: string, name = id): Warrior {
 		class: "Hero",
 		status: "Alive",
 		warbandId,
+		experience: 0,
 		knocked: 0,
 		injuries: 0,
 		knockedDowns: 0,

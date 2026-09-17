@@ -45,6 +45,7 @@ function warrior(id: string, name: string, warbandId: string): Warrior {
 		description: null,
 		status: "Alive",
 		warbandId,
+		experience: 0,
 		knocked: 0,
 		injuries: 0,
 		knockedDowns: 0,

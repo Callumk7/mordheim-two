@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { WarriorEquipment } from "@/components/warrior-equipment";
 import { WarriorForm } from "@/components/warrior-form";
 import { WarriorPortrait } from "@/components/warrior-portrait";
+import { WarriorSkills } from "@/components/warrior-skills";
 import { getCollections } from "@/db-collections";
 import { useWarriorMutations } from "@/db-collections/mutations/warriors";
 import {
@@ -99,6 +100,8 @@ function WarriorDetailPage() {
 				portrait={portrait}
 			/>
 
+			<WarriorSkills collections={collections} warriorId={warrior.id} />
+
 			<WarriorEquipment collections={collections} warriorId={warrior.id} />
 
 			<Card className="mt-7">
@@ -107,6 +110,11 @@ function WarriorDetailPage() {
 						Combat stats
 					</Typography>
 					<dl className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
+						<StatTile
+							label="Experience"
+							value={`${warrior.experience} XP`}
+							variant="compact"
+						/>
 						<StatTile
 							label="Status"
 							value={combat.isDead ? "Dead" : "Alive"}

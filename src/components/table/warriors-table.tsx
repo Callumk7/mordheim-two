@@ -69,6 +69,10 @@ export function WarriorsTable({
 					(row) => (row.combat.isDead ? "Dead" : row.status),
 					{ id: "status", header: "Status" },
 				),
+				columnHelper.accessor("experience", {
+					header: "Experience",
+					meta: { align: "end" },
+				}),
 				columnHelper.accessor((row) => row.combat.injuriesGiven, {
 					id: "injuriesGiven",
 					header: "Injuries given",

@@ -136,6 +136,7 @@ export const warriors = sqliteTable(
 			() => imageGenerationJobs.id,
 			{ onDelete: "set null" },
 		),
+		experience: integer("experience").notNull().default(0),
 		knocked: integer("knocked").notNull().default(0),
 		injuries: integer("injuries").notNull().default(0), // TODO: add an injury table
 		knockedDowns: integer("knocked_downs").notNull().default(0),
@@ -185,6 +186,41 @@ export const equipment = sqliteTable(
 	},
 	(table) => [
 		check("equipment_type_valid", sql`${table.type} IN ('weapon', 'armour')`),
+	],
+);
+
+export const skills = sqliteTable(
+	"skills",
+	{
+		id: text("id").primaryKey(),
+		name: text("name").notNull(),
+		description: text("description").notNull(),
+		createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+		updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+	},
+	(table) => [uniqueIndex("skills_name_unique").on(table.name)],
+);
+
+export const warriorSkills = sqliteTable(
+	"warrior_skills",
+	{
+		id: text("id").primaryKey(),
+		warriorId: text("warrior_id")
+			.notNull()
+			.references(() => warriors.id, { onDelete: "cascade" }),
+		skillId: text("skill_id")
+			.notNull()
+			.references(() => skills.id, { onDelete: "cascade" }),
+		createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+		updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+	},
+	(table) => [
+		uniqueIndex("warrior_skills_warrior_skill_unique").on(
+			table.warriorId,
+			table.skillId,
+		),
+		index("warrior_skills_warrior_idx").on(table.warriorId),
+		index("warrior_skills_skill_idx").on(table.skillId),
 	],
 );
 
@@ -398,6 +434,22 @@ export const warriorsRelations = relations(warriors, ({ many, one }) => ({
 		references: [warbands.id],
 	}),
 	equipment: many(warriorEquipment),
+	skills: many(warriorSkills),
+}));
+
+export const skillsRelations = relations(skills, ({ many }) => ({
+	warriors: many(warriorSkills),
+}));
+
+export const warriorSkillsRelations = relations(warriorSkills, ({ one }) => ({
+	warrior: one(warriors, {
+		fields: [warriorSkills.warriorId],
+		references: [warriors.id],
+	}),
+	skill: one(skills, {
+		fields: [warriorSkills.skillId],
+		references: [skills.id],
+	}),
 }));
 
 export const equipmentRelations = relations(equipment, ({ many }) => ({

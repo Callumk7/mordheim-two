@@ -40,12 +40,13 @@ describe("warrior operations on local D1", () => {
 		]);
 		await operations.updateWarrior(
 			db,
-			{ id: "wa", changes: { description: "Green hood" } },
+			{ id: "wa", changes: { description: "Green hood", experience: 8 } },
 			clock,
 		);
 		expect(await operations.listWarriors(db)).toContainEqual({
 			...warrior(),
 			description: "Green hood",
+			experience: 8,
 			updatedAt,
 		});
 		await createEquipment(db, equipment());

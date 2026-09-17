@@ -66,6 +66,7 @@ export function warriorsQuery(
 				description: warrior.description,
 				status: warrior.status,
 				warbandId: warrior.warbandId,
+				experience: warrior.experience,
 				knocked: warrior.knocked,
 				injuries: warrior.injuries,
 				knockedDowns: warrior.knockedDowns,

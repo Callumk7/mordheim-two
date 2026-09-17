@@ -37,6 +37,7 @@ function warrior(
 		class: "Hero",
 		status,
 		warbandId,
+		experience: 0,
 		knocked: 0,
 		injuries: 0,
 		knockedDowns: 0,

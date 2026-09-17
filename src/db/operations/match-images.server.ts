@@ -32,6 +32,7 @@ type MatchImageWarrior = {
 	description?: string | null;
 	status: string;
 	warbandId: string;
+	experience: number;
 	knocked: number;
 	injuries: number;
 	knockedDowns: number;
@@ -91,6 +92,7 @@ export function buildMatchImagePrompt(context: {
 					description: clip(warrior.description, 180),
 					status: warrior.status,
 					warbandId: clip(warrior.warbandId, 120),
+					experience: warrior.experience,
 					knocked: warrior.knocked,
 					injuries: warrior.injuries,
 					knockedDowns: warrior.knockedDowns,
